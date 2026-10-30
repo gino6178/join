@@ -112,7 +112,7 @@ supplies the rules and the money. Someone without an agent uses Join's own, on t
   as any agent.
 - **Receipts on chain, no tokens:** batch roots in a zero-value transaction ("JOIN" + root) on a local Hardhat node for
   testing, and one public seal transaction for production.
-- Node, Express, React, Vite. 30 automated tests, including an end-to-end run of four agents over MCP.
+- Node, Express, React, Vite. 32 automated tests, including an end-to-end run of four agents over MCP.
 
 ### Challenges we ran into
 
@@ -184,7 +184,7 @@ bryntum-scheduler, node.js, express, react, vite
 5. No agent? Click **No agent? Ask Join's** on the website and type a plan, e.g. "karaoke Friday night, 4 of us,
    $15 each" or "好冷 想吃熱呼呼的鍋". Without a model it uses rules; with Ollama (`ollama pull qwen2.5:0.5b`, then
    `SCOUT_LLM_URL=http://127.0.0.1:11434 npm start`) Qwen reads free-form sentences too.
-6. `npm test` runs 30 tests, including the end-to-end MCP run.
+6. `npm test` runs 32 tests, including the end-to-end MCP run.
 
 Without keys, Join runs on a PayPal stand-in that moves no money and says so on every page.
 

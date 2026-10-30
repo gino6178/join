@@ -58,7 +58,7 @@ same operations with the person's session.
 | Website | `web/src/**` (about 1,000 lines) |
 | Examples | `examples/scripted-agent.mjs`, `claude-agent.mjs`, `venue-agent.mjs`, `toolkit-cli.mjs`, `verify-receipt.mjs` |
 | Website agent | `web/src/scout/understand.js`, `web/src/scout/agent.js`, `web/src/components/AgentDrawer.jsx` |
-| Tests | `api/test/*.test.js`: 30 tests |
+| Tests | `api/test/*.test.js`: 32 tests |
 
 **Money is integer cents inside, USD strings outward.** Times are the town's local time: the process sets `TZ` from
 `world.json` (`America/Los_Angeles`), and the website renders in that zone (`world.js`, `web/src/api.js`).
@@ -234,10 +234,10 @@ For people who don't bring an agent. A drawer ("No agent? Ask Join's") asks what
 
 ## 11. Tests (api/test/, `npm test`)
 
-There are 30, using Node's test runner, and they run against the stand-in with state in memory.
+There are 32, using Node's test runner, and they run against the stand-in with state in memory.
 - **Negotiation (12):** pricing, the floor never leaking, the serious-offer schedule, lowballs, agreeing at an offer, the mandate before the venue, organizer-only actions, expiry and quota, walking away, alternatives' ordering, bad input, venue policy edits.
 - **Receipts (3):** Merkle proofs for 1 to 13 leaves; signature, tamper detection and hashed players; a seal over several batches.
-- **Website agent (4):** the rules reader in English and Chinese, weekends and named friends, a brief built over several messages; and against a stand-in Ollama, that Qwen fills in only the activity, only when the rules found none, and that an answer outside the list is ignored.
+- **Website agent (6):** the sentences our test agents found the rules got wrong, and the checks on a brief from the browser; also the rules reader in English and Chinese, weekends and named friends, a brief built over several messages; and against a stand-in Ollama, that Qwen fills in only the activity, only when the rules found none, and that an answer outside the list is ignored.
 - **Settlement (10):**
   - guarantee first, invitations before any charge, the full lock and payout
   - timeout with the organizer covering, release, void and refund cancellation
@@ -266,6 +266,7 @@ There are 30, using Node's test runner, and they run against the stand-in with s
 **Join's website agent (30 Oct 2026):**
 - Deployed with `deploy/start.sh` on a Linux machine (RTX 3090) on the local network, Ollama serving `qwen2.5:0.5b`, PayPal sandbox and the local chain. From the website: "let's go sing somewhere saturday night, four of us, $15 each" gave three options; the agent offered $29.16 on a $32.40 ask, the venue countered $29.40, the agent accepted, and PayPal authorized the guarantee (sandbox test card). "好冷 想吃熱呼呼的鍋 週六晚上 四個人 每人20塊" became hot pot through Qwen; the venue's $25.20 a person was over Alex's $15 limit, and the agent said so without haggling.
 - Qwen's answers, warm: about 40-350 ms each. In 15 test messages it found karaoke, BBQ ("grilling meat outdoors"), board games ("cards and dice at a cafe") and hot pot, and answered "none" for "我想跟朋友出去玩". It missed "想找人玩解謎 把我們關在房間裡那種" (escape room), which the rules now catch.
+- Two Claude Sonnet agents then tested the deployed website agent: one through the drawer in a browser (7 conversations in English and Chinese, 3 deals), one over HTTP (41 single messages, 5 conversations, about 220 requests including malformed and hostile ones). The tool allow-list, the spending limit, ownership checks and prompt injection held. Their findings were fixed: clock times, next week's weekdays, written dates, party sizes and Chinese budgets in the rules (the 22 sentences the rules got wrong are now regression tests); named friends silently replaced by others; friends added later not growing the group; replies switching to English; a card promising to haggle where the limit made it impossible; stack traces and server paths in body-parser errors; an unchecked brief from the browser.
 - An earlier version ran Qwen2.5 1.5B in the browser with WebLLM; its kernels failed to compile on an NVIDIA Pascal GPU in Chrome 152, which is one reason it moved to the server.
 
 **Built and tested only against the stand-in:**
@@ -308,7 +309,7 @@ There are 30, using Node's test runner, and they run against the stand-in with s
 npm run setup          # api, web, examples; builds the website
 npm start              # http://localhost:8790 (the stand-in without keys)
 npm run demo           # four agents over MCP; JOIN_ACTIVITY=karaoke for another plan
-npm test               # 30 tests
+npm test               # 32 tests
 npm run chain          # optional: a local Hardhat node for receipt anchoring
 ```
 
