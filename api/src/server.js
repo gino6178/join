@@ -27,7 +27,7 @@ const PORT = +(process.env.PORT || 8790);
 const PUBLIC_URL = (process.env.PUBLIC_URL || `http://localhost:${PORT}`).replace(/\/$/, "");
 const DEMO = process.env.DEMO_SIGNIN !== "0";
 const real = process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET && process.env.PAYPAL_MODE !== "mock";
-const pp = real ? paypal({ clientId: process.env.PAYPAL_CLIENT_ID, secret: process.env.PAYPAL_CLIENT_SECRET }) : mockPaypal({ publicUrl: PUBLIC_URL });
+const pp = real ? paypal({ clientId: process.env.PAYPAL_CLIENT_ID, secret: process.env.PAYPAL_CLIENT_SECRET, testCard: process.env.PAYPAL_TEST_CARD === "1" }) : mockPaypal({ publicUrl: PUBLIC_URL });
 settle.configure({ paypal: pp, url: PUBLIC_URL });
 
 const app = express();

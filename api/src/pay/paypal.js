@@ -7,7 +7,12 @@
 // same call to PayPal, not a second charge.
 const BASE = "https://api-m.sandbox.paypal.com";
 
-export function paypal({ clientId, secret, brand = "Join" }) {
+// A sandbox stand-in for the payer: PayPal's published sandbox test card (developer.paypal.com/tools/sandbox/card-testing),
+// so a demo can authorize every share without anyone signing in to a sandbox buyer account. Sandbox only, and only
+// with PAYPAL_TEST_CARD=1; the sandbox merchant must have card processing enabled.
+const TEST_CARD = { number: "4012888888881881", expiry: "2030-12", security_code: "123", name: "Sandbox Test Payer" };
+
+export function paypal({ clientId, secret, brand = "Join", testCard = false }) {
   let token = null, until = 0;
   async function auth() {
     if (token && Date.now() < until - 60e3) return token;
@@ -30,12 +35,15 @@ export function paypal({ clientId, secret, brand = "Join" }) {
   const authOf = (order) => order.purchase_units?.[0]?.payments?.authorizations?.[0] || null;
 
   return {
-    mode: "sandbox",
-    async createOrder({ amount, currency = "USD", reference, description, returnUrl, cancelUrl, vaultId = null, requestId }) {
+    mode: "sandbox", testCard,
+    async createOrder({ amount, currency = "USD", reference, description, returnUrl, cancelUrl, vaultId = null, requestId, card = false }) {
       const payment_source = vaultId
         ? { paypal: { vault_id: vaultId } }
+        : card && testCard ? { card: TEST_CARD }
         : { paypal: { experience_context: { brand_name: brand, shipping_preference: "NO_SHIPPING", user_action: "CONTINUE", return_url: returnUrl, cancel_url: cancelUrl } } };
-      const j = await call("POST", "/v2/checkout/orders", { intent: "AUTHORIZE", purchase_units: [{ reference_id: reference, custom_id: reference, description: description.slice(0, 127), amount: money(amount, currency) }], payment_source }, requestId);
+      let j = await call("POST", "/v2/checkout/orders", { intent: "AUTHORIZE", purchase_units: [{ reference_id: reference, custom_id: reference, description: description.slice(0, 127), amount: money(amount, currency) }], payment_source }, requestId);
+      // (a card order may come back approved but not yet authorized)
+      if (!authOf(j) && card && testCard && j.status === "APPROVED") j = await call("POST", `/v2/checkout/orders/${j.id}/authorize`, {}, `${requestId}:auth`);
       const a = authOf(j);
       return { id: j.id, status: j.status, approveUrl: link(j, "payer-action") || link(j, "approve"), authorization: a ? { id: a.id, status: a.status, expiresAt: a.expiration_time } : null };
     },

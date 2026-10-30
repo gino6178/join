@@ -88,17 +88,17 @@ async function startPayment(b, playerId, amount, role) {
   if (b.payments[playerId]) return b.payments[playerId];
   const v = venue(b.venue), vault = db.data.vaults[playerId], m = getMandate(playerId);
   const f = fits(playerId, { venue: b.venue, share: amount, spentThisWeek: spentAround(playerId, b) });
-  const auto = !!(vault && m.autopay && f.ok);
-  const p = { role, amount, status: "creating", via: auto ? "vault" : "approval", orderId: null, approveUrl: null, authorizationId: null, captureId: null, net: null, why: auto ? null : !vault || !m.autopay ? "approve in PayPal" : `needs your approval: ${f.why.join("; ")}` };
+  const auto = !!(vault && m.autopay && f.ok), card = !auto && !!pp.testCard;
+  const p = { role, amount, status: "creating", via: auto ? "vault" : card ? "sandbox test card" : "approval", orderId: null, approveUrl: null, authorizationId: null, captureId: null, net: null, why: auto ? null : !vault || !m.autopay ? "approve in PayPal" : `needs your approval: ${f.why.join("; ")}` };
   b.payments[playerId] = p; db.save();
   const description = `${v.name}, ${b.activity}, ${b.date} ${b.start} (${role === "organizer" ? "the whole booking, guaranteed by the organizer" : "your share"})`;
   try {
-    const o = await paypalStep(b, `order:${playerId}`, (rid) => pp.createOrder({ amount, reference: `${b.id}:${playerId}`, description, returnUrl: `${publicUrl}/paypal/return?booking=${b.id}&player=${playerId}`, cancelUrl: `${publicUrl}/paypal/cancel?booking=${b.id}&player=${playerId}`, vaultId: auto ? vault.tokenId : null, requestId: rid }));
+    const o = await paypalStep(b, `order:${playerId}`, (rid) => pp.createOrder({ amount, reference: `${b.id}:${playerId}`, description, returnUrl: `${publicUrl}/paypal/return?booking=${b.id}&player=${playerId}`, cancelUrl: `${publicUrl}/paypal/cancel?booking=${b.id}&player=${playerId}`, vaultId: auto ? vault.tokenId : null, card, requestId: rid }));
     p.orderId = o.id; p.approveUrl = o.approveUrl;
     if (o.authorization) { p.authorizationId = o.authorization.id; p.status = "authorized"; }
     else p.status = "awaiting_approval";
     db.save();
-    if (p.status === "authorized") note(b, { kind: "agent", player: playerId }, "authorized", `${name(playerId)}'s agent authorized $${usd(amount)} from their saved PayPal, within their limit.`);
+    if (p.status === "authorized") note(b, { kind: card ? "paypal" : "agent", player: playerId }, "authorized", card ? `PayPal sandbox: $${usd(amount)} authorized for ${name(playerId)} with PayPal's test card (a demo stand-in for their approval).` : `${name(playerId)}'s agent authorized $${usd(amount)} from their saved PayPal, within their limit.`);
     else note(b, { kind: "platform" }, "approval_requested", `${name(playerId)} needs to approve $${usd(amount)} in PayPal${role === "organizer" ? " to keep the booking" : " for their share"}.`, { player: playerId });
     await advance(b);
   } catch (e) {
