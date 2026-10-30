@@ -244,3 +244,4 @@ legend { font-size: var(--fs-14); color: var(--ink-2); padding: 0 6px; }
 .drawer-actions { display: flex; gap: var(--s2); }
 .drawer-input { display: flex; gap: var(--s2); padding: var(--s3) var(--s4); border-top: 1px solid var(--rule); }
 .drawer-input input { flex: 1; min-width: 0; font: inherit; padding: 10px 12px; border-radius: var(--r-pill); border: 1px solid var(--rule-strong); background: var(--bg); color: var(--ink); }
+.warn-text { color: var(--bad); font-size: 12px; }

@@ -49,7 +49,7 @@ export function findOptions(a, { activity = "badminton", dates = [], from = null
   if ((from && !isTime(from)) || (to && !isTime(to)) || dates.some((d) => !isDate(d))) return { error: "bad_time", message: "dates are YYYY-MM-DD, from and to HH:MM." };
   const need = Math.max(1, Math.min(11, players | 0));
   const days = dates.length ? dates.slice(0, 7) : Array.from({ length: 7 }, (_, i) => addDays(ymd(now), i));
-  const mine = windows(me.free), others = getWorld().players.filter((p) => p.id !== me.id && (p.interests || []).includes(activity));
+  const mine = windows(me.free), others = getWorld().players.filter((p) => p.id !== me.id && ((p.interests || []).includes(activity) || want.includes(p.id)));
   const opts = [];
   for (const d of days) {
     const date = dateOf(d);
@@ -86,7 +86,7 @@ export function startNegotiation(a, { venue: venueId, activity, date, start, min
   const r = neg.open({ by: a.player, players, venue: venueId, activity, date, start, minutes });
   const v = venue(venueId);
   if (r.error) {
-    record({ actor: by(a), who: [a.player], action: "negotiation_refused", summary: `${said(a)} asked ${v?.name || venueId} for ${activity} on ${date} ${start}: ${r.message}`, data: r.alternatives ? { alternatives: r.alternatives } : null });
+    record({ actor: by(a), who: [a.player], action: "negotiation_refused", summary: v && activity && date && start ? `${said(a)} asked ${v.name} for ${activity} on ${date} ${start}: ${r.message}` : `${said(a)} tried to open a negotiation: ${r.message}`, data: r.alternatives ? { alternatives: r.alternatives } : null });
     return r;
   }
   record({ actor: by(a), who: r.players, action: "negotiation_opened", ref: r.id, summary: `${said(a)} asked ${r.venueName} for a ${getActivity(r.activity).unit} for ${r.activity} on ${r.date} ${r.start} for ${r.players.map(first).join(", ")}. Venue asks $${r.ask} ($${r.share} each)${r.discounts.length ? `, with ${r.discounts.map((d) => d.kind).join(" + ")} discount` : ""}.`, data: { ask: r.ask, list: r.list, ...(r.overBudget ? { overBudget: true, alternatives: r.alternatives } : {}) } });

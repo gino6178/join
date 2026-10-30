@@ -42,7 +42,9 @@ export default function App() {
 
 // No agent of your own? Join's website agent asks what you want and does the rest (components/AgentDrawer.jsx)
 function Scout({ me, info }) {
-  const [open, setOpen] = useState(() => new URLSearchParams(location.hash.split("?")[1] || "").has("agent"));
+  const asked = () => new URLSearchParams(location.hash.split("?")[1] || "").has("agent");
+  const [open, setOpen] = useState(asked);
+  useEffect(() => { const f = () => asked() && setOpen(true); addEventListener("hashchange", f); return () => removeEventListener("hashchange", f); }, []);
   return <>{!open && <button className="btn primary agent-fab" onClick={() => setOpen(true)}><Icon name="spark" size={16} />No agent? Ask Join's</button>}<AgentDrawer me={me} info={info} open={open} onClose={() => setOpen(false)} /></>;
 }
 

@@ -1,0 +1,81 @@
+// What Join's website agent says, in English or Chinese (whichever the person writes in). Venue and people's names stay
+// as they are; prices are always US dollars.
+const ZH_NAME = { badminton: "羽球", tennis: "網球", pickleball: "匹克球", basketball: "籃球", volleyball: "排球", "table tennis": "桌球", karaoke: "唱歌", "escape room": "密室逃脫", "board games": "桌遊", bbq: "烤肉", "hot pot": "火鍋" };
+const ZH_DAY = "日一二三四五六";
+const $ = (x) => `$${(+x).toFixed(2)}`;
+const enDay = (d) => new Date(`${d}T12:00:00Z`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
+const zhDay = (d) => { const x = new Date(`${d}T12:00:00Z`); return `${x.getUTCMonth() + 1}/${x.getUTCDate()}（${ZH_DAY[x.getUTCDay()]}）`; };
+const list = (xs, and) => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} ${and} ${xs.at(-1)}`);
+
+export const WORDS = {
+  en: {
+    day: enDay,
+    hello: (n) => `Hi ${n}. Tell me what you'd like to do with friends (in English or 中文), and I'll find a time and a place, haggle with the venue, and get it ready for PayPal.`,
+    overLimit: (budget, limit) => `You said ${$(budget)} a person, but your limit on Join is ${$(limit)}, so I'll keep to ${$(limit)}. You can change it on the Limits page.`,
+    options: (n, cap) => `Here ${n === 1 ? "is one option" : `are ${n} options`}. I'll aim for ${$(cap)} a person. Pick one and I'll negotiate.`,
+    nothing: (b, act) => `Nothing fits on ${b.dates.map(enDay).join(", ")}${b.from ? ` between ${b.from} and ${b.to}` : ""}: I need ${b.players} friend${b.players === 1 ? "" : "s"} who ${act} and are free then, and a venue with room. Try another day, a wider time, or fewer people.`,
+    likes: (a) => `like ${a}`,
+    notFree: (names) => `${list(names, "and")} ${names.length === 1 ? "isn't" : "aren't"} free then`,
+    why: { free: (n) => `${n} people free`, trip: (m) => `longest trip ${m} min`, discount: (d) => `${d} discount` },
+    card: { asked: "asked", each: "each", haggle: "over your budget, I'll haggle", tooFar: "too far over your limit to haggle", negotiate: "Negotiate this" },
+    talking: (v, d, s) => `Talking to ${v} about ${enDay(d)} ${s}…`,
+    asks: (v, ask, share) => `${v} asks ${$(ask)} (${$(share)} each).`,
+    offered: (o, v, c, fin) => `Offered ${$(o)}. ${v} countered ${$(c)}${fin ? ", best and final" : ""}.`,
+    agreedAt: (o, v) => `Offered ${$(o)}. ${v} agreed.`,
+    saidNo: (v, o) => `${v} said no at ${$(o)}.`,
+    tooFar: (lowest, each, cap, isLimit) => `Even the lowest offer the venue takes seriously (${$(lowest)}, about ${$(each)} each) is over your ${$(cap)} ${isLimit ? "limit" : "budget"}, so I didn't haggle.`,
+    bestOverLimit: (ask, share, limit) => `The best price is ${$(ask)} (${$(share)} each), over your ${$(limit)} limit. I walked away.`,
+    bestOverBudget: (ask, share, cap) => `The best price is ${$(ask)} (${$(share)} each), over your ${$(cap)} budget but within your limit. Accept anyway, or should I look elsewhere?`,
+    closed: (s) => `The negotiation is ${s}.`,
+    deal: (total, each, v) => `Deal: ${$(total)} in total, ${$(each)} each. ${v} holds it while you guarantee the booking in PayPal; your friends' agents are asked to pay their shares.`,
+    others: (xs) => `Other places then: ${xs.join(", ")}. The Map page shows them.`,
+    other: (a) => `${a.name} (${a.bookable === false ? "free, can't be reserved" : `${$(a.share)} each`})`,
+    noOthers: (act, cap) => `No other place has ${act} within ${$(cap)} a person then. Try another time, fewer people, or raise your limit on the Limits page.`,
+    walked: "I walked away.",
+    failed: "That didn't work.",
+    wrong: (m) => `Something went wrong: ${m}`,
+    reset: "Starting over. What would you like to do?",
+    approved: "Approved. Join authorized it with PayPal; nothing is captured until everyone has paid.",
+    authorized: (via) => `PayPal authorized your guarantee (${via}).`,
+    guarantee: (x) => `Guarantee ${$(x)} in PayPal`,
+    accept: (x) => `Accept ${$(x)}`, elsewhere: "Look elsewhere", see: "See the booking", send: "Send", newPlan: "New plan",
+    placeholder: "e.g. hot pot Saturday evening for 5",
+    act: (a) => a,
+  },
+  zh: {
+    day: zhDay,
+    hello: (n) => `嗨 ${n}！想跟朋友做什麼？用中文或英文告訴我，我會找時間和地點、跟場地談價，再準備好 PayPal 付款。`,
+    overLimit: (budget, limit) => `你說每人 ${$(budget)}，但你在 Join 設的上限是每人 ${$(limit)}，我會以 ${$(limit)} 為準；可以到 Limits 頁修改。`,
+    options: (n, cap) => `找到 ${n} 個選項，我會以每人 ${$(cap)} 為目標。選一個，我去談價。`,
+    nothing: (b, act) => `${b.dates.map(zhDay).join("、")}${b.from ? ` ${b.from}–${b.to}` : ""} 沒有合適的：需要 ${b.players} 位${act}而且那時有空的朋友，加上有空位的場地。換一天、放寬時間，或少幾個人試試。`,
+    likes: (a) => `喜歡${ZH_NAME[a] || a}`,
+    notFree: (names) => `${names.join("、")} 那時沒空`,
+    why: { free: (n) => `${n} 人有空`, trip: (m) => `最遠車程 ${m} 分鐘`, discount: (d) => `${d} 折扣` },
+    card: { asked: "開價", each: "每人", haggle: "超過預算，我去談", tooFar: "超出上限太多，談不下來", negotiate: "去談這個" },
+    talking: (v, d, s) => `正在跟 ${v} 談 ${zhDay(d)} ${s} 的價格…`,
+    asks: (v, ask, share) => `${v} 開價 ${$(ask)}（每人 ${$(share)}）。`,
+    offered: (o, v, c, fin) => `我出 ${$(o)}，${v} 還價 ${$(c)}${fin ? "（最後價格）" : ""}。`,
+    agreedAt: (o, v) => `我出 ${$(o)}，${v} 同意了。`,
+    saidNo: (v, o) => `${v} 不接受 ${$(o)}。`,
+    tooFar: (lowest, each, cap, isLimit) => `場地願意考慮的最低出價（${$(lowest)}，每人約 ${$(each)}）也超過你每人 ${$(cap)} 的${isLimit ? "上限" : "預算"}，所以我沒有去談。`,
+    bestOverLimit: (ask, share, limit) => `最好的價格是 ${$(ask)}（每人 ${$(share)}），超過你每人 ${$(limit)} 的上限，我放棄了。`,
+    bestOverBudget: (ask, share, cap) => `最好的價格是 ${$(ask)}（每人 ${$(share)}），超過你每人 ${$(cap)} 的預算，但在上限內。要接受，還是我找別的？`,
+    closed: (s) => `這次議價已經 ${s}。`,
+    deal: (total, each, v) => `成交：總共 ${$(total)}，每人 ${$(each)}。${v} 會先保留，等你在 PayPal 擔保整筆預約；朋友們的 agent 會收到邀請付自己那份。`,
+    others: (xs) => `那時其他地方：${xs.join("、")}。地圖頁有標出來。`,
+    other: (a) => `${a.name}（${a.bookable === false ? "免費、不能預約" : `每人 ${$(a.share)}`}）`,
+    noOthers: (act, cap) => `那時沒有其他地方能在每人 ${$(cap)} 內${ZH_NAME[act] ? `${ZH_NAME[act]}` : act}。換個時間、少幾個人，或到 Limits 頁調高上限。`,
+    walked: "我放棄這個了。",
+    failed: "沒有成功。",
+    wrong: (m) => `出了點問題：${m}`,
+    reset: "重新開始。想做什麼呢？",
+    approved: "已核准。Join 已在 PayPal 授權；等大家都付了才會扣款。",
+    authorized: (via) => `PayPal 已授權你的擔保（${via}）。`,
+    guarantee: (x) => `在 PayPal 擔保 ${$(x)}`,
+    accept: (x) => `接受 ${$(x)}`, elsewhere: "找別的", see: "看預約", send: "送出", newPlan: "新的計畫",
+    placeholder: "例如：週六晚上 5 個人吃火鍋",
+    act: (a) => ZH_NAME[a] || a,
+  },
+};
+// the language of a message: Chinese if it has Chinese characters, English if it has letters, else unchanged
+export const langOf = (text, was = "en") => (/[一-鿿]/.test(text) ? "zh" : /[a-z]/i.test(text) ? "en" : was);

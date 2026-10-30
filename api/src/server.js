@@ -131,7 +131,7 @@ app.post("/api/scout/understand", limit("agent", +(process.env.AGENT_RPM || 120)
   const history = (Array.isArray(req.body?.history) ? req.body.history : []).slice(-8).map((m) => ({ role: m.role === "assistant" ? "assistant" : "user", content: String(m.content || "").slice(0, 500) }));
   if (!history.length) return res.status(400).json({ error: "empty" });
   const w = getWorld();
-  res.json(await scout.understand(history, req.body?.brief && typeof req.body.brief === "object" ? req.body.brief : {}, { activities: w.activities, people: w.players.filter((p) => p.id !== req.player), today: new Date() }));
+  res.json(await scout.understand(history, req.body?.brief && typeof req.body.brief === "object" ? req.body.brief : {}, { activities: w.activities, people: w.players.filter((p) => p.id !== req.player), today: new Date(), lang: req.body?.lang === "zh" ? "zh" : "en" }));
 });
 app.post("/api/scout/:tool", limit("agent", +(process.env.AGENT_RPM || 120)), signedIn, async (req, res) => {
   if (!SCOUT.includes(req.params.tool)) return res.status(404).json({ error: "unknown_tool", tools: SCOUT });
@@ -223,4 +223,10 @@ const WEB = path.join(HERE, "../../web/dist");
 if (fs.existsSync(WEB)) { app.use(express.static(WEB)); app.get(/^\/(?!api|mcp|paypal|a2a|mock-paypal).*/, (req, res) => res.sendFile(path.join(WEB, "index.html"))); }
 
 setInterval(() => settle.tick().catch((e) => console.error("tick", e.message)), +(process.env.TICK_MS || 5000)).unref();
+app.use((err, req, res, next) => {
+  if (res.headersSent) return next(err);
+  const status = err.status || err.statusCode || 500;
+  if (status >= 500) console.error(err);
+  res.status(status).json({ error: status === 413 ? "too_large" : status === 400 ? "bad_json" : "internal", message: status === 413 ? "The request body is too large." : status === 400 ? "The request body isn't valid JSON." : "Something went wrong." });
+});
 app.listen(PORT, () => console.log(`Join on ${PUBLIC_URL}  (PayPal: ${pp.mode}; MCP: ${PUBLIC_URL}/mcp; receipts: ${anchor ? `${anchor.chain}, ${anchor.mode === "each" ? "every batch" : "one seal"}, from ${anchor.address}` : "signed and batched, no chain"}; demo sign-in: ${DEMO ? "on" : "off"})`));

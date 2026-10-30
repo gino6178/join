@@ -5,56 +5,55 @@ import { api } from "../api.js";
 
 const tool = (name, args, model) => api(`/api/scout/${name}`, { method: "POST", body: { ...args, _model: model } }).catch((e) => e.body || { error: "failed", message: e.message });
 
-// Up to three options, each with why it was picked
-export async function search(brief, model) {
+// What a person may pay: their budget, but never more than the limit they set on Join
+export const each = (brief, limit) => (brief.budget != null ? Math.min(brief.budget, limit) : limit);
+// the lowest offer a venue takes seriously is 70% of its ask; the agent's opening offer is 72%
+const SERIOUS = 0.72;
+
+// Up to three options, each with why it was picked, which named friends can't come, and whether haggling can reach it
+export async function search(brief, model, w) {
   const r = await tool("find_options", { activity: brief.activity, dates: brief.dates || [], from: brief.from, to: brief.to, players: brief.players ?? 3, with: brief.with || [] }, model);
   if (r.error) return { error: r.message || r.error };
+  const limit = +r.mandate.perGame, cap = each(brief, limit);
   return {
     options: r.options.slice(0, 3).map((o) => {
-      const share = +o.share, cap = each(brief, +r.mandate.perGame), over = share > cap;
-      const why = [`${o.names.length} people free`, `longest trip ${o.longestTrip} min`];
-      if (o.discounts.length) why.push(`${o.discounts.join(" + ")} discount`);
-      if (brief.with?.length) why.push("the friends you named first");
-      return { ...o, why, over, limit: +r.mandate.perGame };
+      const share = +o.share, ask = +o.askPrice, people = o.players.length;
+      const why = [w.why.free(people), w.why.trip(o.longestTrip), ...o.discounts.map(w.why.discount)];
+      return { ...o, why, limit, missing: (brief.with || []).filter((id) => !o.players.includes(id)),
+        fit: share <= cap ? "ok" : ask * SERIOUS > cap * people ? "tooFar" : "haggle" };
     }),
-    limit: r.mandate.perGame, note: r.note,
+    limit, cap, note: r.note,
   };
 }
 
-// What a person may pay: their budget, but never more than the limit they set on Join
-const each = (brief, limit) => (brief.budget != null ? Math.min(brief.budget, limit) : limit);
-
-// Haggle for one option: open at the venue's ask, offer a serious amount (never under 70% of the ask, which venues
-// ignore), meet halfway on each counter, and accept once the price is within the budget or the venue's last word is in.
-export async function negotiate(o, brief, model, say) {
+// Haggle for one option: open at a serious offer, meet halfway on each counter, accept once the price is within what the
+// person may pay; over their budget but within their limit, ask them; over their limit, walk away (Join would refuse).
+export async function negotiate(o, brief, model, say, w) {
   const n = await tool("start_negotiation", { venue: o.venue, activity: brief.activity, date: o.date, start: o.start, minutes: o.minutes, players: o.players.slice(1) }, model);
   if (n.error) return { error: n.message, alternatives: n.alternatives };
-  say(`${n.venueName} asks $${n.ask} ($${n.share} each).`);
+  say(w.asks(n.venueName, n.ask, n.share));
   const people = n.players.length, cap = each(brief, o.limit), target = cap * people;
-  const capWhy = brief.budget != null && brief.budget <= o.limit ? `your $${cap.toFixed(2)} budget` : `your $${o.limit.toFixed(2)} limit`;
-  // the lowest offer a venue takes seriously is 70% of its ask: below that, haggling can't get there
   if (target < +n.ask * 0.7) {
     await tool("walk_away", { negotiation: n.id }, model);
-    return { error: `Even the lowest serious offer ($${Math.ceil(+n.ask * 0.72)}, about $${(Math.ceil(+n.ask * 0.72) / people).toFixed(2)} each) is over ${capWhy}, so I didn't haggle.` };
+    const lowest = Math.ceil(+n.ask * SERIOUS);
+    return { error: w.tooFar(lowest, lowest / people, cap, !(brief.budget != null && brief.budget < o.limit)) };
   }
   let cur = n;
   for (let i = 0; i < 4 && cur.status === "open" && !cur.final && cur.roundsLeft > 0; i++) {
     const ask = +cur.ask;
     if (ask <= target && i > 0) break;
-    const offer = Math.max(Math.ceil(ask * 0.72), Math.min(target, ask * 0.9));
-    const r = await tool("make_offer", { negotiation: n.id, amount: Math.round(offer * 100) / 100 }, model);
+    const offer = Math.round(Math.max(Math.ceil(ask * SERIOUS), Math.min(target, ask * 0.9)) * 100) / 100;
+    const r = await tool("make_offer", { negotiation: n.id, amount: offer }, model);
     if (r.error) { say(r.message); break; }
     cur = r;
-    if (r.status === "agreed") { say(`Offered $${offer.toFixed(2)}. ${r.venueName} agreed.`); return { deal: r }; }
-    if (r.status === "rejected") return { error: `${r.venueName} said no at $${offer.toFixed(2)}.`, alternatives: r.alternatives };
-    say(`Offered $${offer.toFixed(2)}. ${r.venueName} countered $${r.ask}${r.final ? ", best and final" : ""}.`);
+    if (r.status === "agreed") { say(w.agreedAt(offer, r.venueName)); return { deal: r }; }
+    if (r.status === "rejected") return { error: w.saidNo(r.venueName, offer), alternatives: r.alternatives };
+    say(w.offered(offer, r.venueName, r.ask, r.final));
   }
-  if (cur.status !== "open") return { error: `The negotiation is ${cur.status}.` };
+  if (cur.status !== "open") return { error: w.closed(cur.status) };
   if (+cur.ask > target) {
-    // over the budget but within the limit: the person decides; over the limit: Join would refuse, so don't offer it
-    const share = +cur.ask / people;
-    if (share > o.limit) { await tool("walk_away", { negotiation: n.id }, model); return { error: `The best price is $${cur.ask} ($${cur.share} each), over your $${o.limit.toFixed(2)} limit. I walked away.` }; }
-    return { pending: cur, note: `The best price is $${cur.ask} ($${cur.share} each), over your $${cap.toFixed(2)} budget but within your limit.` };
+    if (+cur.ask / people > o.limit) { await tool("walk_away", { negotiation: n.id }, model); return { error: w.bestOverLimit(cur.ask, cur.share, o.limit) }; }
+    return { pending: cur, note: w.bestOverBudget(cur.ask, cur.share, cap) };
   }
   return acceptDeal(cur, model);
 }

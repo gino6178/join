@@ -46,3 +46,33 @@ test("Qwen on Join's server fills in only the activity, and only when the rules 
     assert.equal(r.brief.activity, undefined); assert.equal(r.reply.includes("想做什麼"), true);
   } finally { delete process.env.SCOUT_LLM_URL; srv.close(); }
 });
+
+test("cases our test agents found: exact times, next week, party sizes, dates, budgets, typos, names added later", () => {
+  const r = (m, b = {}) => byRules(m, b, ctx);
+  assert.deepEqual([r("Let's play badminton next Friday at 7pm").dates, r("Let's play badminton next Friday at 7pm").from], [["2026-11-06"], "19:00"]);
+  assert.deepEqual(r("我想烤肉 下週五 六個人").dates, ["2026-11-06"]);
+  assert.deepEqual([r("volleyball on Monday from 6pm to 8pm").from, r("volleyball on Monday from 6pm to 8pm").to], ["18:00", "20:00"]);
+  assert.equal(r("打羽毛球 星期六下午兩點 四個人").from, "14:00");
+  assert.equal(r("打羽毛球 星期六下午兩點 四個人").players, 3);
+  assert.equal(r("escape room for a group of ten, under $20 each").players, 9);
+  assert.equal(r("hot pot, me plus 2, in 3 days").dates[0], "2026-11-02");
+  assert.deepEqual(r("karaoke on 11/7 at 9 pm").dates, ["2026-11-07"]);
+  assert.deepEqual(r("bbq on the 3rd of November").dates, ["2026-11-03"]);
+  assert.equal(r("table tennis on Sunday morning, just me and one friend").activity, "table tennis");
+  assert.equal(r("唱K 禮拜六 十二個人").players, 11);
+  assert.equal(r("預算每人十五塊").budget, 15);
+  assert.equal(r("hot pot tomorrow, budget 200 total, 4 of us").budget, 50);
+  assert.equal(r("basketball noon tomorrow, $0").budget, undefined);
+  assert.equal(r("我們一起去吃火鍋 週一").players, undefined);
+  assert.equal(r("kareoke tmrw").activity, "karaoke");
+  let b = r("wanna grill meat with Ines and Kenji tomorrow");
+  b = r("ok add Leo too, and Noor", b);
+  assert.equal(b.players, 4);
+});
+
+test("a brief from the browser is checked before use", async () => {
+  const { clean } = await import("../src/scout/understand.js");
+  assert.deepEqual(clean({ players: -5, budget: 1e9, dates: ["x", 1, "9999-99-99", "2026-11-01"], from: "99:99", to: 5, with: "alex", activity: "skydiving", __proto__: { x: 1 }, extra: 1 }, ctx), { dates: ["2026-11-01"] });
+  assert.deepEqual(clean({ players: 3, budget: 12, with: ["hana", "nobody"], activity: "karaoke", from: "18:00" }, ctx), { players: 3, budget: 12, with: ["hana"], activity: "karaoke", from: "18:00" });
+  assert.deepEqual(clean(null, ctx), {});
+});
