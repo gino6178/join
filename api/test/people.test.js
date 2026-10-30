@@ -16,3 +16,19 @@ test("people who join in one crew and area find each other first; without a crew
   for (const opt of ops.findOptions(me, { activity: "karaoke", people: 4 }).options) assert.ok(!opt.players.includes(loner.id));
   people.peopleStore.reset();
 });
+
+test("a crew by invite link, and friends placed by where they really live", () => {
+  people.peopleStore.reset();
+  const ana = people.demoPerson("Ana", { lat: 25.0418, lon: 121.5654 });
+  assert.equal(people.crewOf(ana.id), null);
+  const code = people.crewOf(ana.id, { create: true });
+  assert.match(code, /^c-[0-9a-f]{8}$/);
+  const bo = people.demoPerson("Bo", { crew: code, lat: 25.0418, lon: 121.5754 }); // (1 km east of Ana)
+  assert.ok(bo.area.x > ana.area.x && Math.abs(bo.area.y - ana.area.y) < 0.05);
+  assert.ok(Math.abs((bo.area.x - ana.area.x) * 1.25 - 1.0) < 0.2); // (a kilometre on the ground is a kilometre in the town)
+  assert.deepEqual(bo.geo, { lat: 25.04, lon: 121.58 }); // (only rounded)
+  const cai = people.demoPerson("Cai"); people.joinCrew(cai.id, code);
+  assert.deepEqual(people.crewNames(code).sort(), ["Ana", "Bo", "Cai"]);
+  assert.equal(people.joinCrew("alex", code), null); // (the demo town's residents don't join crews)
+  people.peopleStore.reset();
+});

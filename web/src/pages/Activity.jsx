@@ -27,6 +27,7 @@ export default function Activity({ entries, me }) {
   }, [entries, games.data]);
   return (
     <div className="page">
+      <CrewCard />
       <header className="page-head"><h1>{tr("Activity")}</h1><p className="muted">{tr("Everything the agents did for you, as it happens. Join writes each line from the facts; nothing here was written by an AI.")}</p></header>
       {waiting.length > 0 && <section className="needs">
         <h2><Icon name="bolt" size={18} />Waiting on you</h2>
@@ -93,5 +94,22 @@ export function Invite({ b, done }) {
       <span><b>You're invited: {b.activity}, {b.date} {b.start}</b><small>{b.venueName} · {b.unitName} · your share {money(b.invite.share)} · answer by {clock(b.invite.payBy)}</small>{err && <small className="err">{err}</small>}</span>
       <span className="need-btns"><button className="btn ghost" disabled={busy} onClick={() => act("decline")}>Can't make it</button><button className="btn primary" disabled={busy} onClick={() => act("pay")}>Join and pay</button></span>
     </div>
+  );
+}
+
+// Your crew: friends who joined Join with you, and the link that brings more in (it makes a crew if you have none)
+function CrewCard() {
+  const [c, setC] = useState(null), [shown, setShown] = useState(false), [copied, setCopied] = useState(false);
+  const open = async () => { try { setC(await api("/api/crew", { method: "POST", body: {} })); setShown(true); } catch (e) { setC({ error: e.message }); setShown(true); } };
+  const copy = async () => { let ok = false; try { await navigator.clipboard.writeText(c.link); ok = true; } catch { const t = Object.assign(document.createElement("textarea"), { value: c.link }); document.body.append(t); t.select(); try { ok = document.execCommand("copy"); } catch {} t.remove(); } setCopied(ok); };
+  return (
+    <section className="card crew-card">
+      <header><h3>{tr("Your crew")}</h3>{!shown && <button className="btn small" onClick={open}>{tr("Invite friends")}</button>}</header>
+      {shown && (c?.error ? <p className="err small">{c.error}</p> : c && <>
+        <p className="small muted">{tr("Send this link to friends. On the website it signs them up in your crew; an agent opening it learns how to join for its person.")}</p>
+        <p className="crew-link"><code>{c.link}</code> <button className="btn small" onClick={copy}>{copied ? "✓" : tr("Copy the link")}</button></p>
+        {c.members?.length > 0 && <p className="small">{c.members.join(", ")}</p>}
+      </>)}
+    </section>
   );
 }

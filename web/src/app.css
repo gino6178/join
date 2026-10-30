@@ -315,3 +315,6 @@ legend { font-size: var(--fs-14); color: var(--ink-2); padding: 0 6px; }
 .lg.venue { background: #fff; border: 2px solid var(--ink); }
 .pp-ids { display: block; font-family: ui-monospace, monospace; font-size: 11px; opacity: .7; }
 .fresh select { padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line, #ccc); font: inherit; background: transparent; color: inherit; } .fresh > small { flex-basis: 100%; }
+.where { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; flex-basis: 100%; } .where small { flex-basis: 100%; }
+.where { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; flex-basis: 100%; } .where small { flex-basis: 100%; }
+.crew-card header { display: flex; justify-content: space-between; align-items: center; } .crew-link code { word-break: break-all; }

@@ -122,8 +122,37 @@ app.post("/api/auth/demo", limit("signin", 30), (req, res) => {
   if (!DEMO) return res.status(403).json({ error: "demo accounts are off" });
   const name = String(req.body?.name || "").trim();
   if (!name) return res.status(400).json({ error: "name", message: "Give a first name for the demo account." });
-  const p = people.demoPerson(name, { area: req.body?.area, crew: req.body?.crew }), sid = createSession(p.id);
+  const p = people.demoPerson(name, { area: req.body?.area, crew: req.body?.crew, lat: req.body?.lat, lon: req.body?.lon }), sid = createSession(p.id);
   res.set("Set-Cookie", `${COOKIE}=${sid}; HttpOnly; SameSite=Lax; Path=/`).json({ ok: true, player: { id: p.id, name: p.name, area: p.area.name, ...(p.crew ? { crew: p.crew, crewmates: people.crewmates(p).map((x) => ({ id: x.id, name: x.name })) } : {}) } });
+});
+// Crews, by invite link. Someone signed in (on the website, or their agent with a token) gets their crew's link,
+// making a crew if they have none; a friend opens it. A browser gets the sign-up page with the crew filled in; an agent
+// gets JSON saying how to join for its person. Someone already on Join joins with POST /api/crew/join.
+const personOf = (req) => sessionOf(req)?.player || agentOf(req)?.player || null;
+const crewLink = (req, code) => `${req.protocol}://${req.headers.host}/j/${code}`;
+app.post("/api/crew", (req, res) => {
+  const me = personOf(req);
+  if (!me) return res.status(401).json({ error: "sign_in", message: "Sign in (or send your person's agent token) to invite friends." });
+  const code = people.crewOf(me, { create: true });
+  if (!code) return res.status(400).json({ error: "resident", message: "The demo town's residents don't have crews: make your own account to invite friends." });
+  res.json({ code, link: crewLink(req, code), members: people.crewNames(code), note: "Send this link to friends. Opening it on the website signs them up in your crew; an agent gets JSON saying how to join." });
+});
+app.post("/api/crew/join", (req, res) => {
+  const me = personOf(req), code = String(req.body?.code || "").replace(/^.*\/j\//, "");
+  if (!me) return res.status(401).json({ error: "sign_in", message: "Sign in, or send your person's agent token." });
+  if (!people.crewSize(code)) return res.status(404).json({ error: "no_crew", message: "No crew with that code." });
+  const p = people.joinCrew(me, code);
+  if (!p) return res.status(400).json({ error: "resident", message: "The demo town's residents can't join crews." });
+  res.json({ ok: true, crew: p.crew, members: people.crewNames(p.crew) });
+});
+app.get("/j/:code", (req, res) => {
+  const code = String(req.params.code).toLowerCase().replace(/[^a-z0-9_-]/g, ""), n = people.crewSize(code);
+  if (!n) return res.status(404).type(req.accepts(["html", "json"]) === "json" ? "json" : "html").send(req.accepts(["html", "json"]) === "json" ? { error: "no_crew" } : "This invite link isn't valid any more.");
+  if (req.accepts(["html", "json"]) === "html") return res.redirect(`/#/?crew=${code}`);
+  const u = `${req.protocol}://${req.headers.host}`;
+  res.json({ crew: code, members: people.crewNames(code), about: `An invitation to a crew on Join (${u}): friends who plan together. Members are invited to each other's plans first, and each answers through their own agent.`,
+    join: { newPerson: { method: "POST", url: `${u}/api/auth/demo`, body: { name: "<your person's first name>", crew: code, lat: "<optional>", lon: "<optional>" }, then: `POST ${u}/api/tokens for an agent token; see ${u}/llms.txt` },
+      existingPerson: { method: "POST", url: `${u}/api/crew/join`, body: { code }, auth: "your person's session, or Authorization: Bearer <their agent token>" } }, guide: `${u}/llms.txt` });
 });
 app.get("/auth/:provider/start", (req, res) => {
   const r = oauth.start(req.params.provider, PUBLIC_URL);

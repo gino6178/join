@@ -7,11 +7,11 @@ import Icon from "../components/Icon.jsx";
 // account with just a name, or as one of the demo town's residents. And, for AI agents, the way in.
 const BRAND = { google: "#4285F4", facebook: "#1877F2", line: "#06C755", paypal: "#003087" };
 export default function SignIn({ info, onIn }) {
-  const [world, setWorld] = useState(null), [err, setErr] = useState(null), [auth, setAuth] = useState(null), [name, setName] = useState(""), [area, setArea] = useState(""), [crew, setCrew] = useState(() => new URLSearchParams(location.hash.split("?")[1] || "").get("crew") || "");
+  const [world, setWorld] = useState(null), [err, setErr] = useState(null), [auth, setAuth] = useState(null), [name, setName] = useState(""), [area, setArea] = useState(""), [where, setWhere] = useState(null), [whereMsg, setWhereMsg] = useState(null), [crew, setCrew] = useState(() => new URLSearchParams(location.hash.split("?")[1] || "").get("crew") || "");
   useEffect(() => { api("/api/world").then(setWorld).catch(setErr); api("/api/auth/providers").then(setAuth).catch(() => {}); }, []);
   useEffect(() => { const m = /signin=([^&]+)/.exec(location.hash); if (m && m[1] !== "off") setErr(new Error(decodeURIComponent(m[1]))); }, []);
   const pick = async (id) => { try { await api("/api/session", { method: "POST", body: { player: id } }); location.hash = "/"; onIn(); } catch (e) { setErr(e); } };
-  const fresh = async (e) => { e.preventDefault(); try { await api("/api/auth/demo", { method: "POST", body: { name, area, crew } }); location.hash = "/"; onIn(); } catch (x) { setErr(x); } };
+  const fresh = async (e) => { e.preventDefault(); try { await api("/api/auth/demo", { method: "POST", body: { name, area, crew, ...(where || {}) } }); location.hash = "/"; onIn(); } catch (x) { setErr(x); } };
   const on = (auth?.providers || []).filter((p) => p.on), off = (auth?.providers || []).filter((p) => !p.on);
   return (
     <div className="signin">
@@ -41,9 +41,17 @@ export default function SignIn({ info, onIn }) {
           {on.map((p) => <a key={p.id} className="btn social-btn" style={{ "--brand": BRAND[p.id] }} href={`/auth/${p.id}/start`}>Continue with {p.name}</a>)}
           {off.length > 0 && <p className="small muted">{off.map((p) => p.name).join(", ")} sign-in {off.length === 1 ? "turns" : "turn"} on when this server has {off.length === 1 ? "its" : "their"} keys (see the README).</p>}
         </div>
+        {crew && auth?.demo && <p className="note good">{tr("A friend invited you to their crew on Join. Make your account below and you're in.")} <code>{crew}</code></p>}
         {auth?.demo && <form className="fresh" onSubmit={fresh}>
           <label><span>{tr("New here? Make a demo account")}</span><input value={name} onChange={(e) => setName(e.target.value)} placeholder={tr("Your first name")} maxLength={40} required /></label>
-          <label><span>{tr("Where you live")}</span><select value={area} onChange={(e) => setArea(e.target.value)}><option value="">{tr("Any district")}</option>{(auth?.areas || []).map((d) => <option key={d}>{d}</option>)}</select></label>
+          <span className="where">
+            <button type="button" className="btn small" onClick={() => {
+              if (!navigator.geolocation || !window.isSecureContext) { setWhereMsg(tr("This browser only shares your location with secure (https) sites; pick your district instead.")); return; }
+              navigator.geolocation.getCurrentPosition((p) => { setWhere({ lat: p.coords.latitude, lon: p.coords.longitude }); setWhereMsg(tr("Got it: Join keeps it rounded to about a kilometre, and others see only your district.")); }, () => setWhereMsg(tr("Location not shared; pick your district instead.")), { timeout: 8000 });
+            }}>{where ? tr("Location shared") : tr("Use my location")}</button>
+            {!where && <select value={area} onChange={(e) => setArea(e.target.value)} aria-label={tr("Where you live")}><option value="">{tr("Or pick your district")}</option>{(auth?.areas || []).map((d) => <option key={d}>{d}</option>)}</select>}
+            {whereMsg && <small className="muted">{whereMsg}</small>}
+          </span>
           <label><span>{tr("Friends' crew code (optional)")}</span><input value={crew} onChange={(e) => setCrew(e.target.value)} placeholder="e.g. badminton-fri" maxLength={32} /></label>
           <small className="muted">{tr("Friends who type the same crew code are invited to each other's plans first.")}</small>
           <button className="btn primary">{tr("Start")}</button>
