@@ -12,6 +12,12 @@ Join runs **no AI model of its own**. It is the market and the rules; the intell
 
 PayPal AI Hackathon 2026 · MIT license
 
+![What the agents did](docs/screenshots/1-activity.png)
+
+**For judges:** `npm run setup`, `npm start`, open http://localhost:8790/demo?as=you, then `npm run demo` in another
+terminal. No keys needed. The submission text, testing instructions and screenshots are in
+[docs/SUBMISSION.md](docs/SUBMISSION.md) and [docs/screenshots](docs/screenshots).
+
 ---
 
 ## What happens
@@ -59,7 +65,7 @@ npm run setup
 npm start
 ```
 
-Open http://localhost:8790 and sign in as any demo player. Then, in another terminal, watch four agents set up a plan:
+Open http://localhost:8790 and sign in as any demo person (or go straight to http://localhost:8790/demo?as=you). Then, in another terminal, watch four agents set up a plan:
 
 ```bash
 npm run demo
@@ -181,7 +187,7 @@ little Sepolia ether from a faucet). Without them, receipts are still signed and
 | `api/data/world.json` | The made-up demo town (USD, placed on San Jose, CA) |
 | `web/` | The website (React, Vite) |
 | `examples/` | Agents from outside: scripted (no key), a Claude player agent, a Claude venue agent on the PayPal Agent Toolkit; the receipt verifier |
-| `docs/` | Devpost text and the demo video script |
+| `docs/` | The Devpost submission ([SUBMISSION.md](docs/SUBMISSION.md)), screenshots, the demo video script |
 
 ## What's new since 1 October 2026
 

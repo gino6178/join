@@ -101,6 +101,14 @@ app.post("/api/session", (req, res) => {
   if (!sid) return res.status(400).json({ error: "unknown player" });
   res.set("Set-Cookie", `${COOKIE}=${sid}; HttpOnly; SameSite=Lax; Path=/`).json({ ok: true });
 });
+// one-click demo sign-in for judges and screenshots: /demo?as=you&go=activity (demo mode only)
+app.get("/demo", (req, res) => {
+  if (!DEMO) return res.status(403).end();
+  const sid = createSession(String(req.query.as || "you"));
+  if (!sid) return res.status(400).send("unknown player");
+  const go = String(req.query.go || "activity").replace(/[^\w/?=&.-]/g, "");
+  res.set("Set-Cookie", `${COOKIE}=${sid}; HttpOnly; SameSite=Lax; Path=/`).redirect(`/#/${go}`);
+});
 app.delete("/api/session", signedIn, (req, res) => { endSession(req.sid); res.set("Set-Cookie", `${COOKIE}=; Max-Age=0; Path=/`).json({ ok: true }); });
 app.get("/api/me", signedIn, (req, res) => { const p = player(req.player), m = getMandate(req.player); res.json({ player: { id: p.id, name: p.name, area: p.area, interests: p.interests, free: p.free }, mandate: { ...m, perGameUsd: usd(m.perGame), perWeekUsd: usd(m.perWeek) }, vault: settle.hasVault(req.player), tokens: tokensOf(req.player) }); });
 app.put("/api/mandate", signedIn, (req, res) => { const r = setMandate(req.player, req.body || {}); res.status(r.error ? 400 : 200).json(r); });

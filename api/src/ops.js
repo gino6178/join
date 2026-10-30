@@ -131,7 +131,7 @@ export const gameStatus = (a, { booking }) => settle.status(booking, a.player);
 
 export async function payMyShare(a, { booking }) {
   const r = await settle.pay(booking, a.player);
-  if (!r.error) record({ actor: by(a), who: [a.player], action: "pay_requested", ref: booking, summary: r.you?.status === "authorized" ? `${said(a)} paid ${first(a.player)}'s $${r.you.amount} from saved PayPal, within the limit.` : r.you?.approveUrl ? `${said(a)} asked ${first(a.player)} to approve $${r.you.amount} in PayPal.` : `${said(a)} checked the payment: ${r.you?.status || r.state}.` });
+  if (!r.error) record({ actor: by(a), who: [a.player], action: "pay_requested", ref: booking, summary: r.you?.status === "authorized" ? (r.you.via === "vault" ? `${said(a)} paid ${first(a.player)}'s $${r.you.authorized} from saved PayPal, within the limit.` : `${said(a)} started ${first(a.player)}'s $${r.you.authorized} payment; PayPal authorized it (${r.you.via}).`) : r.you?.approveUrl ? `${said(a)} asked ${first(a.player)} to approve $${r.you.authorized} in PayPal.` : `${said(a)} checked the payment: ${r.you?.status || r.state}.` });
   return r.you?.approveUrl ? { ...r, nextStep: "PAYER_ACTION_REQUIRED: show approveUrl to your user. They approve in PayPal; check booking_status afterwards." } : r;
 }
 export const declineGame = (a, { booking }) => settle.decline(booking, a.player);
