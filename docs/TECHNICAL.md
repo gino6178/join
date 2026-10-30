@@ -10,7 +10,7 @@ Join is a marketplace for getting a group together (a sports court, a karaoke ro
 a barbecue pit, a dinner table). People's own AI agents use it to find who is free, negotiate the price with a venue,
 split the cost and settle it with PayPal.
 
-**Join's server runs no AI model and holds no AI key.** It is the market and its rules:
+**Join holds no AI key and calls no AI service.** Its only model is a small Qwen on its own server for the website agent (§10), which picks an activity and nothing else. Join is the market and its rules:
 - the venues' negotiation policies
 - each person's spending mandate
 - settlement with PayPal
@@ -29,7 +29,7 @@ same operations with the person's session.
  +-------------------------- api/ (Node 20, Express) ------------------------------+
  |  mcp.js (MCP, Streamable HTTP, stateless)   a2a.js (A2A JSON-RPC)   /api/agent   |
  |                         \            |             /                            |
- |                          ops.js: the 17 agent operations                         |
+ |                          ops.js: the 18 agent operations                         |
  |        /            |               |                 \               \          |
  |  negotiate/     alternatives.js   mandate.js         pay/settle.js   activity.js |
  |  policy.js                                           (state machine)             |
@@ -59,7 +59,7 @@ same operations with the person's session.
 | Website | `web/src/**` (about 1,150 lines) |
 | Examples | `examples/scripted-agent.mjs`, `claude-agent.mjs`, `venue-agent.mjs`, `toolkit-cli.mjs`, `verify-receipt.mjs` |
 | Website agent | `api/src/scout/understand.js` (186), `web/src/scout/agent.js`, `web/src/scout/words.js`, `web/src/components/AgentDrawer.jsx` |
-| Tests | `api/test/*.test.js`: 47 tests |
+| Tests | `api/test/*.test.js`: 48 tests |
 
 **Money is integer cents inside, USD strings outward.** Times are the town's local time: the process sets `TZ` from
 `world.json` (`America/Los_Angeles`), and the website renders in that zone (`world.js`, `web/src/api.js`).
@@ -142,7 +142,7 @@ old one (`store.js`). Tests keep all state in memory.
 | (deal agreed) | a unit is held for the organizer | `awaiting_organizer` |
 | `awaiting_organizer` | the organizer authorizes the **whole** total | `held` |
 | `awaiting_organizer` | 10 minutes pass (`ORGANIZER_MS`) | `released` (nothing charged) |
-| `held` | every invitee who joined has authorized, or 20 minutes pass (`SHARES_MS`) | `locking` → `locked` |
+| `held` | every invitee who joined has authorized, or the window closes (`SHARES_MS`, 20 minutes in the demo; never later than 2 hours before the start, never under 10 minutes) | `locking` → `locked` |
 | `awaiting_organizer`, `held` | the organizer cancels | `cancelled` (every authorization voided) |
 | `locked` | the organizer cancels at least 24 hours before the start | `refunded` (every capture refunded) |
 | `locked` | the end time passes | `played` |
@@ -162,7 +162,8 @@ old one (`store.js`). Tests keep all state in memory.
 - **Otherwise:** the order returns an approval link, `PAYER_ACTION_REQUIRED`. The person approves either through the JS SDK v6 button on the page or through the link. The return URL, polling in `tick()`, or the `CHECKOUT.ORDER.APPROVED` webhook then call `approved()`, which authorizes the order.
 
 ### 6.4 Reliability
-- Each PayPal POST goes through `paypalStep`, which writes `started` and then `done` or `failed` to the booking's journal, and sends `PayPal-Request-Id = <booking>:<step>[:<player>]`. Repeating a step after a crash is therefore the same call to PayPal.
+- Each PayPal POST goes through `paypalStep`, which writes `started` and then `done` or `failed` to the booking's journal, and sends `PayPal-Request-Id = <booking>:<step>[:<player>]`. Repeating a step after a crash is therefore the same call to PayPal; after PayPal refuses one, the retry uses a new id (PayPal would replay the refusal). Payouts are keyed by `sender_batch_id` instead, and dispute evidence and settle-up calls aren't journaled.
+- The lock is resumable: a booking left in `locking` (a refused capture, a restart) is picked up by the next tick; captured shares count as paid and aren't captured again, and the organizer is asked only for the rest. A friend's capture refused three times counts as unpaid (`settle.test.js`).
 - `serial(bookingId)` runs one operation per booking at a time, so a webhook and a poll can't both capture.
 - `tick()` runs every `TICK_MS` (5 s). It handles the expiries, the lock on timeout, played, payouts, payout status, the paying-back invoices and the extras invoices.
 - **Webhooks only confirm;** they never drive state alone. They cover `CHECKOUT.ORDER.APPROVED`, `PAYMENT.CAPTURE.*` (a refund finds its capture through `links[rel=up]`), `PAYMENT.PAYOUTS-ITEM.*`, `INVOICING.INVOICE.PAID` and `CUSTOMER.DISPUTE.CREATED`. Signatures are checked with `verify-webhook-signature`, re-sending the raw body unparsed.
@@ -237,7 +238,7 @@ page at `/mock-paypal/approve`, a 3.49% + $0.49 fee, request-id idempotency, and
 ### 9.1 AP2 mandates (api/src/proof/mandates.js)
 
 Join signs the mandates of the Agent Payments Protocol (github.com/google-agentic-commerce/AP2, `code/sdk/schemas/ap2`), in the "Trusted Agent Provider" model of AP2's agent-authorization document: Join is the agent provider, the Limits page (the person's session, never an agent's token) is the trusted surface, and Join's key signs.
-- **Format:** compact JWS (EdDSA, the receipts key), payloads field for field as AP2's JSON schemas: `vct`, `constraints`, `cnf`, `iat`, `exp`, and the types `checkout.allowed_merchants`, `checkout.line_items`, `payment.reference`, `payment.amount_range`, `payment.agent_recurrence`, `payment.budget`, `payment.allowed_payees`, `payment.allowed_pisps`. Selective disclosure (SD-JWT) is not used.
+- **Format:** compact JWS (EdDSA, the receipts key), payloads following AP2's JSON schemas (checked against the schemas as we read them, not a validator): `vct`, `constraints`, `cnf`, `iat`, `exp`, and the types `checkout.allowed_merchants`, `checkout.line_items`, `payment.reference`, `payment.amount_range`, `payment.agent_recurrence`, `payment.budget`, `payment.allowed_payees`, `payment.allowed_pisps`. Selective disclosure (SD-JWT) is not used.
 - **Open mandates** (`mandate.checkout.open.1`, `mandate.payment.open.1`) per person and agent, `cnf: {kid: <token id>}` (RFC 7800), made again whenever the person's limits change (`ops.openMandates`); `whoami` returns them.
 - **Action authorization (AP2):** `make_offer`, `accept_price` and `pay_my_share` take `mandate`, the agent's open payment mandate. `mandates.authorize` checks Join's signature, `exp`, `sub` (this person), `cnf.kid` (this token), that it is still the current one (mandates are made again when the person's limits change, tracked by a revision number, so an older, looser one stops working), `payment.amount_range` against the share, `payment.budget` against the week's spending plus the share (the booking being paid isn't counted twice), and `payment.allowed_payees`. Missing: `mandate_required`; failing: `invalid_mandate` with an AP2 error receipt. The website agent and WebMCP act through the person's session, so Join presents their mandate. For a token tied to a public key, `cnf` also carries the key (`cnf.jwk`); its RFC 9421 signature on every request is the proof of possession. The plain limits check (`mandate.fits`) runs as well.
 - **Per deal:** the checkout (a JWS of the venue, line item, total and booking) and its Checkout Mandate (`mandate.checkout.1`, `checkout_jwt`, `checkout_hash`); each payer's Payment Mandate (`mandate.payment.1`, `transaction_id` = the checkout hash, `payee`, `payment_amount`, `payment_instrument` = the PayPal order or vault token, `pisp` = PayPal); Join's Mandate Receipts (`result`, `reference` = the mandate's hash). A refusal over a limit returns an error receipt (`invalid_mandate`) as `ap2Receipt`.
@@ -297,7 +298,7 @@ There are 47, using Node's test runner, and they run against the stand-in with s
 - Agent Toolkit: `list_transactions`, `create_invoice`, `send_invoice`, `get_invoice`, `list_disputes`.
 - Full bookings to `locked` for badminton, karaoke and board games, including a cancellation before the lock (void) and after it (refunds).
 
-**Ran by AI agents (Claude Sonnet subagents) against the sandbox:**
+**Ran by AI agents (Claude Sonnet subagents) against the sandbox.** Only the 30 Oct runs with AP2 enforced (below) kept transcripts and briefs (`docs/agent-run/`); for the earlier runs listed here we kept the findings and the fixes, not the transcripts.
 - Four people's agents, given one sentence, chose an activity, haggled, split (one ask to pay less accepted, one refused for the mandate) and locked a karaoke booking.
 - 12 misuse attempts were all refused.
 - A venue agent reconciled with the toolkit and verified an extras invoice. Its findings became fixes (§4.2, §6.5).
@@ -354,7 +355,7 @@ There are 47, using Node's test runner, and they run against the stand-in with s
 npm run setup          # api, web, examples; builds the website
 npm start              # http://localhost:8790 (the stand-in without keys)
 npm run demo           # four agents over MCP; JOIN_ACTIVITY=karaoke for another plan
-npm test               # 47 tests
+npm test               # 48 tests
 npm --prefix api run bench   # the negotiation benchmark
 ```
 

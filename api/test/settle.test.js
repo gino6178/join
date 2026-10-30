@@ -35,6 +35,24 @@ const approve = async (bookingId, player) => {
   return settle.approved(bookingId, player);
 };
 
+test("a lock interrupted by a refused capture resumes: shares already captured aren't charged again", async () => {
+  const id = await deal();
+  await settle.pay(id, "you"); await approve(id, "you");
+  const b = settle.internal(id), orgAuth = b.payments.you.authorizationId, real = pp.capture.bind(pp);
+  let refuse = 1, orgCalls = [];
+  pp.capture = async (aid, o) => { if (aid === orgAuth) { orgCalls.push(o); if (refuse-- > 0) throw new Error("PayPal: try again later"); } return real(aid, o); };
+  for (const p of ["leo", "hana", "tomas"]) await approve(id, p);
+  assert.equal(b.state, "locking");
+  assert.equal(b.payments.leo.status, "captured");
+  await settle.tick();
+  assert.equal(b.state, "locked");
+  // the organizer was asked for their own share both times, never the whole price; each friend captured once
+  assert.deepEqual(orgCalls.map((o) => o.amount), [b.shares.you, b.shares.you]);
+  assert.notEqual(orgCalls[0].requestId, orgCalls[1].requestId);
+  assert.equal(b.journal.filter((j) => j.step === "capture:leo" && j.status === "started").length, 1);
+  pp.capture = real;
+});
+
 test("the organizer guarantees the whole court before anyone else is asked", async () => {
   const id = await deal();
   const v = await settle.pay(id, "you");

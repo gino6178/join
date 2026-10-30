@@ -5,9 +5,9 @@ Impact, Innovation and Presentation. This page maps each one to what Join does, 
 see it in a few minutes. Every claim points to a file; the last section lists what has not been run, so nothing here
 needs to be taken on trust.
 
-**See it fast:** `npm run setup`, `npm start`, then open http://localhost:8790/demo?as=you&go=activity?agent=1 (no
+**See it fast:** `npm run setup`, `npm start`, then open http://localhost:8790/demo?as=hana (no
 keys needed; PayPal is simulated and says so). In another terminal, `npm run demo` runs four agents over MCP.
-`npm test` runs 47 tests; `npm --prefix api run bench` runs the negotiation benchmark. Details: [TECHNICAL.md](TECHNICAL.md).
+`npm test` runs 48 tests; `npm --prefix api run bench` runs the negotiation benchmark. Details: [TECHNICAL.md](TECHNICAL.md).
 
 ---
 
@@ -27,7 +27,7 @@ keys needed; PayPal is simulated and says so). In another terminal, `npm run dem
 | Webhooks: management API and `verify-webhook-signature` | Join subscribes itself to 14 events once it has a public HTTPS address, and checks every event's signature on the raw body | `api/src/server.js`, `api/src/pay/paypal.js` |
 | JS SDK v6 (browser-safe client token) | The PayPal button (and Pay Later / Venmo where eligible) in a popup on Join's page | `web/src/components/PayPalButtons.jsx` |
 | PayPal Agent Toolkit | Join's back office for venues (`list_transactions` reconciliation, `create_invoice`, `send_invoice`, `get_invoice`, `list_disputes`), and a venue's Claude agent with the toolkit as an in-process MCP server | `api/src/pay/toolkit.js`, `examples/venue-agent.mjs` |
-| `PayPal-Request-Id` on every POST, journaled first | A step repeated after a crash is the same PayPal call, not a second charge | `settle.js` `paypalStep` |
+| `PayPal-Request-Id` on booking calls, journaled first; a resumable lock | A lock cut off by a crash or a refused capture resumes without capturing anything twice (Payouts are keyed by `sender_batch_id`) | `settle.js` `paypalStep`, `lock` |
 | Sandbox test card (optional) | Lets a whole group's payments run in a demo without a buyer sign-in | `PAYPAL_TEST_CARD=1` |
 
 **Engineering that holds up under agents:**
@@ -39,8 +39,10 @@ keys needed; PayPal is simulated and says so). In another terminal, `npm run dem
 - **Limits enforced in code before a venue sees an offer** (`api/src/mandate.js`, `negotiate/engine.js`): spending
   (your share per booking and per week, counting what you covered for friends) and guaranteeing (how much your agent
   may guarantee for a group on its own) are separate, and agent tokens can read them, never change them.
-- **Standards that do work:** AP2 mandates in AP2's own JSON schemas, which an agent must present with every offer,
-  accept and payment and Join checks before acting (`api/src/proof/mandates.js` `authorize`);
+- **Standards that do work:** AP2 mandates in AP2's JSON schemas, which an agent must present with every offer,
+  accept, payment and agreed share change, and Join checks before acting (`api/src/proof/mandates.js` `authorize`).
+  Join is both the mandates' issuer and their verifier, so a mandate proves nothing a token couldn't; what it adds is a signed record of which limits applied to each action, carried into receipts and dispute evidence. A person signing mandates with their own key (a passkey) is what would make them proof.
+  Also:
   receipts in an RFC 6962 transparency log with C2SP checkpoints and witness cosignatures (`api/src/proof/tlog.js`,
   `examples/witness.mjs`); signed agent requests per RFC 9421 (`api/src/auth.js`); WebMCP (`web/src/webmcp.js`).
 - **Tested by agents, not only by us:** Claude Sonnet agents played friends and a venue on the sandbox, tried a dozen
@@ -114,9 +116,10 @@ use the demo panel to play the friends, and watch each payment's PayPal status, 
 
 ## 5. Presentation
 
-- **The video** follows [demo-video-script.md](demo-video-script.md) (2:45): the problem, an agent and the website
-  agent planning, the negotiation chart, the PayPal guarantee and captures with the demo panel, the receipt and an
-  automatic dispute answer, limits that hold, the venue's figures. Every number on screen comes from the run.
+- **The video** follows [demo-video-script.md](demo-video-script.md) (2:45): one person's plan, start to finish:
+  Join's website agent finds options with reviews and haggles, the PayPal guarantee, friends paying from the demo
+  panel, the lock on Bryntum, the Activity page, the receipt checked in the browser, and limits that hold. Every number
+  on screen comes from the run.
 - **Docs for every reader:** the [README](../README.md) for a quick start and the PayPal map,
   [SUBMISSION.md](SUBMISSION.md) for the Devpost fields, [TECHNICAL.md](TECHNICAL.md) for reviewers (with a section on
   what has and hasn't been verified), and this page.

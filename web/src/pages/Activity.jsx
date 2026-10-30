@@ -37,7 +37,7 @@ export default function Activity({ entries, me }) {
       {owing.map((b) => <section key={b.id} className="needs"><div className="need"><span><b>Pay back {firstOf(b.organizer)}: {money(b.owes.amount)}</b><small>{b.venueName} · {b.activity} · {b.date} {b.start}. They covered your share; this is a PayPal invoice.</small></span><a className="btn primary" href={b.owes.url} target="_blank" rel="noreferrer">Pay the invoice</a></div></section>)}
       {!entries.length && <div className="empty card start">
         <Icon name="spark" size={28} />
-        <p><b>Plan something with friends.</b> Tell Join's agent what you'd like to do, or bring your own agent. Every step either takes shows up here.</p>
+        <p><b>Plan something with friends.</b> Tell Join's agent what you'd like to do, or bring your own agent. Every step, whoever takes it, shows up here.</p>
         <span className="row-btns"><button className="btn primary" onClick={() => dispatchEvent(new Event("join:open-agent"))}>Plan something</button><a className="btn ghost" href="#/connect">Use my own agent</a></span>
       </div>}
       {groups.map((g) => <Group key={g.k} list={g.list} me={me.player.id} booking={(games.data?.bookings || []).find((b) => b.id === g.k || b.negotiation === g.k)} />)}
@@ -58,7 +58,7 @@ function Group({ list, me, booking: b }) {
   return (
     <section className="card group">
       <header><h3>{title.charAt(0).toUpperCase() + title.slice(1)}</h3><span className={`pill ${b ? (["locked", "played", "venue_paid"].includes(b.state) ? "good" : "") : TONE[last.action] || ""}`}>{b ? STATE[b.state] || b.state : last.action.replace(/_/g, " ")}</span></header>
-      {b && <p className="summary">{b.date} {b.start} · {b.players.length} people · <b>{money(b.total)}</b> · {paid} of {b.players.length} paid · <a href={`#/games?booking=${b.id}`}>Open the plan</a></p>}
+      {b && <p className="summary">{b.date} {b.start} · {b.players.length} people · <b>{money(b.total)}</b> · {["locked", "played", "venue_paid"].includes(b.state) ? "everyone paid" : `${paid} of ${b.players.length} in, held in PayPal`} · <a href={`#/games?booking=${b.id}`}>Open the plan</a></p>}
       {list.length > SHOWN && !all && <button className="link-btn small" onClick={() => setAll(true)}>Show all {list.length} steps</button>}
       <ol className="timeline">{shown.map((e) => (
         <li key={e.id} className={TONE[e.action] || ""}>

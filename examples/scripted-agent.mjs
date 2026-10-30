@@ -36,7 +36,7 @@ async function agent(player, label) {
   // (offers, accepts and payments carry this agent's AP2 open payment mandate, from whoami, as Join requires)
   let mandate = null;
   const call = async (name, args = {}) => {
-    if (["make_offer", "accept_price", "pay_my_share"].includes(name)) { mandate ||= (await raw("whoami")).ap2.openPaymentMandate; args = { ...args, mandate }; }
+    if (["make_offer", "accept_price", "pay_my_share", "answer_share"].includes(name)) { mandate ||= (await raw("whoami")).ap2.openPaymentMandate; args = { ...args, mandate }; }
     return raw(name, args);
   };
   return { call, cookie, close: () => client.close() };

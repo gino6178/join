@@ -9,7 +9,11 @@
 //   Open Checkout Mandate  mandate.checkout.open.1  what the agent may book: the allowed venues, one booking of an activity
 // (Units as AP2's schemas define them: payment.amount_range's min and max are integers in minor units (cents);
 // payment.budget's max is a plain number, so it is in dollars here.)
-//   Open Payment Mandate   mandate.payment.open.1   what it may pay: at most the per-booking limit (payment.amount_range),
+//   Open Payment Mandate   mandate.payment.open.1   what it may authorize in one payment (payment.amount_range: the
+//                                                   per-booking limit, or as an organizer the whole price it may
+//                                                   guarantee from saved PayPal, the `cover` limit, whichever is more),
+//                                                   the person's own share per booking (join.share_max, Join's own
+//                                                   constraint, outside AP2's schema),
 //                                                   at most the weekly limit (payment.budget, recurring weekly), only to
 //                                                   allowed venues, only for a checkout the open checkout mandate allows
 //   Checkout Mandate       mandate.checkout.1       the agreed booking: a checkout JWT (venue, activity, time, price) and
@@ -48,9 +52,13 @@ export function verify(jws, { at = now() } = {}) {
 // offer, an accept, a payment), and Join, as the verifier, checks it before anything else happens: Join's signature,
 // not expired, for this person, bound to this agent's token (cnf.kid), still the person's current one (made again
 // whenever they change a limit, so an older, looser one stops working), and its constraints: the share within
-// payment.amount_range, the week's spending plus the share within payment.budget, the venue among payment.allowed_payees.
+// what is authorized (the share, or an organizer's whole guarantee) within payment.amount_range, the person's own share
+// within join.share_max, the week's spending plus the share within payment.budget, the venue among
+// payment.allowed_payees. Join is both the mandates' issuer and their verifier (AP2's Trusted Agent Provider role), so a
+// mandate proves nothing a token couldn't by itself: its worth is that every refusal and every deal is a signed record
+// of which limits applied, which goes into receipts and dispute evidence.
 // Returns { ok, payload } or { error: "invalid_mandate" | "mandate_required", message, receipt } (an AP2 error receipt).
-export function authorize(jws, { player, agentKid, venue, share, spentThisWeek = 0 }) {
+export function authorize(jws, { player, agentKid, venue, share, authorized = share, spentThisWeek = 0 }) {
   const no = (error, message) => ({ error, message, receipt: jws ? mandateReceipt(jws, { ok: false, error: "invalid_mandate", why: message }) : null });
   if (!jws) return no("mandate_required", "Present your open payment mandate (whoami returns it as ap2.openPaymentMandate) with offers, accepts and payments.");
   const m = verify(jws);
@@ -60,7 +68,8 @@ export function authorize(jws, { player, agentKid, venue, share, spentThisWeek =
   const cur = openFor(player, agentKid);
   if (!cur || cur.payment !== jws) return no("invalid_mandate", "That mandate has been replaced: the person changed their limits. Get the current one from whoami.");
   const c = (t) => m.constraints.find((x) => x.type === t);
-  if (c("payment.amount_range") && share > c("payment.amount_range").max) return no("invalid_mandate", `The share ($${(share / 100).toFixed(2)}) is over the mandate's amount_range ($${(c("payment.amount_range").max / 100).toFixed(2)}).`);
+  if (c("payment.amount_range") && authorized > c("payment.amount_range").max) return no("invalid_mandate", `Authorizing $${(authorized / 100).toFixed(2)} is over the mandate's amount_range ($${(c("payment.amount_range").max / 100).toFixed(2)}).`);
+  if (c("join.share_max") && share > c("join.share_max").max) return no("invalid_mandate", `The share ($${(share / 100).toFixed(2)}) is over the mandate's per-booking limit ($${(c("join.share_max").max / 100).toFixed(2)}).`);
   if (c("payment.budget") && spentThisWeek + share > Math.round(c("payment.budget").max * 100)) return no("invalid_mandate", `That would take this week over the mandate's budget ($${c("payment.budget").max.toFixed(2)}).`);
   if (c("payment.allowed_payees") && !c("payment.allowed_payees").allowed.some((x) => x.id === venue)) return no("invalid_mandate", "That venue isn't among the mandate's allowed payees.");
   return { ok: true, payload: m };
@@ -84,7 +93,8 @@ export function issueOpen(playerId, agentKid, m, venues, activities, keyX = null
   const payment = sign({ iss: issuer, sub: playerId, vct: "mandate.payment.open.1", iat, exp, cnf,
     constraints: [
       { type: "payment.reference", conditional_transaction_id: hashB64u(checkout) },
-      { type: "payment.amount_range", currency: "USD", max: m.perGame },
+      { type: "payment.amount_range", currency: "USD", max: Math.max(m.perGame, m.cover ?? 0) },
+      { type: "join.share_max", currency: "USD", max: m.perGame },
       { type: "payment.agent_recurrence", frequency: "WEEKLY" },
       { type: "payment.budget", max: m.perWeek / 100, currency: "USD" },
       { type: "payment.allowed_payees", allowed },

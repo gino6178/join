@@ -3,15 +3,16 @@
 Two Claude (Sonnet) agents, each acting for one person with that person's own Join token, planned and paid for a game
 using only Join's MCP tools and their descriptions. They had no other instructions about how Join works. Each tool call
 is one JSON line in [`agent-run/organizer.jsonl`](agent-run/organizer.jsonl) and
-[`agent-run/friend.jsonl`](agent-run/friend.jsonl). Mandates are shortened in the logs. Everything ran on PayPal sandbox.
+[`agent-run/friend.jsonl`](agent-run/friend.jsonl); their briefs, verbatim, and their own reports are in
+[`agent-run/briefs.md`](agent-run/briefs.md). Mandates are shortened in the logs. Everything ran on PayPal sandbox.
 
 ## The organizer (Sam)
 
 Sam's brief: badminton or pickleball for Sam, Aisha, Ravi and Kenji this weekend, within Sam's limits.
 
 1. `whoami`, `list_activities`.
-2. `find_options` with `players: 4` returned `group_size`. The agent had passed a count where Join wanted the
-   people's ids. It retried without the count and got options.
+2. `find_options` with `players: 4` returned `group_size`: `players` counts the *other* people, so 4 others plus Sam
+   is 5, over a court's 4. It retried without the count and got options.
 3. `venue_reviews` for Midtown and Riverside, with the group's ids, to see verified reviews and how the group had rated each.
 4. `start_negotiation` at Midtown, Sat 31 Oct 15:00, 90 minutes: the ask was $35.10 after the group discount.
 5. `make_offer` $30 returned `mandate_required`. The agent fetched its AP2 open payment mandate from `whoami` and
@@ -53,8 +54,8 @@ This receipt is exactly as Join recorded it, and Join's log of it hasn't been re
 
 ## What the agents found hard, and what changed
 
-- **`players` meant ids, not a count.** `find_options` now takes `people` for a head count and explains in
-  `group_size` errors which one it needs.
+- **`players` counts the others, not the group.** `find_options` now also takes `people` for the whole group's size and
+  explains in `group_size` errors which one it needs.
 - **The mandate.** Both agents tried an offer or payment without it first. The server instructions and the three
   tools' descriptions now say to present it, and the `mandate` argument is required in the schema.
 - **When does it lock?** `pay_my_share` now returns a `nextStep` saying who still has to pay and when the guarantee

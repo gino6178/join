@@ -15,7 +15,7 @@ import { mockPaypal } from "./pay/mock.js";
 import { configureToolkit, toolkitMode } from "./pay/toolkit.js";
 import { agentOf, sessionOf, createSession, endSession, makeToken, tokensOf, revoke, can, scopeError, COOKIE, VENUE_COOKIE, createVenueSession, venueOf, endVenueSession } from "./auth.js";
 import { getMandate, setMandate } from "./mandate.js";
-import { forPlayer, onActivity, record as recordActivity } from "./activity.js";
+import { forPlayer, onActivity, record as recordActivity, demoScope } from "./activity.js";
 import { getWorld, player, venue, setPolicy } from "./world.js";
 import { usd } from "./negotiate/policy.js";
 import * as receipts from "./proof/receipts.js";
@@ -153,12 +153,14 @@ app.post("/api/scout/understand", limit("agent", +(process.env.AGENT_RPM || 120)
 });
 app.post("/api/scout/:tool", limit("agent", +(process.env.AGENT_RPM || 120)), signedIn, async (req, res) => {
   if (!SCOUT.includes(req.params.tool)) return res.status(404).json({ error: "unknown_tool", tools: SCOUT });
-  const via = String(req.body?._model || "rules"), model = via === "rules" ? "rules" : scout.MODEL;
+  // (_model is what the page says is calling: "webmcp" for a browser's own agent, else Join's website agent. It only picks
+  // the label and the mandate's binding; both act as the signed-in person, within their limits.)
+  const via = String(req.body?._model || "rules");
   const { _model, ...args } = req.body || {};
   // (the person's own session is the trusted surface: Join presents that agent's current open mandate for it)
   const kid = via === "webmcp" ? "webmcp" : "website-agent";
   if (["make_offer", "accept_price", "pay_my_share"].includes(req.params.tool)) args.mandate = ops.openMandates({ player: req.player, token: kid }).payment;
-  try { const r = await TOOLS[req.params.tool](via === "webmcp" ? { player: req.player, client: "Browser agent (WebMCP)", token: "webmcp" } : { player: req.player, client: model === "rules" ? "Join's website agent" : `Join's website agent, ${model}`, token: "website-agent" }, args); res.status(r?.error ? 400 : 200).json(r); } catch (e) { console.error(e); res.status(500).json({ error: "internal" }); }
+  try { const r = await TOOLS[req.params.tool](via === "webmcp" ? { player: req.player, client: "Browser agent (WebMCP)", token: "webmcp" } : { player: req.player, client: "Join's website agent", token: "website-agent" }, args); res.status(r?.error ? 400 : 200).json(r); } catch (e) { console.error(e); res.status(500).json({ error: "internal" }); }
 });
 // the JS SDK v6 on the website: a browser-safe token, and the payer's own approval coming back from the PayPal popup
 app.get("/api/paypal/sdk", signedIn, async (req, res) => {
@@ -209,7 +211,7 @@ app.post("/api/demo/bookings/:id/:act", signedIn, async (req, res) => {
   const other = (id) => b.players.includes(id) && id !== b.organizer;
   const said = (summary) => recordActivity({ actor: { kind: "platform" }, who: b.players, action: "demo_step", ref: b.id, summary: `Demo: ${summary}` });
   const nm = (id) => player(id)?.name.split(" ")[0] || id;
-  try {
+  await demoScope.run(true, async () => { try {
     if (req.params.act === "time-out") { said(`${nm(req.player)} ran the clock out for everyone who hadn't paid.`); return res.json(await settle.expireNow(b.id)); }
     if (!other(who)) return res.status(400).json({ error: "not_invited", message: "Pick someone invited to this booking." });
     if (req.params.act === "pay") {
@@ -223,7 +225,7 @@ app.post("/api/demo/bookings/:id/:act", signedIn, async (req, res) => {
     if (req.params.act === "ask-less") { said(`${nm(req.player)} played ${nm(who)}: asked to pay $1 less.`); return res.json(settle.proposeShare(b.id, who, Math.max(0, b.shares[who] - 100))); }
     if (req.params.act === "decline") { said(`${nm(req.player)} played ${nm(who)}: can't come.`); return res.json(await settle.decline(b.id, who)); }
     res.status(404).json({ error: "unknown_act" });
-  } catch (e) { console.error(e); res.status(500).json({ error: "internal" }); }
+  } catch (e) { console.error(e); res.status(500).json({ error: "internal" }); } });
 });
 app.get("/api/venues/:id/schedule", (req, res) => res.json({ venue: req.params.id, bookings: settle.forVenue(req.params.id) }));
 // live activity for the signed-in player (server-sent events)

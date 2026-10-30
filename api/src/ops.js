@@ -6,7 +6,7 @@ import { getWorld, venue, player, freeUnits, forActivity, ACTIVITIES, activity a
 import * as neg from "./negotiate/engine.js";
 import { price, cents, usd } from "./negotiate/policy.js";
 import { alternatives as alts, shareOf } from "./alternatives.js";
-import { getMandate } from "./mandate.js";
+import { getMandate, coverFits } from "./mandate.js";
 import * as settle from "./pay/settle.js";
 import * as ap2 from "./proof/mandates.js";
 import * as reviews from "./reviews.js";
@@ -97,7 +97,7 @@ export function findOptions(a, { activity = "badminton", dates = [], from = null
   opts.sort((x, y) => y.score - x.score);
   const out = [];
   for (const o of opts) { if (out.length >= 5) break; if (out.some((x) => x.date === o.date && Math.abs(toMin(x.start) - toMin(o.start)) < 120)) continue; out.push(o); }
-  record({ actor: by(a), who: [a.player], action: "searched", summary: `${said(a)} looked for ${activity} with ${need} other${need === 1 ? "" : "s"} over ${days.length} day${days.length > 1 ? "s" : ""}: ${out.length} option${out.length === 1 ? "" : "s"} found.` });
+  record({ actor: by(a), who: [a.player], action: "searched", summary: `${said(a)} looked for ${activity} for ${need + 1} people${days.length === 1 ? ` on ${days[0]}` : ` over ${days.length} days`}: ${out.length ? `${out.length} option${out.length === 1 ? "" : "s"}` : "nothing free"}.` });
   // what the organizer may still commit to for each option: their per-booking limit, or what's left of that week's
   const m = getMandate(a.player), canSpend = (o) => Math.max(0, Math.min(m.perGame, m.perWeek - settle.spentInWeek(a.player, o.date, o.start)));
   return { options: out.map(({ score, ...o }) => ({ ...o, youCanSpend: usd(canSpend(o)) })), mandate: { perGame: usd(m.perGame), perWeek: usd(m.perWeek) }, note: out.length ? "Prices are the venue's opening ask; negotiate with start_negotiation." : "Nothing fits. Try other days, a wider window or fewer players." };
@@ -141,10 +141,10 @@ export function startNegotiation(a, { venue: venueId, activity, date, start, min
 
 // An agent's AP2 open payment mandate, presented with an action that can commit money, checked before the action
 // (mandates.authorize). A person acting on the website themselves (no token) presents none.
-function mandateCheck(a, presented, { venue: venueId, share, date, start, booking = null }) {
+function mandateCheck(a, presented, { venue: venueId, share, authorized = share, date, start, booking = null }) {
   if (!a.token) return null;
   openMandates(a); // (made again first if the person changed a limit, so a stale one is refused)
-  const r = ap2.authorize(presented, { player: a.player, agentKid: a.token, venue: venueId, share, spentThisWeek: settle.spentInWeek(a.player, date, start, booking) }); // (a booking being paid isn't counted twice)
+  const r = ap2.authorize(presented, { player: a.player, agentKid: a.token, venue: venueId, share, authorized, spentThisWeek: settle.spentInWeek(a.player, date, start, booking) }); // (a booking being paid isn't counted twice)
   if (r.ok) return null;
   record({ actor: by(a), who: [a.player], action: "mandate_refused", summary: `${said(a)} was refused: ${r.message}` });
   return { error: r.error, message: r.message, ...(r.receipt ? { ap2Receipt: r.receipt } : {}) };
@@ -184,7 +184,7 @@ export function findAlternatives(a, { activity, date, start, minutes = 90, playe
   const ids = [...new Set([a.player, ...players])].filter((id) => player(id));
   const share = budget != null ? toCents(budget) : getMandate(a.player).perGame;
   const list = alts({ people: ids.map(player), activity, date, start, minutes, budgetShare: share, exclude, from: exclude ? venue(exclude) : null, now: clock() });
-  record({ actor: by(a), who: [a.player], action: "alternatives", summary: `${said(a)} looked for other places for ${activity} on ${date} around ${start}: ${list.length} found.`, data: { alternatives: list } });
+  record({ actor: by(a), who: [a.player], action: "alternatives", summary: list.length ? `${said(a)} compared ${list.length} other place${list.length === 1 ? "" : "s"} for ${activity} on ${date} around ${start}.` : `${said(a)} checked for other places for ${activity} on ${date} around ${start}; none is free then, so it stayed with this one.`, data: { alternatives: list } });
   return { alternatives: list, budgetPerPerson: usd(share), ...(list.some((x) => x.withinBudget && x.venue !== exclude) ? {} : { note: `No other place offers ${activity} within $${usd(share)} a person then. Try another time or another activity the group shares (find_options).` }) };
 }
 
@@ -193,7 +193,11 @@ export const gameStatus = (a, { booking }) => settle.status(booking, a.player);
 
 export async function payMyShare(a, { booking, mandate }) {
   const b0 = settle.status(booking, a.player);
-  if (!b0.error && b0.payments?.[a.player]) { const no = mandateCheck(a, mandate, { venue: b0.venue, share: Math.round(+b0.payments[a.player].share * 100), date: b0.date, start: b0.start, booking }); if (no) return no; }
+  if (!b0.error && b0.payments?.[a.player]) {
+    // (an organizer paying from saved PayPal authorizes the whole price; above `cover`, they approve it in PayPal themselves)
+    const p = b0.payments[a.player], total = Math.round(+b0.total * 100), self = p.role === "organizer" && settle.hasVault(a.player) && coverFits(a.player, total);
+    const no = mandateCheck(a, mandate, { venue: b0.venue, share: Math.round(+p.share * 100), authorized: self ? total : Math.round(+p.share * 100), date: b0.date, start: b0.start, booking }); if (no) return no;
+  }
   const r = await settle.pay(booking, a.player);
   if (!r.error) record({ actor: by(a), who: [a.player], action: "pay_requested", ref: booking, summary: r.you?.status === "authorized" ? (r.you.via === "vault" ? `${said(a)} paid ${first(a.player)}'s $${r.you.authorized} from saved PayPal, within the limit.` : `${said(a)} started ${first(a.player)}'s $${r.you.authorized} payment; PayPal authorized it (${r.you.via}).`) : r.you?.approveUrl ? `${said(a)} asked ${first(a.player)} to approve $${r.you.authorized} in PayPal.` : `${said(a)} checked the payment: ${r.you?.status || r.state}.` });
   const when = "The booking locks when everyone invited has paid, or at payBy (whoever hasn't paid by then is covered by the organizer); nothing is captured before it locks.";
@@ -202,7 +206,14 @@ export async function payMyShare(a, { booking, mandate }) {
 export const declineGame = (a, { booking }) => settle.decline(booking, a.player);
 export function proposeShare(a, { booking, amount }) { const c = amount === 0 ? 0 : toCents(amount); return c === null ? { error: "bad_amount", message: "amount is your share in USD." } : settle.proposeShare(booking, a.player, c); }
 export const requestReimbursement = (a, { booking, player: p }) => settle.requestReimbursement(booking, a.player, p);
-export const answerShare = (a, { booking, player: p, accept }) => settle.answerShare(booking, a.player, p, accept === true);
+// Agreeing that a friend pays less moves the difference onto the organizer, so it carries the mandate like a payment
+export function answerShare(a, { booking, player: p, accept, mandate }) {
+  if (accept === true) {
+    const b0 = settle.status(booking, a.player), ask = (b0.shareAsks || []).find((x) => x.player === p && x.status === "pending");
+    if (!b0.error && ask) { const mine = Math.round(+b0.payments[a.player].share * 100) + Math.round((+ask.from - +ask.amount) * 100); const no = mandateCheck(a, mandate, { venue: b0.venue, share: mine, date: b0.date, start: b0.start, booking }); if (no) return no; }
+  }
+  return settle.answerShare(booking, a.player, p, accept === true);
+}
 export async function cancelBooking(a, { booking }) {
   const r = await settle.cancel(booking, a.player);
   if (r.error) record({ actor: by(a), who: [a.player], action: "cancel_refused", ref: booking, summary: `${said(a)} tried to cancel: ${r.message}` });

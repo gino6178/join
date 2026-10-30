@@ -36,7 +36,11 @@ import * as ap2 from "../proof/mandates.js";
 import * as reviewsMod from "../reviews.js";
 
 export const ORGANIZER_MS = 10 * 60e3;
-export const SHARES_MS = 20 * 60e3;
+// How long friends have to pay once the organizer has guaranteed. The demo town uses 20 minutes, so a judge can watch
+// the window close; a real deployment sets SHARES_MS to a day or so. Never later than 2 hours before the game (and
+// never under 10 minutes), so the venue knows in time.
+export const SHARES_MS = +process.env.SHARES_MS || 20 * 60e3;
+const shareWindowEnd = (b, now) => Math.min(now + SHARES_MS, Math.max(now + 10 * 60e3, startOf(b.date, b.start).getTime() - 2 * 3600e3));
 export const CANCEL_BEFORE_MS = 24 * 3600e3;
 const LIVE = ["awaiting_organizer", "held", "locking", "locked", "played", "venue_paid"];
 
@@ -172,7 +176,7 @@ export async function approvedByOrder(orderId) {
 async function advance(b) {
   const now = clock().getTime(), org = b.payments[b.organizer];
   if (b.state === "awaiting_organizer" && org?.status === "authorized") {
-    b.state = "held"; b.holdUntil = now + SHARES_MS; db.save();
+    b.state = "held"; b.holdUntil = shareWindowEnd(b, now); db.save();
     const until = hm(new Date(b.holdUntil).getHours() * 60 + new Date(b.holdUntil).getMinutes());
     note(b, { kind: "platform" }, "held", `${name(b.organizer)} guaranteed the booking: ${place(b)} is held until ${until}. ${name(b.organizer)} covers anyone who doesn't join and pay by then.`);
     for (const pid of b.players) if (pid !== b.organizer && !b.declined.includes(pid))
@@ -184,29 +188,43 @@ async function advance(b) {
   }
 }
 
+// The lock captures every share, then the organizer's authorization for the rest. It can be interrupted (PayPal refuses
+// a capture, the process stops) and is then resumed from "locking" on the next tick: shares already captured count as
+// paid and aren't captured again. A call cut off by a crash is repeated with the same PayPal-Request-Id, so PayPal treats
+// it as the same call; one PayPal refused is tried with a new id. A friend's capture refused 3 times counts as unpaid,
+// and the organizer covers it.
+const inLock = new Set();
 async function lock(b, reason) {
-  if (b.state !== "held") return;
-  b.state = "locking"; db.save();
-  let covered = 0;
+  if (!["held", "locking"].includes(b.state) || inLock.has(b.id)) return;
+  inLock.add(b.id);
+  try { await lockSteps(b, reason); } finally { inLock.delete(b.id); }
+}
+async function lockSteps(b, reason) {
+  if (b.state === "held") { b.state = "locking"; b.lockReason = reason; db.save(); }
+  reason = b.lockReason || reason;
   for (const pid of b.players) {
     if (pid === b.organizer) continue;
     const p = b.payments[pid];
-    if (p?.status === "authorized") {
+    if (p?.status === "authorized" || (p?.status === "capture_failed" && (p.tries || 0) < 3)) {
       try {
-        const c = await paypalStep(b, `capture:${pid}`, (rid) => pp.capture(p.authorizationId, { amount: p.amount, final: true, requestId: rid }));
+        const c = await paypalStep(b, p.tries ? `capture:${pid}:retry${p.tries}` : `capture:${pid}`, (rid) => pp.capture(p.authorizationId, { amount: p.amount, final: true, requestId: rid }));
         p.captureId = c.id; p.net = c.net; p.status = c.status === "COMPLETED" ? "captured" : c.status.toLowerCase();
-        if (p.status === "captured") covered += p.amount;
-      } catch (e) { p.status = "capture_failed"; p.error = e.message; }
-    } else if (p) p.status = p.status === "awaiting_approval" ? "dropped" : p.status;
+      } catch (e) { p.status = "capture_failed"; p.error = e.message; p.tries = (p.tries || 0) + 1; }
+      db.save();
+    } else if (p?.status === "awaiting_approval") p.status = "dropped";
   }
+  if (b.players.some((pid) => pid !== b.organizer && b.payments[pid]?.status === "capture_failed" && b.payments[pid].tries < 3)) return; // (next tick)
+  const covered = b.players.filter((pid) => pid !== b.organizer && b.payments[pid]?.status === "captured").reduce((t, pid) => t + b.payments[pid].amount, 0);
   const org = b.payments[b.organizer], rest = b.total - covered;
-  try {
-    const c = await paypalStep(b, `capture:${b.organizer}`, (rid) => pp.capture(org.authorizationId, { amount: rest, final: true, requestId: rid }));
-    org.captureId = c.id; org.net = c.net; org.status = "captured"; org.captured = rest;
-  } catch (e) {
-    org.status = "capture_failed"; org.error = e.message; b.state = "held"; db.save();
-    note(b, { kind: "paypal" }, "capture_failed", `PayPal refused to capture the organizer's $${usd(rest)}: ${e.message.slice(0, 120)}`);
-    return;
+  if (org.status !== "captured") {
+    try {
+      const c = await paypalStep(b, org.tries ? `capture:${b.organizer}:retry${org.tries}` : `capture:${b.organizer}`, (rid) => pp.capture(org.authorizationId, { amount: rest, final: true, requestId: rid }));
+      org.captureId = c.id; org.net = c.net; org.status = "captured"; org.captured = rest;
+    } catch (e) {
+      org.status = "capture_failed"; org.error = e.message; org.tries = (org.tries || 0) + 1; db.save(); // (stays "locking": tried again next tick)
+      note(b, { kind: "paypal" }, "capture_failed", `PayPal refused to capture the organizer's $${usd(rest)}: ${e.message.slice(0, 120)}. Join will try again.`);
+      return;
+    }
   }
   b.state = "locked"; b.lockedAt = at(); db.save();
   receipts.issue(Object.assign(b, { ap2: ap2.hashesFor(b.id) }), negotiation(b.negotiation), "locked");
@@ -259,6 +277,7 @@ export async function tick() {
       }
       if (b.state === "awaiting_organizer" && now > b.organizerUntil) await release(b, "released", `${name(b.organizer)} didn't authorize in time, so ${venue(b.venue).name} has ${place(b)} back. Nobody was charged.`);
       else if (b.state === "held" && now > b.holdUntil) await lock(b, "the time to pay ran out");
+      else if (b.state === "locking") await lock(b, "resumed"); // (interrupted: a refused capture, or a restart)
       else if (b.state === "locked" && now > startOf(b.date, b.start).getTime() + b.minutes * 60e3) { b.state = "played"; db.save(); note(b, { kind: "platform" }, "played", "The game is over."); }
       if (b.state === "played" && !b.payout) await payVenue(b);
       await checkReimbursements(b);
@@ -312,7 +331,7 @@ export function proposeShare(bookingId, playerId, amount) {
   const ask = { player: playerId, from: b.shares[playerId], amount, status: "pending", at: at() };
   b.shareAsks.push(ask); db.save();
   record({ actor: { kind: "agent", player: playerId }, who: [playerId, b.organizer], action: "share_asked", ref: b.id, summary: `${name(playerId)}'s agent asked to pay $${usd(amount)} instead of $${usd(ask.from)}. ${name(b.organizer)} would cover the $${usd(ask.from - amount)}.`, data: { from: usd(ask.from), amount: usd(amount) } });
-  return { result: `Asked to pay $${usd(amount)} instead of $${usd(ask.from)}. Pending: ${name(b.organizer)}'s agent answers (it sees the ask in my_plans). Don't pay until then; pay_my_share joins at whatever share stands.`, ...view(b, playerId) };
+  return { result: `Asked to pay $${usd(amount)} instead of $${usd(ask.from)}. Waiting for ${name(b.organizer)} (or their agent) to agree or keep the share; paying before that pays whatever share then stands.`, ...view(b, playerId) };
 }
 
 export function answerShare(bookingId, organizerId, playerId, accept) {
@@ -587,6 +606,7 @@ async function defend(b, disputeId, payerId, by) {
   if (!rid) return { error: "no_receipt", message: "This booking has no receipt yet." };
   const r = receipts.show(rid), p = payerId ? b.payments[payerId] : null, m = payerId ? getMandate(payerId) : null;
   const how = !p ? "" : p.via === "vault" ? ` The disputed payment was made from the payer's saved PayPal by their own agent, within limits only the payer can set on Join (at most $${usd(m.perGame)} a booking, $${usd(m.perWeek)} a week); authorization ${p.authorizationId}, capture ${p.captureId}.`
+    : p.via === "sandbox test card" ? ` The disputed payment was authorized with PayPal's sandbox test card for a demo, not approved by the payer in PayPal (order ${p.orderId}, authorization ${p.authorizationId}, capture ${p.captureId}).`
     : ` The payer approved the disputed payment themselves in PayPal (order ${p.orderId}, authorization ${p.authorizationId}, capture ${p.captureId}).`;
   const notes = `Join booking ${b.id}: ${b.activity} at ${venue(b.venue).name}, ${b.date} ${b.start}, ${place(b)}, $${usd(b.total)} for ${b.players.length} people, locked ${b.lockedAt || ""}.${how} The attached receipt is signed by Join (Ed25519, key ${r.kid}) and lists the negotiation and every payment with its PayPal ids; it is in Join's audit log as entry #${r.batch?.log ?? "(next batch)"}. Verify it at ${publicUrl}/#/receipt/${rid}.`;
   await pp.provideEvidence(disputeId, { notes: `${notes} The AP2 mandates (checkout, and each payment with Join's mandate receipt) are attached alongside the receipt.`, file: JSON.stringify({ receipt: r, ap2: ap2.forBooking(b.id) }) });

@@ -7,7 +7,7 @@ import PayPalButtons from "../components/PayPalButtons.jsx";
 // Deals and bookings: where each one stands, who has paid, and the buttons a person may press themselves.
 const STEPS = [["awaiting_organizer", "Deal"], ["held", "Guaranteed"], ["locked", "Paid and locked"], ["played", "Played"], ["venue_paid", "Venue paid"]];
 const ENDED = { released: "Released: nobody was charged", cancelled: "Cancelled: nobody was charged", refunded: "Cancelled: everyone refunded" };
-const PAY = { invited: "invited, no answer yet", not_started: "not started", creating: "starting", awaiting_approval: "waiting for approval", authorized: "authorized", captured: "paid", voided: "voided", dropped: "didn't pay (covered)", declined: "declined", refunded: "refunded", failed: "failed", capture_failed: "failed", too_late: "too late" };
+const PAY = { invited: "invited, no answer yet", not_started: "not started", creating: "starting", awaiting_approval: "waiting for approval", authorized: "in · held in PayPal", captured: "paid", voided: "voided", dropped: "didn't pay (covered)", declined: "declined", refunded: "refunded", failed: "failed", capture_failed: "failed", too_late: "too late" };
 
 export default function Games({ entries, me, query, demo }) {
   const [tick, setTick] = useState(0);
@@ -57,10 +57,10 @@ function Booking({ b, me, w, focus, demo, done }) {
           {me === b.organizer && <span className="need-btns"><button className="btn ghost" disabled={!!busy} onClick={() => act("answer-share", { player: x.player, accept: false })}>Keep it</button><button className="btn primary" disabled={!!busy} onClick={() => act("answer-share", { player: x.player, accept: true })}>Agree</button></span>}
         </div>))}
       {b.invite && !(b.shareAsks || []).some((x) => x.status === "pending") && <AskLess onAsk={(amount) => act("propose-share", { amount })} share={b.invite.share} busy={!!busy} />}
-      {b.review?.can && <ReviewForm b={b} done={done} />}
+      {b.review?.can && (["played", "venue_paid"].includes(b.state) ? <ReviewForm b={b} done={done} /> : <EarlyReview b={b} done={done} />)}
       {b.review?.done && <p className="small"><Icon name="check" size={14} />You rated {b.venueName} {b.review.done}★. Thank you: agents read verified reviews like yours when they pick venues.</p>}
       <Mandates id={b.id} />
-      {b.receipts?.length > 0 && <p className="small"><Icon name="verify" size={14} />Receipts: {b.receipts.map((x) => <a key={x.id} href={`#/receipt/${x.id}`}>{x.event.replace("_", " ")}</a>).reduce((a, x) => [...a, a.length ? " · " : "", x], [])}</p>}
+      {b.receipts?.length > 0 && <p className="small"><Icon name="verify" size={14} />Receipts: {b.receipts.map((x) => <a key={x.id} href={`#/receipt/${x.id}`}>{RECEIPT[x.event] || x.event}</a>).reduce((a, x) => [...a, a.length ? " · " : "", x], [])}</p>}
       {(b.extras || []).map((x, i) => <p key={i} className="small"><Icon name="store" size={14} />{b.venueName} billed extras ({x.items.join(", ")}): {money(x.total)}, {x.status === "paid" ? "paid" : "waiting to be paid"}{x.url && <> · <a href={x.url} target="_blank" rel="noreferrer">pay the PayPal invoice</a></>}</p>)}
       {(b.reimbursements || []).map((r) => <p key={r.player} className="small"><Icon name="send" size={14} />{r.player === me ? "You" : firstName(w, r.player)}: PayPal invoice for {money(r.amount)}, {r.status === "sent" ? "waiting to be paid" : r.status === "repaid" ? `paid; ${firstName(w, b.organizer)} was paid back with PayPal Payouts` : r.status.replace(/_/g, " ")}</p>)}
       {b.payout && <p className="small"><Icon name="send" size={14} />Venue paid {money(b.payout.amount)} with PayPal Payouts ({String(b.payout.status).toLowerCase()}), after PayPal's fees.</p>}
@@ -144,6 +144,12 @@ function Curve({ hist, list, max }) {
 
 // A verified review: stars, what was good and what wasn't (from a fixed list, so agents can count them), a few words.
 // Only for people who were in the booking and paid; agents can't write reviews.
+const RECEIPT = { locked: "receipt: paid and locked", refunded: "receipt: refunded", venue_paid: "receipt: venue paid" };
+// Reviews open once the game is over. The demo town lets them in earlier (so a judge needn't wait), behind a click.
+function EarlyReview({ b, done }) {
+  const [open, setOpen] = useState(false);
+  return open ? <ReviewForm b={b} done={done} /> : <p className="small muted">Reviews open after the game. <button className="link-btn small" onClick={() => setOpen(true)}>Demo: review it now</button></p>;
+}
 function ReviewForm({ b, done }) {
   const [stars, setStars] = useState(0), [liked, setLiked] = useState([]), [disliked, setDisliked] = useState([]), [text, setText] = useState(""), [err, setErr] = useState(null);
   const a = useApi("/api/reviews/aspects");
@@ -184,7 +190,7 @@ function Mandates({ id }) {
 
 // Demo only: the organizer plays the friends they invited, so the whole split can be seen from one window. Each step is
 // the same call the friend's own agent would make, and the activity log marks it as a demo step.
-const SEAT_STATUS = { authorized: "paid", awaiting_approval: "waiting for PayPal", declined: "can't come" };
+const SEAT_STATUS = { authorized: "in · held in PayPal", awaiting_approval: "waiting for PayPal", declined: "can't come" };
 function Seats({ b, w, done }) {
   const [busy, setBusy] = useState(null), [msg, setMsg] = useState(null);
   const go = async (act, player) => {

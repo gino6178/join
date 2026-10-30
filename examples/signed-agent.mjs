@@ -20,7 +20,7 @@ const priv = crypto.createPrivateKey({ key: JSON.parse(fs.readFileSync(FILE, "ut
 async function signedPost(path, body) {
   const raw = JSON.stringify(body), url = new URL(`${JOIN}${path}`), created = Math.floor(Date.now() / 1000);
   const digest = `sha-256=:${crypto.createHash("sha256").update(raw).digest("base64")}:`;
-  const params = `("@method" "@authority" "@path" "content-digest");created=${created};keyid="${FILE}";alg="ed25519"`;
+  const params = `("@method" "@authority" "@path" "content-digest");created=${created};nonce="${crypto.randomUUID()}";keyid="${FILE}";alg="ed25519"`;
   const base = [`"@method": POST`, `"@authority": ${url.host}`, `"@path": ${url.pathname}`, `"content-digest": ${digest}`, `"@signature-params": ${params}`].join("\n");
   const signature = crypto.sign(null, Buffer.from(base), priv).toString("base64");
   const r = await fetch(url, { method: "POST", body: raw, headers: { "Content-Type": "application/json", Authorization: `Bearer ${process.env.JOIN_TOKEN}`, "Content-Digest": digest, "Signature-Input": `sig1=${params}`, Signature: `sig1=:${signature}:` } });

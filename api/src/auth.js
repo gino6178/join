@@ -79,6 +79,10 @@ export function agentOf(req) {
 // HTTP Message Signatures (RFC 9421), as Web Bot Auth uses them: the request must carry Signature-Input and Signature
 // covering at least "@method", "@authority", "@path" and, with a body, "content-digest" (RFC 9530, sha-256 of the exact
 // bytes received); created within the last five minutes; alg ed25519; signed by the token's key.
+// A signature is accepted once: the same signature again within its five minutes is a replay (agents add a nonce
+// parameter so two identical requests still sign differently).
+const seen = new Map();
+const firstTime = (sig) => { const t = Date.now(); for (const [k, at] of seen) if (t - at > 310e3) seen.delete(k); if (seen.has(sig)) return false; seen.set(sig, t); return true; };
 export function signedBy(req, x) {
   const input = String(req.headers["signature-input"] || ""), sigHeader = String(req.headers.signature || "");
   const m = input.match(/^([\w-]+)=\(([^)]*)\)((?:;[\w-]+=(?:"[^"]*"|\d+))*)$/);
@@ -92,5 +96,5 @@ export function signedBy(req, x) {
   const base = [...fields.map((f) => `"${f}": ${value(f)}`), `"@signature-params": (${fields.map((f) => `"${f}"`).join(" ")})${m[3]}`].join("\n");
   const sig = sigHeader.match(new RegExp(`(?:^|,\\s*)${label}=:([A-Za-z0-9+/=]+):`));
   if (!sig) return false;
-  try { return crypto.verify(null, Buffer.from(base), crypto.createPublicKey({ key: { kty: "OKP", crv: "Ed25519", x }, format: "jwk" }), Buffer.from(sig[1], "base64")); } catch { return false; }
+  try { return crypto.verify(null, Buffer.from(base), crypto.createPublicKey({ key: { kty: "OKP", crv: "Ed25519", x }, format: "jwk" }), Buffer.from(sig[1], "base64")) && firstTime(sig[1]); } catch { return false; }
 }

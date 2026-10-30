@@ -29,7 +29,8 @@ test("an agent's open mandates: signed, bound to its token, with the person's li
   assert.deepEqual(c.cnf, { kid: "tok_test" }); assert.deepEqual(p.cnf, { kid: "tok_test" });
   const k = (m, t) => m.constraints.find((x) => x.type === t);
   assert.ok(k(c, "checkout.line_items").items[0].acceptable_items.some((i) => i.id === "badminton"));
-  assert.equal(k(p, "payment.amount_range").max, 5000);
+  assert.equal(k(p, "payment.amount_range").max, 6000); // (the most it may authorize: an organizer's guarantee, `cover`)
+  assert.equal(k(p, "join.share_max").max, 5000); // (the person's own share per booking)
   assert.equal(k(p, "payment.budget").max, 200);
   assert.equal(k(p, "payment.reference").conditional_transaction_id, ap2.digest(w.openCheckoutMandate));
   // a forged payload doesn't verify
@@ -37,7 +38,7 @@ test("an agent's open mandates: signed, bound to its token, with the person's li
   assert.equal(ap2.verify(`${h}.${Buffer.from(JSON.stringify({ ...p, constraints: [] })).toString("base64url")}.${s}`), null);
   // the person changes a limit: the next look at the mandate is a new one with the new limit
   setMandate("you", { perGame: 1200 });
-  assert.equal(k(ap2.verify(ops.whoami(agent).ap2.openPaymentMandate), "payment.amount_range").max, 1200);
+  assert.equal(k(ap2.verify(ops.whoami(agent).ap2.openPaymentMandate), "join.share_max").max, 1200);
 });
 
 test("a deal: checkout mandate, each payer's payment mandate for that checkout, Join's receipts; refusals get an error receipt", async () => {
@@ -82,7 +83,7 @@ test("AP2 action authorization: an offer, accept or payment needs the agent's ow
   assert.match(tryWith(ops.whoami(agent).ap2.openPaymentMandate).message, /allowed payees/); // the new one doesn't allow this venue
   setMandate("you", { venues: null, perGame: 100 });
   const r = tryWith(ops.whoami(agent).ap2.openPaymentMandate);
-  assert.match(r.message, /amount_range/); // over the per-booking limit
+  assert.match(r.message, /per-booking limit/); // over the per-booking limit
   assert.equal(ap2.verify(r.ap2Receipt).result, "error");
   setMandate("you", { perGame: 5000 });
   assert.equal(tryWith(ops.whoami(agent).ap2.openPaymentMandate).status, "agreed"); // the current, valid mandate works

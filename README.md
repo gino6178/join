@@ -15,7 +15,7 @@ Join holds no AI key, and nothing is sent to an AI service.
 
 PayPal AI Hackathon 2026 · MIT license
 
-![Join's website agent: three options with verified reviews](docs/screenshots/01-agent.png)
+![Join's website agent: three options with verified reviews](docs/screenshots/02-agent.png)
 
 **For judges:** `npm run setup`, `npm start`, open http://localhost:8790/demo?as=you, then `npm run demo` in another
 terminal. No keys needed. How Join maps to each judging criterion (Technological Implementation, Design, Potential
@@ -43,7 +43,7 @@ text, testing instructions and screenshots are in [docs/SUBMISSION.md](docs/SUBM
    the organizer's agent accepts (the organizer covers the difference, within their own limit) or refuses. Joining
    authorizes their share in PayPal, or, if they saved PayPal for their agent (Vault) and the share fits their limits,
    their agent pays it without a redirect.
-6. **Locked.** When everyone has paid (or the 20 minutes run out) each share is captured and the rest is captured from
+6. **Locked.** When everyone has paid (or the payment window closes: 20 minutes in the demo, so you can watch it; `SHARES_MS` sets it, never later than 2 hours before the game) each share is captured and the rest is captured from
    the organizer's authorization: they cover whoever didn't pay. Cancel more than 24 hours ahead: full refunds.
 7. **The venue is paid afterwards** (PayPal Payouts, net of fees), so a cancellation can still be refunded.
 8. **A receipt anyone can check.** Locking, refunding and paying the venue each issue a receipt (see below).
@@ -147,7 +147,7 @@ page) and plans.
   measured in [docs/NEGOTIATION.md](docs/NEGOTIATION.md) (`npm --prefix api run bench`).
 - Only structured fields cross between agents. Every line on the Activity page is written by code from the facts.
 - Nothing is charged until a person approves in PayPal, or within the limits they set for Vault autopay.
-- Every PayPal POST carries a `PayPal-Request-Id` from the booking and step, and is journaled before it is sent.
+- Order, authorization, capture, void, refund and invoice calls carry a `PayPal-Request-Id` and are journaled first; Payouts are keyed by `sender_batch_id`. A lock cut off by a crash or a refused capture resumes from where it stopped, without capturing anything twice.
 
 ## PayPal
 
@@ -233,13 +233,16 @@ and the AP2 mandates to PayPal as evidence the moment a payment is disputed.
 
 ## AP2 mandates
 
-Join signs the Agent Payments Protocol's mandates (github.com/google-agentic-commerce/AP2, its JSON schemas field for
-field), in AP2's "Trusted Agent Provider" model: Join is the agent provider, the Limits page is the trusted surface.
+Join signs the Agent Payments Protocol's mandates (github.com/google-agentic-commerce/AP2, following its JSON schemas),
+in AP2's "Trusted Agent Provider" model: Join is the agent provider, the Limits page is the trusted surface. Join is both the mandates' issuer and their verifier, so a mandate proves nothing a token couldn't; what it adds is a signed record of which limits applied to each action, carried into receipts and dispute evidence. A person signing mandates with their own key (a passkey) is what would make them proof.
 - **Open mandates per agent:** an open checkout mandate (allowed venues, one booking of an activity) and an open payment
-  mandate (the per-booking limit as `payment.amount_range`, the weekly limit as `payment.budget`, allowed payees,
+  mandate (what one payment may authorize as `payment.amount_range`: the per-booking limit, or an organizer's guarantee
+  limit if that is more; the person's own share per booking as `join.share_max`, Join's own constraint; the weekly limit
+  as `payment.budget`; allowed payees,
   PayPal as the payment provider), bound to the agent's token (`cnf.kid`) and made again when the person changes a
   limit. Agents get them from `whoami`.
-- **Checked before acting:** an agent presents its open payment mandate with every offer, accept and payment. Join
+- **Checked before acting:** an agent presents its open payment mandate with every offer, accept, payment and agreed
+  share change. Join
   checks the signature, the expiry, that it's bound to this agent's token, that it's still the person's current one (an
   older, looser one stops working when they change a limit), and its constraints, before anything happens; otherwise it
   refuses with an AP2 error receipt. The database check of the limits stays too.
