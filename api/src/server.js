@@ -32,6 +32,7 @@ const real = process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET &&
 const pp = real ? paypal({ clientId: process.env.PAYPAL_CLIENT_ID, secret: process.env.PAYPAL_CLIENT_SECRET, testCard: process.env.PAYPAL_TEST_CARD === "1" }) : mockPaypal({ publicUrl: PUBLIC_URL });
 settle.configure({ paypal: pp, url: PUBLIC_URL });
 ap2.setIssuer(PUBLIC_URL);
+receipts.setOrigin(process.env.LOG_ORIGIN || `${new URL(PUBLIC_URL).host}/join-receipts`);
 // the back office's PayPal Agent Toolkit uses the same app (or, without keys, the stand-in's records)
 configureToolkit(real ? { token: () => pp.accessToken() } : { standIn: (m, a) => pp.toolkit(m, a) });
 // PayPal's webhooks: Join subscribes itself when it has a public HTTPS address (PayPal only delivers to port 443)
@@ -205,8 +206,15 @@ app.get("/api/activity/stream", signedIn, (req, res) => {
 
 // ---- verifiable receipts ----------------------------------------------------------------------------------------------------
 // Receipts: Join's public key and its audit log's signed head, a receipt, and the log from any entry on
-app.get("/.well-known/join-receipts.json", (req, res) => { const l = receipts.auditLog(); res.json({ keys: [receipts.publicKey()], log: { size: l.head?.size || 0, head: l.head, entries: `${PUBLIC_URL}/api/receipts/log?from=0`, about: "Each entry is a batch's Merkle root and the previous entry's hash; the head is signed with the key above. Keep a copy of a head: later heads must extend it." } }); });
-app.get("/api/receipts/log", (req, res) => res.json(receipts.auditLog(+req.query.from || 0)));
+app.get("/.well-known/join-receipts.json", (req, res) => res.json({ keys: [receipts.publicKey()], log: { ...receipts.logInfo(), checkpointUrl: `${PUBLIC_URL}/api/receipts/log/checkpoint`, proofs: `${PUBLIC_URL}/api/receipts/log/{proof?index=&size=, consistency?from=&to=, entries?from=&to=}`,
+  about: "An RFC 6962 Merkle tree of receipt batches; the checkpoint is a C2SP signed note (c2sp.org/tlog-checkpoint) signed with the key above, with any witnesses' cosignatures (c2sp.org/tlog-cosignature)." } }));
+app.get("/api/receipts/log/checkpoint", (req, res) => { const c = receipts.logInfo().checkpoint; c ? res.type("text/plain").send(c) : res.status(404).end(); });
+app.get("/api/receipts/log/entries", (req, res) => res.json(receipts.entries(+req.query.from || 0, req.query.to != null ? +req.query.to : undefined)));
+app.get("/api/receipts/log/proof", (req, res) => { const p = receipts.inclusion(+req.query.index, req.query.size != null ? +req.query.size : undefined); p ? res.json(p) : res.status(400).json({ error: "bad_range" }); });
+app.get("/api/receipts/log/consistency", (req, res) => { const p = receipts.consistency(+req.query.from, req.query.to != null ? +req.query.to : undefined); p ? res.json(p) : res.status(400).json({ error: "bad_range" }); });
+// witnesses: an operator adds one (demo mode, or ADMIN_TOKEN); a witness then sends its cosignature of the current checkpoint
+app.post("/api/receipts/log/witnesses", (req, res) => { if (!admin(req)) return res.status(403).end(); const r = receipts.addWitness(String(req.body?.name || ""), req.body?.jwk); res.status(r.error ? 400 : 200).json(r); });
+app.post("/api/receipts/log/cosign", (req, res) => { const r = receipts.cosign(String(req.body?.name || ""), String(req.body?.line || "")); res.status(r.error ? 400 : 200).json(r); });
 app.get("/api/receipts/:id", (req, res) => { const r = receipts.show(req.params.id, sessionOf(req)?.player); r ? res.json(r) : res.status(404).json({ error: "no such receipt" }); });
 // (closing a batch now instead of waiting for the next one: in demo mode, or with ADMIN_TOKEN as a bearer token)
 const admin = (req) => DEMO || (process.env.ADMIN_TOKEN && req.headers.authorization === `Bearer ${process.env.ADMIN_TOKEN}`);
@@ -255,4 +263,4 @@ app.use((err, req, res, next) => {
   if (status >= 500) console.error(err);
   res.status(status).json({ error: status === 413 ? "too_large" : status === 400 ? "bad_json" : "internal", message: status === 413 ? "The request body is too large." : status === 400 ? "The request body isn't valid JSON." : "Something went wrong." });
 });
-app.listen(PORT, () => console.log(`Join on ${PUBLIC_URL}  (PayPal: ${pp.mode}; MCP: ${PUBLIC_URL}/mcp; receipts: signed, batched, audit log of ${receipts.auditLog().head?.size || 0} entries; demo sign-in: ${DEMO ? "on" : "off"})`));
+app.listen(PORT, () => console.log(`Join on ${PUBLIC_URL}  (PayPal: ${pp.mode}; MCP: ${PUBLIC_URL}/mcp; receipts: signed, batched, transparency log of ${receipts.logInfo().size} entries; demo sign-in: ${DEMO ? "on" : "off"})`));

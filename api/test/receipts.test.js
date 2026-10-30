@@ -28,28 +28,33 @@ test("a receipt is signed, batched and verifiable; any change breaks it; players
   assert.equal(receipts.verify(forged).hash, false);
 });
 
-test("the audit log: each batch chained to the one before, a signed head; a changed or dropped entry is caught", async () => {
+test("the transparency log: batches in an RFC 6962 tree, a signed C2SP checkpoint, consistency, a witness's cosignature", async () => {
   receipts.receiptsStore.reset(); receipts.auditLogStore.reset();
+  const tlog = await import("../src/proof/tlog.js"), crypto = await import("node:crypto");
   const mk = (id) => receipts.issue({ id, venue: "north", activity: "badminton", date: "2026-11-05", start: "19:00", minutes: 90, unit: 1, total: 2000, players: ["you"], organizer: "you", shares: { you: 2000 }, declined: [], payments: { you: { status: "captured", captured: 2000 } } }, null, "locked");
   const a = mk("bk_a"); await receipts.batch();
-  const kept = structuredClone(receipts.auditLog().head); // someone keeps the head as it was then
+  const kept = tlog.parseNote(receipts.logInfo().checkpoint); // someone keeps the checkpoint as it was then
   const b = mk("bk_b"); mk("bk_c"); await receipts.batch();
   mk("bk_d"); await receipts.batch();
-  const log = receipts.auditLog();
-  assert.equal(log.head.size, 3);
-  assert.equal(log.entries[1].prev, log.entries[0].hash);
-  // a receipt from the first batch checks all the way to the latest head; so does one from a later batch
+  assert.equal(receipts.logInfo().size, 3);
+  // receipts from the first and a later batch check all the way to the latest signed checkpoint
   for (const r of [a, b]) assert.deepEqual(receipts.verify(receipts.show(r.id)), { hash: true, signature: true, proof: true, log: true });
-  // the head kept earlier is still the log's past: its entry is in today's log, unchanged
-  assert.equal(log.entries[kept.size - 1].hash, kept.head);
-  // rewriting an earlier batch root breaks the chain; so does dropping an entry; so does a forged head
-  const pub = receipts.publicKey(), ref = receipts.show(a.id);
-  const changed = structuredClone(ref); changed.log.entries[0].root = "00".repeat(32); changed.batch.root = "00".repeat(32);
+  // today's tree extends the kept checkpoint
+  const now = tlog.parseNote(receipts.logInfo().checkpoint), c = receipts.consistency(kept.size);
+  assert.ok(tlog.verifyConsistency(kept.size, now.size, c.proof.map((x) => Buffer.from(x, "base64")), kept.root, now.root));
+  // a changed batch root, a wrong index or a forged checkpoint is caught
+  const ref = receipts.show(a.id);
+  const changed = structuredClone(ref); changed.log.entry.root = "00".repeat(32); changed.batch.root = "00".repeat(32);
   assert.equal(receipts.verify(changed).log, false);
-  const dropped = structuredClone(ref); dropped.log.entries.splice(1, 1);
-  assert.equal(receipts.verify(dropped).log, false);
-  const forged = structuredClone(ref); forged.log.head.size += 1;
+  const moved = structuredClone(ref); moved.log.index = 1;
+  assert.equal(receipts.verify(moved).log, false);
+  const forged = structuredClone(ref); forged.log.checkpoint = forged.log.checkpoint.replace("\n3\n", "\n4\n"); forged.log.size = 4;
   assert.equal(receipts.verify(forged).log, false);
-  assert.ok(pub.kid);
+  // a witness: added by the operator, cosigns the current checkpoint; a cosignature over anything else is refused
+  const w = crypto.generateKeyPairSync("ed25519"), jwk = w.publicKey.export({ format: "jwk" }), sign = (buf) => crypto.sign(null, buf, w.privateKey);
+  assert.deepEqual(receipts.addWitness("venue.example/witness", jwk), { ok: true });
+  assert.equal(receipts.cosign("venue.example/witness", tlog.cosignatureLine("venue.example/witness", kept.text, 1777000000, sign, jwk)).error, "bad_cosignature");
+  assert.equal(receipts.cosign("venue.example/witness", tlog.cosignatureLine("venue.example/witness", now.text, 1777000000, sign, jwk)).ok, true);
+  assert.equal(tlog.verifyNoteSig(tlog.parseNote(receipts.logInfo().checkpoint), "venue.example/witness", jwk, 0x04), 1777000000);
   assert.equal(await receipts.batch(), null); // nothing new to batch
 });
