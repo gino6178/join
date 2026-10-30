@@ -187,7 +187,7 @@ little Sepolia ether from a faucet). Without them, receipts are still signed and
 | `api/data/world.json` | The made-up demo town (USD, placed on San Jose, CA) |
 | `web/` | The website (React, Vite) |
 | `examples/` | Agents from outside: scripted (no key), a Claude player agent, a Claude venue agent on the PayPal Agent Toolkit; the receipt verifier |
-| `docs/` | The Devpost submission ([SUBMISSION.md](docs/SUBMISSION.md)), screenshots, the demo video script |
+| `docs/` | The Devpost submission ([SUBMISSION.md](docs/SUBMISSION.md)), the technical overview ([TECHNICAL.md](docs/TECHNICAL.md)), screenshots, the demo video script |
 
 ## What's new since 1 October 2026
 
