@@ -20,6 +20,7 @@ import { usd } from "./negotiate/policy.js";
 import * as receipts from "./proof/receipts.js";
 import * as scout from "./scout/understand.js";
 import * as ap2 from "./proof/mandates.js";
+import * as reviews from "./reviews.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 // a small .env reader, so the server needs no package for it
@@ -31,6 +32,7 @@ const DEMO = process.env.DEMO_SIGNIN !== "0";
 const real = process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET && process.env.PAYPAL_MODE !== "mock";
 const pp = real ? paypal({ clientId: process.env.PAYPAL_CLIENT_ID, secret: process.env.PAYPAL_CLIENT_SECRET, testCard: process.env.PAYPAL_TEST_CARD === "1" }) : mockPaypal({ publicUrl: PUBLIC_URL });
 settle.configure({ paypal: pp, url: PUBLIC_URL });
+settle.allowEarlyReviews(DEMO);
 ap2.setIssuer(PUBLIC_URL);
 receipts.setOrigin(process.env.LOG_ORIGIN || `${new URL(PUBLIC_URL).host}/join-receipts`);
 // the back office's PayPal Agent Toolkit uses the same app (or, without keys, the stand-in's records)
@@ -77,7 +79,7 @@ app.all("/mcp", (req, res) => mcp.handle(req, res).catch((e) => { console.error(
 // the same tools as plain REST, for agents and scripts that don't speak MCP: POST /api/agent/<tool> with JSON arguments
 const TOOLS = { whoami: ops.whoami, list_activities: () => ops.listActivities(), list_venues: (a, x) => ops.listVenues(x), find_options: ops.findOptions, start_negotiation: ops.startNegotiation, make_offer: ops.makeOffer, accept_price: ops.acceptPrice,
   walk_away: ops.walkAway, find_alternatives: ops.findAlternatives, my_plans: (a, x) => ops.myGames(a, x), booking_status: ops.gameStatus, pay_my_share: ops.payMyShare, decline_invite: ops.declineGame, cancel_booking: ops.cancelBooking,
-  propose_share: ops.proposeShare, answer_share: ops.answerShare, request_reimbursement: ops.requestReimbursement };
+  propose_share: ops.proposeShare, answer_share: ops.answerShare, request_reimbursement: ops.requestReimbursement, venue_reviews: (a, x) => ops.venueReviews(a, x) };
 app.post("/api/agent/:tool", async (req, res) => {
   const a = agentOf(req);
   if (!a) return res.status(401).json({ error: "unauthorized", message: "Send a player's agent token: Authorization: Bearer join_..." });
@@ -131,7 +133,7 @@ app.post("/api/bookings/:id/:act", signedIn, async (req, res) => {
 // Join's website agent, for people who don't bring one. It understands what they ask on Join's own server (Qwen2.5 0.5B
 // through a local Ollama, or rules; scout/understand.js), then calls the same tools their own agent would, as them,
 // under the same limits. It can search, negotiate and accept; paying stays with the person, in PayPal.
-const SCOUT = ["whoami", "list_activities", "find_options", "start_negotiation", "make_offer", "accept_price", "walk_away", "find_alternatives", "booking_status", "my_plans"];
+const SCOUT = ["whoami", "list_activities", "venue_reviews", "find_options", "start_negotiation", "make_offer", "accept_price", "walk_away", "find_alternatives", "booking_status", "my_plans"];
 app.post("/api/scout/understand", limit("agent", +(process.env.AGENT_RPM || 120)), signedIn, async (req, res) => {
   const history = (Array.isArray(req.body?.history) ? req.body.history : []).slice(-8).map((m) => ({ role: m.role === "assistant" ? "assistant" : "user", content: String(m.content || "").slice(0, 500) }));
   if (!history.length) return res.status(400).json({ error: "empty" });
@@ -151,6 +153,14 @@ app.get("/api/paypal/sdk", signedIn, async (req, res) => {
 });
 // a booking's AP2 mandates (checkout, each payment, Join's mandate receipts), for the people in it
 app.get("/api/bookings/:id/ap2", signedIn, (req, res) => { const b = settle.internal(req.params.id); if (!b || !b.players.includes(req.player)) return res.status(404).json({ error: "no such booking" }); res.json(ap2.forBooking(b.id)); });
+// verified reviews: anyone may read a venue's; a person reviews a booking they were in and paid for (never an agent)
+app.get("/api/venues/:id/reviews", (req, res) => { const r = ops.venueReviews({ player: sessionOf(req)?.player || null }, { venue: req.params.id, activity: req.query.activity || null }); res.status(r.error ? 404 : 200).json(r); });
+app.post("/api/bookings/:id/review", signedIn, (req, res) => {
+  const b = settle.internal(req.params.id), r = reviews.add(req.player, b, { stars: +req.body?.stars, liked: req.body?.liked, disliked: req.body?.disliked, text: req.body?.text }, { canReview: settle.canReview });
+  if (!r.error) recordActivity({ actor: { kind: "player", player: req.player }, who: [req.player], action: "reviewed", ref: b.id, summary: `${player(req.player).name.split(" ")[0]} reviewed ${venue(b.venue).name}: ${r.review.stars}★.` });
+  res.status(r.error ? 400 : 200).json(r);
+});
+app.get("/api/reviews/aspects", (req, res) => res.json({ liked: reviews.ASPECTS, complaints: reviews.COMPLAINTS }));
 // balances with friends across plans, and settling up with one netted PayPal invoice
 app.get("/api/ledger", signedIn, (req, res) => res.json(settle.ledger(req.player)));
 app.post("/api/ledger/settle", signedIn, async (req, res) => { const r = await settle.settleUp(req.player, String(req.body?.friend || "")); res.status(r.error ? 400 : 200).json(r); });

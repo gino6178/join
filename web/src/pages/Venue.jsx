@@ -56,6 +56,7 @@ function Policy({ id, name, bookings = [] }) {
   if (!p) return null;
   return (<>
     <VenueMoney id={id} bookings={bookings} />
+    <VenueReviews id={id} />
     <form className="card form" onSubmit={save}>
       <h3>How Join negotiates for {name}</h3>
       <p className="small muted">Agents never see your floor. They see your list price, your discounts, and your counter-offers on the schedule you pick.</p>
@@ -74,4 +75,21 @@ function Policy({ id, name, bookings = [] }) {
       <button className="btn primary">Save rules</button>
     </form>
   </>);
+}
+
+// What verified customers say: the venue sees the same reviews and score agents use, and can't remove any
+function VenueReviews({ id }) {
+  const r = useApi(`/api/venues/${id}/reviews`);
+  if (!r.data) return null;
+  const s = r.data;
+  return (
+    <section className="card">
+      <h3>Reviews <small className="muted">verified: only people who booked and paid on Join{s.demoData ? "; this demo town's reviews are demo data" : ""}</small></h3>
+      <p><b>★{s.score.toFixed(1)}</b> from {s.count} reviews ({s.recent} in the last 90 days). Agents rank venues with this score and repeat what's counted below.</p>
+      {s.praise.length > 0 && <p className="small good-text">Liked: {s.praise.map((p) => `${p.label} (${p.count})`).join(", ")}</p>}
+      {s.complaints.length > 0 && <p className="small warn-text">Complaints: {s.complaints.map((p) => `${p.label} (${p.count})`).join(", ")}</p>}
+      <ul className="reviews-list">{s.latest.map((x, i) => <li key={i}><b>{"★".repeat(x.stars)}</b> <small className="muted">{x.at} · {x.activity} · {x.verified}</small><br />{x.text || <span className="muted">(no text)</span>}</li>)}</ul>
+      <p className="small muted">Reviews can't be removed or hidden by the venue.</p>
+    </section>
+  );
 }

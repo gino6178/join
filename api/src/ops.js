@@ -9,6 +9,7 @@ import { alternatives as alts, shareOf } from "./alternatives.js";
 import { getMandate } from "./mandate.js";
 import * as settle from "./pay/settle.js";
 import * as ap2 from "./proof/mandates.js";
+import * as reviews from "./reviews.js";
 import { record } from "./activity.js";
 import { trips } from "./geo.js";
 import { DAYS, addDays, dateOf, freeAt, hm, isDate, isTime, toMin, windows, ymd, startOf } from "./time.js";
@@ -45,6 +46,7 @@ export function listVenues({ activity } = {}) {
   return { currency: "USD", town: w.town.name, venues: w.venues.filter((v) => !activity || forActivity(v, activity)).map((v) => ({
     id: v.id, name: v.name, area: v.area, open: v.open, weekendOpen: v.weekendOpen || null,
     offers: Object.fromEntries(Object.keys(v.offers).map((k) => { const o = forActivity(v, k); return [k, { units: o.units, unit: o.unit, people: `${o.min}-${o.max}`, price: usd(cents(o.price)), per: o.per === "person" ? "person" : `${o.unit} per hour`, minutes: o.minutes }]; })),
+    reviews: (({ score, count, praise, complaints, demoData }) => ({ score, count, liked: praise.map((p) => p.label), complaints: complaints.map((p) => p.label), demoData: demoData > 0 }))(reviews.summary(v.id, { activity })),
     negotiates: { style: v.policy.style, maxCounterOffers: v.policy.style === "firm" ? 0 : v.policy.rounds, discounts: [`off-peak ${v.policy.offPeak.pct * 100}% (weekday bookings ending by ${v.policy.offPeak.before})`, `group ${v.policy.group.pct * 100}% (${v.policy.group.min}+ people)`, `last-minute ${v.policy.lastMinute.pct * 100}% (within ${v.policy.lastMinute.withinHours} h)`] },
   })), publicPlaces: (w.publicPlaces || []).filter((p) => !activity || p.activities.includes(activity)).map((p) => ({ id: p.id, name: p.name, activities: p.activities, lit: p.lit, bookable: false })) };
 }
@@ -73,16 +75,20 @@ export function findOptions(a, { activity = "badminton", dates = [], from = null
         .sort((x, y) => y.score - x.score);
       if (free.length < need) continue;
       const group = [me, ...free.slice(0, need).map((x) => x.p)];
+      // the venue for this slot: the shortest longest trip, moved by what verified reviews say (a star above the town's
+      // average is worth 8 minutes; anyone in the group who rated it 2★ or less costs 30), then the price
       let best = null;
       for (const v of getWorld().venues) {
         if (!forActivity(v, activity) || !freeUnits(v.id, activity, d, hm(s), minutes).length) continue;
         const t = trips(group, v), q = price(v, { activity, date: d, start: hm(s), minutes, players: group.length }, now);
-        if (!best || t.longest < best.longestTrip || (t.longest === best.longestTrip && q.ask < best.ask)) best = { venue: v.id, venueName: v.name, longestTrip: t.longest, trips: t.list, ask: q.ask, discounts: q.discounts.map((x) => x.kind) };
+        const rv = reviewsFor(v.id, activity, group.map((g) => g.id)), cost = t.longest + reviews.rankAdjust(rv) + q.ask / group.length / 100;
+        if (!best || cost < best.cost) best = { cost, venue: v.id, venueName: v.name, longestTrip: t.longest, trips: t.list, ask: q.ask, discounts: q.discounts.map((x) => x.kind), reviews: rv };
       }
       if (!best) continue;
       const asked = want.filter((id) => group.some((g) => g.id === id)).length;
       opts.push({ date: d, day: DAYS[date.getDay()], start: hm(s), minutes, players: group.map((g) => g.id), names: group.map((g) => g.name), alsoFree: free.slice(need, need + 3).map((x) => x.p.id),
         venue: best.venue, venueName: best.venueName, longestTrip: best.longestTrip, askPrice: usd(best.ask), share: usd(shareOf(best.ask, group.length)), discounts: best.discounts,
+        reviews: { score: best.reviews.score, count: best.reviews.count, praise: best.reviews.praise.map((p) => p.aspect), complaints: best.reviews.complaints.map((p) => p.aspect), groupLow: best.reviews.groupLow, demoData: best.reviews.demoData > 0, reason: reviews.reason(best.reviews) },
         score: asked * 5 - best.longestTrip * 0.2 - best.ask / 1000 - days.indexOf(d) * 0.3 });
     }
   }
@@ -107,6 +113,17 @@ function withTerms(a, r) {
 const withRefusal = (a, r) => (r?.error === "over_mandate" ? { ...r, ap2Receipt: ap2.mandateReceipt(openMandates(a).payment, { ok: false, error: "invalid_mandate", why: r.message }) } : r);
 // the organizer's share of the agreed price (the remainder of an even split)
 const organizerShare = (n) => { const t = cents(n.agreed.amount), k = n.players.length; return usd(t - Math.floor(t / k) * (k - 1)); };
+
+// what verified reviews say about a venue, for this group (cached per call of find_options)
+const reviewsFor = (venueId, activity, group) => reviews.summary(venueId, { activity, group });
+
+// Verified reviews of a venue: the score (a recency-weighted Bayesian average), what people liked and complained about
+// (counted from a fixed list of aspects), anyone in the group who rated it low, and the latest few as quotes
+export function venueReviews(a, { venue: venueId, activity = null, players = [] } = {}) {
+  if (!venue(venueId)) return { error: "unknown_venue", message: "No such venue (list_venues)." };
+  const s = reviews.summary(venueId, { activity, group: [a.player, ...players] });
+  return { ...s, venueName: venue(venueId).name, reason: reviews.reason(s), about: "Only people who booked and paid on Join can review; agents can read reviews, never write them. Score: a recency-weighted Bayesian average. Seed reviews in the demo town are demo data." };
+}
 
 export function startNegotiation(a, { venue: venueId, activity, date, start, minutes = 90, players = [] }) {
   openMandates(a);

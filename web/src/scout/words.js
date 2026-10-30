@@ -3,6 +3,11 @@
 const ZH_NAME = { badminton: "羽球", tennis: "網球", pickleball: "匹克球", basketball: "籃球", volleyball: "排球", "table tennis": "桌球", karaoke: "唱歌", "escape room": "密室逃脫", "board games": "桌遊", bbq: "烤肉", "hot pot": "火鍋" };
 const ZH_DAY = "日一二三四五六";
 const $ = (x) => `$${(+x).toFixed(2)}`;
+// review aspects (api/src/reviews.js ASPECTS and COMPLAINTS), as each language says them
+const LIKED = { en: { clean: "clean", staff: "friendly staff", value: "good value", equipment: "equipment in good shape", space: "roomy", access: "easy to get to", quiet: "quiet", ontime: "on time", food: "food and drinks", atmosphere: "atmosphere" },
+  zh: { clean: "乾淨", staff: "服務親切", value: "划算", equipment: "設備好", space: "空間大", access: "交通方便", quiet: "安靜", ontime: "準時", food: "餐飲好", atmosphere: "氣氛好" } };
+const DISLIKED = { en: { clean: "not clean", staff: "unhelpful staff", value: "pricey", equipment: "worn equipment", space: "cramped", access: "hard to get to", quiet: "noisy", ontime: "waiting to start", food: "food", atmosphere: "no atmosphere" },
+  zh: { clean: "不夠乾淨", staff: "服務差", value: "偏貴", equipment: "設備老舊", space: "空間擠", access: "交通不便", quiet: "吵", ontime: "要等", food: "餐飲普通", atmosphere: "沒氣氛" } };
 const enDay = (d) => new Date(`${d}T12:00:00Z`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });
 const zhDay = (d) => { const x = new Date(`${d}T12:00:00Z`); return `${x.getUTCMonth() + 1}/${x.getUTCDate()}（${ZH_DAY[x.getUTCDay()]}）`; };
 const list = (xs, and) => (xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} ${and} ${xs.at(-1)}`);
@@ -12,19 +17,23 @@ export const WORDS = {
     day: enDay,
     hello: (n) => `Hi ${n}. Tell me what you'd like to do with friends (in English or 中文), and I'll find a time and a place, haggle with the venue, and get it ready for PayPal.`,
     overLimit: (budget, limit) => `You said ${$(budget)} a person, but your limit on Join is ${$(limit)}, so I'll keep to ${$(limit)}. You can change it on the Limits page.`,
-    options: (n, cap) => `Here ${n === 1 ? "is one option" : `are ${n} options`}. I'll aim for ${$(cap)} a person. Pick one and I'll negotiate.`,
+    options: (n, cap) => `Here ${n === 1 ? "is one option" : `are ${n} options`}, picked by everyone's trip, price and verified reviews. I'll aim for ${$(cap)} a person. Pick one and I'll negotiate.`,
     nothing: (b, act) => `Nothing fits on ${b.dates.map(enDay).join(", ")}${b.from ? ` between ${b.from} and ${b.to}` : ""}: I need ${b.players} friend${b.players === 1 ? "" : "s"} who ${act} and are free then, and a venue with room. Try another day, a wider time, or fewer people.`,
     likes: (a) => `like ${a}`,
     notFree: (names) => `${list(names, "and")} ${names.length === 1 ? "isn't" : "aren't"} free then`,
     why: { free: (n) => `${n} people free`, trip: (m) => `longest trip ${m} min`, discount: (d) => `${d} discount` },
     card: { asked: "asked", each: "each", haggle: "over your budget, I'll haggle", tooFar: "too far over your limit to haggle", negotiate: "Negotiate this", week: (x) => `your weekly limit leaves $${(+x).toFixed(2)} that week` },
     style: { eager: "venue haggles readily", standard: "venue haggles", firm: "fixed price, no haggling" },
+    stars: (r) => (r?.count ? `★${r.score.toFixed(1)} · ${r.count} verified review${r.count === 1 ? "" : "s"}${r.demoData ? " (demo data)" : ""}` : "no reviews yet"),
+    liked: (keys) => `liked: ${keys.map((k) => LIKED.en[k] || k).join(", ")}`, complaints: (keys) => `complaints: ${keys.map((k) => DISLIKED.en[k] || k).join(", ")}`,
+    groupLow: (xs) => `${xs.map((g) => `${g.name} rated it ${g.stars}★`).join(", ")}: I'd steer clear`,
+    aspect: (k) => LIKED.en[k], complaint: (k) => DISLIKED.en[k],
     confirm: (v, most, each, people) => `Before I start: I'll agree to at most ${$(most)} in total (${$(each)} each for ${people}), and I may ask a couple of nearby venues too, to compare. If the venue agrees, you guarantee the whole price in PayPal until your friends pay. You pay only your own share unless someone doesn't pay; then you cover them, at most the whole price.`,
     go: "Go ahead", notThis: "Not this one", stopped: "OK, I won't negotiate that one. Pick another option, or tell me what to change.",
     talking: (v, d, s) => `Talking to ${v} about ${enDay(d)} ${s}…`,
     shopping: (names) => `Asking ${list(names, "and")} too, to compare.`,
     kept: (v, x) => `${v} is the best price: ${$(x)}. Booking it.`,
-    compare: (qs) => `Best prices: ${qs.map((q) => `${q.name} ${$(q.ask)} (${$(q.share)} each, ${q.start})`).join("; ")}. Which one?`,
+    compare: (qs) => `Best prices: ${qs.map((q) => `${q.name} ${$(q.ask)} (${$(q.share)} each, ${q.start}${q.rating ? `, ★${(+q.rating).toFixed(1)}` : ""})`).join("; ")}. Which one?`,
     book: (v, x) => `Book ${v}, ${$(x)}`, none: "None of these",
     asks: (v, ask, share) => `${v} asks ${$(ask)} (${$(share)} each).`,
     offered: (o, v, c, fin) => `Offered ${$(o)}. ${v} countered ${$(c)}${fin ? ", best and final" : ""}.`,
@@ -53,19 +62,23 @@ export const WORDS = {
     day: zhDay,
     hello: (n) => `嗨 ${n}！想跟朋友做什麼？用中文或英文告訴我，我會找時間和地點、跟場地談價，再準備好 PayPal 付款。`,
     overLimit: (budget, limit) => `你說每人 ${$(budget)}，但你在 Join 設的上限是每人 ${$(limit)}，我會以 ${$(limit)} 為準；可以到 Limits 頁修改。`,
-    options: (n, cap) => `找到 ${n} 個選項，我會以每人 ${$(cap)} 為目標。選一個，我去談價。`,
+    options: (n, cap) => `找到 ${n} 個選項，依大家的車程、價格和已驗證評價挑的。我會以每人 ${$(cap)} 為目標。選一個，我去談價。`,
     nothing: (b, act) => `${b.dates.map(zhDay).join("、")}${b.from ? ` ${b.from}–${b.to}` : ""} 沒有合適的：需要 ${b.players} 位${act}而且那時有空的朋友，加上有空位的場地。換一天、放寬時間，或少幾個人試試。`,
     likes: (a) => `喜歡${ZH_NAME[a] || a}`,
     notFree: (names) => `${names.join("、")} 那時沒空`,
     why: { free: (n) => `${n} 人有空`, trip: (m) => `最遠車程 ${m} 分鐘`, discount: (d) => `${d} 折扣` },
     card: { asked: "開價", each: "每人", haggle: "超過預算，我去談", tooFar: "超出上限太多，談不下來", negotiate: "去談這個", week: (x) => `你的每週上限那週只剩 $${(+x).toFixed(2)}` },
     style: { eager: "這家很好談", standard: "這家可以談", firm: "固定價格，不議價" },
+    stars: (r) => (r?.count ? `★${r.score.toFixed(1)} · ${r.count} 則已驗證評價${r.demoData ? "（示範資料）" : ""}` : "還沒有評價"),
+    liked: (keys) => `好評：${keys.map((k) => LIKED.zh[k] || k).join("、")}`, complaints: (keys) => `負評：${keys.map((k) => DISLIKED.zh[k] || k).join("、")}`,
+    groupLow: (xs) => `${xs.map((g) => `${g.name} 給過 ${g.stars} 星`).join("、")}，建議避開`,
+    aspect: (k) => LIKED.zh[k], complaint: (k) => DISLIKED.zh[k],
     confirm: (v, most, each, people) => `開始前先說清楚：我最多同意總共 ${$(most)}（${people} 人，每人 ${$(each)}），也可能順便問附近一兩家比價。場地同意的話，你要先在 PayPal 擔保整筆金額，直到朋友們付款。正常情況你只付自己那份；有人沒付的話由你補上，最多就是整筆金額。`,
     go: "好，開始談", notThis: "不要這個", stopped: "好，這個先不談。可以選別的選項，或告訴我要改什麼。",
     talking: (v, d, s) => `正在跟 ${v} 談 ${zhDay(d)} ${s} 的價格…`,
     shopping: (names) => `也問問 ${names.join("、")}，比較一下。`,
     kept: (v, x) => `${v} 價格最好：${$(x)}，就訂這家。`,
-    compare: (qs) => `最好的價格：${qs.map((q) => `${q.name} ${$(q.ask)}（每人 ${$(q.share)}，${q.start}）`).join("；")}。要哪一家？`,
+    compare: (qs) => `最好的價格：${qs.map((q) => `${q.name} ${$(q.ask)}（每人 ${$(q.share)}，${q.start}${q.rating ? `，★${(+q.rating).toFixed(1)}` : ""}）`).join("；")}。要哪一家？`,
     book: (v, x) => `訂 ${v}，${$(x)}`, none: "都不要",
     asks: (v, ask, share) => `${v} 開價 ${$(ask)}（每人 ${$(share)}）。`,
     offered: (o, v, c, fin) => `我出 ${$(o)}，${v} 還價 ${$(c)}${fin ? "（最後價格）" : ""}。`,

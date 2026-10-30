@@ -271,3 +271,9 @@ legend { font-size: var(--fs-14); color: var(--ink-2); padding: 0 6px; }
 .ap2-body pre { max-height: 220px; overflow: auto; font-size: 11px; background: var(--control); padding: 8px; border-radius: var(--r-md); }
 .drawer-actions.wrap { flex-wrap: wrap; }
 .token-opts { grid-column: 1 / -1; border: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; } .token-opts legend { font-weight: 600; margin-bottom: 4px; } .form .wide { grid-column: 1 / -1; }
+.stars { font-weight: 600; font-size: 13px; } .good-text { color: var(--good); font-size: 12px; }
+.review-form { display: flex; flex-direction: column; gap: 8px; border: 1px solid var(--rule); border-radius: var(--r-md); padding: var(--s3); margin: var(--s2) 0; }
+.review-form .starsel button { border: 0; background: none; font-size: 22px; cursor: pointer; color: var(--ink-3); padding: 0 2px; } .review-form .starsel button.on { color: #f5a524; }
+.review-form textarea { font: inherit; padding: 8px; border-radius: var(--r-md); border: 1px solid var(--rule-strong); background: var(--bg); color: var(--ink); min-height: 56px; }
+.chip.on { background: var(--accent); color: var(--accent-ink); border-color: var(--accent); } .chip.bad.on { background: var(--bad); border-color: var(--bad); }
+.reviews-list li { margin: 6px 0; list-style: none; } .reviews-list { padding: 0; }

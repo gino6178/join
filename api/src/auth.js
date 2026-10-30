@@ -37,7 +37,7 @@ export function sessionOf(req) { const s = sessions.get(cookie(req, COOKIE) || "
 
 // What each scope allows: reading, negotiating (and answering invitations), paying a share
 export const SCOPES = ["read", "negotiate", "pay"];
-const NEEDS = { whoami: "read", list_activities: "read", list_venues: "read", find_options: "read", find_alternatives: "read", my_plans: "read", booking_status: "read",
+const NEEDS = { venue_reviews: "read", whoami: "read", list_activities: "read", list_venues: "read", find_options: "read", find_alternatives: "read", my_plans: "read", booking_status: "read",
   start_negotiation: "negotiate", make_offer: "negotiate", accept_price: "negotiate", walk_away: "negotiate", propose_share: "negotiate", answer_share: "negotiate",
   decline_invite: "negotiate", cancel_booking: "negotiate", request_reimbursement: "negotiate", pay_my_share: "pay" };
 export const can = (a, tool) => !a?.scopes || a.scopes.includes(NEEDS[tool] || "negotiate");

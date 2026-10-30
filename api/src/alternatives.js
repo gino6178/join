@@ -6,6 +6,7 @@ import { getWorld, freeUnits, forActivity } from "./world.js";
 import { price, usd } from "./negotiate/policy.js";
 import { trips } from "./geo.js";
 import { hm, toMin } from "./time.js";
+import * as reviews from "./reviews.js";
 
 const SHIFTS = [0, -30, 30, -60, 60];
 export const shareOf = (amount, n) => Math.ceil(amount / Math.max(1, n));
@@ -24,7 +25,9 @@ export function alternatives({ people, activity, date, start, minutes, budgetSha
       const units = freeUnits(v.id, activity, date, terms.start, minutes);
       if (!units.length) continue;
       const q = price(v, terms, now), share = shareOf(q.ask, n);
-      const cand = { kind: "venue", bookable: true, venue: v.id, name: v.name, start: terms.start, shift: d, unitsFree: units.length, price: q.ask, share, withinBudget: share <= budgetShare, longestTrip: t.longest, trips: t.list, discounts: q.discounts.map((x) => x.kind) };
+      const rv = reviews.summary(v.id, { activity, group: people.map((p) => p.id) });
+      const cand = { kind: "venue", bookable: true, venue: v.id, name: v.name, start: terms.start, shift: d, unitsFree: units.length, price: q.ask, share, withinBudget: share <= budgetShare, longestTrip: t.longest, trips: t.list, discounts: q.discounts.map((x) => x.kind),
+        rating: rv.count ? rv.score : null, ratingAdjust: reviews.rankAdjust(rv), reviews: reviews.reason(rv), groupLow: rv.groupLow.map((g) => g.name) };
       if (!best || rank(cand) < rank(best)) best = cand;
     }
     if (best) out.push(best);
@@ -38,11 +41,12 @@ export function alternatives({ people, activity, date, start, minutes, budgetSha
   const pub = out.filter((x) => !x.bookable).slice(0, 1);
   const list = [...out.filter((x) => x.bookable).slice(0, limit - pub.length), ...pub];
   // (money leaves as USD strings, like every answer to an agent)
-  return list.map((x) => ({ ...x, price: usd(x.price), share: usd(x.share), why: why(x, { base, budgetShare, start }) }));
+  return list.map(({ ratingAdjust, ...x }) => ({ ...x, price: usd(x.price), share: usd(x.share), why: why(x, { base, budgetShare, start }) }));
 }
 
 // lower is better: bookable before public, within budget, same time, shortest longest trip, cheapest
-const rank = (x) => (x.bookable ? 0 : 1e9) + (x.withinBudget ? 0 : 1e8) + Math.abs(x.shift) * 1e4 + x.longestTrip * 100 + x.price / 1e4;
+// (verified reviews move a venue like minutes of travel do: reviews.rankAdjust)
+const rank = (x) => (x.bookable ? 0 : 1e9) + (x.withinBudget ? 0 : 1e8) + Math.abs(x.shift) * 1e4 + (x.longestTrip + (x.ratingAdjust || 0)) * 100 + x.price / 1e4;
 
 function why(x, { base, budgetShare, start }) {
   const parts = [];
@@ -53,5 +57,6 @@ function why(x, { base, budgetShare, start }) {
   else parts.push(`longest trip ${x.longestTrip} min`);
   if (x.kind === "public" && x.lit === false) parts.push("no lights");
   if (x.discounts?.length) parts.push(`${x.discounts.join(" + ")} price`);
+  if (x.reviews && x.reviews !== "no reviews yet") parts.push(x.reviews);
   return parts.join("; ");
 }

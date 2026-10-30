@@ -33,6 +33,7 @@ import { record } from "../activity.js";
 import { startOf, toMin, hm } from "../time.js";
 import { usd } from "../negotiate/policy.js";
 import * as ap2 from "../proof/mandates.js";
+import * as reviewsMod from "../reviews.js";
 
 export const ORGANIZER_MS = 10 * 60e3;
 export const SHARES_MS = 20 * 60e3;
@@ -366,6 +367,7 @@ export function view(b, viewer) {
     currency: "USD", total: usd(b.total), organizer: b.organizer, players: b.players, declined: b.declined,
     guaranteeBy: b.state === "awaiting_organizer" ? new Date(b.organizerUntil).toISOString() : null, payBy: b.state === "held" ? new Date(b.holdUntil).toISOString() : null,
     payments: Object.fromEntries(b.players.map((pid) => { const p = b.payments[pid]; return [pid, { share: usd(b.shares[pid]), ...(pid === b.organizer ? { guarantee: usd(b.total), paid: p?.captured != null ? usd(p.captured) : null } : {}), role: pid === b.organizer ? "organizer" : "share", status: b.declined.includes(pid) ? "declined" : p?.status || (pid !== b.organizer && b.state === "held" ? "invited" : "not_started"), via: p?.via || null }]; })),
+    review: viewer ? (reviewsMod.byPlayer(viewer, b.id) ? { done: reviewsMod.byPlayer(viewer, b.id).stars } : canReview(b, viewer).ok ? { can: true } : null) : null,
     invite: viewer !== b.organizer && b.state === "held" && !mine && !b.declined.includes(viewer) ? { share: usd(b.shares[viewer]), payBy: new Date(b.holdUntil).toISOString() } : null,
     you: mine ? { share: usd(b.shares[viewer]), ...(mine.role === "organizer" ? { guarantee: usd(b.total) } : {}), authorized: usd(mine.amount), paid: mine.status === "captured" ? usd(mine.captured ?? mine.amount) : "0.00", status: mine.status, via: mine.via,
       approveUrl: mine.status === "awaiting_approval" ? mine.approveUrl : null, orderId: mine.status === "awaiting_approval" ? mine.orderId : null, ...(mine.status === "awaiting_approval" && mine.why ? { note: mine.why } : {}),
@@ -427,6 +429,20 @@ async function checkReimbursements(b) {
     if (r.status !== "sent") continue;
     try { const inv = await pp.getInvoice(r.invoiceId); if (inv.status === "PAID" || inv.status === "MARKED_AS_PAID") await reimbursed(b, r); } catch {}
   }
+}
+
+// ---- reviews: who may review a booking -----------------------------------------------------------------------------
+// Someone who was in it and paid (the organizer, or anyone whose share was captured), once it's locked and has started.
+// (In demo mode a locked booking can be reviewed before it starts, so the demo doesn't have to wait for the game.)
+let demoReviews = false;
+export const allowEarlyReviews = (on) => { demoReviews = !!on; };
+export function canReview(b, playerId) {
+  if (!b || !b.players.includes(playerId)) return { error: "not_in_booking", message: "Only people in this booking can review it." };
+  if (!["locked", "played", "venue_paid"].includes(b.state)) return { error: "not_yet", message: "You can review a booking once it's paid and locked." };
+  const p = b.payments[playerId];
+  if (playerId !== b.organizer && p?.status !== "captured") return { error: "not_paid", message: "Only people who paid for this booking can review it." };
+  if (!demoReviews && clock() < startOf(b.date, b.start)) return { error: "not_yet", message: "You can review it once it has started." };
+  return { ok: true };
 }
 
 // ---- balances with friends, across plans ----------------------------------------------------------------------------

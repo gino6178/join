@@ -96,6 +96,10 @@ export default function AgentDrawer({ me, info, open, onClose }) {
           {o.missing.length > 0 && <small className="warn-text">{w.notFree(o.missing.map(firstName))}</small>}
           {o.weekCut && <small className="warn-text">{w.card.week(o.limit)}</small>}
           <span><b>{money(o.askPrice)}</b> {w.card.asked} · {money(o.share)} {w.card.each}{o.fit !== "ok" ? ` · ${w.card[o.fit]}` : ""}</span>
+          <span className="stars">{w.stars(o.reviews)}</span>
+          {o.reviews?.praise?.length > 0 && <small className="good-text">{w.liked(o.reviews.praise)}</small>}
+          {o.reviews?.complaints?.length > 0 && <small className="warn-text">{w.complaints(o.reviews.complaints)}</small>}
+          {o.reviews?.groupLow?.length > 0 && <small className="warn-text">{w.groupLow(o.reviews.groupLow)}</small>}
           <span className="tags">{(o.discounts || []).length > 0 && <span className="tag good">{o.discounts.map((d) => w.why.discount(d)).join(" + ")}</span>}{world?.venues.find((v) => v.id === o.venue)?.style && <span className="tag">{w.style[world.venues.find((v) => v.id === o.venue).style]}</span>}</span>
           <small className="muted">{o.why.filter((x, i) => i < 2).join(" · ")}</small>
           <button className="btn primary small" disabled={busy || o.fit === "tooFar"} onClick={() => ask(o)}>{w.card.negotiate}</button>

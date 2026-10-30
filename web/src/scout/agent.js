@@ -62,14 +62,15 @@ export async function negotiate(o, brief, model, say, w) {
   if (first.deal || (first.error && !first.quote)) return first;
   const quotes = [{ n: first.quote, o }];
   // other venues for the same plan, at about the same time, within what the person may pay
-  const alts = ((await alternatives(o, brief, model)).alternatives || []).filter((a) => a.bookable !== false && a.venue !== o.venue && a.withinBudget !== false).slice(0, 2);
+  const alts = ((await alternatives(o, brief, model)).alternatives || []).filter((a) => a.bookable !== false && a.venue !== o.venue && a.withinBudget !== false && !(a.groupLow || []).length).slice(0, 2);
   if (alts.length) say(w.shopping(alts.map((a) => a.name)));
   for (const a of alts) {
-    const ao = { ...o, venue: a.venue, venueName: a.name, start: a.start, askPrice: a.price };
+    const ao = { ...o, venue: a.venue, venueName: a.name, start: a.start, askPrice: a.price, rating: a.rating };
     const r = await haggle(ao, brief, model, say, w);
     if (r.deal) { for (const q of quotes) await walkAway(q.n, model); return r; } // (a venue took an offer: that's the booking)
     if (r.quote) quotes.push({ n: r.quote, o: ao });
   }
+  // (alternatives a group member rated 2★ or less, find_alternatives says so, are dropped; the rest by price)
   const fits = quotes.filter((q) => +q.n.ask / people <= o.limit).sort((x, y) => +x.n.ask - +y.n.ask);
   for (const q of quotes.filter((x) => !fits.includes(x))) await walkAway(q.n, model);
   if (!fits.length) return { error: w.bestOverLimit(first.quote.ask, first.quote.share, o.limit) };
@@ -80,7 +81,7 @@ export async function negotiate(o, brief, model, say, w) {
     if (fits.length > 1) say(w.kept(mine.n.venueName, mine.n.ask));
     return acceptDeal(mine.n, model);
   }
-  return { choices: fits.map((q) => ({ n: q.n, o: q.o, over: +q.n.ask > target })), note: fits.length > 1 ? w.compare(fits.map((q) => ({ name: q.n.venueName, ask: q.n.ask, share: q.n.share, start: q.o.start }))) : w.bestOverBudget(best.n.ask, best.n.share, cap) };
+  return { choices: fits.map((q) => ({ n: q.n, o: q.o, over: +q.n.ask > target })), note: fits.length > 1 ? w.compare(fits.map((q) => ({ name: q.n.venueName, ask: q.n.ask, share: q.n.share, start: q.o.start, rating: q.o.rating ?? q.o.reviews?.score }))) : w.bestOverBudget(best.n.ask, best.n.share, cap) };
 }
 
 export async function acceptDeal(n, model) {

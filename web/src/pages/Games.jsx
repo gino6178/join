@@ -53,6 +53,8 @@ function Booking({ b, me, w, focus, demo, done }) {
           {me === b.organizer && <span className="need-btns"><button className="btn ghost" disabled={!!busy} onClick={() => act("answer-share", { player: x.player, accept: false })}>Keep it</button><button className="btn primary" disabled={!!busy} onClick={() => act("answer-share", { player: x.player, accept: true })}>Agree</button></span>}
         </div>))}
       {b.invite && !(b.shareAsks || []).some((x) => x.status === "pending") && <AskLess onAsk={(amount) => act("propose-share", { amount })} share={b.invite.share} busy={!!busy} />}
+      {b.review?.can && <ReviewForm b={b} done={done} />}
+      {b.review?.done && <p className="small"><Icon name="check" size={14} />You rated {b.venueName} {b.review.done}★. Thank you: agents read verified reviews like yours when they pick venues.</p>}
       <Mandates id={b.id} />
       {b.receipts?.length > 0 && <p className="small"><Icon name="verify" size={14} />Receipts: {b.receipts.map((x) => <a key={x.id} href={`#/receipt/${x.id}`}>{x.event.replace("_", " ")}</a>).reduce((a, x) => [...a, a.length ? " · " : "", x], [])}</p>}
       {(b.extras || []).map((x, i) => <p key={i} className="small"><Icon name="store" size={14} />{b.venueName} billed extras ({x.items.join(", ")}): {money(x.total)}, {x.status === "paid" ? "paid" : "waiting to be paid"}{x.url && <> · <a href={x.url} target="_blank" rel="noreferrer">pay the PayPal invoice</a></>}</p>)}
@@ -133,6 +135,27 @@ function Curve({ hist, list, max }) {
       </svg>
       <figcaption className="small muted"><span className="key ask" /> venue's ask <span className="key offer" /> your agent's offer · the venue's floor is never shown</figcaption>
     </figure>
+  );
+}
+
+// A verified review: stars, what was good and what wasn't (from a fixed list, so agents can count them), a few words.
+// Only for people who were in the booking and paid; agents can't write reviews.
+function ReviewForm({ b, done }) {
+  const [stars, setStars] = useState(0), [liked, setLiked] = useState([]), [disliked, setDisliked] = useState([]), [text, setText] = useState(""), [err, setErr] = useState(null);
+  const a = useApi("/api/reviews/aspects");
+  const flip = (xs, set, k) => set(xs.includes(k) ? xs.filter((x) => x !== k) : [...xs, k]);
+  const send = async () => { setErr(null); try { await api(`/api/bookings/${b.id}/review`, { method: "POST", body: { stars, liked, disliked, text } }); done(); } catch (e) { setErr(e.message); } };
+  if (!a.data) return null;
+  return (
+    <div className="review-form">
+      <b>How was {b.venueName}?</b>
+      <span className="starsel">{[1, 2, 3, 4, 5].map((n) => <button key={n} className={n <= stars ? "on" : ""} onClick={() => setStars(n)} aria-label={`${n} stars`}>★</button>)}</span>
+      <span className="chips">{Object.entries(a.data.liked).map(([k, label]) => <button key={k} className={`chip ${liked.includes(k) ? "on" : ""}`} onClick={() => flip(liked, setLiked, k)}>{label}</button>)}</span>
+      <span className="chips">{Object.entries(a.data.complaints).map(([k, label]) => <button key={k} className={`chip bad ${disliked.includes(k) ? "on" : ""}`} onClick={() => flip(disliked, setDisliked, k)}>{label}</button>)}</span>
+      <textarea value={text} onChange={(e) => setText(e.target.value)} maxLength={400} placeholder="A few words for the next group (optional)" />
+      <button className="btn primary small" disabled={!stars} onClick={send}>Post a verified review</button>
+      {err && <p className="err">{err}</p>}
+    </div>
   );
 }
 
