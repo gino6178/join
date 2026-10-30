@@ -102,7 +102,9 @@ export function summary(venueId, { activity = null, group = [], viewer = null } 
 // A short reason, written by code from the summary (what the agent says about a venue)
 export function reason(s) {
   if (!s.count) return "no reviews yet";
-  const bits = [`★${s.score.toFixed(1)} from ${s.count} verified review${s.count === 1 ? "" : "s"}${!s.demoData ? "" : s.demoData === s.count ? " (demo data)" : ` (${s.demoData} of them demo data)`}`];
+  // (only reviews from people who booked and paid on Join are "verified"; the demo town's seed reviews are "demo")
+  const real = s.count - (s.demoData || 0);
+  const bits = [`★${s.score.toFixed(1)} from ${!s.demoData ? `${s.count} verified review${s.count === 1 ? "" : "s"}` : real ? `${real} verified and ${s.demoData} demo reviews` : `${s.count} demo reviews`}`];
   if (s.praise.length) bits.push(`liked: ${s.praise.map((p) => `${p.label} (${p.count})`).join(", ")}`);
   if (s.complaints.length) bits.push(`complaints: ${s.complaints.map((p) => `${p.label} (${p.count})`).join(", ")}`);
   for (const n of s.tasteNotes || []) bits.push(`${n.you ? (n.good ? "you care about" : "you mind") : n.good ? "someone in your group cares about" : "someone in your group minds"} ${n.good ? ASPECTS[n.aspect] : COMPLAINTS[n.aspect]}: ${n.count} review${n.count === 1 ? "" : "s"} ${n.good ? "praise" : "complain about"} it here`);

@@ -23,7 +23,7 @@ test("a score is a Bayesian average: a venue with many good reviews outranks one
   assert.ok(mid.score > west.score);
   assert.ok(mid.count >= 3 && west.count >= 3);
   assert.ok(west.complaints.some((c) => c.label === "worn equipment"));
-  assert.ok(reviews.reason(mid).startsWith(`★${mid.score.toFixed(1)} from ${mid.count} verified reviews (demo data)`));
+  assert.ok(reviews.reason(mid).startsWith(`★${mid.score.toFixed(1)} from ${mid.count} demo reviews`)); // (seed reviews are never called verified)
   // a venue's score stays near the town's average with few reviews, even if they're perfect
   assert.ok(reviews.summary("north", { activity: "volleyball" }).score < 5);
 });

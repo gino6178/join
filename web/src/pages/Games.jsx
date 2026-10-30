@@ -45,7 +45,7 @@ function Booking({ b, me, w, focus, demo, done }) {
       {b.payBy && <p className="small"><Icon name="clock" size={14} />Shares due by {clock(b.payBy)}. {firstName(w, b.organizer)} covers anyone who doesn't pay.</p>}
       <table className="pays"><thead><tr><th>Player</th><th>Pays</th><th>Status</th><th>How</th></tr></thead><tbody>
         {b.players.map((pid) => { const p = b.payments[pid]; return (
-          <tr key={pid} className={pid === me ? "me" : ""}><td>{pid === me ? "You" : firstName(w, pid)}{pid === b.organizer && <small> organizer</small>}</td><td>{p.role === "organizer" ? <>{money(p.paid ?? p.share)}<small>{p.paid != null && +p.paid > +p.share ? " (covered others)" : ` · guarantees ${money(p.guarantee)}`}</small></> : money(p.share)}</td><td><span className={`st ${p.status}`}>{PAY[p.status] || p.status}</span></td><td><small>{p.via === "vault" ? "saved PayPal, by the agent" : p.via === "approval" ? "approved in PayPal" : p.via === "sandbox test card" ? "PayPal sandbox test card" : ""}</small></td></tr>); })}
+          <tr key={pid} className={pid === me ? "me" : ""}><td><span className="avatar sm">{firstName(w, pid)[0]}</span> {pid === me ? "You" : firstName(w, pid)}{pid === b.organizer && <small> organizer</small>}</td><td>{p.role === "organizer" ? <>{money(p.paid ?? p.share)}<small>{p.paid != null && +p.paid > +p.share ? " (covered others)" : ` · guarantees ${money(p.guarantee)}`}</small></> : money(p.share)}</td><td><span className={`st ${p.status}`}>{PAY[p.status] || p.status}</span></td><td><small>{p.via === "vault" ? "saved PayPal, by the agent" : p.via === "approval" ? "approved in PayPal" : p.via === "sandbox test card" ? "PayPal sandbox test card" : ""}</small></td></tr>); })}
       </tbody></table>
       {(() => { // who the organizer paid for, said plainly (the table alone reads as if everyone paid)
         const org = b.payments[b.organizer], short = b.players.filter((pid) => pid !== b.organizer && b.payments[pid]?.status !== "captured");
@@ -171,7 +171,7 @@ function Mandates({ id }) {
   const short = (x) => (x?.payload ? { vct: x.payload.vct, ...Object.fromEntries(Object.entries(x.payload).filter(([k]) => !["iss", "iat", "exp", "vct", "checkout_jwt"].includes(k))) } : null);
   return (
     <div className="ap2">
-      <button className="link-btn small" onClick={load}><Icon name="verify" size={14} />AP2 mandates {open ? "▾" : "▸"}</button>
+      <button className="link-btn small" onClick={load}><Icon name="verify" size={14} />Signed authorizations (AP2) {open ? "▾" : "▸"}</button>
       {open && m && (m.checkoutMandate ? <div className="ap2-body">
         <p className="small muted">Signed by Join (Ed25519, the key at /.well-known/join-receipts.json) as the agent provider, in AP2's schema. The payments refer to the checkout by its hash.</p>
         <b className="small">Checkout <code>{m.checkout_hash.slice(0, 16)}…</code></b><pre>{JSON.stringify(m.checkout.payload, null, 1)}</pre>

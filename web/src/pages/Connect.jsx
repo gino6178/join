@@ -30,7 +30,9 @@ export default function Connect({ me, info, reload }) {
           {[["read", "look: options, venues, plans"], ["negotiate", "negotiate, accept, answer invitations"], ["pay", "start your payments (you approve in PayPal, or saved PayPal within your limits)"]].map(([s, t]) => <label key={s} className="check"><input type="checkbox" checked={scopes.includes(s)} onChange={() => flip(s)} />{t}</label>)}
         </fieldset>
         <label><span>For</span><select value={days} onChange={(e) => setDays(+e.target.value)}>{[1, 7, 30, 90, 365].map((d) => <option key={d} value={d}>{d === 1 ? "1 day" : `${d} days`}</option>)}</select></label>
-        <label className="wide"><span>Public key (optional): every request must then be signed with its private key (RFC 9421, as in Web Bot Auth)</span><input value={key} onChange={(e) => setKey(e.target.value)} placeholder="Ed25519 public key, base64url (examples/signed-agent.mjs --key)" /></label>
+        <details className="wide"><summary className="small">Advanced: require signed requests</summary>
+          <label className="wide"><span>Public key (optional): every request must then be signed with its private key (RFC 9421, as in Web Bot Auth)</span><input value={key} onChange={(e) => setKey(e.target.value)} placeholder="Ed25519 public key, base64url (examples/signed-agent.mjs --key)" /></label>
+        </details>
       </form>
       {made && <p className="note good">Token for <b>{made.label}</b>: <code className="tok">{made.token}</code> Copy it now: Join keeps only a hash and can't show it again.</p>}
       <section className="card">

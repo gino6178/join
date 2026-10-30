@@ -6,3 +6,4 @@
 !**/.env.example
 api/data/state/
 web/dist/
+examples/witness.json

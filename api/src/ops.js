@@ -54,12 +54,13 @@ export function listVenues({ activity } = {}) {
 
 // Who is free and when, and the fair venue for each: the organizer's usual free times (or the window they give), the
 // people interested in the activity who are free then, and the venue with a free unit whose longest trip is shortest.
-export function findOptions(a, { activity = "badminton", dates = [], from = null, to = null, minutes = null, players = 3, with: want = [] } = {}) {
+export function findOptions(a, { activity = "badminton", dates = [], from = null, to = null, minutes = null, players = 3, people = null, with: want = [] } = {}) {
+  if (Number.isInteger(people) && people >= 1) players = people - 1; // ("people" is the whole group, your user included)
   const now = clock(), me = player(a.player), act = getActivity(activity);
   if (!act) return { error: "unknown_activity", message: `activity is one of ${ACTIVITIES().join(", ")}.` };
   minutes ??= act.minutes.includes(90) ? 90 : act.minutes[0];
   if (!act.minutes.includes(minutes)) return { error: "bad_length", message: `${activity} is booked for ${act.minutes.join(", ")} minutes.` };
-  if (players + 1 < act.min || players + 1 > act.max) return { error: "group_size", message: `One ${act.unit} for ${activity} takes ${act.min} to ${act.max} people, you included.` };
+  if (players + 1 < act.min || players + 1 > act.max) return { error: "group_size", message: `One ${act.unit} for ${activity} takes ${act.min} to ${act.max} people, your user included. "players" counts only the others (${act.min - 1} to ${act.max - 1}); or pass "people" for the whole group.` };
   if ((from && !isTime(from)) || (to && !isTime(to)) || dates.some((d) => !isDate(d))) return { error: "bad_time", message: "dates are YYYY-MM-DD, from and to HH:MM." };
   const need = Math.max(1, Math.min(11, players | 0));
   const days = dates.length ? dates.slice(0, 7) : Array.from({ length: 7 }, (_, i) => addDays(ymd(now), i));
@@ -195,7 +196,8 @@ export async function payMyShare(a, { booking, mandate }) {
   if (!b0.error && b0.payments?.[a.player]) { const no = mandateCheck(a, mandate, { venue: b0.venue, share: Math.round(+b0.payments[a.player].share * 100), date: b0.date, start: b0.start, booking }); if (no) return no; }
   const r = await settle.pay(booking, a.player);
   if (!r.error) record({ actor: by(a), who: [a.player], action: "pay_requested", ref: booking, summary: r.you?.status === "authorized" ? (r.you.via === "vault" ? `${said(a)} paid ${first(a.player)}'s $${r.you.authorized} from saved PayPal, within the limit.` : `${said(a)} started ${first(a.player)}'s $${r.you.authorized} payment; PayPal authorized it (${r.you.via}).`) : r.you?.approveUrl ? `${said(a)} asked ${first(a.player)} to approve $${r.you.authorized} in PayPal.` : `${said(a)} checked the payment: ${r.you?.status || r.state}.` });
-  return r.you?.approveUrl ? { ...r, nextStep: "PAYER_ACTION_REQUIRED: show approveUrl to your user. They approve in PayPal; check booking_status afterwards." } : r;
+  const when = "The booking locks when everyone invited has paid, or at payBy (whoever hasn't paid by then is covered by the organizer); nothing is captured before it locks.";
+  return r.you?.approveUrl ? { ...r, nextStep: `PAYER_ACTION_REQUIRED: show approveUrl to your user. They approve in PayPal; check booking_status afterwards. ${when}` } : r.error ? r : { ...r, nextStep: when };
 }
 export const declineGame = (a, { booking }) => settle.decline(booking, a.player);
 export function proposeShare(a, { booking, amount }) { const c = amount === 0 ? 0 : toCents(amount); return c === null ? { error: "bad_amount", message: "amount is your share in USD." } : settle.proposeShare(booking, a.player, c); }

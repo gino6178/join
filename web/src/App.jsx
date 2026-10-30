@@ -47,7 +47,7 @@ export default function App() {
 function Scout({ me, info }) {
   const asked = () => new URLSearchParams(location.hash.split("?")[1] || "").has("agent");
   const [open, setOpen] = useState(asked);
-  useEffect(() => { const f = () => asked() && setOpen(true); addEventListener("hashchange", f); return () => removeEventListener("hashchange", f); }, []);
+  useEffect(() => { const f = () => asked() && setOpen(true), g = () => setOpen(true); addEventListener("hashchange", f); addEventListener("join:open-agent", g); return () => { removeEventListener("hashchange", f); removeEventListener("join:open-agent", g); }; }, []);
   return <>{!open && <button className="btn primary agent-fab" onClick={() => setOpen(true)}><Icon name="spark" size={16} />No agent? Ask Join's</button>}<AgentDrawer me={me} info={info} open={open} onClose={() => setOpen(false)} /></>;
 }
 
