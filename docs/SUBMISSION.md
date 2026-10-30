@@ -48,8 +48,8 @@ without limits and a way to check what it did.
 ### What it does
 
 Join is an agent-ready marketplace for getting a group together: sports courts, karaoke rooms, escape rooms, board game
-tables, barbecue pits, dinner tables. Join runs no AI model of its own. People bring their own agents (Claude, or any MCP
-or A2A agent), and Join supplies the rules and the money.
+tables, barbecue pits, dinner tables. People bring their own agents (Claude, or any MCP or A2A agent), and Join
+supplies the rules and the money. Someone without an agent uses Join's own, on the website.
 
 - **Find a plan.** Who's free, and the fairest venue for each time: the one where the longest trip in the group is
   shortest.
@@ -66,6 +66,10 @@ or A2A agent), and Join supplies the rules and the money.
 - **Loose ends, settled with PayPal.** Someone who said yes but never paid gets a PayPal invoice, and the organizer is
   paid back with Payouts. A venue bills extras like overtime with an invoice, reconciles against PayPal's records, and
   answers a chargeback with Join's signed receipt.
+- **No agent? Use Join's.** A drawer on the website asks what you want ("karaoke Friday night, 4 of us, $15 each",
+  or the same in Chinese), shows three options with reasons, haggles and accepts as you under your limits, then hands
+  you the PayPal button. It runs in your browser: Qwen through WebLLM if you choose to download it, plain rules
+  otherwise. Join holds no AI key.
 - **See every step.** The website shows each person what the agents did, in words Join writes from the facts: every
   search, offer, counter, invitation and payment.
 - **Limits only people can set.** Per-booking and per-week limits and allowed venues are set on the website. Agent
@@ -102,7 +106,11 @@ or A2A agent), and Join supplies the rules and the money.
 - **Bryntum Scheduler** shows a venue its courts and rooms, with payments driving the schedule.
 - **Receipts:** Ed25519-signed and batched in SHA-256 Merkle trees; anyone can check one in the browser or with a
   script that shares no code with Join.
-- Node, Express, React, Vite. 25 automated tests, including an end-to-end run of four agents over MCP.
+- **Join's website agent:** Qwen2.5-1.5B-Instruct in the browser with WebLLM (WebGPU), its output held to a JSON
+  schema and checked by code; a rules reader as the fallback. It calls the same tools as any agent.
+- **Receipts on chain, no tokens:** batch roots in a zero-value transaction ("JOIN" + root) on a local Hardhat node for
+  testing, and one public seal transaction for production.
+- Node, Express, React, Vite. 29 automated tests, including an end-to-end run of four agents over MCP.
 
 ### Challenges we ran into
 
@@ -152,7 +160,10 @@ bryntum-scheduler, node.js, express, react, vite
   their own decisions and reporting what confused them; we fixed what they found.
 - **The PayPal Agent Toolkit** (`@paypal/agent-toolkit`): its tools run Join's venue back office (reconciliation,
   invoices, disputes) and the venue agent.
-- **Join itself runs no model.** It's the market and the rules: negotiation policy, mandates, settlement. Everything an
+- **Qwen, for people without an agent.** Join's website agent runs Qwen2.5-1.5B-Instruct in the person's browser
+  (WebLLM), only to understand what they ask for; searching, haggling and accepting are fixed code. Join's server runs
+  no model and holds no AI key.
+- **Join's server is the market and the rules:** negotiation policy, mandates, settlement. Everything an
   agent does is shown to the people involved in code-written sentences.
 - **Development:** built with Claude Code as a coding assistant.
 
@@ -167,7 +178,9 @@ bryntum-scheduler, node.js, express, react, vite
 4. In another terminal, `npm run demo` runs four agents over MCP: an over-budget venue, alternatives, haggling, an ask
    to pay less, the guarantee, four shares, and the lock. Then refresh the website. Other plans:
    `JOIN_ACTIVITY=karaoke npm run demo` (or `"escape room"`, `"board games"`, `bbq`, `"hot pot"`).
-5. `npm test` runs 25 tests, including the end-to-end MCP run.
+5. No agent? Click **No agent? Ask Join's** on the website and type a plan, e.g. "karaoke Friday night, 4 of us,
+   $15 each". "Use Qwen in your browser" downloads the model (about 1 GB, WebGPU); otherwise it uses rules.
+6. `npm test` runs 29 tests, including the end-to-end MCP run.
 
 Without keys, Join runs on a PayPal stand-in that moves no money and says so on every page.
 
@@ -188,7 +201,9 @@ Without keys, Join runs on a PayPal stand-in that moves no money and says so on 
 - Reconcile, bill extras, see disputes. With the stand-in, "Simulate a buyer's dispute" opens one to answer.
 
 **Receipts:** a booking's receipt link opens a page that checks it in the browser;
-`node examples/verify-receipt.mjs <id>` checks it independently.
+`node examples/verify-receipt.mjs <id>` checks it independently. With `npm run chain` (a local Hardhat node) and
+`ANCHOR_RPC_URL` / `ANCHOR_PRIVATE_KEY` set as in `api/.env.example`, each batch root also goes on chain and
+`--rpc http://127.0.0.1:8545` checks the transaction.
 
 ## Was this an existing project?
 
@@ -205,7 +220,8 @@ submission period:
 - invitations and the negotiated split
 - per-person agent tokens
 - all PayPal integration
-- verifiable receipts
+- verifiable receipts and their on-chain anchoring
+- Join's website agent
 - the MCP, REST and A2A interfaces
 - the activity log
 - the website with Bryntum Scheduler

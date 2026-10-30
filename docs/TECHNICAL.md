@@ -10,13 +10,14 @@ Join is a marketplace for getting a group together (a sports court, a karaoke ro
 a barbecue pit, a dinner table). People's own AI agents use it to find who is free, negotiate the price with a venue,
 split the cost and settle it with PayPal.
 
-**Join runs no AI model.** It is the market and its rules:
+**Join's server runs no AI model and holds no AI key.** It is the market and its rules:
 - the venues' negotiation policies
 - each person's spending mandate
 - settlement with PayPal
 - an activity log of everything the agents did
 
-Agents reach it over MCP, REST or A2A, with a per-person token.
+Agents reach it over MCP, REST or A2A, with a per-person token. For people without an agent, the website has its own
+(§10.1): it runs in the person's browser and calls the same operations with their session.
 
 ## 2. Architecture
 
@@ -34,12 +35,13 @@ Agents reach it over MCP, REST or A2A, with a per-person token.
  |  engine.js                                           pay/paypal.js  --> PayPal REST (sandbox)
  |                                                      pay/toolkit.js --> PayPal Agent Toolkit
  |                                                      pay/mock.js (stand-in without keys)
- |  world.js (town, venues, offers, people)   proof/ (receipts, Merkle, Sepolia anchor)
+ |  world.js (town, venues, offers, people)   proof/ (receipts, Merkle, EVM anchor)    
  |  auth.js (sessions, agent tokens)          store.js (atomic JSON files, api/data/state)
  +---------------------------------------------------------------------------------+
         ^                                                   ^
         | session cookie                                     | PayPal webhooks, return URLs
- web/ (React, Vite): Activity, Plans, Map, Limits, Connect, Venue view (Bryntum), Receipt
+ web/ (React, Vite): Activity, Plans, Map, Limits, Connect, Venue view (Bryntum), Receipt,
+      Join's website agent (Qwen via WebLLM or rules, in the browser) --> /api/scout/<tool>
 ```
 
 | Area | Files (lines) |
@@ -54,7 +56,8 @@ Agents reach it over MCP, REST or A2A, with a per-person token.
 | World and storage | `api/src/world.js` (98), `api/data/world.json`, `api/src/store.js` (37) |
 | Website | `web/src/**` (about 1,000 lines) |
 | Examples | `examples/scripted-agent.mjs`, `claude-agent.mjs`, `venue-agent.mjs`, `toolkit-cli.mjs`, `verify-receipt.mjs` |
-| Tests | `api/test/*.test.js`: 25 tests |
+| Website agent | `web/src/scout/understand.js`, `web/src/scout/agent.js`, `web/src/components/AgentDrawer.jsx` |
+| Tests | `api/test/*.test.js`: 29 tests |
 
 **Money is integer cents inside, USD strings outward.** Times are the town's local time: the process sets `TZ` from
 `world.json` (`America/Los_Angeles`), and the website renders in that zone (`world.js`, `web/src/api.js`).
@@ -195,7 +198,10 @@ page at `/mock-paypal/approve`, a 3.49% + $0.49 fee, request-id idempotency, and
 - **Body:** the negotiation history, the split rule, and each payment with its role, share, status, captured amount, method (`via`) and PayPal order, authorization and capture ids. Players appear only as `sha256(salt:id)`, with one salt per receipt; each player's own copy includes their salt. Also the payout.
 - **Hash:** canonical JSON (keys sorted), then SHA-256, then an Ed25519 signature. The key is made on first run and published at `/.well-known/join-receipts.json`.
 - **Batching:** every `ANCHOR_MS`, open receipts go into a SHA-256 Merkle tree (pairs hashed in sorted order, an odd node carried up). Each receipt keeps its proof path.
-- **Anchoring:** optional. With `ANCHOR_RPC_URL` and `ANCHOR_PRIVATE_KEY`, the root is sent to Ethereum Sepolia as the data of a zero-value transaction to self, `0x4a4f494e<root>`, using viem. This is not configured in the current setup.
+- **Anchoring:** optional, on any EVM chain (`anchor.js`, viem). With `ANCHOR_RPC_URL` and `ANCHOR_PRIVATE_KEY`, a root is sent as the data of a zero-value transaction to self, `0x4a4f494e<root>`. No token or contract.
+  - Mode `each` (the default on chain id 31337): every batch root goes on chain. Used for local testing with `npm run chain` (a Hardhat 2.29.1 node).
+  - Mode `seal` (the default elsewhere): batches stay off chain; `POST /api/receipts/seal` (admin) puts one Merkle tree over all unsealed batch roots in one transaction, and each receipt gets its batch's path to the seal root. This is the single public proof for production (Base Sepolia planned).
+  - `/.well-known/join-receipts.json` publishes the keys, the chain (name, id, sending address, mode) and the seals.
 - **Verifying:**
   - `web/src/pages/Receipt.jsx` checks the hash, the Merkle path and the Ed25519 signature (WebCrypto) in the browser.
   - `examples/verify-receipt.mjs` shares no code with the server, and can also read the transaction over JSON-RPC.
@@ -213,11 +219,23 @@ page at `/mock-paypal/approve`, a 3.49% + $0.49 fee, request-id idempotency, and
 | Venue view | Bryntum Scheduler (`PlaceScheduler.jsx`: one row per unit, dashed bars while held, solid when locked, refreshed every 3 s); policy editor; reconciliation, extras and disputes (`VenueMoney.jsx`) |
 | Receipt | Checks a receipt in the browser |
 
+### 10.1 Join's website agent (web/src/scout/, components/AgentDrawer.jsx)
+
+For people who don't bring an agent. A drawer ("No agent? Ask Join's") asks what they want, then acts as them.
+- **Understanding, in the browser.** `understand.js` turns messages into a brief `{activity, dates, from, to, players, with, budget}` and asks for what's missing (activity, day, group size).
+  - Qwen2.5-1.5B-Instruct through WebLLM on WebGPU, downloaded only when the person clicks and cached by the browser: the `q4f16_1` build (about 1 GB) on GPUs with `shader-f16`, the `q4f32_1` build otherwise. Its output is held to a JSON schema, then checked by code (known activities, group size 2-12, budget range, known friends).
+  - Without WebGPU, or before the download: a rules reader (English and Chinese keywords, weekdays, numbers, "$").
+  - WebLLM is a separate 6 MB chunk loaded on demand; the page's own script stays about 300 kB.
+- **Acting, in code.** `agent.js` runs fixed steps through `POST /api/scout/<tool>` (session cookie): `find_options` (three cards with reasons), then `start_negotiation`, offers never under 72% of the ask (a lowball doesn't move venues), halfway on counters, accepting when the price is within the budget and asking the person when it isn't, and `find_alternatives` when the venue says no.
+- **Same rules as any agent.** The route allows 10 read and negotiation tools only (no paying, cancelling or inviting), applies the person's mandate, and is rate-limited like `/api/agent`. Activity entries carry the client "Join website agent, Qwen in the browser" or "..., rules in the browser".
+- **Paying stays with the person:** after the deal the drawer shows the PayPal SDK v6 button for the guarantee (or, with the sandbox test card, the authorization result).
+
 ## 11. Tests (api/test/, `npm test`)
 
-There are 25, using Node's test runner, and they run against the stand-in with state in memory.
+There are 29, using Node's test runner, and they run against the stand-in with state in memory.
 - **Negotiation (12):** pricing, the floor never leaking, the serious-offer schedule, lowballs, agreeing at an offer, the mandate before the venue, organizer-only actions, expiry and quota, walking away, alternatives' ordering, bad input, venue policy edits.
-- **Receipts (2):** Merkle proofs for 1 to 13 leaves; signature, tamper detection and hashed players.
+- **Receipts (3):** Merkle proofs for 1 to 13 leaves; signature, tamper detection and hashed players; a seal over several batches.
+- **Website agent (3):** the rules reader in English and Chinese, weekends and named friends, a brief built over several messages.
 - **Settlement (10):**
   - guarantee first, invitations before any charge, the full lock and payout
   - timeout with the organizer covering, release, void and refund cancellation
@@ -243,6 +261,10 @@ There are 25, using Node's test runner, and they run against the stand-in with s
 - 12 misuse attempts were all refused.
 - A venue agent reconciled with the toolkit and verified an extras invoice. Its findings became fixes (§4.2, §6.5).
 
+**Join's website agent (30 Oct 2026):**
+- With the rules reader, against the PayPal sandbox: "Karaoke Friday night, 4 of us, $15 each" gave three options; the agent offered $29.16 on a $32.40 ask, the venue countered $29.40, the agent accepted, and PayPal authorized the guarantee (sandbox test card). Every step appeared on the Activity page as "Join website agent, rules in the browser".
+- Qwen: the model downloaded, but WebLLM's kernels failed to compile in the Claude desktop app's built-in browser (Chrome 152) on an NVIDIA Pascal GPU, with both the `q4f16_1` and `q4f32_1` builds. The drawer fell back to rules each time. The Qwen path has not yet run end to end on a machine where WebLLM works.
+
 **Built and tested only against the stand-in:**
 - Dispute evidence.
 - Webhook self-registration (it needs public HTTPS).
@@ -252,7 +274,7 @@ There are 25, using Node's test runner, and they run against the stand-in with s
 
 **Not run:**
 - `examples/claude-agent.mjs` and `examples/venue-agent.mjs` through the Anthropic API (no key). Their MCP wiring is tested.
-- Sepolia anchoring (no key).
+- The public seal on Base Sepolia (no testnet key yet). Anchoring ran on a local Hardhat node in both modes: `each` (a batch per block) and `seal` (two batches and three receipts in one transaction).
 
 ## 13. Known limitations and open risks (review targets)
 
@@ -283,7 +305,8 @@ There are 25, using Node's test runner, and they run against the stand-in with s
 npm run setup          # api, web, examples; builds the website
 npm start              # http://localhost:8790 (the stand-in without keys)
 npm run demo           # four agents over MCP; JOIN_ACTIVITY=karaoke for another plan
-npm test               # 25 tests
+npm test               # 29 tests
+npm run chain          # optional: a local Hardhat node for receipt anchoring
 ```
 
 - **Sandbox:** set `PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET` in `api/.env` (template: `api/.env.example`), and optionally `PAYPAL_TEST_CARD=1`.

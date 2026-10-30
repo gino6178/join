@@ -122,6 +122,16 @@ app.post("/api/bookings/:id/:act", signedIn, async (req, res) => {
   if (!act) return res.status(404).end();
   const r = await act(a, { ...(req.body || {}), booking: req.params.id }); res.status(r.error ? 400 : 200).json(r);
 });
+// Join's website agent, for people who don't bring one: it runs in their browser (Qwen on WebGPU, or plain rules) and
+// calls the same tools their own agent would, as them, under the same limits. It can search, negotiate and accept;
+// paying stays with the person, in PayPal.
+const SCOUT = ["whoami", "list_activities", "find_options", "start_negotiation", "make_offer", "accept_price", "walk_away", "find_alternatives", "booking_status", "my_plans"];
+app.post("/api/scout/:tool", limit("agent", +(process.env.AGENT_RPM || 120)), signedIn, async (req, res) => {
+  if (!SCOUT.includes(req.params.tool)) return res.status(404).json({ error: "unknown_tool", tools: SCOUT });
+  const model = String(req.body?._model || "rules") === "qwen" ? "Qwen in the browser" : "rules in the browser";
+  const { _model, ...args } = req.body || {};
+  try { const r = await TOOLS[req.params.tool]({ player: req.player, client: `Join website agent, ${model}` }, args); res.status(r?.error ? 400 : 200).json(r); } catch (e) { console.error(e); res.status(500).json({ error: "internal" }); }
+});
 // the JS SDK v6 on the website: a browser-safe token, and the payer's own approval coming back from the PayPal popup
 app.get("/api/paypal/sdk", signedIn, async (req, res) => {
   if (!pp.clientToken) return res.json({ mode: pp.mode, token: null });

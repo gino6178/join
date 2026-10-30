@@ -8,7 +8,9 @@ client) to find who is free, **negotiate the price with the venue**, split the c
 inside spending limits each person set. A booking is locked only when the money is real, and the people
 involved see every step their agents took.
 
-Join runs **no AI model of its own**. It is the market and the rules; the intelligence is in the agents that use it.
+Join is the market and the rules; the intelligence is in the agents that use it. **No agent of your own?** Join's
+website agent asks what you want (activity, day, how many, budget) and does the rest for you. It runs in your browser:
+Qwen on WebGPU if you choose to download it, plain rules otherwise. Join holds no AI key and sends nothing to an AI service.
 
 PayPal AI Hackathon 2026 · MIT license
 
@@ -54,7 +56,7 @@ kept in `api/data/state/` and survives restarts (`JOIN_STATE_DIR=memory` keeps i
 
 ## Run it
 
-Node 20+. No GPU, no model, and no PayPal keys needed: without keys Join runs on a PayPal stand-in that moves no money
+Node 20+. No GPU, no model key, and no PayPal keys needed: without keys Join runs on a PayPal stand-in that moves no money
 and says so on every page.
 
 ```bash
@@ -72,6 +74,10 @@ npm run demo
 ```
 
 Any other plan: `JOIN_ACTIVITY=karaoke npm run demo` (or `"escape room"`, `"board games"`, `bbq`, `"hot pot"`).
+
+No agent? On the website, click **No agent? Ask Join's** (bottom right) and type something like "karaoke Friday night,
+4 of us, $15 each" or "週六晚上 5 個人吃火鍋". It searches, haggles and accepts as you, under your limits; you approve the
+PayPal guarantee yourself. Every step shows up on the Activity page, labelled as Join's website agent.
 
 The scripted agent (`examples/scripted-agent.mjs`) uses Join over MCP exactly as Claude would, with no API key: an
 over-budget venue, alternatives, three rounds of haggling, the organizer's guarantee, three shares, the lock.
@@ -163,17 +169,21 @@ in advance, under which an agent may act).
 When a booking is locked, refunded or its venue paid, Join issues a receipt: the negotiation step by step, each
 payment with its PayPal ids, and the players only as salted hashes (each player's own copy carries their salt). Join
 signs it with Ed25519 (public key at `/.well-known/join-receipts.json`). Every few minutes the new receipts go into a
-SHA-256 Merkle tree whose root is written to **Ethereum Sepolia** as the data of a zero-value transaction from Join's
-address to itself: no token, no contract, only a public timestamp.
+SHA-256 Merkle tree whose root can be written to an EVM chain as the data of a zero-value transaction from Join's
+address to itself (`0x4a4f494e` "JOIN" + the root): no token, no stablecoin, no contract, only a public timestamp.
+
+- **Locally:** `npm run chain` starts a Hardhat node (chain id 31337) and every batch goes on it.
+- **In production:** batches stay off chain and one transaction seals all of them on a public chain (Base Sepolia
+  in our setup). `POST /api/receipts/seal` makes the seal; each receipt then carries its path to the seal's root.
 
 - In the browser: `/#/receipt/<id>` checks the hash, the signature and the Merkle path itself, and links the
-  transaction on Etherscan.
-- Independently: `node examples/verify-receipt.mjs <id> --rpc <Sepolia RPC URL>` shares no code with Join and also
+  transaction on the chain's explorer.
+- Independently: `node examples/verify-receipt.mjs <id> --rpc <the chain's RPC URL>` shares no code with Join and also
   reads the transaction from the chain.
 
 What a receipt proves: it existed exactly so by that block. Whether PayPal moved the money is PayPal's record; the
-receipt points to it by id. To anchor, set `ANCHOR_RPC_URL` and `ANCHOR_PRIVATE_KEY` (a key made only for this, with a
-little Sepolia ether from a faucet). Without them, receipts are still signed and batched, and say they are not on chain.
+receipt points to it by id. To anchor, set `ANCHOR_RPC_URL` and `ANCHOR_PRIVATE_KEY` (locally, one of the Hardhat node's development
+accounts; for the public seal, a key made only for this, with a little testnet ether). Without them, receipts are still signed and batched, and say they are not on chain.
 
 ## Layout
 
@@ -183,7 +193,7 @@ little Sepolia ether from a faucet). Without them, receipts are still signed and
 | `api/src/pay/` | PayPal client (`paypal.js`), the Agent Toolkit back office (`toolkit.js`), the stand-in (`mock.js`), settlement (`settle.js`) |
 | `api/src/ops.js` | What an agent can do; MCP (`mcp.js`), REST and A2A (`a2a.js`) all call it |
 | `api/src/alternatives.js`, `mandate.js`, `auth.js`, `activity.js` | Alternatives, limits, tokens, the activity log |
-| `api/src/proof/` | Receipts (`receipts.js`), Merkle trees (`merkle.js`), Sepolia anchoring (`anchor.js`) |
+| `api/src/proof/` | Receipts (`receipts.js`), Merkle trees (`merkle.js`), EVM anchoring (`anchor.js`) |
 | `api/data/world.json` | The made-up demo town (USD, placed on San Jose, CA) |
 | `web/` | The website (React, Vite) |
 | `examples/` | Agents from outside: scripted (no key), a Claude player agent, a Claude venue agent on the PayPal Agent Toolkit; the receipt verifier |
@@ -197,5 +207,5 @@ keeps a few of Serve's pure functions (free-time intersection, travel time, the 
 timetable, atomic JSON writes) and its visual design. Everything else was removed (Serve's own models, guards,
 memory, voice, video, Messenger, the community loop, the feed) or written new for this hackathon: the negotiation
 layer, venue rules, the map alternatives, mandates, invitations and the negotiated split, per-player tokens, the
-PayPal settlement, verifiable receipts anchored on Sepolia, the MCP / REST / A2A interfaces, the activity log, the
+PayPal settlement, verifiable receipts anchored on an EVM chain, Join's website agent, the MCP / REST / A2A interfaces, the activity log, the
 website with Bryntum Scheduler, and the examples.
