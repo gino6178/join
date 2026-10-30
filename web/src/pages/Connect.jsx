@@ -8,7 +8,9 @@ import { webMcpAvailable } from "../webmcp.js";
 // change the limits or make other tokens.
 export default function Connect({ me, info, reload }) {
   const [label, setLabel] = useState("Claude Code"), [made, setMade] = useState(null), [copied, setCopied] = useState(null);
-  const make = async (e) => { e.preventDefault(); const t = await api("/api/tokens", { method: "POST", body: { label } }); setMade(t); reload(); };
+  const [scopes, setScopes] = useState(["read", "negotiate", "pay"]), [days, setDays] = useState(90), [key, setKey] = useState("");
+  const make = async (e) => { e.preventDefault(); const t = await api("/api/tokens", { method: "POST", body: { label, scopes, days, key: key.trim() || null } }); setMade(t); reload(); };
+  const flip = (s) => setScopes((xs) => (xs.includes(s) ? xs.filter((x) => x !== s) : [...xs, s]));
   const revoke = async (id) => { await api(`/api/tokens/${id}`, { method: "DELETE" }); reload(); };
   const url = info?.mcpUrl || `${location.origin}/mcp`, tok = made?.token || "join_YOUR_TOKEN";
   const copy = (k, text) => { navigator.clipboard?.writeText(text); setCopied(k); setTimeout(() => setCopied(null), 1500); };
@@ -24,6 +26,11 @@ export default function Connect({ me, info, reload }) {
       <form className="card form row" onSubmit={make}>
         <label><span>Name this agent</span><input value={label} onChange={(e) => setLabel(e.target.value)} maxLength={40} /></label>
         <button className="btn primary"><Icon name="key" size={18} />Make a token</button>
+        <fieldset className="token-opts"><legend>It may</legend>
+          {[["read", "look: options, venues, plans"], ["negotiate", "negotiate, accept, answer invitations"], ["pay", "start your payments (you approve in PayPal, or saved PayPal within your limits)"]].map(([s, t]) => <label key={s} className="check"><input type="checkbox" checked={scopes.includes(s)} onChange={() => flip(s)} />{t}</label>)}
+        </fieldset>
+        <label><span>For</span><select value={days} onChange={(e) => setDays(+e.target.value)}>{[1, 7, 30, 90, 365].map((d) => <option key={d} value={d}>{d === 1 ? "1 day" : `${d} days`}</option>)}</select></label>
+        <label className="wide"><span>Public key (optional): every request must then be signed with its private key (RFC 9421, as in Web Bot Auth)</span><input value={key} onChange={(e) => setKey(e.target.value)} placeholder="Ed25519 public key, base64url (examples/signed-agent.mjs --key)" /></label>
       </form>
       {made && <p className="note good">Token for <b>{made.label}</b>: <code className="tok">{made.token}</code> Copy it now: Join keeps only a hash and can't show it again.</p>}
       <section className="card">
@@ -42,7 +49,7 @@ export default function Connect({ me, info, reload }) {
       {snippets.map(([k, text]) => <section key={k} className="card snippet"><header><h3>{k}</h3><button className="btn ghost small" onClick={() => copy(k, text)}>{copied === k ? "Copied" : "Copy"}</button></header><pre>{text}</pre></section>)}
       <section className="card">
         <h3>Your agents</h3>
-        {!me.tokens.length ? <p className="muted small">None yet.</p> : <ul className="tokens">{me.tokens.map((t) => <li key={t.id}><span><b>{t.label}</b><small>{t.hint} · made {new Date(t.created).toLocaleString()} · {t.lastUsed ? `last used ${new Date(t.lastUsed).toLocaleString()}` : "not used yet"}</small></span><button className="btn ghost small" onClick={() => revoke(t.id)}>Revoke</button></li>)}</ul>}
+        {!me.tokens.length ? <p className="muted small">None yet.</p> : <ul className="tokens">{me.tokens.map((t) => <li key={t.id}><span><b>{t.label}</b><small>{t.hint} · {(t.scopes || []).join(", ")}{t.signed ? " · signed requests only" : ""}{t.expires ? ` · until ${new Date(t.expires).toLocaleDateString()}` : ""} · made {new Date(t.created).toLocaleString()} · {t.lastUsed ? `last used ${new Date(t.lastUsed).toLocaleString()}` : "not used yet"}</small></span><button className="btn ghost small" onClick={() => revoke(t.id)}>Revoke</button></li>)}</ul>}
       </section>
     </div>
   );

@@ -270,3 +270,4 @@ legend { font-size: var(--fs-14); color: var(--ink-2); padding: 0 6px; }
 .ap2 { margin: var(--s2) 0; } .link-btn { border: 0; background: none; padding: 0; color: var(--agent); cursor: pointer; display: inline-flex; gap: 6px; align-items: center; font: inherit; }
 .ap2-body pre { max-height: 220px; overflow: auto; font-size: 11px; background: var(--control); padding: 8px; border-radius: var(--r-md); }
 .drawer-actions.wrap { flex-wrap: wrap; }
+.token-opts { grid-column: 1 / -1; border: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px 16px; } .token-opts legend { font-weight: 600; margin-bottom: 4px; } .form .wide { grid-column: 1 / -1; }

@@ -12,7 +12,7 @@ import * as settle from "./pay/settle.js";
 import { paypal } from "./pay/paypal.js";
 import { mockPaypal } from "./pay/mock.js";
 import { configureToolkit, toolkitMode } from "./pay/toolkit.js";
-import { agentOf, sessionOf, createSession, endSession, makeToken, tokensOf, revoke, COOKIE, VENUE_COOKIE, createVenueSession, venueOf, endVenueSession } from "./auth.js";
+import { agentOf, sessionOf, createSession, endSession, makeToken, tokensOf, revoke, can, scopeError, COOKIE, VENUE_COOKIE, createVenueSession, venueOf, endVenueSession } from "./auth.js";
 import { getMandate, setMandate } from "./mandate.js";
 import { forPlayer, onActivity, record as recordActivity } from "./activity.js";
 import { getWorld, player, venue, setPolicy } from "./world.js";
@@ -53,7 +53,8 @@ app.post("/paypal/webhook", express.raw({ type: "*/*", limit: "256kb" }), async 
   } catch (e) { console.error("webhook", e.message); }
   res.status(200).end();
 });
-app.use(express.json({ limit: "64kb" }));
+// (the exact bytes are kept too, for a signed agent's Content-Digest)
+app.use(express.json({ limit: "64kb", verify: (req, res, buf) => { req.rawBody = buf; } }));
 
 // Rate limits: a fixed window per caller (the agent's token when there is one, else the address). Agents get room for a
 // busy negotiation; signing in and making tokens get less.
@@ -82,9 +83,11 @@ app.post("/api/agent/:tool", async (req, res) => {
   if (!a) return res.status(401).json({ error: "unauthorized", message: "Send a player's agent token: Authorization: Bearer join_..." });
   const fn = TOOLS[req.params.tool];
   if (!fn) return res.status(404).json({ error: "unknown_tool", tools: Object.keys(TOOLS) });
+  if (!can(a, req.params.tool)) return res.status(403).json(scopeError(req.params.tool));
   try { const r = await fn(a, req.body || {}); res.status(r?.error ? 400 : 200).json(r); } catch (e) { console.error(e); res.status(500).json({ error: "internal" }); }
 });
 
+app.get("/.well-known/mcp-tools.json", (req, res) => res.json({ ...mcp.toolsManifest(), about: "SHA-256 over the canonical JSON of the instructions and tools; the MCP server's version ends in its first 16 hex digits. Pin it." }));
 app.get("/.well-known/agent-card.json", (req, res) => res.json(a2a.card(PUBLIC_URL)));
 app.post("/a2a", (req, res) => a2a.handle(req, res));
 
@@ -115,7 +118,7 @@ app.get("/demo", (req, res) => {
 app.delete("/api/session", signedIn, (req, res) => { endSession(req.sid); res.set("Set-Cookie", `${COOKIE}=; Max-Age=0; Path=/`).json({ ok: true }); });
 app.get("/api/me", signedIn, (req, res) => { const p = player(req.player), m = getMandate(req.player); res.json({ player: { id: p.id, name: p.name, area: p.area, interests: p.interests, free: p.free }, mandate: { ...m, perGameUsd: usd(m.perGame), perWeekUsd: usd(m.perWeek) }, vault: settle.hasVault(req.player), tokens: tokensOf(req.player) }); });
 app.put("/api/mandate", signedIn, (req, res) => { const r = setMandate(req.player, req.body || {}); res.status(r.error ? 400 : 200).json(r); });
-app.post("/api/tokens", signedIn, (req, res) => res.json(makeToken(req.player, req.body?.label)));
+app.post("/api/tokens", signedIn, (req, res) => res.json(makeToken(req.player, req.body?.label, { scopes: req.body?.scopes, days: req.body?.days, key: req.body?.key })));
 app.delete("/api/tokens/:id", signedIn, (req, res) => res.json({ ok: revoke(req.player, req.params.id) }));
 app.get("/api/activity", signedIn, (req, res) => res.json({ entries: forPlayer(req.player, { after: +req.query.after || 0 }) }));
 app.get("/api/games", signedIn, (req, res) => res.json(ops.myGames({ player: req.player }, { all: true })));

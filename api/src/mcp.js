@@ -4,9 +4,11 @@
 // the rules the platform enforces whatever the agent does.
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StreamableHTTPServerTransport } from "@modelcontextprotocol/sdk/server/streamableHttp.js";
+import crypto from "node:crypto";
 import { z } from "zod";
+import { canonical } from "./proof/merkle.js";
 import * as ops from "./ops.js";
-import { agentOf } from "./auth.js";
+import { agentOf, can, scopeError } from "./auth.js";
 import { ACTIVITIES } from "./world.js";
 
 const DATE = z.string().regex(/^\d{4}-\d{2}-\d{2}$/).describe("YYYY-MM-DD, the town's local date");
@@ -19,11 +21,21 @@ const INSTRUCTIONS = `Join is a marketplace for getting a group together: a game
 Rules the platform enforces, whatever you do: your person's mandate (per-booking and weekly limits, allowed venues) can't be exceeded and only they can change it on the website; only the organizer's agent negotiates with the venue; a venue's last counter is its best and final; nothing is charged until a person approves in PayPal, unless they saved PayPal for you and the amount is within their mandate.
 Typical flow: list_activities -> find_options -> start_negotiation -> make_offer (or accept_price) -> pay_my_share (the organizer guarantees the whole booking first) -> booking_status. Invited people's agents join with pay_my_share, may ask to pay less (propose_share), or decline_invite. When a price is over budget or refused, the reply includes alternatives nearby; offer them to your user. Always tell your user what you agreed and show them any approveUrl.`;
 
-function build(agent) {
+// Every tool's name, description, input schema and annotations, and the instructions: what a model reads. Their SHA-256
+// is published (/.well-known/mcp-tools.json) and sent as the server's version, so an agent can pin it and notice if the
+// descriptions ever change under it (the "tool poisoning" and "rug pull" risks of MCP).
+let defs = null;
+export function toolsManifest() {
+  if (!defs) { defs = []; build(null, defs); }
+  const tools = defs.map((d) => ({ name: d.name, title: d.title, description: d.description, inputSchema: z.toJSONSchema(z.object(d.inputSchema)), annotations: d.annotations }));
+  return { digest: crypto.createHash("sha256").update(canonical({ instructions: INSTRUCTIONS, tools })).digest("hex"), instructions: INSTRUCTIONS, tools };
+}
+
+function build(agent, capture = null) {
   const ACTIVITY = z.enum(ACTIVITIES()).describe("what the group is getting together for (list_activities)");
-  const s = new McpServer({ name: "join", version: "0.1.0" }, { instructions: INSTRUCTIONS });
+  const s = new McpServer({ name: "join", version: capture ? "0" : `1.0.0+tools.${toolsManifest().digest.slice(0, 16)}` }, { instructions: INSTRUCTIONS });
   const out = (r) => ({ content: [{ type: "text", text: JSON.stringify(r, null, 1) }], structuredContent: r, isError: !!r?.error });
-  const tool = (name, title, description, inputSchema, annotations, fn) => s.registerTool(name, { title, description, inputSchema, annotations: { title, ...annotations } }, async (args) => out(await fn(agent, args)));
+  const tool = (name, title, description, inputSchema, annotations, fn) => capture ? capture.push({ name, title, description, inputSchema, annotations: { title, ...annotations } }) : s.registerTool(name, { title, description, inputSchema, annotations: { title, ...annotations } }, async (args) => out(can(agent, name) ? await fn(agent, args) : scopeError(name)));
 
   tool("whoami", "Who you act for", "The person you act for, their interests and usual free times, and their mandate: the limits on what you may commit them to (read-only).", {}, READ, (a) => ops.whoami(a));
   tool("list_activities", "What groups can book", "Every activity on Join (sports, karaoke, escape rooms, board games, barbecues, dinners), what one booking holds (a court, a room, a table, a pit), how many people it takes and the lengths it is booked in.", {}, READ, () => ops.listActivities());

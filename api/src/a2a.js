@@ -5,7 +5,7 @@
 // on one side is read as an instruction on the other. The caller's player token goes in Authorization: Bearer.
 import crypto from "node:crypto";
 import * as ops from "./ops.js";
-import { agentOf } from "./auth.js";
+import { agentOf, can, scopeError } from "./auth.js";
 
 const ACTIONS = { whoami: ops.whoami, list_activities: () => ops.listActivities(), list_venues: (a, x) => ops.listVenues(x), find_options: ops.findOptions, start_negotiation: ops.startNegotiation, make_offer: ops.makeOffer, accept_price: ops.acceptPrice,
   walk_away: ops.walkAway, find_alternatives: ops.findAlternatives, my_plans: (a, x) => ops.myGames(a, x), booking_status: ops.gameStatus, pay_my_share: ops.payMyShare, decline_invite: ops.declineGame, cancel_booking: ops.cancelBooking, propose_share: ops.proposeShare, answer_share: ops.answerShare, request_reimbursement: ops.requestReimbursement };
@@ -34,6 +34,6 @@ export async function handle(req, res) {
   const { action, ...args } = part?.data || {};
   const fn = ACTIONS[action];
   if (!fn) return fail(-32602, `data.action is one of ${Object.keys(ACTIONS).join(", ")}.`);
-  const result = await fn({ ...a, client: `${a.client} via A2A` }, args);
+  const result = can(a, action) ? await fn({ ...a, client: `${a.client} via A2A` }, args) : scopeError(action);
   reply({ kind: "message", role: "agent", messageId: crypto.randomUUID(), contextId: params?.message?.contextId, parts: [{ kind: "data", data: result }] });
 }
