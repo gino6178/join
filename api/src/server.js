@@ -7,6 +7,9 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import express from "express";
 import * as mcp from "./mcp.js";
+import * as oauth from "./oauth.js";
+import * as people from "./people.js";
+import { agentGuide } from "./guide.js";
 import * as ops from "./ops.js";
 import * as a2a from "./a2a.js";
 import * as settle from "./pay/settle.js";
@@ -113,6 +116,34 @@ app.post("/api/session", (req, res) => {
   if (!sid) return res.status(400).json({ error: "unknown player" });
   res.set("Set-Cookie", `${COOKIE}=${sid}; HttpOnly; SameSite=Lax; Path=/`).json({ ok: true });
 });
+// Sign-in with an account people have (Google, Facebook, LINE, PayPal: whichever has keys here, oauth.js), or a new
+// demo account with just a name. Either way the person joins the town (people.js) and gets the usual session cookie.
+app.get("/api/auth/providers", (req, res) => res.json({ providers: oauth.providers(), demo: DEMO }));
+app.post("/api/auth/demo", limit("signin", 30), (req, res) => {
+  if (!DEMO) return res.status(403).json({ error: "demo accounts are off" });
+  const name = String(req.body?.name || "").trim();
+  if (!name) return res.status(400).json({ error: "name", message: "Give a first name for the demo account." });
+  const p = people.demoPerson(name), sid = createSession(p.id);
+  res.set("Set-Cookie", `${COOKIE}=${sid}; HttpOnly; SameSite=Lax; Path=/`).json({ ok: true, player: { id: p.id, name: p.name, area: p.area.name } });
+});
+app.get("/auth/:provider/start", (req, res) => {
+  const r = oauth.start(req.params.provider, PUBLIC_URL);
+  if (!r) return res.redirect("/#/?signin=off");
+  res.set("Set-Cookie", `join_oauth=${r.state}; HttpOnly; SameSite=Lax; Path=/auth; Max-Age=600`).redirect(r.url);
+});
+app.get("/auth/:provider/callback", async (req, res) => {
+  const c = (req.headers.cookie || "").split(/;\s*/).map((x) => x.split("=")).find(([k]) => k === "join_oauth")?.[1];
+  try {
+    const r = await oauth.finish(req.params.provider, req.query, c, PUBLIC_URL);
+    if (r.error) return res.redirect(`/#/?signin=${encodeURIComponent(r.error)}`);
+    const p = people.personFor(req.params.provider, r.id, r.name), sid = createSession(p.id);
+    res.set("Set-Cookie", [`${COOKIE}=${sid}; HttpOnly; SameSite=Lax; Path=/`, "join_oauth=; Path=/auth; Max-Age=0"]).redirect("/#/activity");
+  } catch (e) { console.error(e); res.redirect("/#/?signin=error"); }
+});
+// The front door for agents: what Join is and how to get in with nothing but this address (llms.txt, as many sites
+// now publish for language models), next to the machine-readable cards.
+app.get("/llms.txt", (req, res) => res.type("text/plain").send(agentGuide(`${req.protocol}://${req.headers.host}`))); // (the address the agent used)
+app.get("/.well-known/llms.txt", (req, res) => res.redirect("/llms.txt"));
 // one-click demo sign-in for judges and screenshots: /demo?as=you&go=activity (demo mode only)
 // Demo only: the town back to its starting state, for a clean run (a judge's first look, a recording). Receipts and the
 // transparency log stay: an append-only log that a button could wipe would prove nothing.

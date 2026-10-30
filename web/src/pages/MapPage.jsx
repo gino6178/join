@@ -1,6 +1,6 @@
 import { useMemo } from "react";
 import { useApi, money } from "../api.js";
-import TownMap from "../components/TownMap.jsx";
+import RealMap from "../components/RealMap.jsx";
 import { useWorld } from "../components/Actor.jsx";
 import Icon from "../components/Icon.jsx";
 
@@ -15,9 +15,9 @@ export default function MapPage({ entries, me }) {
   const alts = fresh ? last.data.alternatives : [];
   return (
     <div className="page wide">
-      <header className="page-head"><h1>Map</h1><p className="muted">{w ? `${w.town.name}. ` : ""}Venues are pins; squares are free public places such as park courts and picnic grills (first come, not bookable); dots are people's home areas, never addresses.</p></header>
+      <header className="page-head"><h1>Map</h1><p className="muted">{w ? `${w.town.name}. ` : ""}Venues are round pins (click one for what it offers, or to plan there); squares are free public places such as park courts and picnic grills (first come, not bookable); blue circles are people's home areas, never addresses.</p></header>
       <div className="map-layout">
-        <div className="card map-card"><TownMap world={w} me={me.player.id} over={fresh ? overVenue : null} alternatives={alts} booked={!fresh ? booking?.venue : null} people={!fresh ? booking?.players || [] : [me.player.id]} /></div>
+        <div className="card map-card"><RealMap world={w} me={me.player.id} over={fresh ? overVenue : null} alternatives={alts} booked={!fresh ? booking?.venue : null} people={!fresh ? booking?.players || [] : [me.player.id]} /></div>
         <aside className="map-side">
           {fresh ? <section className="card">
             <h3><Icon name="pin" size={18} />Alternatives</h3>

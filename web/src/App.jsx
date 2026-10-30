@@ -37,7 +37,7 @@ export default function App() {
   if (me === undefined) return <div className="boot" />;
   // a receipt is public: anyone with its link can check it
   if (r.page.startsWith("receipt/")) return <Shell me={me} info={info} page="receipt" onOut={() => setMe(null)}><Receipt id={r.page.slice(8)} /></Shell>;
-  if (r.page === "venue") return <Shell me={me} info={info} page="venue" onOut={() => setMe(null)}><Venue query={r.query} /></Shell>;
+  if (r.page === "venue") return <Shell me={me} info={info} page="venue" onOut={() => setMe(null)}><Venue key={r.query.get("id") || ""} query={r.query} /></Shell>;
   if (!me) return <SignIn info={info} onIn={loadMe} />;
   const pages = { activity: <Activity entries={entries} me={me} />, games: <Games entries={entries} me={me} query={r.query} demo={!!info?.demoSignin} />, map: <MapPage entries={entries} me={me} />, limits: <Limits me={me} reload={loadMe} query={r.query} />, connect: <Connect me={me} info={info} reload={loadMe} /> };
   return <Shell me={me} info={info} page={r.page} onOut={() => setMe(null)}>{pages[r.page] || pages.activity}<Scout me={me} info={info} /></Shell>;

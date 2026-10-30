@@ -19,6 +19,7 @@ export default function AgentDrawer({ me, info, open, onClose }) {
   const [msgs, setMsgs] = useState([{ from: "agent", text: WORDS.en.hello(me.player.name.split(" ")[0]) }]);
   const [brief, setBrief] = useState({});
   const [text, setText] = useState(""), [busy, setBusy] = useState(false);
+  useEffect(() => { const f = (e) => setText(String(e.detail || "")); addEventListener("join:prefill", f); return () => removeEventListener("join:prefill", f); }, []); // (a sentence to start from, e.g. "Plan here" on the map)
   const [cards, setCards] = useState(null), [deal, setDeal] = useState(null), [pending, setPending] = useState(null), [booking, setBooking] = useState(null), [confirm, setConfirm] = useState(null), [choices, setChoices] = useState(null);
   const [model, setModel] = useState(info?.scout || "rules");
   const end = useRef(null);

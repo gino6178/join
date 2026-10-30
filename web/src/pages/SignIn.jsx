@@ -2,11 +2,16 @@ import { useEffect, useState } from "react";
 import { api } from "../api.js";
 import Icon from "../components/Icon.jsx";
 
-// The demo signs in by picking one of the town's made-up players. A real deployment puts its own login here.
+// Sign in with an account you have (Google, Facebook, LINE, PayPal: the ones this server has keys for), as a new demo
+// account with just a name, or as one of the demo town's residents. And, for AI agents, the way in.
+const BRAND = { google: "#4285F4", facebook: "#1877F2", line: "#06C755", paypal: "#003087" };
 export default function SignIn({ info, onIn }) {
-  const [world, setWorld] = useState(null), [err, setErr] = useState(null);
-  useEffect(() => { api("/api/world").then(setWorld).catch(setErr); }, []);
+  const [world, setWorld] = useState(null), [err, setErr] = useState(null), [auth, setAuth] = useState(null), [name, setName] = useState("");
+  useEffect(() => { api("/api/world").then(setWorld).catch(setErr); api("/api/auth/providers").then(setAuth).catch(() => {}); }, []);
+  useEffect(() => { const m = /signin=([^&]+)/.exec(location.hash); if (m && m[1] !== "off") setErr(new Error(decodeURIComponent(m[1]))); }, []);
   const pick = async (id) => { try { await api("/api/session", { method: "POST", body: { player: id } }); location.hash = "/"; onIn(); } catch (e) { setErr(e); } };
+  const fresh = async (e) => { e.preventDefault(); try { await api("/api/auth/demo", { method: "POST", body: { name } }); location.hash = "/"; onIn(); } catch (x) { setErr(x); } };
+  const on = (auth?.providers || []).filter((p) => p.on), off = (auth?.providers || []).filter((p) => !p.on);
   return (
     <div className="signin">
       <section className="hero-join">
@@ -19,13 +24,31 @@ export default function SignIn({ info, onIn }) {
           <li><Icon name="lock" /><span><b>Set your limits</b>Per booking, per week, which venues. Agents can read them, never change them.</span></li>
           <li><Icon name="spark" /><span><b>Watch it work</b>Every search, offer, counter-offer and payment, as it happens.</span></li>
         </ol>
+      <section className="card for-agents" id="agents">
+        <h2><Icon name="key" />For AI agents</h2>
+        <p>An agent can use Join from this address alone. Start with <a href="/llms.txt">/llms.txt</a>: what Join is, how to get in for your person, the tools and the rules.</p>
+        <ul className="small">
+          <li>MCP: <code>{location.origin}/mcp</code> · REST: <code>/api/agent/&lt;tool&gt;</code> · A2A: <a href="/.well-known/agent-card.json">agent card</a></li>
+          <li>A person makes their agent's token on the Connect page; for testing, a demo account can make one too (llms.txt says how).</li>
+          <li>Limits only the person can set are enforced by Join whatever an agent is told; every step an agent takes is shown to the people involved.</li>
+        </ul>
+      </section>
       </section>
       <section className="card pick">
-        <h2>Sign in to the demo</h2>
+        <h2>Sign in</h2>
+        <div className="social">
+          {on.map((p) => <a key={p.id} className="btn social-btn" style={{ "--brand": BRAND[p.id] }} href={`/auth/${p.id}/start`}>Continue with {p.name}</a>)}
+          {off.length > 0 && <p className="small muted">{off.map((p) => p.name).join(", ")} sign-in {off.length === 1 ? "turns" : "turn"} on when this server has {off.length === 1 ? "its" : "their"} keys (see the README).</p>}
+        </div>
+        {auth?.demo && <form className="fresh" onSubmit={fresh}>
+          <label><span>New here? Make a demo account</span><input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your first name" maxLength={40} required /></label>
+          <button className="btn primary">Start</button>
+        </form>}
+        <h3>Or be one of the demo town's residents</h3>
         <p className="muted">A made-up town placed on San Jose, CA. {info?.paypal === "mock" ? "PayPal is simulated: no money moves." : "PayPal sandbox: test money only."}</p>
         {err && <p className="err">{err.message}</p>}
         {info?.demoSignin && <p className="small muted">Someone else has been playing in this town? <button className="link-btn small" onClick={async () => { if (confirm("Reset the demo town? Plans, bookings, limits and activity start fresh; receipts and the transparency log are kept.")) { await api("/api/demo/reset", { method: "POST" }); location.reload(); } }}>Reset the demo town</button></p>}
-        <div className="players">{world?.players.map((p) => (
+        <div className="players">{world?.players.filter((p) => !p.id.startsWith("u_")).map((p) => (
           <button key={p.id} className="player-btn" onClick={() => pick(p.id)}><span className="avatar">{p.name[0]}</span><span><b>{p.name}</b><small>{p.area?.name} · {p.interests.join(", ")}</small></span></button>
         ))}</div>
       </section>

@@ -37,7 +37,7 @@ function Booking({ b, me, w, focus, demo, done }) {
   return (
     <section className={`card booking ${focus ? "focus" : ""}`}>
       <header>
-        <div><h3>{b.venueName} · {b.unitName}</h3><p className="muted">{b.activity} · {dayLabel(b.date)} {b.start} · {b.minutes} min · {money(b.total)} total</p></div>
+        <div><h3><a className="plain-link" href={`#/venue?id=${b.venue}`} title="The venue's rooms and courts">{b.venueName}</a> · {b.unitName}</h3><p className="muted">{b.activity} · {dayLabel(b.date)} {b.start} · {b.minutes} min · {money(b.total)} total</p></div>
         {ENDED[b.state] ? <span className="pill warn">{ENDED[b.state]}</span> : <span className="pill good">{STEPS[at]?.[1]}</span>}
       </header>
       {!ENDED[b.state] && <ol className="stepper">{STEPS.map(([s, label], i) => <li key={s} className={i < at ? "done" : i === at ? "now" : ""}><span />{label}</li>)}</ol>}

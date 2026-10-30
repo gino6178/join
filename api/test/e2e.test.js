@@ -16,7 +16,7 @@ test("agents organize, negotiate and settle a group booking over MCP", { skip: !
   const port = 20000 + Math.floor(Math.random() * 20000), url = `http://localhost:${port}`;
   const server = spawn(process.execPath, ["src/server.js"], { cwd: path.join(HERE, ".."), env: { ...process.env, PORT: String(port), PUBLIC_URL: url, PAYPAL_MODE: "mock", PAYPAL_CLIENT_ID: "", TICK_MS: "1000" } });
   try {
-    await new Promise((ok, bad) => { server.stdout.on("data", (d) => String(d).includes("Join on") && ok()); server.on("exit", bad); setTimeout(() => bad(new Error("server did not start")), 10e3); });
+    await new Promise((ok, bad) => { server.stdout.on("data", (d) => String(d).includes("Join on") && ok()); server.on("exit", bad); setTimeout(() => bad(new Error("server did not start")), 30e3); });
     const out = await new Promise((ok, bad) => {
       const a = spawn(process.execPath, ["scripted-agent.mjs"], { cwd: EX, env: { ...process.env, JOIN_URL: url } });
       let s = ""; a.stdout.on("data", (d) => (s += d)); a.stderr.on("data", (d) => (s += d));

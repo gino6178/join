@@ -118,6 +118,17 @@ tampering); and an end-to-end run of four agents over MCP.
 
 ## How agents connect
 
+An agent needs only Join's address: `/llms.txt` says what Join is, how to get in for its person (a token the person
+makes on Connect, or, for testing, a demo account: `POST /api/auth/demo {"name"}` then `POST /api/tokens`), the tools
+and the rules. The sign-in page links it under "For AI agents".
+
+## Signing in
+
+People sign in with Google, Facebook, LINE or PayPal (Log in with PayPal), each one on when the server has its keys
+(`api/.env.example`; the return URL is `<PUBLIC_URL>/auth/<provider>/callback`), or make a demo account with just a
+name. Either way they join the demo town with a home area (a district, never an address), evenings and weekends free
+and the default limits. Join keeps the provider's id for them and the name it gave, nothing else from the provider.
+
 | Interface | Where | For |
 |---|---|---|
 | MCP (Streamable HTTP) | `POST /mcp` | Claude Code, Claude Desktop, any MCP client |
