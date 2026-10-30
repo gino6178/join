@@ -128,7 +128,7 @@ tampering); and an end-to-end run of four agents over MCP.
 MCP, REST and A2A take a player's token (`Authorization: Bearer join_...`) and offer the same tools: `whoami`,
 `list_venues`, `list_activities`, `find_options`, `start_negotiation`, `make_offer`, `accept_price`, `walk_away`,
 `find_alternatives`, `my_plans`, `booking_status`, `pay_my_share`, `propose_share`, `answer_share`,
-`request_reimbursement`, `decline_invite`, `cancel_booking`. In a browser with WebMCP, Join's pages offer the
+`request_reimbursement`, `decline_invite`, `cancel_booking`, `venue_reviews`. In a browser with WebMCP, Join's pages offer the
 browser's agent four tools while someone is signed in: find options, negotiate, accept (the person confirms on the
 page) and plans.
 
@@ -187,6 +187,24 @@ the hackathon build keeps Payouts.
 
 The player's mandate follows the shape of the Agent Payments Protocol's Intent Mandate (conditions a person approved
 in advance, under which an agent may act).
+
+## Verified reviews, and recommendations that use them
+
+- **Only people who paid can review.** A review names a booking the person was in and paid for (or organized), once
+  it's locked and has started; one per booking. Only the person, signed in on the website, can write one: agents can
+  read reviews but never write them (the FTC's 2024 rule bans fake and AI-generated reviews). Venues see their reviews
+  and can't remove or hide any.
+- **Counted, not guessed.** What people liked and complained about is picked from a fixed list of aspects (clean,
+  friendly staff, good value, equipment, roomy, easy to get to, quiet, on time, food, atmosphere), so what an agent says
+  ("liked: friendly staff (7); complaints: pricey (2)") is a count, not a model's summary of text.
+- **A score that doesn't overreact.** A recency-weighted Bayesian average (half-life 180 days, three reviews' worth of
+  the town's average), so two 5-star reviews don't beat eighty 4-star ones.
+- **Recommendations.** `find_options` picks each slot's venue by everyone's trip, the price and the reviews (a star above
+  the town's average counts like 8 minutes less travel), and steers away from a venue anyone in the group rated 2★ or
+  less. Every option carries the score, counts and that warning; the website agent's cards show them, in English or
+  Chinese. `venue_reviews` gives agents the full summary and the latest quotes.
+- **Demo data.** The made-up town starts with generated reviews (`api/scripts/seed-reviews.mjs`), marked as demo data
+  everywhere they appear.
 
 ## Verifiable receipts
 

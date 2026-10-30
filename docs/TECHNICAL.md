@@ -59,7 +59,7 @@ same operations with the person's session.
 | Website | `web/src/**` (about 1,150 lines) |
 | Examples | `examples/scripted-agent.mjs`, `claude-agent.mjs`, `venue-agent.mjs`, `toolkit-cli.mjs`, `verify-receipt.mjs` |
 | Website agent | `api/src/scout/understand.js` (186), `web/src/scout/agent.js`, `web/src/scout/words.js`, `web/src/components/AgentDrawer.jsx` |
-| Tests | `api/test/*.test.js`: 42 tests |
+| Tests | `api/test/*.test.js`: 45 tests |
 
 **Money is integer cents inside, USD strings outward.** Times are the town's local time: the process sets `TZ` from
 `world.json` (`America/Los_Angeles`), and the website renders in that zone (`world.js`, `web/src/api.js`).
@@ -103,7 +103,17 @@ old one (`store.js`). Tests keep all state in memory.
 
 [NEGOTIATION.md](NEGOTIATION.md) has the benchmark (`api/bench/negotiation.mjs`: six buyer strategies, 28 negotiations each, on the real engine). Join's website agent uses the strategy that did best: an offer just over 70% of the current ask each round, no offer once the price is final, then the final price. It also haggles with up to two other venues free at about the same time and lets the person choose when another is at least $1 a person cheaper (`web/src/scout/agent.js`).
 
-### 4.4 Alternatives (alternatives.js)
+### 4.4 Verified reviews (api/src/reviews.js)
+
+- **Who writes:** `POST /api/bookings/:id/review` (the person's session only; agent tokens get 401): someone in the booking who paid (or the organizer), once it is locked and has started (in demo mode, once locked), one review per booking. Stars 1-5, `liked` and `disliked` from a fixed vocabulary of ten aspects, up to 400 characters of text. Venues can't remove reviews. This follows the FTC's 2024 rule on consumer reviews (no fake or AI-written reviews, no suppression) and Booking.com's "verified stay" practice.
+- **Score:** a Bayesian average, `(C·m + Σ wᵢ·starsᵢ) / (C + Σ wᵢ)`, with `C = 3`, `m` the town's recency-weighted mean and `wᵢ = 0.5^(age in days / 180)`. Per activity when it has 3 or more reviews, else the venue's overall.
+- **Aspects:** liked and complained-about aspects counted; shown when at least 2 reviews and a quarter of them mention one (a constrained vocabulary, as HADSF, arXiv 2510.26994, recommends to keep review-based explanations from drifting).
+- **Group:** any group member's own review of 2★ or less is returned (`groupLow`) and adds 30 "minutes" to the venue's cost in ranking (least misery, from group recommender systems).
+- **In ranking:** `find_options` picks each slot's venue by `longest trip + review adjustment + price per person`, where a star above the town's mean is worth 8 minutes; `find_alternatives` ranks the same way; the website agent leaves out alternatives a group member rated low. Options carry `reviews {score, count, praise, complaints, groupLow, demoData, reason}`.
+- **Read:** `venue_reviews` (MCP, REST, A2A; `read` scope), `GET /api/venues/:id/reviews`, `list_venues` (score per venue), Venue view.
+- **Demo data:** `api/data/reviews-seed.json` (174 reviews, generated deterministically by `api/scripts/seed-reviews.mjs`), `seed: true`, labelled "demo data" wherever shown.
+
+### 4.5 Alternatives (alternatives.js)
 - **Candidates:** every other venue offering the activity whose unit can take the group, at start offsets 0, −30, +30, −60 and +60 minutes, with a free unit.
 - **Rank:** bookable before public, then within budget, then the smallest time shift, then the shortest longest trip, then price.
 - At most one public place is included. The reason given for each candidate is written by code.
@@ -239,7 +249,7 @@ Join signs the mandates of the Agent Payments Protocol (github.com/google-agenti
 | Map | An SVG town map with over-budget and alternatives overlays |
 | Limits | Edit the mandate (per booking, per week, the most an agent may guarantee for a group); Vault save and remove |
 | Connect | Tokens with scopes, expiry and an optional public key for signed requests; Claude Code, Claude Desktop, REST, A2A and WebMCP |
-| Venue view | What Join brought in: paid by groups, share booked off-peak, unpaid by customers, paid out, all counted from the bookings (`venueMetrics`); Bryntum Scheduler (`PlaceScheduler.jsx`: one row per unit, dashed bars while held, solid when locked, refreshed every 3 s); policy editor; reconciliation, extras and disputes (`VenueMoney.jsx`) |
+| Venue view | Its verified reviews (score, counts, latest), which it can't remove; what Join brought in: paid by groups, share booked off-peak, unpaid by customers, paid out, all counted from the bookings (`venueMetrics`); Bryntum Scheduler (`PlaceScheduler.jsx`: one row per unit, dashed bars while held, solid when locked, refreshed every 3 s); policy editor; reconciliation, extras and disputes (`VenueMoney.jsx`) |
 | Receipt | Checks a receipt in the browser |
 
 ### 10.1 Join's website agent (api/src/scout/, web/src/scout/agent.js, components/AgentDrawer.jsx)
@@ -256,8 +266,9 @@ For people who don't bring an agent. A drawer ("No agent? Ask Join's") asks what
 
 ## 11. Tests (api/test/, `npm test`)
 
-There are 42, using Node's test runner, and they run against the stand-in with state in memory.
+There are 45, using Node's test runner, and they run against the stand-in with state in memory.
 - **Negotiation (12):** pricing, the floor never leaking, the serious-offer schedule, lowballs, agreeing at an offer, the mandate before the venue, organizer-only actions, expiry and quota, walking away, alternatives' ordering, bad input, venue policy edits.
+- **Reviews (3):** the Bayesian score and counted aspects; a group member's low rating flagged and the venue avoided by `find_options`; who may review (in the booking, paid, locked, started, once; aspects outside the list dropped). The end-to-end test also checks that the review route is reached and that an agent token can't post.
 - **Transparency log (2):** inclusion and consistency proofs for every tree size to 20, and a rewritten entry caught; a C2SP checkpoint and a witness cosignature that verify, and a changed one that doesn't.
 - **AP2 (2):** open mandates per agent with the limits as AP2 constraints, made again on a limit change, a forged payload refused; a deal's checkout and payment mandates tied by the checkout hash, and an error receipt for a refusal.
 - **Agent tokens (2):** scopes and expiry; signed requests (a good signature, and no signature, a changed body, an old one, another key or another host refused).
@@ -293,6 +304,7 @@ There are 42, using Node's test runner, and they run against the stand-in with s
 - Qwen's answers, warm: about 40-350 ms each. In 15 test messages it found karaoke, BBQ ("grilling meat outdoors"), board games ("cards and dice at a cafe") and hot pot, and answered "none" for "我想跟朋友出去玩". It missed "想找人玩解謎 把我們關在房間裡那種" (escape room), which the rules now catch.
 - On the same server, with the earlier hash-chained log: a karaoke booking made through the drawer, then the demo panel on Plans (one friend paid, one asked $1 less and the organizer agreed, the time ran out for the third) locked it on the PayPal sandbox with the organizer's capture covering exactly the $1 and the missing share. Its receipt verified in the browser in 29 ms (with the noble libraries, since plain HTTP on a LAN has no WebCrypto) and with `verify-receipt.mjs`, including a saved head checked again. The venue's figures matched its bookings.
 - On the same server, with the transparency log, AP2 and shopping (30 Oct 2026): the drawer haggled with three badminton venues (Midtown, North Park, Westgate; each down its schedule to a final price) and let the person book the cheapest, Westgate at $27.72 against the $33.54 they first picked; the booking's AP2 checkout and payment mandates showed on Plans; the demo panel locked it on the PayPal sandbox; its receipt verified in the browser and with `verify-receipt.mjs` against a checkpoint cosigned by a witness running on a different machine (`examples/witness.mjs`).
+- Reviews: on the server, the drawer's cards showed each venue's score, liked and complained-about aspects in Chinese; a review posted from Plans for a sandbox booking moved Westgate from 3.4 to 3.5 (16 to 17 reviews) and was shown as "booked and paid on Join (bk_…)"; `venue_reviews` flagged Hana's earlier 2★ for Westgate.
 - WebMCP: no browser we had exposes `document.modelContext`; with a stand-in object on the page, the four tools registered on sign-in, and `join-find-options` and `join-my-plans` ran and showed in the activity log as "Browser agent (WebMCP)".
 - Two Claude Sonnet agents then tested the deployed website agent: one through the drawer in a browser (7 conversations in English and Chinese, 3 deals), one over HTTP (41 single messages, 5 conversations, about 220 requests including malformed and hostile ones). The tool allow-list, the spending limit, ownership checks and prompt injection held. Their findings were fixed: clock times, next week's weekdays, written dates, party sizes and Chinese budgets in the rules (the 22 sentences the rules got wrong are now regression tests); named friends silently replaced by others; friends added later not growing the group; replies switching to English; a card promising to haggle where the limit made it impossible; stack traces and server paths in body-parser errors; an unchecked brief from the browser.
 - An earlier version ran Qwen2.5 1.5B in the browser with WebLLM; its kernels failed to compile on an NVIDIA Pascal GPU in Chrome 152, which is one reason it moved to the server.
@@ -338,7 +350,7 @@ There are 42, using Node's test runner, and they run against the stand-in with s
 npm run setup          # api, web, examples; builds the website
 npm start              # http://localhost:8790 (the stand-in without keys)
 npm run demo           # four agents over MCP; JOIN_ACTIVITY=karaoke for another plan
-npm test               # 42 tests
+npm test               # 45 tests
 npm --prefix api run bench   # the negotiation benchmark
 ```
 

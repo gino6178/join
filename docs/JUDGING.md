@@ -7,7 +7,7 @@ needs to be taken on trust.
 
 **See it fast:** `npm run setup`, `npm start`, then open http://localhost:8790/demo?as=you&go=activity?agent=1 (no
 keys needed; PayPal is simulated and says so). In another terminal, `npm run demo` runs four agents over MCP.
-`npm test` runs 42 tests; `npm --prefix api run bench` runs the negotiation benchmark. Details: [TECHNICAL.md](TECHNICAL.md).
+`npm test` runs 45 tests; `npm --prefix api run bench` runs the negotiation benchmark. Details: [TECHNICAL.md](TECHNICAL.md).
 
 ---
 
@@ -60,6 +60,8 @@ use the demo panel to play the friends, and watch each payment's PayPal status, 
   (pays, asks $1 less, can't come, time runs out), so judges see the split, the lock and the captures without four
   browsers (`web/src/pages/Games.jsx`, `Seats`).
 - **The negotiation as a chart:** the venue's asks stepping down, the agent's offers, lowballs marked (`Curve`).
+- **Recommendations you can trust:** each option shows its verified-review score, what people liked and complained
+  about (counted, not generated), and a warning if someone in your group rated the venue badly.
 - **Shopping, then a choice:** the website agent compares the venue you picked with up to two others and offers the
   cheapest as buttons; balances with friends are netted across plans and settled with one invoice.
 - **The venue's view:** Bryntum Scheduler with payment state driving the schedule (dashed while the group pays, solid
@@ -103,6 +105,8 @@ use the demo panel to play the friends, and watch each payment's PayPal status, 
 - **Receipts without a blockchain.** A transparency log as Certificate Transparency runs it: checkpoints signed by Join
   and cosigned by witnesses (a venue, anyone) who check that the log only grew. No fees, no waiting for blocks. Join
   sends the receipt and the AP2 mandates to PayPal by itself when a payment is disputed.
+- **Reviews that can't be faked by agents.** Only people who paid can review, agents only read, and the agent ranks
+  venues with a Bayesian score and "least misery" for the group, so one friend's bad experience counts.
 - **Measured negotiation.** Six buyer strategies against every venue's rules (docs/NEGOTIATION.md): patience wins,
   lowballing and floor-probing don't, and nobody ever paid under a floor. Join's website agent uses the winning
   strategy and shops across venues.

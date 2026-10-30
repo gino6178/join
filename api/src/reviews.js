@@ -66,7 +66,7 @@ export function summary(venueId, { activity = null, group = [] } = {}) {
 // A short reason, written by code from the summary (what the agent says about a venue)
 export function reason(s) {
   if (!s.count) return "no reviews yet";
-  const bits = [`★${s.score.toFixed(1)} from ${s.count} verified review${s.count === 1 ? "" : "s"}${s.demoData ? " (demo data)" : ""}`];
+  const bits = [`★${s.score.toFixed(1)} from ${s.count} verified review${s.count === 1 ? "" : "s"}${!s.demoData ? "" : s.demoData === s.count ? " (demo data)" : ` (${s.demoData} of them demo data)`}`];
   if (s.praise.length) bits.push(`liked: ${s.praise.map((p) => `${p.label} (${p.count})`).join(", ")}`);
   if (s.complaints.length) bits.push(`complaints: ${s.complaints.map((p) => `${p.label} (${p.count})`).join(", ")}`);
   if (s.groupLow.length) bits.push(`${s.groupLow.map((g) => `${g.name} rated it ${g.stars}★`).join(", ")}`);
