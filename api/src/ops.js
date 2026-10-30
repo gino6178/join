@@ -157,6 +157,13 @@ function mandateCheck(a, presented, { venue: venueId, share, authorized = share,
 const mayPay = (a) => !a.scopes || a.scopes.includes("pay");
 const ownShare = (total, k) => total - Math.floor(total / k) * (k - 1);
 
+// For agents: a deal's reply after the guarantee it triggered has started, with the booking as it now stands
+export async function afterDeal(a, r) {
+  const id = r?.booking?.id;
+  if (!id) return r;
+  await settle.settled(id);
+  return { ...r, booking: settle.status(id, a.player) || r.booking };
+}
 export function makeOffer(a, { negotiation, amount, mandate }) {
   const c = toCents(amount);
   if (!c) return { error: "bad_amount", message: "amount is the total for the booking in USD as a number, e.g. 30 or 31.5 (not the per-person share)." };

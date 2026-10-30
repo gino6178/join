@@ -41,6 +41,15 @@ ${tools}
 - Errors come back as {"error", "message"} in the tool's result (over A2A: in the data part of the reply), not as
   protocol errors, so check every result for "error".
 
+## Receipts, and checking one yourself
+
+When a booking locks, is refunded or the venue is paid, Join issues a receipt: GET ${u}/api/receipts/<id> (ids are in
+booking_status). body is the record; hash = SHA-256 of body as canonical JSON (keys sorted, no spaces), hex;
+signature = Ed25519 over the 32 hash bytes, base64url, by the key in ${u}/.well-known/join-receipts.json (use that
+one, not the copy in the receipt). Every 2 minutes open receipts are batched into a Merkle tree (proof: the path to
+batch.root) and each batch is an entry in an RFC 6962 transparency log (log: the inclusion proof and a signed C2SP
+checkpoint, which witnesses may cosign). Until its batch closes, a receipt has no proof yet.
+
 ## A typical plan
 
 whoami (your person, their limits, and your AP2 open payment mandate) -> list_activities -> find_options (players

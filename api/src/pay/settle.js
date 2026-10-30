@@ -50,7 +50,7 @@ const db = store(stateFile("bookings"), { bookings: [], vaults: {}, setups: {}, 
 db.data.settlements ||= []; // (stores written before settlements existed)
 export const bookingsStore = db;
 let pp = null, clock = () => new Date(), publicUrl = "http://localhost:8790";
-export function configure({ paypal, now, url } = {}) { if (paypal) pp = paypal; if (now) clock = now; if (url) publicUrl = url; }
+export function configure({ paypal, now, url, residentMs } = {}) { if (paypal) pp = paypal; if (now) clock = now; if (url) publicUrl = url; if (residentMs != null) RESIDENT_MS = residentMs; }
 export const paypalMode = () => pp?.mode || "none";
 
 const get = (id) => db.data.bookings.find((b) => b.id === id);
@@ -190,6 +190,7 @@ async function advance(b) {
     note(b, { kind: "platform" }, "held", `${name(b.organizer)} guaranteed the booking: ${place(b)} is held until ${until}. ${name(b.organizer)} covers anyone who doesn't join and pay by then.`);
     for (const pid of b.players) if (pid !== b.organizer && !b.declined.includes(pid))
       record({ actor: { kind: "agent", player: b.organizer }, who: [pid], action: "invited", ref: b.id, summary: `${name(b.organizer)}'s agent invited you: ${b.activity} on ${b.date} ${b.start} at ${venue(b.venue).name}, ${place(b)}. Your share is $${usd(b.shares[pid])}. Join or decline by ${until}.`, data: { share: usd(b.shares[pid]), payBy: until } });
+    residentsAnswer(b);
   }
   if (b.state === "held") {
     const others = b.players.filter((pid) => pid !== b.organizer && !b.declined.includes(pid));
@@ -321,6 +322,26 @@ async function payVenue(b) {
 }
 
 // ---- what players and agents can do -----------------------------------------------------------------------------
+// The demo town's residents have agents too (simulated): a while after they are invited, each one joins and pays if
+// the activity is one they like and their share is within their own per-booking limit, and otherwise says they can't
+// come. So an outside agent organizing in the demo town sees friends answer, as real friends' agents would. Someone
+// who has already answered for them (the demo panel) goes first. RESIDENT_AGENT_MS sets the wait (0: they never answer).
+let RESIDENT_MS = process.env.RESIDENT_AGENT_MS != null ? +process.env.RESIDENT_AGENT_MS : 90e3;
+function residentsAnswer(b) {
+  if (!RESIDENT_MS) return;
+  b.players.filter((pid) => pid !== b.organizer && player(pid) && !player(pid).joined).forEach((pid, i) => setTimeout(() => serial(b.id, async () => {
+    if (b.state !== "held" || b.payments[pid] || b.declined.includes(pid)) return;
+    const p = player(pid), m = getMandate(pid), likes = (p.interests || []).includes(b.activity), fits = b.shares[pid] <= m.perGame;
+    record({ actor: { kind: "agent", player: pid, client: "simulated resident" }, who: [pid, b.organizer], action: likes && fits ? "joined" : "declined", ref: b.id,
+      summary: likes && fits ? `${name(pid)}'s agent (a simulated resident) is in: ${name(pid)} likes ${b.activity}, and $${usd(b.shares[pid])} is within their limit.` : `${name(pid)}'s agent (a simulated resident) says ${name(pid)} can't come${!likes ? `: not one for ${b.activity}` : `: $${usd(b.shares[pid])} is over their $${usd(m.perGame)} limit`}.` });
+    if (likes && fits) {
+      await startPayment(b, pid, b.shares[pid], "share");
+      // (on the stand-in, the resident approves at once, as a person with saved PayPal would)
+      if (b.payments[pid]?.status === "awaiting_approval" && pp.mode === "mock") { pp.approve({ token: b.payments[pid].orderId }); setTimeout(() => approved(b.id, pid), 0); }
+    } else { b.declined.push(pid); db.save(); }
+    await advance(b);
+  }).catch(() => {}), RESIDENT_MS + i * Math.min(15e3, RESIDENT_MS)).unref?.());
+}
 export function pay(bookingId, playerId) {
   const b = get(bookingId);
   if (!b || !b.players.includes(playerId)) return Promise.resolve({ error: "no_booking", message: "No such booking." });
@@ -420,6 +441,9 @@ export function view(b, viewer) {
   };
 }
 
+// once the steps queued for a booking are done (at most `ms`): an agent's reply then says what is true, e.g. that the
+// guarantee it just triggered is already authorized
+export const settled = (bookingId, ms = 15e3) => Promise.race([chains.get(bookingId) || Promise.resolve(), new Promise((ok) => setTimeout(ok, ms).unref?.())]);
 export const status = (bookingId, viewer) => { const b = get(bookingId); return b && b.players.includes(viewer) ? view(b, viewer) : { error: "no_booking", message: "No such booking." }; };
 const DONE = ["released", "cancelled", "refunded"];
 export const mine = (viewer, { all = false } = {}) => db.data.bookings.filter((b) => b.players.includes(viewer) && (all || (!DONE.includes(b.state) && !b.declined.includes(viewer) && startOf(b.date, b.start).getTime() + b.minutes * 60e3 > clock().getTime() - 2 * 864e5))).map((b) => view(b, viewer)).reverse();

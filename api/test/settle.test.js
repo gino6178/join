@@ -16,7 +16,7 @@ beforeEach(() => {
   now = new Date(2026, 10, 2, 10, 0);
   setClock(clock);
   pp = mockPaypal();
-  settle.configure({ paypal: pp, now: clock, url: "http://test" });
+  settle.configure({ paypal: pp, now: clock, url: "http://test", residentMs: 0 });
   negotiationsStore.reset(); mandatesStore.reset(); settle.bookingsStore.reset(); activityStore.reset();
   for (const p of ["alex", "leo", "hana", "tomas"]) setMandate(p, { perGame: 5000, perWeek: 20000 });
 });
@@ -51,6 +51,19 @@ test("a lock interrupted by a refused capture resumes: shares already captured a
   assert.notEqual(orgCalls[0].requestId, orgCalls[1].requestId);
   assert.equal(b.journal.filter((j) => j.step === "capture:leo" && j.status === "started").length, 1);
   pp.capture = real;
+});
+
+test("the demo town's residents have agents: invited, each joins and pays if it likes the activity and the share fits, or says no", async () => {
+  settle.configure({ residentMs: 5 });
+  try {
+    const id = await deal();
+    await settle.pay(id, "alex"); await approve(id, "alex");
+    for (let i = 0; i < 40 && settle.internal(id).state === "held"; i++) await new Promise((ok) => setTimeout(ok, 50));
+    const b = settle.internal(id);
+    assert.equal(b.state, "locked"); // (all three like badminton, and $${share} is within their limits)
+    for (const p of ["leo", "hana", "tomas"]) assert.equal(b.payments[p].status, "captured");
+    assert.ok(forRef(id).some((e) => e.actor.client === "simulated resident"));
+  } finally { settle.configure({ residentMs: 0 }); }
 });
 
 test("the organizer guarantees the whole court before anyone else is asked", async () => {

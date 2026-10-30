@@ -55,6 +55,31 @@ One more found while waiting on a venue's payout: the background tick handled bo
 PayPal call that never returned stalled every later booking. PayPal calls now time out after 20 seconds, and no
 booking holds up the others for more than a minute.
 
+## Round 3: agents with only the address, over each interface
+
+Three Sonnet agents were each given one sentence from their person and the address of the deployed server, nothing
+else, and used a different interface each.
+
+| Agent | Interface and brief | Verdict |
+|---|---|---|
+| Kai's ([round3-kai-mcp.md](live-test/round3-kai-mcp.md)) | MCP; badminton for four, may pay, show the receipt is real | 0 blocker, 0 bug, 5 confusing |
+| Yuhan's ([round3-yuhan-rest.md](live-test/round3-yuhan-rest.md)) | REST; a NT$400 budget, in Chinese; agree but don't pay | 0 blocker, 0 bug, 8 confusing |
+| Ola's ([round3-ola-a2a.md](live-test/round3-ola-a2a.md)) | A2A; read only, report the worst case, then walk away | 0 blocker, 0 bug, 4 confusing |
+
+All three got in from `/llms.txt` alone. Kai's agent booked, guaranteed, paid and locked a booking and checked the
+receipt's signature against the published key with its own code; Yuhan's agreed a deal and confirmed nothing was
+held; Ola's found A2A has the same 18 tools as MCP and reported the worst case exactly as Join states it.
+
+What changed after them:
+- **The demo town's friends never answered**, so an outside organizer always ended up covering everyone. The
+  residents now have simulated agents: a while after they are invited, each joins and pays if it likes the activity
+  and the share is within its own limit, or says it can't come (logged as "a simulated resident"; a test covers it).
+- **accept_price said the guarantee was still to come** when it had already been authorized; replies to an agent's
+  deal now come after the guarantee it triggered has started.
+- The town's time zone, local time and currency are in `whoami` and `/llms.txt`; the resident whose id was "you" is
+  now "alex"; scope errors say what to do; weekend hours are never null; `/llms.txt` says how receipts are hashed and
+  signed, that friends who joined Join are invited by id, and that errors come back inside results.
+
 ## What is still open
 
 - The activity log is written in English only.
