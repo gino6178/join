@@ -7,7 +7,7 @@ needs to be taken on trust.
 
 **See it fast:** `npm run setup`, `npm start`, then open http://localhost:8790/demo?as=you&go=activity?agent=1 (no
 keys needed; PayPal is simulated and says so). In another terminal, `npm run demo` runs four agents over MCP.
-`npm test` runs 46 tests; `npm --prefix api run bench` runs the negotiation benchmark. Details: [TECHNICAL.md](TECHNICAL.md).
+`npm test` runs 47 tests; `npm --prefix api run bench` runs the negotiation benchmark. Details: [TECHNICAL.md](TECHNICAL.md).
 
 ---
 
@@ -39,7 +39,8 @@ keys needed; PayPal is simulated and says so). In another terminal, `npm run dem
 - **Limits enforced in code before a venue sees an offer** (`api/src/mandate.js`, `negotiate/engine.js`): spending
   (your share per booking and per week, counting what you covered for friends) and guaranteeing (how much your agent
   may guarantee for a group on its own) are separate, and agent tokens can read them, never change them.
-- **Standards, implemented, not name-dropped:** AP2 mandates in AP2's own JSON schemas (`api/src/proof/mandates.js`);
+- **Standards that do work:** AP2 mandates in AP2's own JSON schemas, which an agent must present with every offer,
+  accept and payment and Join checks before acting (`api/src/proof/mandates.js` `authorize`);
   receipts in an RFC 6962 transparency log with C2SP checkpoints and witness cosignatures (`api/src/proof/tlog.js`,
   `examples/witness.mjs`); signed agent requests per RFC 9421 (`api/src/auth.js`); WebMCP (`web/src/webmcp.js`).
 - **Tested by agents, not only by us:** Claude Sonnet agents played friends and a venue on the sandbox, tried a dozen

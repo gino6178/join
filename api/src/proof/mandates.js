@@ -36,11 +36,34 @@ export function sign(payload, typ = "JWT") {
   const body = b64u(JSON.stringify(payload));
   return `${head}.${body}.${signBytes(Buffer.from(`${head}.${body}`)).toString("base64url")}`;
 }
-export function verify(jws) {
+export function verify(jws, { at = now() } = {}) {
   const [h, p, s] = String(jws).split(".");
   if (!s) return null;
   if (!verifyBytes(Buffer.from(`${h}.${p}`), Buffer.from(s, "base64url"))) return null;
-  return JSON.parse(Buffer.from(p, "base64url").toString("utf8"));
+  const payload = JSON.parse(Buffer.from(p, "base64url").toString("utf8"));
+  return payload.exp && payload.exp < at ? null : payload; // (an expired mandate verifies as nothing)
+}
+
+// AP2's action authorization: the agent presents its open payment mandate with an action that can commit money (an
+// offer, an accept, a payment), and Join, as the verifier, checks it before anything else happens: Join's signature,
+// not expired, for this person, bound to this agent's token (cnf.kid), still the person's current one (made again
+// whenever they change a limit, so an older, looser one stops working), and its constraints: the share within
+// payment.amount_range, the week's spending plus the share within payment.budget, the venue among payment.allowed_payees.
+// Returns { ok, payload } or { error: "invalid_mandate" | "mandate_required", message, receipt } (an AP2 error receipt).
+export function authorize(jws, { player, agentKid, venue, share, spentThisWeek = 0 }) {
+  const no = (error, message) => ({ error, message, receipt: jws ? mandateReceipt(jws, { ok: false, error: "invalid_mandate", why: message }) : null });
+  if (!jws) return no("mandate_required", "Present your open payment mandate (whoami returns it as ap2.openPaymentMandate) with offers, accepts and payments.");
+  const m = verify(jws);
+  if (!m || m.vct !== "mandate.payment.open.1") return no("invalid_mandate", "That mandate doesn't verify with Join's key, or it has expired.");
+  if (m.sub !== player) return no("invalid_mandate", "That mandate is for someone else.");
+  if (m.cnf?.kid !== agentKid) return no("invalid_mandate", "That mandate was made for another agent (its cnf.kid isn't your token).");
+  const cur = openFor(player, agentKid);
+  if (!cur || cur.payment !== jws) return no("invalid_mandate", "That mandate has been replaced: the person changed their limits. Get the current one from whoami.");
+  const c = (t) => m.constraints.find((x) => x.type === t);
+  if (c("payment.amount_range") && share > c("payment.amount_range").max) return no("invalid_mandate", `The share ($${(share / 100).toFixed(2)}) is over the mandate's amount_range ($${(c("payment.amount_range").max / 100).toFixed(2)}).`);
+  if (c("payment.budget") && spentThisWeek + share > Math.round(c("payment.budget").max * 100)) return no("invalid_mandate", `That would take this week over the mandate's budget ($${c("payment.budget").max.toFixed(2)}).`);
+  if (c("payment.allowed_payees") && !c("payment.allowed_payees").allowed.some((x) => x.id === venue)) return no("invalid_mandate", "That venue isn't among the mandate's allowed payees.");
+  return { ok: true, payload: m };
 }
 export const digest = hashB64u;
 
@@ -48,8 +71,10 @@ const merchant = (v) => ({ id: v.id, name: v.name });
 
 // The open mandates for one agent of one person, signed when the person sets their limits (or the agent is connected).
 // `agentKid` is the agent's token id (or "website-agent"), `m` the mandate (cents), `venues` the town's venues.
-export function issueOpen(playerId, agentKid, m, venues, activities) {
-  const iat = now(), exp = iat + 30 * 86400, cnf = { kid: agentKid };
+export function issueOpen(playerId, agentKid, m, venues, activities, keyX = null) { // (m.updated is kept, to know when the limits change)
+  // (bound to the agent's token; with its public key too when the token has one: proof of possession is then the
+  // RFC 9421 signature every request of that token must carry)
+  const iat = now(), exp = iat + 30 * 86400, cnf = { kid: agentKid, ...(keyX ? { jwk: { kty: "OKP", crv: "Ed25519", x: keyX } } : {}) };
   const allowed = (m.venues ? venues.filter((v) => m.venues.includes(v.id)) : venues).map(merchant);
   const checkout = sign({ iss: issuer, sub: playerId, vct: "mandate.checkout.open.1", iat, exp, cnf,
     constraints: [
@@ -65,7 +90,7 @@ export function issueOpen(playerId, agentKid, m, venues, activities) {
       { type: "payment.allowed_payees", allowed },
       { type: "payment.allowed_pisps", allowed: [PAYPAL] },
     ] });
-  (db.data.open[playerId] ||= {})[agentKid] = { checkout, payment, iat, exp, at: Date.now() };
+  (db.data.open[playerId] ||= {})[agentKid] = { checkout, payment, iat, exp, at: Date.now(), limits: m.rev || 0 };
   db.save();
   return { checkout, payment };
 }

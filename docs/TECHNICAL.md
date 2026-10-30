@@ -59,7 +59,7 @@ same operations with the person's session.
 | Website | `web/src/**` (about 1,150 lines) |
 | Examples | `examples/scripted-agent.mjs`, `claude-agent.mjs`, `venue-agent.mjs`, `toolkit-cli.mjs`, `verify-receipt.mjs` |
 | Website agent | `api/src/scout/understand.js` (186), `web/src/scout/agent.js`, `web/src/scout/words.js`, `web/src/components/AgentDrawer.jsx` |
-| Tests | `api/test/*.test.js`: 46 tests |
+| Tests | `api/test/*.test.js`: 47 tests |
 
 **Money is integer cents inside, USD strings outward.** Times are the town's local time: the process sets `TZ` from
 `world.json` (`America/Los_Angeles`), and the website renders in that zone (`world.js`, `web/src/api.js`).
@@ -239,6 +239,7 @@ page at `/mock-paypal/approve`, a 3.49% + $0.49 fee, request-id idempotency, and
 Join signs the mandates of the Agent Payments Protocol (github.com/google-agentic-commerce/AP2, `code/sdk/schemas/ap2`), in the "Trusted Agent Provider" model of AP2's agent-authorization document: Join is the agent provider, the Limits page (the person's session, never an agent's token) is the trusted surface, and Join's key signs.
 - **Format:** compact JWS (EdDSA, the receipts key), payloads field for field as AP2's JSON schemas: `vct`, `constraints`, `cnf`, `iat`, `exp`, and the types `checkout.allowed_merchants`, `checkout.line_items`, `payment.reference`, `payment.amount_range`, `payment.agent_recurrence`, `payment.budget`, `payment.allowed_payees`, `payment.allowed_pisps`. Selective disclosure (SD-JWT) is not used.
 - **Open mandates** (`mandate.checkout.open.1`, `mandate.payment.open.1`) per person and agent, `cnf: {kid: <token id>}` (RFC 7800), made again whenever the person's limits change (`ops.openMandates`); `whoami` returns them.
+- **Action authorization (AP2):** `make_offer`, `accept_price` and `pay_my_share` take `mandate`, the agent's open payment mandate. `mandates.authorize` checks Join's signature, `exp`, `sub` (this person), `cnf.kid` (this token), that it is still the current one (mandates are made again when the person's limits change, tracked by a revision number, so an older, looser one stops working), `payment.amount_range` against the share, `payment.budget` against the week's spending plus the share (the booking being paid isn't counted twice), and `payment.allowed_payees`. Missing: `mandate_required`; failing: `invalid_mandate` with an AP2 error receipt. The website agent and WebMCP act through the person's session, so Join presents their mandate. For a token tied to a public key, `cnf` also carries the key (`cnf.jwk`); its RFC 9421 signature on every request is the proof of possession. The plain limits check (`mandate.fits`) runs as well.
 - **Per deal:** the checkout (a JWS of the venue, line item, total and booking) and its Checkout Mandate (`mandate.checkout.1`, `checkout_jwt`, `checkout_hash`); each payer's Payment Mandate (`mandate.payment.1`, `transaction_id` = the checkout hash, `payee`, `payment_amount`, `payment_instrument` = the PayPal order or vault token, `pisp` = PayPal); Join's Mandate Receipts (`result`, `reference` = the mandate's hash). A refusal over a limit returns an error receipt (`invalid_mandate`) as `ap2Receipt`.
 - **Where they go:** `GET /api/bookings/:id/ap2` (the people in the booking; "AP2 mandates" on Plans), the receipt body (their hashes) and dispute evidence (in full).
 
@@ -268,11 +269,11 @@ For people who don't bring an agent. A drawer ("No agent? Ask Join's") asks what
 
 ## 11. Tests (api/test/, `npm test`)
 
-There are 46, using Node's test runner, and they run against the stand-in with state in memory.
+There are 47, using Node's test runner, and they run against the stand-in with state in memory.
 - **Negotiation (12):** pricing, the floor never leaking, the serious-offer schedule, lowballs, agreeing at an offer, the mandate before the venue, organizer-only actions, expiry and quota, walking away, alternatives' ordering, bad input, venue policy edits.
 - **Reviews (4):** tastes from a person's own reviews moving a venue up or down for the group, with only the viewer named; the Bayesian score and counted aspects; a group member's low rating flagged and the venue avoided by `find_options`; who may review (in the booking, paid, locked, started, once; aspects outside the list dropped). The end-to-end test also checks that the review route is reached and that an agent token can't post.
 - **Transparency log (2):** inclusion and consistency proofs for every tree size to 20, and a rewritten entry caught; a C2SP checkpoint and a witness cosignature that verify, and a changed one that doesn't.
-- **AP2 (2):** open mandates per agent with the limits as AP2 constraints, made again on a limit change, a forged payload refused; a deal's checkout and payment mandates tied by the checkout hash, and an error receipt for a refusal.
+- **AP2 (3):** a mandate is required for an offer, accept or payment, and a missing, tampered, another agent's, another person's, replaced, over-limit or wrong-venue one is refused; open mandates per agent with the limits as AP2 constraints, made again on a limit change, a forged payload refused; a deal's checkout and payment mandates tied by the checkout hash, and an error receipt for a refusal.
 - **Agent tokens (2):** scopes and expiry; signed requests (a good signature, and no signature, a changed body, an old one, another key or another host refused).
 - **Receipts (3):** Merkle proofs for 1 to 13 leaves; signature, tamper detection and hashed players; the transparency log (receipts from early and late batches verify to the latest checkpoint, a kept checkpoint is extended by consistency, a changed root, a wrong index or a forged checkpoint is caught, and a witness cosigns only the current checkpoint).
 - **Website agent (6):** the sentences our test agents found the rules got wrong, and the checks on a brief from the browser; also the rules reader in English and Chinese, weekends and named friends, a brief built over several messages; and against a stand-in Ollama, that Qwen fills in only the activity, only when the rules found none, and that an answer outside the list is ignored.
@@ -323,7 +324,7 @@ There are 46, using Node's test runner, and they run against the stand-in with s
 
 ## 13. Known limitations and open risks (review targets)
 
-0. **AP2:** Join plays both agent provider and verifier, so its mandates show what the person allowed and what was done, signed by Join; they are not yet signed by the person's own key (a passkey, or the User Credential model). No SD-JWT selective disclosure. Witnesses trust Join's log key on first use, and there is no gossip between witnesses yet.
+0. **AP2:** Join plays both agent provider and verifier: mandates are signed by Join on the person's behalf (the Trusted Agent Provider model), not yet by the person's own key (a passkey, or the User Credential model). No SD-JWT selective disclosure. Witnesses trust Join's log key on first use, and there is no gossip between witnesses yet.
 
 1. **Single process, JSON files.**
    - No database or locking across processes. `serial()` is in memory, so two server instances on the same state would race.
@@ -352,7 +353,7 @@ There are 46, using Node's test runner, and they run against the stand-in with s
 npm run setup          # api, web, examples; builds the website
 npm start              # http://localhost:8790 (the stand-in without keys)
 npm run demo           # four agents over MCP; JOIN_ACTIVITY=karaoke for another plan
-npm test               # 46 tests
+npm test               # 47 tests
 npm --prefix api run bench   # the negotiation benchmark
 ```
 

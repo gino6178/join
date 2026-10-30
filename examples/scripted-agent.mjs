@@ -32,7 +32,13 @@ async function agent(player, label) {
   const { token, cookie } = await tokenFor(player, label);
   const client = new Client({ name: label, version: "0.1.0" });
   await client.connect(new StreamableHTTPClientTransport(new URL(`${URL0}/mcp`), { requestInit: { headers: { Authorization: `Bearer ${token}` } } }));
-  const call = async (name, args = {}) => { const r = await client.callTool({ name, arguments: args }); return r.structuredContent ?? JSON.parse(r.content[0].text); };
+  const raw = async (name, args = {}) => { const r = await client.callTool({ name, arguments: args }); return r.structuredContent ?? JSON.parse(r.content[0].text); };
+  // (offers, accepts and payments carry this agent's AP2 open payment mandate, from whoami, as Join requires)
+  let mandate = null;
+  const call = async (name, args = {}) => {
+    if (["make_offer", "accept_price", "pay_my_share"].includes(name)) { mandate ||= (await raw("whoami")).ap2.openPaymentMandate; args = { ...args, mandate }; }
+    return raw(name, args);
+  };
   return { call, cookie, close: () => client.close() };
 }
 // the person's click on the simulated PayPal page
@@ -95,6 +101,7 @@ say("Venue", `deal: $${r.agreed.amount} ($${r.agreed.share} each)`);
 
 const booking = r.booking.id;
 let p = await alex.call("pay_my_share", { booking });
+if (p.error) { say("Join", `refused: ${p.message}`); process.exit(1); }
 say("Alex's agent", `Alex guarantees the whole booking: $${p.you.authorized}`);
 if (p.you?.approveUrl) await approve(p.you.approveUrl, "Alex", () => alex.call("booking_status", { booking }));
 else say("Alex", `authorized (${p.you?.via})`);

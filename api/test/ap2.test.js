@@ -43,7 +43,7 @@ test("an agent's open mandates: signed, bound to its token, with the person's li
 test("a deal: checkout mandate, each payer's payment mandate for that checkout, Join's receipts; refusals get an error receipt", async () => {
   const start = ["18:00", "19:00", "20:00"].find((s) => freeUnits("north", "badminton", "2026-11-05", s, 90).length);
   const n = ops.startNegotiation(agent, { venue: "north", activity: "badminton", date: "2026-11-05", start, minutes: 90, players: ["leo", "hana", "tomas"] });
-  const r = ops.acceptPrice(agent, { negotiation: n.id });
+  const r = ops.acceptPrice(agent, { negotiation: n.id, mandate: ops.whoami(agent).ap2.openPaymentMandate });
   assert.equal(r.status, "agreed");
   await settle.pay(r.booking.id, "you");
   const m = ap2.forBooking(r.booking.id);
@@ -60,6 +60,30 @@ test("a deal: checkout mandate, each payer's payment mandate for that checkout, 
   // over the limit: refused, with an AP2 mandate receipt saying so
   setMandate("you", { perGame: 100 });
   const n2 = ops.startNegotiation(agent, { venue: "west", activity: "badminton", date: "2026-11-06", start: "19:00", minutes: 90, players: ["leo", "hana", "tomas"] });
-  const refused = n2.error ? n2 : ops.acceptPrice(agent, { negotiation: n2.id });
+  const refused = n2.error ? n2 : ops.acceptPrice(agent, { negotiation: n2.id, mandate: ops.whoami(agent).ap2.openPaymentMandate });
   if (refused.error === "over_mandate") { const x = ap2.verify(refused.ap2Receipt); assert.equal(x.result, "error"); assert.equal(x.error, "invalid_mandate"); }
+});
+
+test("AP2 action authorization: an offer, accept or payment needs the agent's own, current, valid open payment mandate", () => {
+  const start = ["18:00", "19:00", "20:00"].find((s) => freeUnits("north", "badminton", "2026-11-05", s, 90).length);
+  const n = ops.startNegotiation(agent, { venue: "north", activity: "badminton", date: "2026-11-05", start, minutes: 90, players: ["leo", "hana", "tomas"] });
+  const good = ops.whoami(agent).ap2.openPaymentMandate;
+  const tryWith = (mandate) => ops.acceptPrice(agent, { negotiation: n.id, mandate });
+  assert.equal(tryWith(undefined).error, "mandate_required"); // none presented
+  const [h, p, sig] = good.split(".");
+  const looser = JSON.parse(Buffer.from(p, "base64url")); looser.constraints.find((c) => c.type === "payment.amount_range").max = 1e9;
+  assert.equal(tryWith(`${h}.${Buffer.from(JSON.stringify(looser)).toString("base64url")}.${sig}`).error, "invalid_mandate"); // tampered
+  const other = ops.whoami({ player: "you", client: "other", token: "tok_other" }).ap2.openPaymentMandate;
+  assert.match(tryWith(other).message, /another agent/); // another agent's
+  const leos = ops.whoami({ player: "leo", client: "leo's", token: "tok_test" }).ap2.openPaymentMandate;
+  assert.match(tryWith(leos).message, /someone else/); // someone else's
+  setMandate("you", { perGame: 5000, perWeek: 20000, venues: ["west"] }); // the person changes a limit
+  assert.match(tryWith(good).message, /replaced/); // the old mandate stops working
+  assert.match(tryWith(ops.whoami(agent).ap2.openPaymentMandate).message, /allowed payees/); // the new one doesn't allow this venue
+  setMandate("you", { venues: null, perGame: 100 });
+  const r = tryWith(ops.whoami(agent).ap2.openPaymentMandate);
+  assert.match(r.message, /amount_range/); // over the per-booking limit
+  assert.equal(ap2.verify(r.ap2Receipt).result, "error");
+  setMandate("you", { perGame: 5000 });
+  assert.equal(tryWith(ops.whoami(agent).ap2.openPaymentMandate).status, "agreed"); // the current, valid mandate works
 });

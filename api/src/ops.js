@@ -10,6 +10,7 @@ import { getMandate } from "./mandate.js";
 import * as settle from "./pay/settle.js";
 import * as ap2 from "./proof/mandates.js";
 import * as reviews from "./reviews.js";
+import { tokenKey } from "./auth.js";
 import { record } from "./activity.js";
 import { trips } from "./geo.js";
 import { DAYS, addDays, dateOf, freeAt, hm, isDate, isTime, toMin, windows, ymd, startOf } from "./time.js";
@@ -25,9 +26,9 @@ const said = (a) => `${first(a.player)}'s agent${a.client ? ` (${a.client})` : "
 // changes their limits on the website
 export function openMandates(a) {
   const kid = a.token || "website-agent", m = getMandate(a.player), cur = ap2.openFor(a.player, kid);
-  if (cur && (!m.updated || Date.parse(m.updated) <= cur.at)) return cur;
+  if (cur && cur.limits === (m.rev || 0)) return cur; // (the limits haven't changed since it was made)
   const w = getWorld();
-  return ap2.issueOpen(a.player, kid, m, w.venues, w.activities);
+  return ap2.issueOpen(a.player, kid, m, w.venues, w.activities, a.token ? tokenKey(a.token) : null);
 }
 
 export function whoami(a) {
@@ -112,7 +113,7 @@ function withTerms(a, r) {
 // AP2: when Join refuses an action under the person's limits, the agent gets Join's signed Mandate Receipt saying so
 const withRefusal = (a, r) => (r?.error === "over_mandate" ? { ...r, ap2Receipt: ap2.mandateReceipt(openMandates(a).payment, { ok: false, error: "invalid_mandate", why: r.message }) } : r);
 // the organizer's share of the agreed price (the remainder of an even split)
-const organizerShare = (n) => { const t = cents(n.agreed.amount), k = n.players.length; return usd(t - Math.floor(t / k) * (k - 1)); };
+const organizerShare = (n) => usd(ownShare(cents(n.agreed.amount), n.players.length));
 
 // what verified reviews say about a venue, for this group (cached per call of find_options)
 const reviewsFor = (venueId, activity, group, viewer) => reviews.summary(venueId, { activity, group, viewer });
@@ -137,9 +138,23 @@ export function startNegotiation(a, { venue: venueId, activity, date, start, min
   return withTerms(a, r);
 }
 
-export function makeOffer(a, { negotiation, amount }) {
+// An agent's AP2 open payment mandate, presented with an action that can commit money, checked before the action
+// (mandates.authorize). A person acting on the website themselves (no token) presents none.
+function mandateCheck(a, presented, { venue: venueId, share, date, start, booking = null }) {
+  if (!a.token) return null;
+  openMandates(a); // (made again first if the person changed a limit, so a stale one is refused)
+  const r = ap2.authorize(presented, { player: a.player, agentKid: a.token, venue: venueId, share, spentThisWeek: settle.spentInWeek(a.player, date, start, booking) }); // (a booking being paid isn't counted twice)
+  if (r.ok) return null;
+  record({ actor: by(a), who: [a.player], action: "mandate_refused", summary: `${said(a)} was refused: ${r.message}` });
+  return { error: r.error, message: r.message, ...(r.receipt ? { ap2Receipt: r.receipt } : {}) };
+}
+const ownShare = (total, k) => total - Math.floor(total / k) * (k - 1);
+
+export function makeOffer(a, { negotiation, amount, mandate }) {
   const c = toCents(amount);
   if (!c) return { error: "bad_amount", message: "amount is the total for the booking in USD, e.g. 30 or 31.5." };
+  const cur = neg.status({ id: negotiation, by: a.player });
+  if (!cur.error) { const no = mandateCheck(a, mandate, { venue: cur.venue, share: ownShare(Math.min(c, cents(cur.ask)), cur.players.length), date: cur.date, start: cur.start }); if (no) return no; }
   const r = neg.offer({ id: negotiation, by: a.player, amount: c });
   const n = r.error ? r.negotiation : r;
   if (n) record({ actor: by(a), who: n.players, action: r.error ? "offer_refused" : r.status === "agreed" ? "deal" : r.status === "rejected" ? "venue_rejected" : "venue_countered", ref: n.id,
@@ -148,7 +163,9 @@ export function makeOffer(a, { negotiation, amount }) {
   return withTerms(a, withRefusal(a, r));
 }
 
-export function acceptPrice(a, { negotiation }) {
+export function acceptPrice(a, { negotiation, mandate }) {
+  const cur = neg.status({ id: negotiation, by: a.player });
+  if (!cur.error) { const no = mandateCheck(a, mandate, { venue: cur.venue, share: ownShare(cents(cur.ask), cur.players.length), date: cur.date, start: cur.start }); if (no) return no; }
   const r = neg.accept({ id: negotiation, by: a.player });
   const n = r.error ? r.negotiation : r;
   if (n) record({ actor: by(a), who: n.players, action: r.error ? "accept_refused" : "deal", ref: n.id, summary: r.error ? `${said(a)} tried to accept $${n.ask}: ${r.message}` : `${said(a)} accepted ${n.venueName}'s $${n.agreed.amount}. Next: ${first(a.player)} guarantees the whole $${n.agreed.amount} in PayPal until the others pay; ${first(a.player)}'s own share is $${organizerShare(n)}, and at most $${n.agreed.amount} if nobody else pays.`, data: r.alternatives ? { alternatives: r.alternatives } : null });
@@ -173,7 +190,9 @@ export function findAlternatives(a, { activity, date, start, minutes = 90, playe
 export const myGames = (a, { all = false } = {}) => ({ negotiations: neg.mine(a.player, { all }), bookings: settle.mine(a.player, { all }), ...(all ? {} : { note: "Open negotiations and live bookings only; pass all: true for finished ones too." }) });
 export const gameStatus = (a, { booking }) => settle.status(booking, a.player);
 
-export async function payMyShare(a, { booking }) {
+export async function payMyShare(a, { booking, mandate }) {
+  const b0 = settle.status(booking, a.player);
+  if (!b0.error && b0.payments?.[a.player]) { const no = mandateCheck(a, mandate, { venue: b0.venue, share: Math.round(+b0.payments[a.player].share * 100), date: b0.date, start: b0.start, booking }); if (no) return no; }
   const r = await settle.pay(booking, a.player);
   if (!r.error) record({ actor: by(a), who: [a.player], action: "pay_requested", ref: booking, summary: r.you?.status === "authorized" ? (r.you.via === "vault" ? `${said(a)} paid ${first(a.player)}'s $${r.you.authorized} from saved PayPal, within the limit.` : `${said(a)} started ${first(a.player)}'s $${r.you.authorized} payment; PayPal authorized it (${r.you.via}).`) : r.you?.approveUrl ? `${said(a)} asked ${first(a.player)} to approve $${r.you.authorized} in PayPal.` : `${said(a)} checked the payment: ${r.you?.status || r.state}.` });
   return r.you?.approveUrl ? { ...r, nextStep: "PAYER_ACTION_REQUIRED: show approveUrl to your user. They approve in PayPal; check booking_status afterwards." } : r;

@@ -28,7 +28,7 @@ export function setMandate(playerId, m) {
   if (m.venues !== undefined) { if (m.venues !== null && !(Array.isArray(m.venues) && m.venues.every((v) => typeof v === "string"))) return { error: "venues must be null or a list of venue ids" }; next.venues = m.venues; }
   if (m.autopay !== undefined) next.autopay = m.autopay === true;
   delete next.player;
-  db.data.mandates[playerId] = { ...next, updated: new Date().toISOString() };
+  db.data.mandates[playerId] = { ...next, updated: new Date().toISOString(), rev: (cur.rev || 0) + 1 }; // (rev: AP2 mandates are made again when it changes)
   db.save();
   return getMandate(playerId);
 }

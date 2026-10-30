@@ -54,6 +54,8 @@ export function makeToken(playerId, label, { scopes = SCOPES, days = 90, key = n
 const view = (t) => ({ id: t.id, label: t.label, hint: `${t.hint}…`, created: t.created, lastUsed: t.lastUsed, revoked: t.revoked, scopes: t.scopes || SCOPES, expires: t.expires || null, signed: !!t.key });
 // an Ed25519 public key as a JWK's "x" (base64url, 32 bytes), or null
 function validKey(k) { const x = typeof k === "string" ? k : k?.x; return typeof x === "string" && Buffer.from(x, "base64url").length === 32 ? x : null; }
+// a token's public key, if it was made with one (for an AP2 mandate's cnf.jwk: requests are signed with its private key)
+export const tokenKey = (id) => db.data.tokens.find((t) => t.id === id)?.key || null;
 export const tokensOf = (playerId) => db.data.tokens.filter((t) => t.player === playerId && !t.revoked && !(t.expires && Date.parse(t.expires) < Date.now())).map(view);
 export function revoke(playerId, id) {
   const t = db.data.tokens.find((x) => x.id === id && x.player === playerId);

@@ -239,6 +239,10 @@ field), in AP2's "Trusted Agent Provider" model: Join is the agent provider, the
   mandate (the per-booking limit as `payment.amount_range`, the weekly limit as `payment.budget`, allowed payees,
   PayPal as the payment provider), bound to the agent's token (`cnf.kid`) and made again when the person changes a
   limit. Agents get them from `whoami`.
+- **Checked before acting:** an agent presents its open payment mandate with every offer, accept and payment. Join
+  checks the signature, the expiry, that it's bound to this agent's token, that it's still the person's current one (an
+  older, looser one stops working when they change a limit), and its constraints, before anything happens; otherwise it
+  refuses with an AP2 error receipt. The database check of the limits stays too.
 - **Per deal:** the checkout (venue, activity, time, total) and its checkout mandate; each payer's payment mandate for
   that checkout's hash; Join's signed mandate receipts, including an error receipt when it refuses an action over a
   limit. On a booking in Plans, "AP2 mandates" shows them decoded.

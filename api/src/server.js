@@ -154,6 +154,9 @@ app.post("/api/scout/:tool", limit("agent", +(process.env.AGENT_RPM || 120)), si
   if (!SCOUT.includes(req.params.tool)) return res.status(404).json({ error: "unknown_tool", tools: SCOUT });
   const via = String(req.body?._model || "rules"), model = via === "rules" ? "rules" : scout.MODEL;
   const { _model, ...args } = req.body || {};
+  // (the person's own session is the trusted surface: Join presents that agent's current open mandate for it)
+  const kid = via === "webmcp" ? "webmcp" : "website-agent";
+  if (["make_offer", "accept_price", "pay_my_share"].includes(req.params.tool)) args.mandate = ops.openMandates({ player: req.player, token: kid }).payment;
   try { const r = await TOOLS[req.params.tool](via === "webmcp" ? { player: req.player, client: "Browser agent (WebMCP)", token: "webmcp" } : { player: req.player, client: `Join website agent (${model})`, token: "website-agent" }, args); res.status(r?.error ? 400 : 200).json(r); } catch (e) { console.error(e); res.status(500).json({ error: "internal" }); }
 });
 // the JS SDK v6 on the website: a browser-safe token, and the payer's own approval coming back from the PayPal popup
