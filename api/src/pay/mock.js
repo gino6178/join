@@ -3,14 +3,20 @@
 // (/mock-paypal/approve), clearly marked as a simulation. Fees follow PayPal's US rate for the demo: 3.49% + $0.49 per
 // capture. Nothing here moves money or talks to PayPal.
 import crypto from "node:crypto";
+import { store, stateFile } from "../store.js";
 
 const id = (p) => `${p}${crypto.randomBytes(6).toString("hex").toUpperCase()}`;
 const fee = (cents) => Math.round(cents * 0.0349) + 49;
 
-export function mockPaypal({ publicUrl = "http://localhost:8790" } = {}) {
-  const orders = new Map(), auths = new Map(), captures = new Map(), payouts = new Map(), setups = new Map(), tokens = new Map(), byRequest = new Map();
-  // the same PayPal-Request-Id gives the same answer, as PayPal does
-  const once = (rid, fn) => { if (rid && byRequest.has(rid)) return byRequest.get(rid); const r = fn(); if (rid) byRequest.set(rid, r); return r; };
+// Its records are kept like Join's own (store.js), so a restart doesn't lose the orders the bookings point at.
+const KINDS = ["orders", "auths", "captures", "payouts", "setups", "tokens", "byRequest"];
+const table = (db, k) => ({ get: (id) => db.data[k][id], has: (id) => id in db.data[k], set: (id, v) => { db.data[k][id] = v; db.save(); } });
+
+export function mockPaypal({ publicUrl = "http://localhost:8790", file = stateFile("paypal-standin") } = {}) {
+  const db = store(file, Object.fromEntries(KINDS.map((k) => [k, {}])));
+  const [orders, auths, captures, payouts, setups, tokens, byRequest] = KINDS.map((k) => table(db, k));
+  // the same PayPal-Request-Id gives the same answer, as PayPal does (objects below are changed in place, then saved)
+  const once = (rid, fn) => { if (rid && byRequest.has(rid)) return byRequest.get(rid); const r = fn(); if (rid) byRequest.set(rid, r); db.save(); return r; };
   const authorize = (o) => {
     const a = { id: id("AUTH-"), order: o.id, amount: o.amount, status: "CREATED", expiresAt: new Date(Date.now() + 29 * 864e5).toISOString(), captured: 0 };
     auths.set(a.id, a); o.authorization = a.id; o.status = "COMPLETED";
@@ -87,8 +93,8 @@ export function mockPaypal({ publicUrl = "http://localhost:8790" } = {}) {
     async verifyWebhook() { return true; },
     // what the simulated approval page does
     approve({ token, setup }) {
-      if (token) { const o = orders.get(token); if (!o) return false; if (o.status === "PAYER_ACTION_REQUIRED") { o.status = "APPROVED"; o.payerId = id("PAYER-"); } return true; }
-      if (setup) { const s = setups.get(setup); if (!s) return false; s.status = "APPROVED"; return true; }
+      if (token) { const o = orders.get(token); if (!o) return false; if (o.status === "PAYER_ACTION_REQUIRED") { o.status = "APPROVED"; o.payerId = id("PAYER-"); db.save(); } return true; }
+      if (setup) { const s = setups.get(setup); if (!s) return false; s.status = "APPROVED"; db.save(); return true; }
       return false;
     },
     describe({ token, setup }) {

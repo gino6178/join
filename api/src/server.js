@@ -11,10 +11,10 @@ import * as a2a from "./a2a.js";
 import * as settle from "./pay/settle.js";
 import { paypal } from "./pay/paypal.js";
 import { mockPaypal } from "./pay/mock.js";
-import { agentOf, sessionOf, createSession, endSession, makeToken, tokensOf, revoke, COOKIE } from "./auth.js";
+import { agentOf, sessionOf, createSession, endSession, makeToken, tokensOf, revoke, COOKIE, VENUE_COOKIE, createVenueSession, venueOf, endVenueSession } from "./auth.js";
 import { getMandate, setMandate } from "./mandate.js";
 import { forPlayer, onActivity } from "./activity.js";
-import { getWorld, player } from "./world.js";
+import { getWorld, player, venue, setPolicy } from "./world.js";
 import { usd } from "./negotiate/policy.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -61,7 +61,7 @@ app.post("/a2a", (req, res) => a2a.handle(req, res));
 
 // ---- people: the website's API ----------------------------------------------------------------------------------------
 const signedIn = (req, res, next) => { const s = sessionOf(req); if (!s) return res.status(401).json({ error: "signed_out" }); req.player = s.player; req.sid = s.sid; next(); };
-app.get("/api/info", (req, res) => res.json({ demoSignin: DEMO, paypal: pp.mode, publicUrl: PUBLIC_URL, mcpUrl: `${PUBLIC_URL}/mcp` }));
+app.get("/api/info", (req, res) => res.json({ timeZone: getWorld().town.timeZone, demoSignin: DEMO, paypal: pp.mode, publicUrl: PUBLIC_URL, mcpUrl: `${PUBLIC_URL}/mcp` }));
 app.get("/api/world", (req, res) => {
   const w = getWorld();
   res.json({ town: w.town, currency: w.currency, note: w.note,
@@ -89,6 +89,18 @@ app.post("/api/bookings/:id/:act", signedIn, async (req, res) => {
 });
 app.post("/api/vault", signedIn, async (req, res) => { try { res.json(await settle.vaultStart(req.player)); } catch (e) { res.status(502).json({ error: "paypal", message: e.message }); } });
 app.delete("/api/vault", signedIn, (req, res) => { setMandate(req.player, { autopay: false }); res.json(settle.vaultForget(req.player)); });
+// ---- venues: their own policy -----------------------------------------------------------------------------------------
+app.post("/api/venue-session", (req, res) => {
+  if (!DEMO) return res.status(403).json({ error: "demo sign-in is off" });
+  if (!venue(String(req.body?.venue || ""))) return res.status(400).json({ error: "unknown venue" });
+  res.set("Set-Cookie", `${VENUE_COOKIE}=${createVenueSession(req.body.venue)}; HttpOnly; SameSite=Lax; Path=/`).json({ ok: true });
+});
+app.delete("/api/venue-session", (req, res) => { const s = venueOf(req); if (s) endVenueSession(s.sid); res.set("Set-Cookie", `${VENUE_COOKIE}=; Max-Age=0; Path=/`).json({ ok: true }); });
+const venueStaff = (req, res, next) => { const s = venueOf(req); if (!s || s.venue !== req.params.id) return res.status(401).json({ error: "signed_out", message: "Sign in as this venue." }); next(); };
+app.get("/api/venue-me", (req, res) => { const s = venueOf(req); res.json({ venue: s?.venue || null }); });
+// (only the venue's own staff see its floor)
+app.get("/api/venues/:id/policy", venueStaff, (req, res) => res.json({ venue: req.params.id, policy: venue(req.params.id).policy }));
+app.put("/api/venues/:id/policy", venueStaff, (req, res) => { const r = setPolicy(req.params.id, req.body || {}); res.status(r.error ? 400 : 200).json(r); });
 app.get("/api/venues/:id/schedule", (req, res) => res.json({ venue: req.params.id, bookings: settle.forVenue(req.params.id) }));
 // live activity for the signed-in player (server-sent events)
 app.get("/api/activity/stream", signedIn, (req, res) => {

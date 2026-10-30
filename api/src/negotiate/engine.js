@@ -12,16 +12,16 @@
 // and a quota of negotiations per player, venue and day, so nobody can map a venue's schedule by asking over and over.
 // When a deal is out of the budget, refused, or the court is gone, the answer carries alternatives nearby.
 import crypto from "node:crypto";
-import { store } from "../store.js";
+import { store, stateFile } from "../store.js";
 import { venue, player, freeCourts, forSport, SPORTS } from "../world.js";
 import { price, askAt, cheaperTerms, usd } from "./policy.js";
 import { alternatives, shareOf } from "../alternatives.js";
 import { fits, getMandate } from "../mandate.js";
-import { isDate, isTime, startOf } from "../time.js";
+import { isDate, isTime, startOf, ymd } from "../time.js";
 
 export const TTL_MS = 15 * 60e3;
 export const QUOTA = 5; // negotiations per player, venue and day
-const db = store(process.env.NEGOTIATIONS_FILE || null, { negotiations: [] });
+const db = store(stateFile("negotiations"), { negotiations: [] });
 export const negotiationsStore = db;
 let clock = () => new Date();
 export const setClock = (fn) => { clock = fn; };
@@ -65,7 +65,7 @@ export function open({ by, players = [], venue: venueId, sport, date, start, min
   if (startOf(date, start) <= now) return err("in_the_past", "That time has passed.");
   const ids = [...new Set([by, ...players])];
   if (ids.length > 12 || ids.some((id) => !player(id))) return err("bad_players", "players must be known player ids, 12 at most.");
-  const day = now.toISOString().slice(0, 10);
+  const day = ymd(now);
   const used = db.data.negotiations.filter((n) => n.by === by && n.venue === venueId && n.openedDay === day).length;
   if (used >= QUOTA) return err("quota", `${QUOTA} negotiations with this venue today already. Try another venue or tomorrow.`);
   const terms = { sport, date, start, minutes, players: ids.length };

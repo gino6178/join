@@ -29,6 +29,7 @@ async function deal(players = ["leo", "hana", "tomas"]) {
 }
 const approve = async (bookingId, player) => {
   const b = settle.internal(bookingId);
+  if (!b.payments[player]) await settle.pay(bookingId, player); // (an invitee joins first)
   assert.equal(b.payments[player].status, "awaiting_approval");
   assert.ok(pp.approve({ token: b.payments[player].orderId }));
   return settle.approved(bookingId, player);
@@ -44,7 +45,13 @@ test("the organizer guarantees the whole court before anyone else is asked", asy
   await approve(id, "you");
   const b = settle.internal(id);
   assert.equal(b.state, "held");
-  for (const p of ["leo", "hana", "tomas"]) assert.equal(b.payments[p].status, "awaiting_approval");
+  // invited, not charged: nothing starts for a player until they join
+  for (const p of ["leo", "hana", "tomas"]) { assert.equal(b.payments[p], undefined); assert.ok((await settle.pay(id, "kenji")).error); }
+  const v2 = settle.status(id, "leo");
+  assert.equal(v2.invite.share, v2.payments.leo.share);
+  assert.equal(v2.payments.leo.status, "invited");
+  await settle.pay(id, "leo");
+  assert.equal(settle.internal(id).payments.leo.status, "awaiting_approval");
 });
 
 test("everyone pays: each share captured, the organizer's authorization captured for the rest, then the venue is paid after the game", async () => {
@@ -76,7 +83,7 @@ test("time runs out: the organizer covers whoever didn't pay; a decline voids th
   const b = settle.internal(id);
   assert.equal(b.state, "locked");
   assert.equal(b.payments.leo.status, "captured");
-  assert.equal(b.payments.tomas.status, "dropped");
+  assert.equal(b.payments.tomas, undefined); // never joined, so nothing was ever started for him
   assert.equal(b.payments.you.captured, b.total - b.shares.leo);
 });
 
@@ -112,6 +119,7 @@ test("with saved PayPal and within the mandate, the agent pays without a redirec
   setMandate("hana", { autopay: true, perGame: 100 });
   const id = await deal(["leo", "hana"]);
   await settle.pay(id, "you"); await approve(id, "you");
+  await settle.pay(id, "leo"); await settle.pay(id, "hana");
   const b = settle.internal(id);
   assert.equal(b.payments.leo.status, "authorized");
   assert.equal(b.payments.leo.via, "vault");

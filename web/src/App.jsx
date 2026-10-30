@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api, useActivity } from "./api.js";
+import { api, useActivity, setZone } from "./api.js";
 import Icon from "./components/Icon.jsx";
 import Activity from "./pages/Activity.jsx";
 import Games from "./pages/Games.jsx";
@@ -27,7 +27,7 @@ export default function App() {
   const [me, setMe] = useState(undefined), [info, setInfo] = useState(null);
   useEffect(() => { const f = () => { setR(route()); window.scrollTo(0, 0); }; addEventListener("hashchange", f); return () => removeEventListener("hashchange", f); }, []);
   const loadMe = () => api("/api/me").then(setMe).catch(() => setMe(null));
-  useEffect(() => { loadMe(); api("/api/info").then(setInfo).catch(() => {}); }, []);
+  useEffect(() => { loadMe(); api("/api/info").then((i) => { setZone(i.timeZone); setInfo(i); }).catch(() => {}); }, []);
   const entries = useActivity(!!me);
   if (me === undefined) return <div className="boot" />;
   if (r.page === "venue") return <Shell me={me} info={info} page="venue" onOut={() => setMe(null)}><Venue query={r.query} /></Shell>;

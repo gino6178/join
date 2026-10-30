@@ -5,10 +5,39 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { dateOf, toMin, ymd } from "./time.js";
+import { store, stateFile } from "./store.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const FILE = process.env.WORLD_FILE || path.join(HERE, "../data/world.json");
 let world = JSON.parse(fs.readFileSync(FILE, "utf8"));
+// Dates and times on Join are the town's local ones ("2026-11-05 19:00" in San Jose), wherever the server runs: the
+// process takes the town's time zone, so "today", "an hour from now" and a booking's start all agree.
+if (world.town.timeZone && !process.env.JOIN_KEEP_TZ) process.env.TZ = world.town.timeZone;
+// What each venue set for itself on the website (its negotiation policy), kept apart from the demo data and laid over it
+const policies = store(stateFile("venue-policies"), { venues: {} });
+export const policiesStore = policies;
+const overlay = () => { for (const v of world.venues) if (policies.data.venues[v.id]) v.policy = { ...v.policy, ...policies.data.venues[v.id] }; };
+overlay();
+
+// A venue changes its own policy. Every field is checked: a style, a floor between 50% and 100% of the list price, each
+// discount between 0 and 50%, one to five counter-offers.
+export function setPolicy(venueId, p) {
+  const v = venue(venueId);
+  if (!v) return { error: "unknown venue" };
+  const pct = (x, lo = 0, hi = 0.5) => typeof x === "number" && x >= lo && x <= hi;
+  const time = (s) => typeof s === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(s);
+  const next = structuredClone(v.policy), bad = [];
+  if (p.style !== undefined) (["firm", "standard", "eager"].includes(p.style) ? (next.style = p.style) : bad.push("style"));
+  if (p.floorPct !== undefined) (pct(p.floorPct, 0.5, 1) ? (next.floorPct = p.floorPct) : bad.push("floorPct"));
+  if (p.rounds !== undefined) (Number.isInteger(p.rounds) && p.rounds >= 1 && p.rounds <= 5 ? (next.rounds = p.rounds) : bad.push("rounds"));
+  if (p.offPeak) { if (pct(p.offPeak.pct) && time(p.offPeak.before)) next.offPeak = { pct: p.offPeak.pct, before: p.offPeak.before }; else bad.push("offPeak"); }
+  if (p.group) { if (pct(p.group.pct) && Number.isInteger(p.group.min) && p.group.min >= 2 && p.group.min <= 12) next.group = { pct: p.group.pct, min: p.group.min }; else bad.push("group"); }
+  if (p.lastMinute) { if (pct(p.lastMinute.pct) && typeof p.lastMinute.withinHours === "number" && p.lastMinute.withinHours >= 1 && p.lastMinute.withinHours <= 48) next.lastMinute = { pct: p.lastMinute.pct, withinHours: p.lastMinute.withinHours }; else bad.push("lastMinute"); }
+  if (bad.length) return { error: "invalid", fields: bad };
+  policies.data.venues[venueId] = next; policies.save(); v.policy = next;
+  return { venue: venueId, policy: next };
+}
+
 export const getWorld = () => world;
 export const setWorld = (w) => { world = w; };
 

@@ -20,6 +20,11 @@ export function writeJSON(file, value) {
   fs.renameSync(tmp, file);
 }
 
+// Where the stores live: api/data/state/<name>.json, so a restart keeps every negotiation, booking, token and payment.
+// JOIN_STATE_DIR moves them; JOIN_STATE_DIR=memory (and the test runner) keeps them in memory only.
+const STATE = process.env.JOIN_STATE_DIR || path.join(path.dirname(new URL(import.meta.url).pathname.replace(/^\/([A-Za-z]:)/, "$1")), "../data/state");
+export const stateFile = (name) => (STATE === "memory" || process.env.NODE_TEST_CONTEXT ? null : path.join(STATE, `${name}.json`));
+
 // One store: a JSON object kept in memory and written through on every change. Tests pass file = null to keep it in
 // memory only.
 export function store(file, fallback) {

@@ -3,9 +3,11 @@
 //
 //   awaiting_organizer  The court is held for ORGANIZER_MS while the organizer authorizes the WHOLE price (an order with
 //                       intent AUTHORIZE). Nothing else happens until they do, so nobody can hold a court for free.
-//   held                The organizer's authorization guarantees the court. Every other player gets an order for their
-//                       share, for SHARES_MS. A player who saved PayPal (Vault) and whose mandate covers the share is
-//                       authorized by their agent at once; everyone else approves in PayPal.
+//   held                The organizer's authorization guarantees the court. Every other player is invited, for
+//                       SHARES_MS: their agent (or they, on the website) joins or declines. Nothing is started for
+//                       anyone who hasn't said yes. Joining starts their share: a player who saved PayPal (Vault) and
+//                       whose mandate covers the share is authorized by their agent at once; everyone else approves in
+//                       PayPal.
 //   locked              Everyone authorized, or the time ran out: each share is captured, and the rest of the price is
 //                       captured from the organizer's authorization (they cover whoever didn't pay). The court is the
 //                       group's. Until CANCEL_BEFORE_MS before the game it can still be cancelled with full refunds.
@@ -19,12 +21,12 @@
 // carries a PayPal-Request-Id made from the booking and the step, so doing a step again after a crash repeats the same
 // call instead of making a second one.
 import crypto from "node:crypto";
-import { store } from "../store.js";
+import { store, stateFile } from "../store.js";
 import { setTaken, venue, player, freeCourts } from "../world.js";
 import { setOnAgreed } from "../negotiate/engine.js";
 import { getMandate, fits } from "../mandate.js";
 import { record } from "../activity.js";
-import { startOf, toMin } from "../time.js";
+import { startOf, toMin, hm } from "../time.js";
 import { usd } from "../negotiate/policy.js";
 
 export const ORGANIZER_MS = 10 * 60e3;
@@ -32,7 +34,7 @@ export const SHARES_MS = 20 * 60e3;
 export const CANCEL_BEFORE_MS = 24 * 3600e3;
 const LIVE = ["awaiting_organizer", "held", "locking", "locked", "played", "venue_paid"];
 
-const db = store(process.env.BOOKINGS_FILE || null, { bookings: [], vaults: {}, setups: {} });
+const db = store(stateFile("bookings"), { bookings: [], vaults: {}, setups: {} });
 export const bookingsStore = db;
 let pp = null, clock = () => new Date(), publicUrl = "http://localhost:8790";
 export function configure({ paypal, now, url } = {}) { if (paypal) pp = paypal; if (now) clock = now; if (url) publicUrl = url; }
@@ -139,8 +141,10 @@ async function advance(b) {
   const now = clock().getTime(), org = b.payments[b.organizer];
   if (b.state === "awaiting_organizer" && org?.status === "authorized") {
     b.state = "held"; b.holdUntil = now + SHARES_MS; db.save();
-    note(b, { kind: "platform" }, "held", `Court ${b.court} is held until ${new Date(b.holdUntil).toISOString().slice(11, 16)} UTC. Everyone else pays their share; ${name(b.organizer)} covers anyone who doesn't.`);
-    for (const pid of b.players) if (pid !== b.organizer && !b.declined.includes(pid)) await startPayment(b, pid, b.shares[pid], "share");
+    const until = hm(new Date(b.holdUntil).getHours() * 60 + new Date(b.holdUntil).getMinutes());
+    note(b, { kind: "platform" }, "held", `${name(b.organizer)} guaranteed the court: court ${b.court} is held until ${until}. ${name(b.organizer)} covers anyone who doesn't join and pay by then.`);
+    for (const pid of b.players) if (pid !== b.organizer && !b.declined.includes(pid))
+      record({ actor: { kind: "agent", player: b.organizer }, who: [pid], action: "invited", ref: b.id, summary: `${name(b.organizer)}'s agent invited you: ${b.sport} on ${b.date} ${b.start} at ${venue(b.venue).name}, court ${b.court}. Your share is $${usd(b.shares[pid])}. Join or decline by ${until}.`, data: { share: usd(b.shares[pid]), payBy: until } });
   }
   if (b.state === "held") {
     const others = b.players.filter((pid) => pid !== b.organizer && !b.declined.includes(pid));
@@ -236,7 +240,10 @@ export function pay(bookingId, playerId) {
   return serial(b.id, async () => {
     if (b.declined.includes(playerId)) return { error: "declined", message: "You declined this game." };
     if (playerId !== b.organizer && b.state === "awaiting_organizer") return { ...view(b, playerId), message: `Waiting for ${name(b.organizer)} to guarantee the court first.` };
-    if (!b.payments[playerId] && ["awaiting_organizer", "held"].includes(b.state)) await startPayment(b, playerId, b.shares[playerId], playerId === b.organizer ? "organizer" : "share");
+    if (!b.payments[playerId] && ["awaiting_organizer", "held"].includes(b.state)) {
+      if (playerId !== b.organizer) note(b, { kind: "agent", player: playerId }, "joined", `${name(playerId)} is in: their share of $${usd(b.shares[playerId])} is being paid.`);
+      await startPayment(b, playerId, playerId === b.organizer ? b.total : b.shares[playerId], playerId === b.organizer ? "organizer" : "share");
+    }
     return view(b, playerId);
   });
 }
@@ -273,7 +280,8 @@ export function view(b, viewer) {
     id: b.id, state: b.state, negotiation: b.negotiation, venue: b.venue, venueName: v?.name, sport: b.sport, date: b.date, start: b.start, minutes: b.minutes, court: b.court,
     currency: "USD", total: usd(b.total), organizer: b.organizer, players: b.players, declined: b.declined,
     guaranteeBy: b.state === "awaiting_organizer" ? new Date(b.organizerUntil).toISOString() : null, payBy: b.state === "held" ? new Date(b.holdUntil).toISOString() : null,
-    payments: Object.fromEntries(b.players.map((pid) => { const p = b.payments[pid]; return [pid, { share: usd(b.shares[pid]), ...(pid === b.organizer ? { guarantee: usd(b.total), paid: p?.captured != null ? usd(p.captured) : null } : {}), role: pid === b.organizer ? "organizer" : "share", status: b.declined.includes(pid) ? "declined" : p?.status || "not_started", via: p?.via || null }]; })),
+    payments: Object.fromEntries(b.players.map((pid) => { const p = b.payments[pid]; return [pid, { share: usd(b.shares[pid]), ...(pid === b.organizer ? { guarantee: usd(b.total), paid: p?.captured != null ? usd(p.captured) : null } : {}), role: pid === b.organizer ? "organizer" : "share", status: b.declined.includes(pid) ? "declined" : p?.status || (pid !== b.organizer && b.state === "held" ? "invited" : "not_started"), via: p?.via || null }]; })),
+    invite: viewer !== b.organizer && b.state === "held" && !mine && !b.declined.includes(viewer) ? { share: usd(b.shares[viewer]), payBy: new Date(b.holdUntil).toISOString() } : null,
     you: mine ? { amount: usd(mine.amount), status: mine.status, via: mine.via, approveUrl: mine.status === "awaiting_approval" ? mine.approveUrl : null, note: mine.why } : null,
     payout: b.payout ? { amount: usd(b.payout.amount), status: b.payout.item || b.payout.status } : null,
     paypal: paypalMode(),

@@ -203,3 +203,9 @@ legend { font-size: var(--fs-14); color: var(--ink-2); padding: 0 6px; }
 .slot.held { border: 2px dashed var(--warn); background: color-mix(in srgb, var(--warn) 10%, transparent); color: var(--warn); }
 .slot.locked { background: var(--agent); color: var(--agent-ink); }
 .slot.played { background: var(--surface-3); color: var(--ink-2); }
+.need .need-btns { display: flex; gap: var(--s2); flex: none; }
+.policy { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--s4); }
+.policy .full { grid-column: 1 / -1; }
+.policy small { color: var(--ink-3); font-weight: 400; }
+.form select { font: inherit; padding: 10px 12px; border-radius: var(--r-md); border: 1px solid var(--rule-strong); background: var(--bg); color: var(--ink); }
+.venue-head { display: flex; justify-content: space-between; align-items: center; gap: var(--s3); flex-wrap: wrap; }

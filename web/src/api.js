@@ -39,5 +39,10 @@ export function useActivity(enabled) {
 }
 
 export const money = (x) => `$${(+x).toFixed(2)}`;
-export const when = (iso) => new Date(iso).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit", second: "2-digit" });
-export const dayLabel = (d) => new Date(`${d}T12:00:00`).toLocaleDateString([], { weekday: "short", month: "short", day: "numeric" });
+// Times are shown in the town's time zone (the venues' clock), whatever the viewer's own is, so the website and what the
+// agents are told agree. App sets it from /api/info.
+let zone;
+export const setZone = (z) => { zone = z; };
+export const when = (iso) => new Date(iso).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false, timeZone: zone });
+export const clock = (iso) => new Date(iso).toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", hour12: false, timeZone: zone });
+export const dayLabel = (d) => new Date(`${d}T12:00:00Z`).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", timeZone: "UTC" });

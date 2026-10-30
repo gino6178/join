@@ -6,14 +6,21 @@
 //   the player's agent should do (search, negotiate, pay their share within their mandate) and nothing else: it can't
 //   change the mandate, make other tokens or save a payment method. Those need the person's session.
 import crypto from "node:crypto";
-import { store } from "./store.js";
+import { store, stateFile } from "./store.js";
 import { player } from "./world.js";
 
-const db = store(process.env.TOKENS_FILE || null, { tokens: [] });
+const db = store(stateFile("tokens"), { tokens: [] });
 export const tokensStore = db;
 const sessions = new Map();
 const sha = (s) => crypto.createHash("sha256").update(s).digest("hex");
 export const COOKIE = "join_session";
+export const VENUE_COOKIE = "join_venue";
+// A venue's staff sign in the same way (the demo picks a venue). Its own cookie, so one browser can be a player and a
+// venue at once in the demo.
+const venueSessions = new Map();
+export function createVenueSession(venueId) { const sid = crypto.randomBytes(24).toString("base64url"); venueSessions.set(sid, venueId); return sid; }
+export function venueOf(req) { const sid = cookie(req, VENUE_COOKIE) || ""; return venueSessions.has(sid) ? { venue: venueSessions.get(sid), sid } : null; }
+export const endVenueSession = (sid) => venueSessions.delete(sid);
 
 export function createSession(playerId) {
   if (!player(playerId)) return null;

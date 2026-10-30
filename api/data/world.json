@@ -130,7 +130,8 @@
      "y": 4.9
     }
    ]
-  }
+  },
+  "timeZone": "America/Los_Angeles"
  },
  "currency": "USD",
  "venues": [

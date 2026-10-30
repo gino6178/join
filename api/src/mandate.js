@@ -7,10 +7,10 @@
 //              asking each time; otherwise every payment waits for the player's approval in PayPal
 // The shape follows the Intent Mandate of the Agent Payments Protocol (AP2): conditions a person approved in advance,
 // under which an agent may act while they are away.
-import { store } from "./store.js";
+import { store, stateFile } from "./store.js";
 
 const DEFAULT = { perGame: 1500, perWeek: 4000, venues: null, autopay: false };
-const db = store(process.env.MANDATES_FILE || null, { mandates: {} });
+const db = store(stateFile("mandates"), { mandates: {} });
 export const mandatesStore = db;
 
 export const getMandate = (playerId) => ({ ...DEFAULT, ...(db.data.mandates[playerId] || {}), player: playerId });

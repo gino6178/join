@@ -121,3 +121,14 @@ test("bad input is refused", () => {
   assert.equal(open({ by: "you", venue: "north", sport: "badminton", date: "2026-11-31", start: "19:00" }).error, "bad_time");
   assert.equal(open({ by: "you", venue: "north", sport: "badminton", date: "2026-11-01", start: "19:00" }).error, "in_the_past");
 });
+
+test("a venue's own policy: checked, then used for the next negotiation", async () => {
+  const { setPolicy, policiesStore } = await import("../src/world.js");
+  assert.equal(setPolicy("north", { floorPct: 0.2 }).error, "invalid");
+  assert.equal(setPolicy("north", { style: "generous" }).error, "invalid");
+  const before = venue("north").policy.style;
+  assert.equal(setPolicy("north", { style: "firm" }).policy.style, "firm");
+  const n = open({ by: "you", players: ["leo"], venue: "north", sport: "badminton", date: DATE, start: freeStart("north"), minutes: 90 });
+  assert.equal(n.final, true);
+  setPolicy("north", { style: before }); policiesStore.reset();
+});

@@ -25,16 +25,21 @@ PayPal AI Hackathon 2026 · MIT license
    the group's longest trip, each with a reason written by code.
 4. **The organizer guarantees the court.** A deal is binding: the organizer authorizes the **whole** price with PayPal
    (Orders v2, intent `AUTHORIZE`) within 10 minutes, or the court goes back. Nobody can hold a court for free.
-5. **Everyone pays their share.** Each player authorizes their own share in PayPal, or, if they saved PayPal for
-   their agent (Vault) and the share fits their limits, their agent pays it without a redirect.
+5. **The others are invited, then pay their share.** Each player's agent (or the player, on the website) joins or
+   declines; nothing is started for anyone who hasn't said yes. Joining authorizes their share in PayPal, or, if they
+   saved PayPal for their agent (Vault) and the share fits their limits, their agent pays it without a redirect.
 6. **Locked.** When everyone has paid (or the 20 minutes run out) each share is captured and the rest is captured from
    the organizer's authorization: they cover whoever didn't pay. Cancel more than 24 hours ahead: full refunds.
 7. **The venue is paid after the game** (PayPal Payouts, net of fees), so a cancellation can still be refunded.
 
 The website shows each person what the agents did (**Activity**), what waits on them (an approval in PayPal), where
 each payment stands (**Games**), the venue and alternatives on the town map (**Map**), the limits only they can set
-(**Limits**), and which agents may act for them (**Connect**). A **Venue view** shows a venue its courts: dashed while
-a group pays, solid once paid.
+(**Limits**), and which agents may act for them (**Connect**). A **Venue view** shows a venue its courts (dashed while
+a group pays, solid once paid), and lets the venue's staff set the rules Join negotiates by: style, floor, number of
+counter-offers, off-peak / group / last-minute discounts.
+
+Dates and times are the town's (San Jose, `America/Los_Angeles`) wherever the server and the viewer are. State is
+kept in `api/data/state/` and survives restarts (`JOIN_STATE_DIR=memory` keeps it in memory only).
 
 ## Run it
 

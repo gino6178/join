@@ -4,15 +4,15 @@
 // agent or a model wrote.
 //   actor   { kind: "agent" | "player" | "venue" | "platform" | "paypal", player?, client? }
 //   who     the players the entry is about; each sees only entries about themselves
-import { store } from "./store.js";
+import { store, stateFile } from "./store.js";
 
-const db = store(process.env.ACTIVITY_FILE || null, { entries: [] });
+const db = store(stateFile("activity"), { entries: [] });
 export const activityStore = db;
 const listeners = new Set();
 export const onActivity = (fn) => { listeners.add(fn); return () => listeners.delete(fn); };
 
 export function record({ actor, who = [], action, summary, ref = null, data = null }) {
-  const e = { id: db.data.entries.length + 1, at: new Date().toISOString(), actor, who: [...new Set(who)], action, summary, ref, data };
+  const e = { id: (db.data.entries.at(-1)?.id || 0) + 1, at: new Date().toISOString(), actor, who: [...new Set(who)], action, summary, ref, data };
   db.data.entries.push(e);
   if (db.data.entries.length > 5000) db.data.entries.splice(0, db.data.entries.length - 5000);
   db.save();
