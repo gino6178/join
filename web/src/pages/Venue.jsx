@@ -1,6 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from "react";
 import { api, useApi, money } from "../api.js";
 import { useWorld } from "../components/Actor.jsx";
+import VenueMoney from "../components/VenueMoney.jsx";
 
 // A venue's side: its courts, rooms or tables over a day, with the bookings Join made. Held while a group pays is
 // dashed; once everyone has paid it is solid; a booking that went back is gone. The schedule is public; the venue's rules are for its
@@ -32,7 +33,7 @@ export default function Venue({ query }) {
           : <p className="muted small">Nothing booked through Join at this venue yet.</p>}
         <p className="small muted legend-row"><span className="lg-bar held" />held while the group pays <span className="lg-bar locked" />paid and locked <span className="lg-bar played" />played</p>
       </section>
-      <Policy id={id} name={v?.name} />
+      <Policy id={id} name={v?.name} bookings={s.data?.bookings || []} />
       {s.data?.bookings?.length > 0 && <section className="card"><h3>Bookings and payouts</h3><table className="pays"><thead><tr><th>Date</th><th>Time</th><th>Place</th><th>Total</th><th>State</th><th>Paid out</th></tr></thead><tbody>
         {s.data.bookings.map((b) => <tr key={b.id}><td>{b.date}</td><td>{b.start}</td><td>{b.unitName}</td><td>{money(b.total)}</td><td>{b.state.replace(/_/g, " ")}</td><td>{b.payout ? money(b.payout) : ""}</td></tr>)}
       </tbody></table></section>}
@@ -43,7 +44,7 @@ export default function Venue({ query }) {
 // The venue's own rules for agents: Join negotiates by them for the venue. Only the venue's staff see or change them
 // (the floor never reaches an agent). The demo signs in by picking the venue.
 const pctIn = (x) => Math.round(x * 100);
-function Policy({ id, name }) {
+function Policy({ id, name, bookings = [] }) {
   const [me, setMe] = useState(undefined), [p, setP] = useState(null), [msg, setMsg] = useState(null), [err, setErr] = useState(null);
   const load = () => api("/api/venue-me").then((r) => { setMe(r.venue); if (r.venue === id) api(`/api/venues/${id}/policy`).then((x) => setP(x.policy)); else setP(null); });
   useEffect(() => { setMsg(null); load(); }, [id]);
@@ -53,7 +54,8 @@ function Policy({ id, name }) {
   if (me === undefined) return null;
   if (me !== id) return <section className="card venue-head"><span><b>Your rules for agents</b><br /><small className="muted">Staff of {name} set how Join negotiates for them.</small></span><button className="btn" onClick={signIn}>Sign in as {name} (demo)</button></section>;
   if (!p) return null;
-  return (
+  return (<>
+    <VenueMoney id={id} bookings={bookings} />
     <form className="card form" onSubmit={save}>
       <h3>How Join negotiates for {name}</h3>
       <p className="small muted">Agents never see your floor. They see your list price, your discounts, and your counter-offers on the schedule you pick.</p>
@@ -71,5 +73,5 @@ function Policy({ id, name }) {
       </div>
       <button className="btn primary">Save rules</button>
     </form>
-  );
+  </>);
 }

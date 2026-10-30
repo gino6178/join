@@ -46,6 +46,8 @@ function build(agent) {
     { booking: z.string(), amount: z.number().min(0).describe("the share your person would pay, USD") }, WRITE, (a, x) => ops.proposeShare(a, x));
   tool("answer_share", "Answer an ask to pay less (organizer)", "As organizer, accept or refuse another person's ask to pay a smaller share (my_plans shows open asks under shareAsks). Accepting moves the difference onto your person's share; it is refused if that would go over their per-booking limit.",
     { booking: z.string(), player: z.string(), accept: z.boolean() }, WRITE, (a, x) => ops.answerShare(a, x));
+  tool("request_reimbursement", "Ask to be paid back (organizer)", "After the booking is locked, if your person covered someone who never paid, send that person a PayPal invoice for their share. When they pay it, Join sends the money to your person with PayPal Payouts. Never for someone who declined or whose smaller share your person agreed to.",
+    { booking: z.string(), player: z.string() }, WRITE, (a, x) => ops.requestReimbursement(a, x));
   tool("decline_invite", "Decline an invitation", "Your person won't join a booking someone else organized. Any authorization of theirs is voided.", { booking: z.string() }, { ...WRITE, destructiveHint: true }, (a, x) => ops.declineGame(a, x));
   tool("cancel_booking", "Cancel a booking (organizer)", "Before the booking is locked: voids every authorization, nobody is charged. Once locked, until 24 hours before the start: refunds everyone in full.", { booking: z.string() }, { ...WRITE, destructiveHint: true }, (a, x) => ops.cancelBooking(a, x));
   return s;

@@ -220,3 +220,6 @@ legend { font-size: var(--fs-14); color: var(--ink-2); padding: 0 6px; }
 .need.ask { border-top: 0; background: var(--surface); padding: var(--s3); border-radius: var(--r-md); margin: var(--s2) 0; }
 .ask-less { display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; margin: var(--s2) 0; }
 .ask-less input { width: 100px; font: inherit; padding: 6px 10px; border-radius: var(--r-md); border: 1px solid var(--rule-strong); background: var(--bg); color: var(--ink); }
+.pp-buttons { display: grid; gap: 6px; min-width: 220px; }
+.pp-box { display: grid; gap: 8px; }
+.pp-box > * { display: block; min-height: 40px; }

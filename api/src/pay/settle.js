@@ -27,6 +27,7 @@ import { setTaken, venue, player, freeUnits, unitName } from "../world.js";
 const place = (b, cap = false) => { const t = unitName(b.activity, b.unit); return cap ? t[0].toUpperCase() + t.slice(1) : t; };
 import { setOnAgreed, internal as negotiation } from "../negotiate/engine.js";
 import * as receipts from "../proof/receipts.js";
+import * as toolkit from "./toolkit.js";
 import { getMandate, fits } from "../mandate.js";
 import { record } from "../activity.js";
 import { startOf, toMin, hm } from "../time.js";
@@ -210,7 +211,8 @@ async function refundAll(b, why) {
 export async function tick() {
   const now = clock().getTime();
   for (const b of db.data.bookings) {
-    if (!LIVE.includes(b.state) || b.state === "venue_paid" && b.payout?.status !== "PENDING") continue;
+    const owed = Object.values(b.reimbursements || {}).some((r) => r.status === "sent") || (b.bills || []).some((x) => x.status === "sent");
+    if (!owed && (!LIVE.includes(b.state) || b.state === "venue_paid" && b.payout?.status !== "PENDING")) continue;
     await serial(b.id, async () => {
       // payers who approved but never came back to the return URL
       for (const [pid, p] of Object.entries(b.payments)) {
@@ -221,6 +223,8 @@ export async function tick() {
       else if (b.state === "held" && now > b.holdUntil) await lock(b, "the time to pay ran out");
       else if (b.state === "locked" && now > startOf(b.date, b.start).getTime() + b.minutes * 60e3) { b.state = "played"; db.save(); note(b, { kind: "platform" }, "played", "The game is over."); }
       if (b.state === "played" && !b.payout) await payVenue(b);
+      await checkReimbursements(b);
+      await checkBills(b);
       if (b.payout?.status === "PENDING") {
         try { const r = await pp.getPayout(b.payout.batchId); if (r.status !== "PENDING") { b.payout.status = r.status; b.payout.item = r.item; db.save(); note(b, { kind: "paypal" }, "payout_status", `PayPal Payouts: the venue's payment is ${String(r.item || r.status).toLowerCase()}.`); } } catch {}
       }
@@ -326,8 +330,11 @@ export function view(b, viewer) {
     guaranteeBy: b.state === "awaiting_organizer" ? new Date(b.organizerUntil).toISOString() : null, payBy: b.state === "held" ? new Date(b.holdUntil).toISOString() : null,
     payments: Object.fromEntries(b.players.map((pid) => { const p = b.payments[pid]; return [pid, { share: usd(b.shares[pid]), ...(pid === b.organizer ? { guarantee: usd(b.total), paid: p?.captured != null ? usd(p.captured) : null } : {}), role: pid === b.organizer ? "organizer" : "share", status: b.declined.includes(pid) ? "declined" : p?.status || (pid !== b.organizer && b.state === "held" ? "invited" : "not_started"), via: p?.via || null }]; })),
     invite: viewer !== b.organizer && b.state === "held" && !mine && !b.declined.includes(viewer) ? { share: usd(b.shares[viewer]), payBy: new Date(b.holdUntil).toISOString() } : null,
-    you: mine ? { amount: usd(mine.amount), status: mine.status, via: mine.via, approveUrl: mine.status === "awaiting_approval" ? mine.approveUrl : null, note: mine.why } : null,
+    you: mine ? { amount: usd(mine.amount), status: mine.status, via: mine.via, approveUrl: mine.status === "awaiting_approval" ? mine.approveUrl : null, orderId: mine.status === "awaiting_approval" ? mine.orderId : null, note: mine.why } : null,
     payout: b.payout ? { amount: usd(b.payout.amount), status: b.payout.item || b.payout.status } : null,
+    reimbursements: Object.values(b.reimbursements || {}).filter((r) => viewer === b.organizer || r.player === viewer).map((r) => ({ player: r.player, amount: usd(r.amount), status: r.status, url: r.player === viewer && r.status === "sent" ? r.url : undefined })),
+    extras: (b.bills || []).map((x) => ({ total: usd(x.total), items: x.items.map((i) => i.name), status: x.status, url: viewer === b.organizer && x.status === "sent" ? x.url : undefined })),
+    owes: b.reimbursements?.[viewer]?.status === "sent" ? { amount: usd(b.reimbursements[viewer].amount), url: b.reimbursements[viewer].url } : null,
     split: b.splitRule || "even", shareAsks: (b.shareAsks || []).filter((x) => viewer === b.organizer || x.player === viewer).map((x) => ({ ...x, from: usd(x.from), amount: usd(x.amount) })),
     paypal: paypalMode(), receipts: receipts.forBooking(b.id),
   };
@@ -335,8 +342,91 @@ export function view(b, viewer) {
 
 export const status = (bookingId, viewer) => { const b = get(bookingId); return b && b.players.includes(viewer) ? view(b, viewer) : { error: "no_booking", message: "No such booking." }; };
 export const mine = (viewer) => db.data.bookings.filter((b) => b.players.includes(viewer)).map((b) => view(b, viewer)).reverse();
-export const forVenue = (venueId) => db.data.bookings.filter((b) => b.venue === venueId).map((b) => ({ id: b.id, state: b.state, activity: b.activity, date: b.date, start: b.start, minutes: b.minutes, unit: b.unit, unitName: place(b), total: usd(b.total), players: b.players.length, paid: Object.values(b.payments).filter((p) => p.status === "captured").length, payout: b.payout ? usd(b.payout.amount) : null }));
+export const forVenue = (venueId) => db.data.bookings.filter((b) => b.venue === venueId).map((b) => ({ id: b.id, state: b.state, activity: b.activity, date: b.date, start: b.start, minutes: b.minutes, unit: b.unit, unitName: place(b), total: usd(b.total), players: b.players.length, paid: Object.values(b.payments).filter((p) => p.status === "captured").length, payout: b.payout ? usd(b.payout.amount) : null, captures: Object.values(b.payments).map((p) => p.captureId).filter(Boolean), extras: (b.bills || []).map((x) => ({ total: usd(x.total), status: x.status })), disputes: Object.keys(b.disputes || {}).length }));
 export const internal = get;
+
+// ---- paying the organizer back ---------------------------------------------------------------------------------------------
+// When the organizer covered someone who never paid (they were invited and didn't join in time, or their payment failed),
+// the organizer's agent can ask for the money back: Join sends that person a PayPal invoice (Invoicing) for their share,
+// and when PayPal says it is paid, sends the same amount to the organizer (Payouts). One invoice per person per booking.
+// Someone who declined is never invoiced, and neither is a share the organizer agreed to cover.
+export function requestReimbursement(bookingId, organizerId, playerId) {
+  const b = get(bookingId);
+  if (!b || b.organizer !== organizerId) return Promise.resolve({ error: "not_organizer", message: "Only the organizer can ask to be paid back." });
+  return serial(b.id, async () => {
+    if (!["locked", "played", "venue_paid"].includes(b.state)) return { error: "too_early", message: "Ask once the booking is locked." };
+    const p = b.payments[playerId];
+    if (!b.players.includes(playerId) || playerId === b.organizer || b.declined.includes(playerId) || p?.status === "captured") return { error: "nothing_owed", message: `${name(playerId)} doesn't owe anything for this booking.` };
+    if ((b.reimbursements ||= {})[playerId]) return view(b, organizerId);
+    const amount = b.shares[playerId], who = player(playerId);
+    const r = { player: playerId, amount, status: "creating" };
+    b.reimbursements[playerId] = r; db.save();
+    try {
+      const inv = await paypalStep(b, `invoice:${playerId}`, (rid) => pp.invoice({ recipient: who.paypal, amount, item: `Your share: ${b.activity}, ${venue(b.venue).name}, ${b.date} ${b.start}`, note: `${name(b.organizer)} paid your share of this booking on Join. Paying this invoice pays them back.`, requestId: rid }));
+      Object.assign(r, { invoiceId: inv.id, url: inv.url, status: "sent" }); db.save();
+      record({ actor: { kind: "agent", player: organizerId }, who: [organizerId, playerId], action: "reimbursement_requested", ref: b.id, summary: `${name(organizerId)}'s agent asked ${name(playerId)} to pay back $${usd(amount)} with a PayPal invoice.`, data: { invoice: inv.id, url: inv.url, amount: usd(amount), player: playerId } });
+    } catch (e) { r.status = "failed"; r.error = e.message; db.save(); }
+    return view(b, organizerId);
+  });
+}
+
+// An invoice that was paid: the organizer gets the money (Payouts to their PayPal)
+async function reimbursed(b, r) {
+  r.status = "paid"; db.save();
+  record({ actor: { kind: "paypal" }, who: [b.organizer, r.player], action: "reimbursement_paid", ref: b.id, summary: `${name(r.player)} paid the $${usd(r.amount)} invoice in PayPal.` });
+  try {
+    const out = await paypalStep(b, `repay:${r.player}`, () => pp.payout({ batchId: `join-repay-${b.id}-${r.player}`, receiver: player(b.organizer).paypal, amount: r.amount, note: `Join: ${name(r.player)} paid you back for ${b.activity} on ${b.date}` }));
+    Object.assign(r, { status: "repaid", payout: out.batchId }); db.save();
+    record({ actor: { kind: "platform" }, who: [b.organizer, r.player], action: "organizer_repaid", ref: b.id, summary: `Sent ${name(b.organizer)} $${usd(r.amount)} with PayPal Payouts: ${name(r.player)}'s share is settled.` });
+  } catch (e) { r.status = "paid_payout_failed"; r.error = e.message; db.save(); }
+}
+async function checkReimbursements(b) {
+  for (const r of Object.values(b.reimbursements || {})) {
+    if (r.status !== "sent") continue;
+    try { const inv = await pp.getInvoice(r.invoiceId); if (inv.status === "PAID" || inv.status === "MARKED_AS_PAID") await reimbursed(b, r); } catch {}
+  }
+}
+
+// ---- the venue's side: extras, reconciliation, disputes (PayPal Agent Toolkit, toolkit.js) ------------------------------------
+// A venue bills the organizer for extras after a booking (overtime, rentals) with a PayPal invoice; Join keeps the
+// invoice with the booking and tells everyone in it.
+export async function billExtras(venueId, bookingId, items) {
+  const b = get(bookingId);
+  if (!b || b.venue !== venueId) return { error: "no_booking", message: "No such booking at this venue." };
+  if (!["locked", "played", "venue_paid"].includes(b.state)) return { error: "too_early", message: "Extras are billed once the booking is paid and locked." };
+  const clean = (items || []).filter((x) => typeof x?.name === "string" && x.name.trim() && Number.isInteger(x.amount) && x.amount > 0 && x.amount <= 50000).slice(0, 10).map((x) => ({ name: x.name.trim().slice(0, 120), amount: x.amount }));
+  if (!clean.length) return { error: "bad_items", message: "Each extra needs a name and an amount in cents." };
+  const total = clean.reduce((a, x) => a + x.amount, 0);
+  const inv = await toolkit.bill({ recipient: player(b.organizer).paypal, venueName: venue(b.venue).name, reference: b.id, note: `Extras after your ${b.activity} booking on ${b.date} (${place(b)}).`, items: clean });
+  (b.bills ||= []).push({ invoiceId: inv.id, url: inv.url, items: clean, total, status: "sent", at: at() }); db.save();
+  record({ actor: { kind: "venue", venue: b.venue }, who: b.players, action: "extras_billed", ref: b.id, summary: `${venue(b.venue).name} billed ${name(b.organizer)} $${usd(total)} for extras (${clean.map((x) => x.name).join(", ")}) with a PayPal invoice.`, data: { invoice: inv.id, url: inv.url } });
+  return { invoice: inv.id, url: inv.url, total: usd(total) };
+}
+async function checkBills(b) {
+  for (const x of b.bills || []) {
+    if (x.status !== "sent") continue;
+    try { const s = await toolkit.invoiceStatus(x.invoiceId); if (s.status === "PAID" || s.status === "MARKED_AS_PAID") { x.status = "paid"; db.save(); record({ actor: { kind: "paypal" }, who: b.players, action: "extras_paid", ref: b.id, summary: `${name(b.organizer)} paid the $${usd(x.total)} extras invoice in PayPal.` }); } } catch {}
+  }
+}
+export const reconcileVenue = (venueId) => toolkit.reconcile(db.data.bookings.filter((b) => b.venue === venueId));
+export async function venueDisputes(venueId) {
+  const mine = db.data.bookings.filter((b) => b.venue === venueId), byCapture = new Map();
+  for (const b of mine) for (const p of Object.values(b.payments)) if (p.captureId) byCapture.set(p.captureId, b.id);
+  const list = await toolkit.disputes([...byCapture.keys()]);
+  return list.map((d) => ({ ...d, booking: d.transactions.map((t) => byCapture.get(t)).find(Boolean) || null, receipt: receipts.forBooking(d.transactions.map((t) => byCapture.get(t)).find(Boolean) || "").at(-1)?.id || null }));
+}
+// The venue answers a chargeback with Join's signed receipt for that booking: what was agreed, who paid what, and when
+export async function answerDispute(venueId, disputeId) {
+  const d = (await venueDisputes(venueId)).find((x) => x.id === disputeId);
+  if (!d || !d.booking) return { error: "no_dispute", message: "No such dispute on this venue's bookings." };
+  const b = get(d.booking), rid = d.receipt;
+  if (!rid) return { error: "no_receipt", message: "This booking has no receipt yet." };
+  const r = receipts.show(rid);
+  await pp.provideEvidence(disputeId, { notes: `Join booking ${b.id}: ${b.activity} at ${venue(b.venue).name}, ${b.date} ${b.start}, ${place(b)}. The attached receipt is signed by Join (Ed25519, key ${r.kid}) and lists the negotiation, each payment and its PayPal ids. Verify it at /api/receipts/${rid}.`, file: JSON.stringify(r) });
+  (b.disputes ||= {})[disputeId] = { status: "evidence_sent", receipt: rid, at: at() }; db.save();
+  record({ actor: { kind: "venue", venue: b.venue }, who: b.players, action: "dispute_answered", ref: b.id, summary: `${venue(b.venue).name} answered PayPal dispute ${disputeId} with Join's signed receipt.` });
+  return { dispute: disputeId, status: "evidence_sent", receipt: rid };
+}
 
 // ---- Vault: save PayPal once, then the agent pays within the mandate -------------------------------------------------
 export async function vaultStart(playerId) {
@@ -359,9 +449,22 @@ export function vaultForget(playerId) { delete db.data.vaults[playerId]; db.save
 export async function webhook(event) {
   const r = event.resource || {}, type = event.event_type;
   if (type === "CHECKOUT.ORDER.APPROVED") return approvedByOrder(r.id);
+  if (type === "INVOICING.INVOICE.PAID") {
+    for (const b of db.data.bookings) for (const x of Object.values(b.reimbursements || {})) if (x.invoiceId === (r.id || r.invoice?.id) && x.status === "sent") { await serial(b.id, () => reimbursed(b, x)); return { ok: true }; }
+    for (const b of db.data.bookings) for (const x of b.bills || []) if (x.invoiceId === (r.id || r.invoice?.id) && x.status === "sent") { await serial(b.id, () => checkBills(b)); return { ok: true }; }
+    return null;
+  }
   const find = (pred) => { for (const b of db.data.bookings) for (const [pid, p] of Object.entries(b.payments)) if (pred(p)) return { b, pid, p }; return null; };
+  if (type === "CUSTOMER.DISPUTE.CREATED") {
+    const ids = (r.disputed_transactions || []).map((t) => t.seller_transaction_id);
+    const hit = find((p) => ids.includes(p.captureId));
+    if (hit) { (hit.b.disputes ||= {})[r.dispute_id] = { status: "open", reason: r.reason, at: at() }; db.save(); record({ actor: { kind: "paypal" }, who: [hit.b.organizer], action: "dispute_opened", ref: hit.b.id, summary: `PayPal: a dispute was opened on a payment for this booking (${String(r.reason || "").toLowerCase().replace(/_/g, " ")}).` }); }
+    return hit ? { ok: true } : null;
+  }
   if (type?.startsWith("PAYMENT.CAPTURE.")) {
-    const hit = find((p) => p.captureId === r.id);
+    // (a refund event's resource is the refund; its capture is the link marked "up")
+    const capId = type === "PAYMENT.CAPTURE.REFUNDED" ? String((r.links || []).find((l) => l.rel === "up")?.href || "").split("/").pop() || r.id : r.id;
+    const hit = find((p) => p.captureId === capId);
     if (hit) { const s = type.split(".").pop().toLowerCase(); if (s === "declined") hit.p.status = "capture_failed"; if (s === "refunded") hit.p.status = "refunded"; db.save(); note(hit.b, { kind: "paypal" }, `capture_${s}`, `PayPal: ${name(hit.pid)}'s payment ${s}.`); }
     return hit ? { ok: true } : null;
   }

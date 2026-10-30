@@ -153,3 +153,44 @@ test("players negotiate the split: an invitee asks to pay less; the organizer co
   assert.equal(b.payments.leo.amount, even - 300);
   assert.equal(b.payments.you.captured, b.total - b.payments.leo.amount - b.payments.hana.amount);
 });
+
+test("paying the organizer back: an invoice to whoever never paid, then a payout to the organizer", async () => {
+  const id = await deal(["leo", "hana"]);
+  await settle.pay(id, "you"); await approve(id, "you"); await approve(id, "leo");
+  assert.equal((await settle.requestReimbursement(id, "you", "hana")).error, "too_early");
+  now = new Date(now.getTime() + settle.SHARES_MS + 60e3);
+  await settle.tick();
+  const b = settle.internal(id);
+  assert.equal(b.state, "locked");
+  assert.equal((await settle.requestReimbursement(id, "you", "leo")).error, "nothing_owed");
+  assert.equal((await settle.requestReimbursement(id, "leo", "hana")).error, "not_organizer");
+  const v = await settle.requestReimbursement(id, "you", "hana");
+  assert.equal(v.reimbursements[0].status, "sent");
+  assert.ok(settle.status(id, "hana").owes.url);
+  pp.approve({ invoice: b.reimbursements.hana.invoiceId });
+  await settle.tick();
+  assert.equal(b.reimbursements.hana.status, "repaid");
+  assert.ok(b.reimbursements.hana.payout);
+});
+
+test("the venue's side on the PayPal Agent Toolkit: extras invoice, reconciliation, a dispute answered with the receipt", async () => {
+  const toolkit = await import("../src/pay/toolkit.js");
+  toolkit.configureToolkit({ standIn: (m, a) => pp.toolkit(m, a) });
+  const id = await deal(["leo"]);
+  await settle.pay(id, "you"); await approve(id, "you"); await approve(id, "leo");
+  const b = settle.internal(id);
+  assert.equal(b.state, "locked");
+  const bill = await settle.billExtras("north", id, [{ name: "Overtime, 30 min", amount: 1200 }, { name: "Racket rental", amount: 500 }]);
+  assert.equal(bill.total, "17.00");
+  assert.equal((await settle.billExtras("west", id, [{ name: "x", amount: 1 }])).error, "no_booking");
+  pp.approve({ invoice: bill.invoice }); await settle.tick();
+  assert.equal(b.bills[0].status, "paid");
+  const rec = await settle.reconcileVenue("north");
+  assert.ok(rec.rows.filter((r) => r.kind === "capture").every((r) => r.paypal === "matched" && r.fee > 0));
+  const d = pp.openDispute(b.payments.leo.captureId);
+  await settle.webhook({ event_type: "CUSTOMER.DISPUTE.CREATED", resource: d });
+  const list = await settle.venueDisputes("north");
+  assert.equal(list[0].booking, id);
+  const ans = await settle.answerDispute("north", d.dispute_id);
+  assert.equal(ans.status, "evidence_sent");
+});

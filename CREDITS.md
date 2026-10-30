@@ -2,7 +2,7 @@
 
 Join is our own work. It reuses a few pure functions (free-time intersection, travel time, "the venue in the middle",
 the demo venues' timetable, atomic JSON writes) from our earlier project Serve, imported as the `baseline` commit of this
-repository. Everything after that commit was written for the PayPal AI Hackathon (from 30 October 2026).
+repository. Everything after that commit was written for the PayPal AI Hackathon, during its submission period.
 
 Join runs no AI model of its own. The agents that use it are the players' and venues' own (Claude, or any MCP or A2A
 client).
@@ -18,6 +18,7 @@ client).
 
 | What | License |
 |---|---|
+| PayPal Agent Toolkit (`@paypal/agent-toolkit`) | Apache 2.0 |
 | Express | MIT |
 | Model Context Protocol TypeScript SDK (`@modelcontextprotocol/sdk`) | MIT |
 | Zod | MIT |

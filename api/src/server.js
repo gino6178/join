@@ -11,6 +11,7 @@ import * as a2a from "./a2a.js";
 import * as settle from "./pay/settle.js";
 import { paypal } from "./pay/paypal.js";
 import { mockPaypal } from "./pay/mock.js";
+import { configureToolkit, toolkitMode } from "./pay/toolkit.js";
 import { agentOf, sessionOf, createSession, endSession, makeToken, tokensOf, revoke, COOKIE, VENUE_COOKIE, createVenueSession, venueOf, endVenueSession } from "./auth.js";
 import { getMandate, setMandate } from "./mandate.js";
 import { forPlayer, onActivity } from "./activity.js";
@@ -29,6 +30,13 @@ const DEMO = process.env.DEMO_SIGNIN !== "0";
 const real = process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET && process.env.PAYPAL_MODE !== "mock";
 const pp = real ? paypal({ clientId: process.env.PAYPAL_CLIENT_ID, secret: process.env.PAYPAL_CLIENT_SECRET, testCard: process.env.PAYPAL_TEST_CARD === "1" }) : mockPaypal({ publicUrl: PUBLIC_URL });
 settle.configure({ paypal: pp, url: PUBLIC_URL });
+// the back office's PayPal Agent Toolkit uses the same app (or, without keys, the stand-in's records)
+configureToolkit(real ? { token: () => pp.accessToken() } : { standIn: (m, a) => pp.toolkit(m, a) });
+// PayPal's webhooks: Join subscribes itself when it has a public HTTPS address (PayPal only delivers to port 443)
+const EVENTS = ["CHECKOUT.ORDER.APPROVED", "PAYMENT.AUTHORIZATION.CREATED", "PAYMENT.AUTHORIZATION.VOIDED", "PAYMENT.CAPTURE.COMPLETED", "PAYMENT.CAPTURE.DECLINED", "PAYMENT.CAPTURE.PENDING", "PAYMENT.CAPTURE.REFUNDED",
+  "PAYMENT.PAYOUTS-ITEM.SUCCEEDED", "PAYMENT.PAYOUTS-ITEM.UNCLAIMED", "PAYMENT.PAYOUTS-ITEM.RETURNED", "PAYMENT.PAYOUTS-ITEM.FAILED", "INVOICING.INVOICE.PAID", "CUSTOMER.DISPUTE.CREATED", "VAULT.PAYMENT-TOKEN.CREATED"];
+if (real && PUBLIC_URL.startsWith("https://") && !process.env.PAYPAL_WEBHOOK_ID)
+  pp.ensureWebhook(`${PUBLIC_URL}/paypal/webhook`, EVENTS).then((w) => { process.env.PAYPAL_WEBHOOK_ID = w.id; console.log(`PayPal webhook ${w.created ? "created" : "found"}: ${w.id}`); }).catch((e) => console.error("webhook setup", e.message));
 
 const app = express();
 app.disable("x-powered-by");
@@ -65,7 +73,7 @@ app.all("/mcp", (req, res) => mcp.handle(req, res).catch((e) => { console.error(
 // the same tools as plain REST, for agents and scripts that don't speak MCP: POST /api/agent/<tool> with JSON arguments
 const TOOLS = { whoami: ops.whoami, list_activities: () => ops.listActivities(), list_venues: (a, x) => ops.listVenues(x), find_options: ops.findOptions, start_negotiation: ops.startNegotiation, make_offer: ops.makeOffer, accept_price: ops.acceptPrice,
   walk_away: ops.walkAway, find_alternatives: ops.findAlternatives, my_plans: ops.myGames, booking_status: ops.gameStatus, pay_my_share: ops.payMyShare, decline_invite: ops.declineGame, cancel_booking: ops.cancelBooking,
-  propose_share: ops.proposeShare, answer_share: ops.answerShare };
+  propose_share: ops.proposeShare, answer_share: ops.answerShare, request_reimbursement: ops.requestReimbursement };
 app.post("/api/agent/:tool", async (req, res) => {
   const a = agentOf(req);
   if (!a) return res.status(401).json({ error: "unauthorized", message: "Send a player's agent token: Authorization: Bearer join_..." });
@@ -102,10 +110,16 @@ app.get("/api/activity", signedIn, (req, res) => res.json({ entries: forPlayer(r
 app.get("/api/games", signedIn, (req, res) => res.json(ops.myGames({ player: req.player })));
 // the person can do from the website what their agent can (approving payments is in PayPal itself)
 app.post("/api/bookings/:id/:act", signedIn, async (req, res) => {
-  const a = { player: req.player, client: null }, act = { pay: ops.payMyShare, decline: ops.declineGame, cancel: ops.cancelBooking, "propose-share": ops.proposeShare, "answer-share": ops.answerShare }[req.params.act];
+  const a = { player: req.player, client: null }, act = { pay: ops.payMyShare, decline: ops.declineGame, cancel: ops.cancelBooking, "propose-share": ops.proposeShare, "answer-share": ops.answerShare, "reimburse": ops.requestReimbursement }[req.params.act];
   if (!act) return res.status(404).end();
   const r = await act(a, { ...(req.body || {}), booking: req.params.id }); res.status(r.error ? 400 : 200).json(r);
 });
+// the JS SDK v6 on the website: a browser-safe token, and the payer's own approval coming back from the PayPal popup
+app.get("/api/paypal/sdk", signedIn, async (req, res) => {
+  if (!pp.clientToken) return res.json({ mode: pp.mode, token: null });
+  try { res.json({ mode: pp.mode, ...(await pp.clientToken()) }); } catch (e) { res.status(502).json({ error: "paypal", message: e.message }); }
+});
+app.post("/api/bookings/:id/approved", signedIn, async (req, res) => { const r = await settle.approved(req.params.id, req.player); res.status(r?.error ? 400 : 200).json(r); });
 app.post("/api/vault", signedIn, async (req, res) => { try { res.json(await settle.vaultStart(req.player)); } catch (e) { res.status(502).json({ error: "paypal", message: e.message }); } });
 app.delete("/api/vault", signedIn, (req, res) => { setMandate(req.player, { autopay: false }); res.json(settle.vaultForget(req.player)); });
 // ---- venues: their own policy -----------------------------------------------------------------------------------------
@@ -120,6 +134,13 @@ app.get("/api/venue-me", (req, res) => { const s = venueOf(req); res.json({ venu
 // (only the venue's own staff see its floor)
 app.get("/api/venues/:id/policy", venueStaff, (req, res) => res.json({ venue: req.params.id, policy: venue(req.params.id).policy }));
 app.put("/api/venues/:id/policy", venueStaff, (req, res) => { const r = setPolicy(req.params.id, req.body || {}); res.status(r.error ? 400 : 200).json(r); });
+// the venue's money, through the PayPal Agent Toolkit: reconciliation, extras, disputes
+app.get("/api/venues/:id/reconcile", venueStaff, async (req, res) => res.json(await settle.reconcileVenue(req.params.id)));
+app.post("/api/venues/:id/bookings/:booking/extras", venueStaff, async (req, res) => { try { const r = await settle.billExtras(req.params.id, req.params.booking, req.body?.items); res.status(r.error ? 400 : 200).json(r); } catch (e) { res.status(502).json({ error: "paypal", message: e.message }); } });
+app.get("/api/venues/:id/disputes", venueStaff, async (req, res) => { try { res.json({ toolkit: toolkitMode(), disputes: await settle.venueDisputes(req.params.id) }); } catch (e) { res.status(502).json({ error: "paypal", message: e.message }); } });
+app.post("/api/venues/:id/disputes/:dispute/answer", venueStaff, async (req, res) => { try { const r = await settle.answerDispute(req.params.id, req.params.dispute); res.status(r.error ? 400 : 200).json(r); } catch (e) { res.status(502).json({ error: "paypal", message: e.message }); } });
+// (stand-in only) open a dispute on a capture, as a buyer would, to try the flow
+app.post("/api/demo/dispute", (req, res) => { if (pp.mode !== "mock") return res.status(404).end(); const d = pp.openDispute(String(req.body?.capture || "")); if (!d) return res.status(400).json({ error: "no such capture" }); settle.webhook({ event_type: "CUSTOMER.DISPUTE.CREATED", resource: d }).then(() => res.json(d)); });
 app.get("/api/venues/:id/schedule", (req, res) => res.json({ venue: req.params.id, bookings: settle.forVenue(req.params.id) }));
 // live activity for the signed-in player (server-sent events)
 app.get("/api/activity/stream", signedIn, (req, res) => {
@@ -153,14 +174,15 @@ app.get("/paypal/vault-return", async (req, res) => {
 if (pp.mode === "mock") {
   const page = (body) => `<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>PayPal (simulated)</title><style>body{font:16px system-ui;background:#f5f7fa;margin:0;display:grid;place-items:center;min-height:100vh}.c{background:#fff;padding:32px;border-radius:16px;box-shadow:0 8px 30px #0001;max-width:380px;width:calc(100% - 32px)}h1{font-size:20px;margin:0 0 4px}.n{color:#a15c00;background:#fff4e0;padding:8px 12px;border-radius:8px;font-size:13px;margin:12px 0 20px}button{font:inherit;width:100%;padding:12px;border-radius:999px;border:0;margin-top:8px;cursor:pointer}.y{background:#0070e0;color:#fff;font-weight:600}.x{background:#eee}</style><div class="c">${body}</div>`;
   app.get("/mock-paypal/approve", (req, res) => {
-    const d = pp.describe({ token: req.query.token, setup: req.query.setup });
+    const d = pp.describe({ token: req.query.token, setup: req.query.setup, invoice: req.query.invoice });
     if (!d) return res.status(404).send(page("<h1>Unknown payment</h1>"));
-    const what = d.kind === "order" ? `Authorize <b>$${usd(d.amount)}</b> for ${String(d.reference).split(":")[0]}` : "Save PayPal so your Join agent can pay your share within your limits";
+    const what = d.kind === "invoice" ? `Pay invoice: <b>$${usd(d.amount)}</b> for ${d.reference}` : d.kind === "order" ? `Authorize <b>$${usd(d.amount)}</b> for ${String(d.reference).split(":")[0]}` : "Save PayPal so your Join agent can pay your share within your limits";
     res.send(page(`<h1>PayPal</h1><p>${what}</p><p class="n">Simulated PayPal: Join is running without sandbox keys. No money moves.</p><form method="post"><button class="y" name="a" value="yes">Agree and continue</button><button class="x" name="a" value="no">Cancel</button></form>`));
   });
   app.post("/mock-paypal/approve", express.urlencoded({ extended: false }), (req, res) => {
-    const { token, setup } = req.query, yes = req.body?.a === "yes";
-    if (yes) pp.approve({ token, setup });
+    const { token, setup, invoice } = req.query, yes = req.body?.a === "yes";
+    if (yes) pp.approve({ token, setup, invoice });
+    if (invoice) return res.redirect("/#/games");
     if (setup) return res.redirect(yes ? `/paypal/vault-return?setup=${setup}` : "/#/limits");
     for (const b of settle.bookingsStore.data.bookings) for (const [pid, p] of Object.entries(b.payments)) if (p.orderId === token) return res.redirect(yes ? `/paypal/return?booking=${b.id}&player=${pid}` : `/paypal/cancel?booking=${b.id}&player=${pid}`);
     res.redirect("/");

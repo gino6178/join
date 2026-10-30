@@ -8,7 +8,7 @@ import * as ops from "./ops.js";
 import { agentOf } from "./auth.js";
 
 const ACTIONS = { whoami: ops.whoami, list_activities: () => ops.listActivities(), list_venues: (a, x) => ops.listVenues(x), find_options: ops.findOptions, start_negotiation: ops.startNegotiation, make_offer: ops.makeOffer, accept_price: ops.acceptPrice,
-  walk_away: ops.walkAway, find_alternatives: ops.findAlternatives, my_plans: ops.myGames, booking_status: ops.gameStatus, pay_my_share: ops.payMyShare, decline_invite: ops.declineGame, cancel_booking: ops.cancelBooking, propose_share: ops.proposeShare, answer_share: ops.answerShare };
+  walk_away: ops.walkAway, find_alternatives: ops.findAlternatives, my_plans: ops.myGames, booking_status: ops.gameStatus, pay_my_share: ops.payMyShare, decline_invite: ops.declineGame, cancel_booking: ops.cancelBooking, propose_share: ops.proposeShare, answer_share: ops.answerShare, request_reimbursement: ops.requestReimbursement };
 
 export const card = (base) => ({
   protocolVersion: "0.3.0", name: "Join venue desk", version: "0.1.0",

@@ -44,10 +44,19 @@ game tables, barbecue pits, dinner tables. It runs no AI model of its own. Peopl
 
 ## How we built it
 
-- **PayPal:** Orders v2 with intent `AUTHORIZE` (one order per payer), captures with `final_capture`, voids, refunds,
-  Payouts to the venue afterwards, Vault v3 so a player can save PayPal once for their agent, webhooks with
-  signature verification. Every PayPal POST is journaled first and carries a `PayPal-Request-Id`, so a step retried
-  after a crash is the same call. PayPal's own MCP server is the venue's tool for reconciling and invoicing.
+- **PayPal, all run on the sandbox:**
+  - JS SDK v6 buttons (PayPal, Pay Later, Venmo) so people approve in a PayPal popup.
+  - Orders v2 with intent `AUTHORIZE` (one order per payer); captures with `final_capture`, partial for the organizer;
+    voids and refunds.
+  - Payouts to the venue after the booking.
+  - Vault v3, so a person saves PayPal once and their agent pays within their limits.
+  - Invoicing, so a person who never paid gets an invoice and the organizer is paid back with Payouts.
+  - The **PayPal Agent Toolkit** as Join's back office for venues: `list_transactions` for reconciliation,
+    `create_invoice` / `send_invoice` for extras, `list_disputes`, and dispute evidence with the signed receipt.
+  - A venue's Claude agent that loads the Agent Toolkit as an in-process MCP server.
+  - Webhooks that Join subscribes itself to, with signature verification.
+  - Every PayPal POST is journaled first and carries a `PayPal-Request-Id`, so a step retried after a crash is the same
+    call.
 - **Agents:** an MCP server (Streamable HTTP), the same tools over REST, and an A2A endpoint with an Agent Card. Tool
   descriptions are written for the model that reads them. The player's mandate follows the shape of the Agent
   Payments Protocol's Intent Mandate.
@@ -58,6 +67,10 @@ game tables, barbecue pits, dinner tables. It runs no AI model of its own. Peopl
 - Node, Express, React, Vite. 22 automated tests, including an end-to-end run of four agents over MCP.
 
 ## Challenges we ran into
+
+- Marketplace settlement: PayPal's multiparty model (the venue as `payee`, Join's fee as `platform_fees`) is the
+  production path, but partner onboarding is gated, and a payout can't be pulled back. So Join captures each share,
+  keeps cancellations refundable until 24 hours before, and pays the venue with Payouts afterwards.
 
 - A deal between agents is only binding if money backs it. Without a saved payment method, every payer has to approve
   in PayPal, so "accept" alone could have held a place for free. We made the organizer authorize the whole booking first
@@ -85,8 +98,9 @@ through the Agent Payments Protocol once PayPal's support for it is available.
 
 ## Built with
 
-PayPal Orders v2, Payments (Authorizations, Captures, Refunds), Payouts, Vault v3, Webhooks, PayPal MCP server · MCP ·
-A2A · Claude · Bryntum Scheduler · Node.js, Express, React, Vite
+PayPal JS SDK v6 (PayPal, Pay Later, Venmo), Orders v2, Payments (Authorizations, Captures, Refunds), Payouts,
+Vault v3, Invoicing, Disputes, Webhooks, PayPal Agent Toolkit · MCP · A2A · Claude · Bryntum Scheduler · Node.js,
+Express, React, Vite
 
 ## Links
 

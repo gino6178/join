@@ -587,7 +587,8 @@
     "karaoke",
     "board games",
     "hot pot"
-   ]
+   ],
+   "paypal": "you@join-demo.example"
   },
   {
    "id": "hana",
@@ -612,7 +613,8 @@
     "karaoke",
     "escape room",
     "hot pot"
-   ]
+   ],
+   "paypal": "hana@join-demo.example"
   },
   {
    "id": "ravi",
@@ -635,7 +637,8 @@
     "basketball",
     "bbq",
     "board games"
-   ]
+   ],
+   "paypal": "ravi@join-demo.example"
   },
   {
    "id": "tomas",
@@ -663,7 +666,8 @@
     "hot pot",
     "karaoke",
     "board games"
-   ]
+   ],
+   "paypal": "tomas@join-demo.example"
   },
   {
    "id": "yuki",
@@ -685,7 +689,8 @@
     "badminton",
     "tennis",
     "board games"
-   ]
+   ],
+   "paypal": "yuki@join-demo.example"
   },
   {
    "id": "aisha",
@@ -711,7 +716,8 @@
     "bbq",
     "board games",
     "hot pot"
-   ]
+   ],
+   "paypal": "aisha@join-demo.example"
   },
   {
    "id": "leo",
@@ -735,7 +741,8 @@
     "escape room",
     "karaoke",
     "hot pot"
-   ]
+   ],
+   "paypal": "leo@join-demo.example"
   },
   {
    "id": "noor",
@@ -760,7 +767,8 @@
     "escape room",
     "karaoke",
     "hot pot"
-   ]
+   ],
+   "paypal": "noor@join-demo.example"
   },
   {
    "id": "sam",
@@ -782,7 +790,8 @@
     "pickleball",
     "bbq",
     "hot pot"
-   ]
+   ],
+   "paypal": "sam@join-demo.example"
   },
   {
    "id": "ines",
@@ -809,7 +818,8 @@
     "board games",
     "hot pot",
     "escape room"
-   ]
+   ],
+   "paypal": "ines@join-demo.example"
   },
   {
    "id": "kenji",
@@ -836,7 +846,8 @@
     "hot pot",
     "karaoke",
     "board games"
-   ]
+   ],
+   "paypal": "kenji@join-demo.example"
   },
   {
    "id": "priya",
@@ -860,7 +871,8 @@
     "board games",
     "karaoke",
     "hot pot"
-   ]
+   ],
+   "paypal": "priya@join-demo.example"
   }
  ],
  "activities": [

@@ -36,6 +36,8 @@ export function paypal({ clientId, secret, brand = "Join", testCard = false }) {
 
   return {
     mode: "sandbox", testCard,
+    // the OAuth access token, for the PayPal Agent Toolkit (toolkit.js) to use the same app
+    accessToken: auth,
     async createOrder({ amount, currency = "USD", reference, description, returnUrl, cancelUrl, vaultId = null, requestId, card = false }) {
       const payment_source = vaultId
         ? { paypal: { vault_id: vaultId } }
@@ -68,12 +70,22 @@ export function paypal({ clientId, secret, brand = "Join", testCard = false }) {
       return { id: j.id, status: j.status };
     },
     async payout({ batchId, receiver, amount, currency = "USD", note }) {
-      const j = await call("POST", "/v1/payments/payouts", { sender_batch_header: { sender_batch_id: batchId, email_subject: `${brand}: a court booking was paid`, email_message: note }, items: [{ recipient_type: "EMAIL", receiver, note, sender_item_id: batchId, amount: { value: (amount / 100).toFixed(2), currency } }] });
+      const j = await call("POST", "/v1/payments/payouts", { sender_batch_header: { sender_batch_id: batchId, email_subject: `${brand}: a booking was paid`, email_message: note }, items: [{ recipient_type: "EMAIL", receiver, note, sender_item_id: batchId, amount: { value: (amount / 100).toFixed(2), currency } }] });
       return { batchId: j.batch_header.payout_batch_id, status: j.batch_header.batch_status };
     },
     async getPayout(batchId) {
       const j = await call("GET", `/v1/payments/payouts/${batchId}`);
       return { batchId, status: j.batch_header.batch_status, item: j.items?.[0]?.transaction_status || null };
+    },
+    // Invoicing v2: a draft invoice to one recipient, sent (PayPal hosts the page where they pay), and its status
+    async invoice({ recipient, item, amount, currency = "USD", note, requestId }) {
+      const j = await call("POST", "/v2/invoicing/invoices", { detail: { currency_code: currency, note: note.slice(0, 4000), payment_term: { term_type: "DUE_ON_RECEIPT" } }, primary_recipients: [{ billing_info: { email_address: recipient } }], items: [{ name: item.slice(0, 200), quantity: "1", unit_amount: money(amount, currency) }] }, requestId);
+      const s = await call("POST", `/v2/invoicing/invoices/${j.id}/send`, { send_to_recipient: true, send_to_invoicer: false }, `${requestId}:send`);
+      return { id: j.id, url: s.href || null, status: "SENT" };
+    },
+    async getInvoice(id) {
+      const j = await call("GET", `/v2/invoicing/invoices/${id}`);
+      return { id, status: j.status, url: j.detail?.metadata?.recipient_view_url || null, paid: j.payments?.paid_amount ? Math.round(+j.payments.paid_amount.value * 100) : 0 };
     },
     async vaultSetup({ returnUrl, cancelUrl, requestId }) {
       const j = await call("POST", "/v3/vault/setup-tokens", { payment_source: { paypal: { usage_type: "MERCHANT", customer_type: "CONSUMER", permit_multiple_payment_tokens: false, description: `${brand}: your agent may pay your share of games within your limits`, experience_context: { brand_name: brand, shipping_preference: "NO_SHIPPING", return_url: returnUrl, cancel_url: cancelUrl } } } }, requestId);
@@ -82,6 +94,30 @@ export function paypal({ clientId, secret, brand = "Join", testCard = false }) {
     async vaultToken(setupTokenId, requestId) {
       const j = await call("POST", "/v3/vault/payment-tokens", { payment_source: { token: { id: setupTokenId, type: "SETUP_TOKEN" } } }, requestId);
       return { id: j.id, customerId: j.customer?.id || null };
+    },
+    // A browser-safe client token for the JS SDK v6 (short-lived; scoped to initializing the SDK)
+    async clientToken() {
+      const r = await fetch(`${BASE}/v1/oauth2/token`, { method: "POST", headers: { Authorization: `Basic ${Buffer.from(`${clientId}:${secret}`).toString("base64")}`, "Content-Type": "application/x-www-form-urlencoded" }, body: "grant_type=client_credentials&response_type=client_token&intent=sdk_init" });
+      if (!r.ok) throw new Error(`PayPal client token: ${r.status}`);
+      const j = await r.json();
+      return { token: j.access_token, expiresIn: j.expires_in, sdk: "https://www.sandbox.paypal.com/web-sdk/v6/core" };
+    },
+    // Disputes: answer a chargeback with evidence (multipart: the evidence JSON and one file, here Join's signed receipt)
+    async provideEvidence(disputeId, { notes, file, fileName = "join-receipt.json" }) {
+      const form = new FormData();
+      form.append("input", new Blob([JSON.stringify({ evidences: [{ evidence_type: "PROOF_OF_FULFILLMENT", evidence_info: {}, notes: notes.slice(0, 2000) }] })], { type: "application/json" }), "input.json");
+      form.append("file1", new Blob([file], { type: "application/json" }), fileName);
+      const r = await fetch(`${BASE}/v1/customer/disputes/${disputeId}/provide-evidence`, { method: "POST", headers: { Authorization: `Bearer ${await auth()}` }, body: form });
+      if (!r.ok) throw new Error(`PayPal provide-evidence: ${r.status} ${(await r.text()).slice(0, 200)}`);
+      return { status: "UNDER_REVIEW" };
+    },
+    // Webhooks management: Join subscribes itself (no hand-copied webhook id)
+    async ensureWebhook(url, events) {
+      const list = await call("GET", "/v1/notifications/webhooks");
+      const have = (list.webhooks || []).find((w) => w.url === url);
+      if (have) return { id: have.id, created: false };
+      const j = await call("POST", "/v1/notifications/webhooks", { url, event_types: events.map((name) => ({ name })) });
+      return { id: j.id, created: true };
     },
     async verifyWebhook(headers, rawBody, webhookId) {
       const h = (k) => headers[k] || headers[k.toLowerCase()];

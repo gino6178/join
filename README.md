@@ -107,7 +107,7 @@ tampering); and an end-to-end run of four agents over MCP.
 
 All three take a player's token (`Authorization: Bearer join_...`) and offer the same tools: `whoami`, `list_venues`,
 `list_activities`, `find_options`, `start_negotiation`, `make_offer`, `accept_price`, `walk_away`, `find_alternatives`,
-`my_plans`, `booking_status`, `pay_my_share`, `propose_share`, `answer_share`, `decline_invite`, `cancel_booking`.
+`my_plans`, `booking_status`, `pay_my_share`, `propose_share`, `answer_share`, `request_reimbursement`, `decline_invite`, `cancel_booking`.
 
 **What the platform guarantees, whatever the agent does**
 
@@ -122,15 +122,27 @@ All three take a player's token (`Authorization: Bearer join_...`) and offer the
 
 ## PayPal
 
+Everything below has been run against the PayPal sandbox.
+
 | PayPal | In Join |
 |---|---|
-| Orders v2, intent `AUTHORIZE`, approval links | The organizer's guarantee and each player's share |
-| Authorizations: capture (final), void | Lock the booking; release it; decline |
-| Captures: refund | Cancellation more than 24 h ahead |
-| Payouts | The venue's money, afterwards, net of fees |
-| Vault v3 (setup token → payment token → `vault_id`) | Save PayPal once; the agent pays within the mandate |
-| Webhooks + `verify-webhook-signature` | Confirmations (order approved, captures, payouts) |
-| PayPal MCP server / Agent Toolkit | A venue's own agent reconciles and invoices ([examples/venue](examples/venue/README.md)) |
+| **JS SDK v6** (`web-sdk/v6/core`, browser-safe client token), PayPal / Pay Later / Venmo buttons | A person approves their share in a PayPal popup without leaving Join (`web/src/components/PayPalButtons.jsx`) |
+| **Orders v2**, intent `AUTHORIZE`, one order per payer | The organizer's guarantee for the whole booking, and each person's share |
+| **Authorizations**: capture with `final_capture` (partial for the organizer), void | Lock the booking; release it; a decline |
+| **Captures**: refund | Cancellation more than 24 hours ahead |
+| **Payouts** | The venue's money after the booking, net of fees; paying an organizer back |
+| **Vault v3** (setup token, payment token, `vault_id`) | Save PayPal once; the agent pays within the person's mandate without a redirect |
+| **Invoicing v2** | A person who never paid gets an invoice for their share; when it's paid, the organizer is paid back (Payouts) |
+| **PayPal Agent Toolkit** (`@paypal/agent-toolkit`): `list_transactions`, `create_invoice`, `send_invoice`, `get_invoice`, `list_disputes` | Join's back office for venues: reconciliation against PayPal's transaction records, billing extras, disputes (`api/src/pay/toolkit.js`); and a venue's own Claude agent with the toolkit as an in-process MCP server (`examples/venue-agent.mjs`) |
+| **Disputes**: `provide-evidence` | A venue answers a chargeback with Join's signed receipt for the booking |
+| **Webhooks** management API + `verify-webhook-signature` | Join subscribes itself to 14 events when it has a public HTTPS address; webhooks confirm, return URLs and polling drive |
+| Sandbox test card | Optional demo stand-in for each payer's approval (`PAYPAL_TEST_CARD=1`, sandbox only) |
+
+**Why Payouts and not multiparty (yet).** Join captures each share to its own account and pays the venue after the
+booking, because a payout to the venue can't be pulled back, and cancellations until 24 hours before must stay
+refundable. The production path is PayPal's multiparty model: the venue onboarded through Partner Referrals as the
+`payee` on each order, Join's fee as `platform_fees`, captured when the booking locks. Partner onboarding is gated, so
+the hackathon build keeps Payouts.
 
 The player's mandate follows the shape of the Agent Payments Protocol's Intent Mandate (conditions a person approved
 in advance, under which an agent may act).
@@ -157,13 +169,13 @@ little Sepolia ether from a faucet). Without them, receipts are still signed and
 | Path | What |
 |---|---|
 | `api/src/negotiate/` | Venue policy (`policy.js`) and the negotiation engine (`engine.js`) |
-| `api/src/pay/` | PayPal client (`paypal.js`), the stand-in (`mock.js`), settlement (`settle.js`) |
+| `api/src/pay/` | PayPal client (`paypal.js`), the Agent Toolkit back office (`toolkit.js`), the stand-in (`mock.js`), settlement (`settle.js`) |
 | `api/src/ops.js` | What an agent can do; MCP (`mcp.js`), REST and A2A (`a2a.js`) all call it |
 | `api/src/alternatives.js`, `mandate.js`, `auth.js`, `activity.js` | Alternatives, limits, tokens, the activity log |
 | `api/src/proof/` | Receipts (`receipts.js`), Merkle trees (`merkle.js`), Sepolia anchoring (`anchor.js`) |
 | `api/data/world.json` | The made-up demo town (USD, placed on San Jose, CA) |
 | `web/` | The website (React, Vite) |
-| `examples/` | Agents from outside: scripted, Claude, venue; the receipt verifier |
+| `examples/` | Agents from outside: scripted (no key), a Claude player agent, a Claude venue agent on the PayPal Agent Toolkit; the receipt verifier |
 | `docs/` | Devpost text and the demo video script |
 
 ## What's new since 1 October 2026

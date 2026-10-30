@@ -1,18 +1,21 @@
 import { useMemo, useState } from "react";
 import { api, useApi, when, money, clock } from "../api.js";
-import Actor from "../components/Actor.jsx";
+import Actor, { useWorld, firstName } from "../components/Actor.jsx";
 import Icon from "../components/Icon.jsx";
+import PayPalButtons from "../components/PayPalButtons.jsx";
 
 // What the agents did, for the person they did it for: every search, offer, counter-offer, approval and payment, live,
 // grouped by the deal it belongs to. Each line says who did it (your agent and which one, another player's agent, the
 // venue, PayPal, Join) in words made by code from the facts. On top, what is waiting on you.
 const ICON = { searched: "list", alternatives: "pin", negotiation_opened: "chat", venue_countered: "chat", deal: "check", venue_rejected: "warn", offer_refused: "warn", accept_refused: "warn", negotiation_refused: "warn",
-  walked_away: "back", invited: "send", joined: "check", share_asked: "chat", share_accepted: "check", share_refused: "close", place_held: "clock", approval_requested: "card", authorized: "verify", held: "lock", locked: "lock", played: "check", venue_paid: "send", payout_status: "send", released: "back", cancelled: "close", refunded: "back", declined: "close", vault_saved: "card", pay_requested: "card" };
+  walked_away: "back", reimbursement_requested: "send", reimbursement_paid: "card", organizer_repaid: "check", invited: "send", joined: "check", share_asked: "chat", share_accepted: "check", share_refused: "close", place_held: "clock", approval_requested: "card", authorized: "verify", held: "lock", locked: "lock", played: "check", venue_paid: "send", payout_status: "send", released: "back", cancelled: "close", refunded: "back", declined: "close", vault_saved: "card", pay_requested: "card" };
 const TONE = { deal: "good", locked: "good", venue_paid: "good", authorized: "good", venue_rejected: "bad", offer_refused: "warn", accept_refused: "warn", negotiation_refused: "warn", released: "warn", payment_failed: "bad", capture_failed: "bad" };
 
 export default function Activity({ entries, me }) {
+  const w = useWorld(), firstOf = (id) => firstName(w, id);
   const games = useApi("/api/games", entries.length);
   const waiting = (games.data?.bookings || []).filter((b) => b.you?.approveUrl || b.invite);
+  const owing = (games.data?.bookings || []).filter((b) => b.owes);
   const groups = useMemo(() => {
     const by = new Map();
     for (const e of entries) { const k = e.ref || "_other"; if (!by.has(k)) by.set(k, []); by.get(k).push(e); }
@@ -28,9 +31,10 @@ export default function Activity({ entries, me }) {
         <h2><Icon name="bolt" size={18} />Waiting on you</h2>
         {waiting.map((b) => b.invite ? <Invite key={b.id} b={b} done={games.reload} /> : <div key={b.id} className="need">
           <span><b>{b.organizer === me.player.id ? "Guarantee the booking" : "Pay your share"}: {money(b.you.amount)}</b><small>{b.venueName} · {b.activity} · {b.date} {b.start}{b.you.note ? ` · ${b.you.note}` : ""}</small></span>
-          <a className="btn primary" href={b.you.approveUrl}>Approve in PayPal</a>
+          <PayPalButtons bookingId={b.id} orderId={b.you.orderId} approveUrl={b.you.approveUrl} onDone={games.reload} />
         </div>)}
       </section>}
+      {owing.map((b) => <section key={b.id} className="needs"><div className="need"><span><b>Pay back {firstOf(b.organizer)}: {money(b.owes.amount)}</b><small>{b.venueName} · {b.activity} · {b.date} {b.start}. They covered your share; this is a PayPal invoice.</small></span><a className="btn primary" href={b.owes.url} target="_blank" rel="noreferrer">Pay the invoice</a></div></section>)}
       {!entries.length && <div className="empty card"><Icon name="key" size={28} /><p><b>No activity yet.</b> Connect an agent and ask it to get a group together; every step it takes shows up here.</p><a className="btn" href="#/connect">Connect your agent</a></div>}
       {groups.map((g) => <Group key={g.k} list={g.list} me={me.player.id} />)}
     </div>
