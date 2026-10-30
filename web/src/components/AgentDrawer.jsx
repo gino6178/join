@@ -79,7 +79,7 @@ export default function AgentDrawer({ me, info, open, onClose }) {
         {cards?.map((o, i) => <div key={i} className={`rec ${o.over ? "over" : ""}`}>
           <b>{o.venueName}</b><span className="muted small">{dayLabel(o.date)} · {o.start} · {o.minutes} min</span>
           <span>{o.names.map((n) => n.split(" ")[0]).join(", ")}</span>
-          <span><b>{money(o.askPrice)}</b> asked · {money(o.share)} each{o.over ? " · over your budget, I'll haggle" : ""}</span>
+          <span><b>{money(o.askPrice)}</b> asked · {money(o.share)} each{o.over ? " · over your budget or limit, I'll try" : ""}</span>
           <small className="muted">{o.why.join(" · ")}</small>
           <button className="btn primary small" disabled={busy} onClick={() => choose(o)}>Negotiate this</button>
         </div>)}
