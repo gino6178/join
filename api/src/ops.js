@@ -123,10 +123,10 @@ export function findAlternatives(a, { activity, date, start, minutes = 90, playe
   const share = budget != null ? toCents(budget) : getMandate(a.player).perGame;
   const list = alts({ people: ids.map(player), activity, date, start, minutes, budgetShare: share, exclude, from: exclude ? venue(exclude) : null, now: clock() });
   record({ actor: by(a), who: [a.player], action: "alternatives", summary: `${said(a)} looked for other places for ${activity} on ${date} around ${start}: ${list.length} found.`, data: { alternatives: list } });
-  return { alternatives: list, budgetPerPerson: usd(share) };
+  return { alternatives: list, budgetPerPerson: usd(share), ...(list.some((x) => x.withinBudget && x.venue !== exclude) ? {} : { note: `No other place offers ${activity} within $${usd(share)} a person then. Try another time or another activity the group shares (find_options).` }) };
 }
 
-export const myGames = (a) => ({ negotiations: neg.mine(a.player), bookings: settle.mine(a.player) });
+export const myGames = (a, { all = false } = {}) => ({ negotiations: neg.mine(a.player, { all }), bookings: settle.mine(a.player, { all }), ...(all ? {} : { note: "Open negotiations and live bookings only; pass all: true for finished ones too." }) });
 export const gameStatus = (a, { booking }) => settle.status(booking, a.player);
 
 export async function payMyShare(a, { booking }) {

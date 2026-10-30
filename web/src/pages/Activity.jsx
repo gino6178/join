@@ -30,7 +30,7 @@ export default function Activity({ entries, me }) {
       {waiting.length > 0 && <section className="needs">
         <h2><Icon name="bolt" size={18} />Waiting on you</h2>
         {waiting.map((b) => b.invite ? <Invite key={b.id} b={b} done={games.reload} /> : <div key={b.id} className="need">
-          <span><b>{b.organizer === me.player.id ? "Guarantee the booking" : "Pay your share"}: {money(b.you.amount)}</b><small>{b.venueName} · {b.activity} · {b.date} {b.start}{b.you.note ? ` · ${b.you.note}` : ""}</small></span>
+          <span><b>{b.organizer === me.player.id ? "Guarantee the booking" : "Pay your share"}: {money(b.you.authorized)}</b><small>{b.venueName} · {b.activity} · {b.date} {b.start}{b.you.note ? ` · ${b.you.note}` : ""}</small></span>
           <PayPalButtons bookingId={b.id} orderId={b.you.orderId} approveUrl={b.you.approveUrl} onDone={games.reload} />
         </div>)}
       </section>}

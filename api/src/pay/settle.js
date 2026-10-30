@@ -274,7 +274,7 @@ export function proposeShare(bookingId, playerId, amount) {
   const ask = { player: playerId, from: b.shares[playerId], amount, status: "pending", at: at() };
   b.shareAsks.push(ask); db.save();
   record({ actor: { kind: "agent", player: playerId }, who: [playerId, b.organizer], action: "share_asked", ref: b.id, summary: `${name(playerId)}'s agent asked to pay $${usd(amount)} instead of $${usd(ask.from)}. ${name(b.organizer)} would cover the $${usd(ask.from - amount)}.`, data: { from: usd(ask.from), amount: usd(amount) } });
-  return view(b, playerId);
+  return { result: `Asked to pay $${usd(amount)} instead of $${usd(ask.from)}. Pending: ${name(b.organizer)}'s agent answers (it sees the ask in my_plans). Don't pay until then; pay_my_share joins at whatever share stands.`, ...view(b, playerId) };
 }
 
 export function answerShare(bookingId, organizerId, playerId, accept) {
@@ -287,13 +287,13 @@ export function answerShare(bookingId, organizerId, playerId, accept) {
   if (accept && !f.ok) {
     ask.status = "refused"; db.save();
     record({ actor: { kind: "platform" }, who: [playerId, organizerId], action: "share_refused", ref: b.id, summary: `${name(organizerId)}'s agent can't take on $${usd(diff)} more: ${f.why.join("; ")}.` });
-    return { error: "over_mandate", message: f.why.join("; "), booking: view(b, organizerId) };
+    return { error: "over_mandate", message: `Can't accept: ${f.why.join("; ")}. ${name(playerId)}'s ask is now refused and their share stays $${usd(b.shares[playerId])}; their agent is told.`, booking: view(b, organizerId) };
   }
   ask.status = accept ? "accepted" : "refused"; ask.answered = at();
   if (accept) { b.shares[playerId] = ask.amount; b.shares[organizerId] += diff; b.splitRule = "negotiated"; }
   db.save();
   record({ actor: { kind: "agent", player: organizerId }, who: [playerId, organizerId], action: accept ? "share_accepted" : "share_refused", ref: b.id, summary: accept ? `${name(organizerId)}'s agent agreed: ${name(playerId)} pays $${usd(ask.amount)}, ${name(organizerId)} covers $${usd(diff)} more.` : `${name(organizerId)}'s agent kept ${name(playerId)}'s share at $${usd(b.shares[playerId])}.` });
-  return view(b, organizerId);
+  return { result: accept ? `Accepted: ${name(playerId)} pays $${usd(ask.amount)}, your share is now $${usd(b.shares[organizerId])}.` : `Refused: ${name(playerId)}'s share stays $${usd(b.shares[playerId])}.`, ...view(b, organizerId) };
 }
 
 export function decline(bookingId, playerId) {
@@ -330,7 +330,9 @@ export function view(b, viewer) {
     guaranteeBy: b.state === "awaiting_organizer" ? new Date(b.organizerUntil).toISOString() : null, payBy: b.state === "held" ? new Date(b.holdUntil).toISOString() : null,
     payments: Object.fromEntries(b.players.map((pid) => { const p = b.payments[pid]; return [pid, { share: usd(b.shares[pid]), ...(pid === b.organizer ? { guarantee: usd(b.total), paid: p?.captured != null ? usd(p.captured) : null } : {}), role: pid === b.organizer ? "organizer" : "share", status: b.declined.includes(pid) ? "declined" : p?.status || (pid !== b.organizer && b.state === "held" ? "invited" : "not_started"), via: p?.via || null }]; })),
     invite: viewer !== b.organizer && b.state === "held" && !mine && !b.declined.includes(viewer) ? { share: usd(b.shares[viewer]), payBy: new Date(b.holdUntil).toISOString() } : null,
-    you: mine ? { amount: usd(mine.amount), status: mine.status, via: mine.via, approveUrl: mine.status === "awaiting_approval" ? mine.approveUrl : null, orderId: mine.status === "awaiting_approval" ? mine.orderId : null, note: mine.why } : null,
+    you: mine ? { share: usd(b.shares[viewer]), ...(mine.role === "organizer" ? { guarantee: usd(b.total) } : {}), authorized: usd(mine.amount), paid: mine.status === "captured" ? usd(mine.captured ?? mine.amount) : "0.00", status: mine.status, via: mine.via,
+      approveUrl: mine.status === "awaiting_approval" ? mine.approveUrl : null, orderId: mine.status === "awaiting_approval" ? mine.orderId : null, ...(mine.status === "awaiting_approval" && mine.why ? { note: mine.why } : {}),
+      paypal: { order: mine.orderId, authorization: mine.authorizationId, capture: mine.captureId } } : null,
     payout: b.payout ? { amount: usd(b.payout.amount), status: b.payout.item || b.payout.status } : null,
     reimbursements: Object.values(b.reimbursements || {}).filter((r) => viewer === b.organizer || r.player === viewer).map((r) => ({ player: r.player, amount: usd(r.amount), status: r.status, url: r.player === viewer && r.status === "sent" ? r.url : undefined })),
     extras: (b.bills || []).map((x) => ({ total: usd(x.total), items: x.items.map((i) => i.name), status: x.status, url: viewer === b.organizer && x.status === "sent" ? x.url : undefined })),
@@ -341,7 +343,8 @@ export function view(b, viewer) {
 }
 
 export const status = (bookingId, viewer) => { const b = get(bookingId); return b && b.players.includes(viewer) ? view(b, viewer) : { error: "no_booking", message: "No such booking." }; };
-export const mine = (viewer) => db.data.bookings.filter((b) => b.players.includes(viewer)).map((b) => view(b, viewer)).reverse();
+const DONE = ["released", "cancelled", "refunded"];
+export const mine = (viewer, { all = false } = {}) => db.data.bookings.filter((b) => b.players.includes(viewer) && (all || (!DONE.includes(b.state) && !b.declined.includes(viewer) && startOf(b.date, b.start).getTime() + b.minutes * 60e3 > clock().getTime() - 2 * 864e5))).map((b) => view(b, viewer)).reverse();
 export const forVenue = (venueId) => db.data.bookings.filter((b) => b.venue === venueId).map((b) => ({ id: b.id, state: b.state, activity: b.activity, date: b.date, start: b.start, minutes: b.minutes, unit: b.unit, unitName: place(b), total: usd(b.total), players: b.players.length, paid: Object.values(b.payments).filter((p) => p.status === "captured").length, payout: b.payout ? usd(b.payout.amount) : null, captures: Object.values(b.payments).map((p) => p.captureId).filter(Boolean), extras: (b.bills || []).map((x) => ({ invoice: x.invoiceId, url: x.url, to: player(b.organizer).paypal, items: x.items.map((i) => ({ name: i.name, amount: usd(i.amount) })), total: usd(x.total), status: x.status })), disputes: Object.keys(b.disputes || {}).length }));
 export const internal = get;
 

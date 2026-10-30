@@ -21,6 +21,9 @@ import { fits, getMandate } from "../mandate.js";
 import { isDate, isTime, startOf, ymd } from "../time.js";
 
 export const TTL_MS = 15 * 60e3;
+// An offer under SERIOUS of the venue's current ask is a lowball: it uses up a round and the venue doesn't move. Only a
+// serious offer earns the next step of the concession schedule, so offering $1 three times gets nothing.
+export const SERIOUS = 0.7;
 export const QUOTA = 5; // negotiations per player, venue and day
 const db = store(stateFile("negotiations"), { negotiations: [] });
 export const negotiationsStore = db;
@@ -35,11 +38,11 @@ const people = (ids) => ids.map(player).filter(Boolean);
 const err = (code, message, extra = {}) => ({ error: code, message, ...extra });
 
 function view(n, extra = {}) {
-  const share = shareOf(n.ask, n.players.length);
+  const share = shareOf(n.ask, n.players.length), each = Math.floor(n.ask / n.players.length);
   return {
     id: n.id, status: n.status, venue: n.venue, venueName: venue(n.venue)?.name, activity: n.activity, date: n.date, start: n.start, minutes: n.minutes,
     players: n.players, organizer: n.by, currency: "USD",
-    list: usd(n.list), ask: usd(n.ask), share: usd(share), discounts: n.discounts,
+    list: usd(n.list), ask: usd(n.ask), share: usd(share), shares: { organizer: usd(n.ask - each * (n.players.length - 1)), eachOther: usd(each) }, discounts: n.discounts,
     round: n.round, roundsLeft: Math.max(0, n.rounds - n.round), final: n.final,
     agreed: n.agreed ? { amount: usd(n.agreed.amount), share: usd(shareOf(n.agreed.amount, n.players.length)), at: n.agreed.at } : null,
     expiresAt: new Date(n.expiresAt).toISOString(), history: n.history.map((h) => ({ ...h, amount: h.amount != null ? usd(h.amount) : undefined })),
@@ -79,7 +82,7 @@ export function open({ by, players = [], venue: venueId, activity, date, start, 
   const q = price(v, terms, now);
   const n = {
     id: `neg_${crypto.randomBytes(6).toString("hex")}`, by, players: ids, venue: v.id, activity, date, start, minutes,
-    list: q.list, ask0: q.ask, ask: q.ask, floor: q.floor, style: q.style, rounds: q.rounds, round: 0, final: q.style === "firm",
+    list: q.list, ask0: q.ask, ask: q.ask, floor: q.floor, style: q.style, rounds: q.rounds, round: 0, steps: 0, final: q.style === "firm",
     discounts: q.discounts, status: "open", openedDay: day, expiresAt: now.getTime() + TTL_MS,
     history: [{ at: now.toISOString(), by: "venue", type: "ask", amount: q.ask }],
   };
@@ -121,14 +124,17 @@ export function offer({ id, by, amount }) {
     return view(n, { message: `${venue(n.venue).name} said its last price was $${usd(n.ask)}.`, alternatives: alts(n, getMandate(n.by).perGame) });
   }
   n.round += 1;
-  // (the schedule runs from the opening ask, not from the last counter)
-  const next = askAt({ ask: n.ask0, floor: n.floor, style: n.style, rounds: n.rounds }, n.round);
+  n.steps ??= n.round - 1; // (negotiations opened before this rule counted every round as a step)
+  const lowball = amount < Math.round(n.ask * SERIOUS);
+  if (!lowball) n.steps += 1;
+  // (the schedule runs from the opening ask, not from the last counter, and moves only for serious offers)
+  const next = askAt({ ask: n.ask0, floor: n.floor, style: n.style, rounds: n.rounds }, n.steps);
   if (amount >= next) return agree(n, amount, "venue");
   n.ask = next; n.final = n.round >= n.rounds || next === n.floor;
   n.history.push({ at: now, by: "venue", type: n.final ? "final" : "counter", amount: next });
   db.save();
   const budget = getMandate(n.by).perGame;
-  return view(n, { message: n.final ? `Best and final: $${usd(next)}.` : `The venue counters at $${usd(next)}.`, ...(shareOf(next, n.players.length) > budget ? { overBudget: true, alternatives: alts(n, budget) } : {}) });
+  return view(n, { message: lowball ? `$${usd(amount)} is under ${SERIOUS * 100}% of the venue's ask, so it doesn't come down: still $${usd(next)}${n.final ? " (best and final)" : ""}.` : n.final ? `Best and final: $${usd(next)}.` : `The venue counters at $${usd(next)}.`, ...(lowball ? { lowball: true } : {}), ...(shareOf(next, n.players.length) > budget ? { overBudget: true, alternatives: alts(n, budget) } : {}) });
 }
 
 export function accept({ id, by }) {
@@ -160,5 +166,5 @@ export function status({ id, by }) {
   return view(expireIfDue(n));
 }
 
-export const mine = (by) => db.data.negotiations.filter((n) => n.players.includes(by)).map((n) => view(expireIfDue(n)));
+export const mine = (by, { all = false } = {}) => db.data.negotiations.filter((n) => n.players.includes(by)).map((n) => view(expireIfDue(n))).filter((n) => all || n.status === "open");
 export const internal = get; // for bookings.js and tests (includes the floor; never send to an agent)

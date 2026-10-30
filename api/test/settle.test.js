@@ -40,7 +40,7 @@ test("the organizer guarantees the whole court before anyone else is asked", asy
   const v = await settle.pay(id, "you");
   assert.equal(v.state, "awaiting_organizer");
   assert.match(v.you.approveUrl, /mock-paypal\/approve/);
-  assert.equal(v.you.amount, v.total);
+  assert.equal(v.you.authorized, v.total);
   assert.equal((await settle.pay(id, "leo")).message.startsWith("Waiting for"), true);
   await approve(id, "you");
   const b = settle.internal(id);

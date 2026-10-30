@@ -44,13 +44,13 @@ test("an offer at the ask is agreed at the ask; the floor never leaves the engin
   assert.equal(r.agreed.amount, n.ask);
 });
 
-test("a low offer gets counters on the schedule, then best and final, then a refusal with alternatives", () => {
+test("serious offers walk the venue down its schedule, then best and final, then a refusal with alternatives", () => {
   const start = freeStart("north");
   const n = open({ by: "you", players: ["leo"], venue: "north", activity: "badminton", date: DATE, start, minutes: 90 });
   const q = { ...internal(n.id) };
   let r;
   for (let i = 1; i <= q.rounds; i++) {
-    r = offer({ id: n.id, by: "you", amount: 100 });
+    r = offer({ id: n.id, by: "you", amount: Math.ceil(cents(+(r?.ask || n.ask)) * 0.75) });
     assert.equal(r.status, "open");
     assert.equal(cents(+r.ask), askAt(q, i));
   }
@@ -131,4 +131,14 @@ test("a venue's own policy: checked, then used for the next negotiation", async 
   const n = open({ by: "you", players: ["leo"], venue: "north", activity: "badminton", date: DATE, start: freeStart("north"), minutes: 90 });
   assert.equal(n.final, true);
   setPolicy("north", { style: before }); policiesStore.reset();
+});
+
+test("a lowball earns nothing: three $1 offers leave the venue where it was", () => {
+  const start = freeStart("lakeside");
+  const n = open({ by: "you", players: ["leo"], venue: "lakeside", activity: "badminton", date: DATE, start, minutes: 90 });
+  let r;
+  for (let i = 0; i < 3; i++) { r = offer({ id: n.id, by: "you", amount: 100 }); assert.equal(r.lowball, true); }
+  assert.equal(r.ask, n.ask);
+  assert.equal(r.final, true);
+  assert.equal(offer({ id: n.id, by: "you", amount: 100 }).status, "rejected");
 });

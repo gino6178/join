@@ -95,7 +95,7 @@ say("Venue", `deal: $${r.agreed.amount} ($${r.agreed.share} each)`);
 
 const booking = r.booking.id;
 let p = await alex.call("pay_my_share", { booking });
-say("Alex's agent", `Alex guarantees the whole booking: $${p.you.amount}`);
+say("Alex's agent", `Alex guarantees the whole booking: $${p.you.authorized}`);
 if (p.you?.approveUrl) await approve(p.you.approveUrl, "Alex", () => alex.call("booking_status", { booking }));
 else say("Alex", `authorized (${p.you?.via})`);
 
@@ -116,7 +116,7 @@ for (const id of r.players.filter((p) => p !== "you")) {
     say("Alex's agent", ans.error ? `can't cover it: ${ans.message}` : `agrees: Alex covers the $1.00`);
   }
   p = await a.call("pay_my_share", { booking: b.id });
-  say(label, `pays the share: $${p.you?.amount}`);
+  say(label, `pays the share: $${p.you?.authorized}`);
   if (p.you?.approveUrl) await approve(p.you.approveUrl, names[id], () => a.call("booking_status", { booking }));
   else say(names[id], `authorized (${p.you?.via})`);
   await a.close();

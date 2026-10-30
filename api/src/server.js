@@ -72,7 +72,7 @@ app.all("/mcp", (req, res) => mcp.handle(req, res).catch((e) => { console.error(
 
 // the same tools as plain REST, for agents and scripts that don't speak MCP: POST /api/agent/<tool> with JSON arguments
 const TOOLS = { whoami: ops.whoami, list_activities: () => ops.listActivities(), list_venues: (a, x) => ops.listVenues(x), find_options: ops.findOptions, start_negotiation: ops.startNegotiation, make_offer: ops.makeOffer, accept_price: ops.acceptPrice,
-  walk_away: ops.walkAway, find_alternatives: ops.findAlternatives, my_plans: ops.myGames, booking_status: ops.gameStatus, pay_my_share: ops.payMyShare, decline_invite: ops.declineGame, cancel_booking: ops.cancelBooking,
+  walk_away: ops.walkAway, find_alternatives: ops.findAlternatives, my_plans: (a, x) => ops.myGames(a, x), booking_status: ops.gameStatus, pay_my_share: ops.payMyShare, decline_invite: ops.declineGame, cancel_booking: ops.cancelBooking,
   propose_share: ops.proposeShare, answer_share: ops.answerShare, request_reimbursement: ops.requestReimbursement };
 app.post("/api/agent/:tool", async (req, res) => {
   const a = agentOf(req);
@@ -107,7 +107,7 @@ app.put("/api/mandate", signedIn, (req, res) => { const r = setMandate(req.playe
 app.post("/api/tokens", signedIn, (req, res) => res.json(makeToken(req.player, req.body?.label)));
 app.delete("/api/tokens/:id", signedIn, (req, res) => res.json({ ok: revoke(req.player, req.params.id) }));
 app.get("/api/activity", signedIn, (req, res) => res.json({ entries: forPlayer(req.player, { after: +req.query.after || 0 }) }));
-app.get("/api/games", signedIn, (req, res) => res.json(ops.myGames({ player: req.player })));
+app.get("/api/games", signedIn, (req, res) => res.json(ops.myGames({ player: req.player }, { all: true })));
 // the person can do from the website what their agent can (approving payments is in PayPal itself)
 app.post("/api/bookings/:id/:act", signedIn, async (req, res) => {
   const a = { player: req.player, client: null }, act = { pay: ops.payMyShare, decline: ops.declineGame, cancel: ops.cancelBooking, "propose-share": ops.proposeShare, "answer-share": ops.answerShare, "reimburse": ops.requestReimbursement }[req.params.act];
