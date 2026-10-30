@@ -42,6 +42,8 @@ export const ORGANIZER_MS = 10 * 60e3;
 export const SHARES_MS = +process.env.SHARES_MS || 20 * 60e3;
 const shareWindowEnd = (b, now) => Math.min(now + SHARES_MS, Math.max(now + 10 * 60e3, startOf(b.date, b.start).getTime() - 2 * 3600e3));
 export const CANCEL_BEFORE_MS = 24 * 3600e3;
+// a payout PayPal hasn't finished yet (its batch is PENDING, then PROCESSING): Join keeps asking until it has
+const unsettled = (p) => !!p && ["PENDING", "PROCESSING"].includes(p.status);
 const LIVE = ["awaiting_organizer", "held", "locking", "locked", "played", "venue_paid"];
 
 const db = store(stateFile("bookings"), { bookings: [], vaults: {}, setups: {}, settlements: [] });
@@ -284,7 +286,7 @@ export async function tick() {
   await checkSettlements();
   for (const b of db.data.bookings) {
     const owed = Object.values(b.reimbursements || {}).some((r) => r.status === "sent") || (b.bills || []).some((x) => x.status === "sent" || x.status === "paid");
-    if (!owed && (!LIVE.includes(b.state) || b.state === "venue_paid" && b.payout?.status !== "PENDING")) continue;
+    if (!owed && (!LIVE.includes(b.state) || b.state === "venue_paid" && !unsettled(b.payout))) continue;
     // (each booking waits at most 60 s here, so one stuck on a slow PayPal call can't hold up the others; its own queue
     // carries on, and the next tick picks it up again)
     await Promise.race([serial(b.id, async () => {
@@ -300,8 +302,8 @@ export async function tick() {
       if (b.state === "played" && !b.payout) await payVenue(b);
       await checkReimbursements(b);
       await checkBills(b);
-      if (b.payout?.status === "PENDING") {
-        try { const r = await pp.getPayout(b.payout.batchId); if (r.status !== "PENDING") { b.payout.status = r.status; b.payout.item = r.item; db.save(); note(b, { kind: "paypal" }, "payout_status", `PayPal Payouts: the venue's payment is ${String(r.item || r.status).toLowerCase()}.`); } } catch {}
+      if (unsettled(b.payout)) {
+        try { const r = await pp.getPayout(b.payout.batchId); if (r.status !== b.payout.status) { b.payout.status = r.status; b.payout.item = r.item; db.save(); note(b, { kind: "paypal" }, "payout_status", `PayPal Payouts: the venue's payment is ${String(r.item || r.status).toLowerCase()}.`); } } catch {}
       }
     }), new Promise((ok) => setTimeout(ok, 60e3).unref?.())]);
   }
