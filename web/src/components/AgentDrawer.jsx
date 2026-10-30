@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { api, money } from "../api.js";
+import { tr, lang as siteLang } from "../i18n.js";
 import { useWorld } from "./Actor.jsx";
 import Icon from "./Icon.jsx";
 import PayPalButtons from "./PayPalButtons.jsx";
@@ -15,7 +16,7 @@ const EXAMPLES = ["Karaoke Friday night, 4 of us, $15 each", "Badminton this wee
 
 export default function AgentDrawer({ me, info, open, onClose }) {
   const world = useWorld();
-  const [lang, setLang] = useState("en"), w = WORDS[lang];
+  const [lang, setLang] = useState(siteLang), w = WORDS[lang]; // (the site's language until the person writes in another)
   const [msgs, setMsgs] = useState([{ from: "agent", text: WORDS.en.hello(me.player.name.split(" ")[0]) }]);
   const [brief, setBrief] = useState({});
   const [text, setText] = useState(""), [busy, setBusy] = useState(false);
@@ -85,7 +86,7 @@ export default function AgentDrawer({ me, info, open, onClose }) {
   return (
     <aside className="drawer" role="dialog" aria-label="Join's website agent">
       <header className="drawer-head">
-        <span><b><Icon name="spark" size={16} /> Join's agent</b><small>{(info?.scout || "rules") === "rules" ? "Runs on Join's own server" : "Runs on Join's own server, with a small language model for free-form sentences · no outside AI service"}</small></span>
+        <span><b><Icon name="spark" size={16} /> {tr("Join's agent")}</b><small>{tr((info?.scout || "rules") === "rules" ? "Runs on Join's own server" : "Runs on Join's own server, with a small language model for free-form sentences · no outside AI service")}</small></span>
         <button className="icon-btn" onClick={onClose} aria-label="Close"><Icon name="close" size={18} /></button>
       </header>
       <div className="drawer-body">
@@ -104,7 +105,7 @@ export default function AgentDrawer({ me, info, open, onClose }) {
           {o.reviews?.groupLow?.length > 0 && <small className="warn-text">{w.groupLow(o.reviews.groupLow)}</small>}
           <span className="tags">{(o.discounts || []).length > 0 && <span className="tag good">{o.discounts.map((d) => w.why.discount(d)).join(" + ")}</span>}{world?.venues.find((v) => v.id === o.venue)?.style && <span className="tag">{w.style[world.venues.find((v) => v.id === o.venue).style]}</span>}</span>
           <small className="muted">{o.why.filter((x, i) => i < 2).join(" · ")}</small>
-          {o.fit === "tooFar" ? <><small className="warn-text">{w.card.tooFarWhy(o.limit)}</small><a className="btn small" href="#/limits" onClick={onClose}>{w.card.raise}</a></>
+          {o.fit === "tooFar" ? (o.byBudget ? <small className="warn-text">{w.card.overBudget(o.cap, o.lowestEach)}</small> : <><small className="warn-text">{w.card.tooFarWhy(o.limit)}</small><a className="btn small" href="#/limits" onClick={onClose}>{w.card.raise}</a></>)
             : <button className="btn primary small" disabled={busy} onClick={() => ask(o)}>{w.card.negotiate}</button>}
         </div>)}
         {confirm && <div className="drawer-actions">

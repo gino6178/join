@@ -22,9 +22,9 @@ export default function Limits({ me, reload, query }) {
       <form className="card form" onSubmit={submit}>
         <label><span>{tr("Most for one booking (your share)")}</span><small className="muted">{tr("Your agent aims for this a person, and Join refuses anything above it.")}</small><span className="money-in">$<input type="number" min="0" step="0.5" value={perGame} onChange={(e) => setPerGame(e.target.value)} /></span></label>
         <label><span>{tr("Most in one week")}</span><span className="money-in">$<input type="number" min="0" step="1" value={perWeek} onChange={(e) => setPerWeek(e.target.value)} /></span></label>
-        <small className="muted">Counts your shares, and anything you actually paid for friends who didn't pay, less what they paid you back.</small>
+        <small className="muted">{tr("Counts your shares, and anything you actually paid for friends who didn't pay, less what they paid you back.")}</small>
         <label><span>{tr("Most your agent may guarantee for a group")}</span><span className="money-in">$<input type="number" min="0" step="1" value={cover} onChange={(e) => setCover(e.target.value)} /></span></label>
-        <small className="muted">When you organize, you guarantee the whole price until your friends pay; you pay your own share unless someone doesn't. Above this amount, you approve the guarantee yourself in PayPal.</small>
+        <small className="muted">{tr("When you organize, you guarantee the whole price until your friends pay; you pay your own share unless someone doesn't. Above this amount, you approve the guarantee yourself in PayPal.")}</small>
         <fieldset><legend>{tr("Venues")}</legend>
           <label className="check"><input type="radio" checked={venues === null} onChange={() => setVenues(null)} />{tr("Any venue")}</label>
           <label className="check"><input type="radio" checked={venues !== null} onChange={() => setVenues(venues || [])} />{tr("Only these:")}</label>

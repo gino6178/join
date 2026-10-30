@@ -21,7 +21,7 @@ export async function search(brief, model, w) {
       const why = [w.why.free(people), w.why.trip(o.longestTrip), ...o.discounts.map(w.why.discount)];
       // (the limit for this option: per booking, or what's left of that week's, whichever is less)
       const lim = Math.min(limit, o.youCanSpend != null ? +o.youCanSpend : limit), c = each(brief, lim);
-      return { ...o, why, limit: lim, weekCut: lim < limit, missing: (brief.with || []).filter((id) => !o.players.includes(id)),
+      return { ...o, why, limit: lim, cap: c, byBudget: c < lim, lowestEach: Math.ceil((ask * SERIOUS) / people * 100) / 100, weekCut: lim < limit, missing: (brief.with || []).filter((id) => !o.players.includes(id)),
         fit: share <= c ? "ok" : ask * SERIOUS > c * people ? "tooFar" : "haggle" };
     }),
     limit, cap, note: r.note,

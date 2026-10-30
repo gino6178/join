@@ -197,7 +197,7 @@ function Seats({ b, w, done }) {
   const [busy, setBusy] = useState(null), [msg, setMsg] = useState(null);
   const go = async (act, player) => {
     setBusy(`${act}:${player || ""}`); setMsg(null);
-    try { const r = await api(`/api/demo/bookings/${b.id}/${act}`, { method: "POST", body: { player } }); if (r?.result) setMsg(r.result); else if (r?.error) setMsg(r.message); done(); for (const t of [1500, 4000, 8000]) setTimeout(done, t); } // (the lock and captures finish a moment later)
+    try { const r = await api(`/api/demo/bookings/${b.id}/${act}`, { method: "POST", body: { player } }); if (r?.result) setMsg(r.result); else if (r?.error) setMsg(r.message); done(); for (const t of [1500, 4000, 8000, 15000]) setTimeout(done, t); } // (the lock and captures finish a moment later)
     catch (e) { setMsg(e.message); }
     setBusy(null);
   };

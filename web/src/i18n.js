@@ -49,5 +49,19 @@ const ZH = {
   // sign-in
   "Sign in": "登入", "New here? Make a demo account": "第一次來？建立示範帳號", "Your first name": "你的名字", "Start": "開始",
   "Or be one of the demo town's residents": "或扮演示範城鎮裡的居民", "For AI agents": "給 AI agent",
+  // more
+  "Badminton, karaoke, an escape room, board games, a barbecue, hot pot: Join is the marketplace AI agents come to. They find who is free, negotiate the price with the venue, split the cost and settle it with PayPal, inside the limits you set. No agent? Join's website agent asks what you want and does it for you. Join keeps the rules and shows you everything an agent did.": "羽球、唱歌、密室逃脫、桌遊、烤肉、火鍋：Join 是 AI agent 來辦團的市集。它們找出誰有空、跟場地議價、分攤費用，再用 PayPal 結清，全都在你設的上限之內。沒有 agent？Join 網站上的 agent 會問你想做什麼，幫你搞定。Join 管規則，也讓你看到 agent 做的每一步。",
+  "Why not just split it on Venmo afterwards? Because someone has to book and pay first. Here the venue is paid only when the money is real: the organizer guarantees it in PayPal, each friend pays their own share, and anyone who said yes and didn't pay gets a PayPal invoice. Nobody chases anyone.": "為什麼不事後再分帳？因為總得有人先訂、先付。在這裡，錢到位了場地才算數：發起人先用 PayPal 擔保，每位朋友付自己那份，說好要來卻沒付的人會收到 PayPal 帳單。沒有人需要去追錢。",
+  "Claude, or any MCP or A2A agent, with a token only you can make.": "Claude，或任何支援 MCP、A2A 的 agent，用只有你能建立的 token 連進來。",
+  "Set your limits": "設定你的上限",
+  "Per booking, per week, which venues. Agents can read them, never change them.": "每次預約、每週、哪些場地。agent 只能讀，不能改。",
+  "Watch it work": "看它怎麼做",
+  "Every search, offer, counter-offer and payment, as it happens.": "每一次搜尋、出價、還價和付款，即時呈現。",
+  "Counts your shares, and anything you actually paid for friends who didn't pay, less what they paid you back.": "計入你自己的份額，以及你替沒付的朋友實際代墊、扣掉他們已還你的部分。",
+  "When you organize, you guarantee the whole price until your friends pay; you pay your own share unless someone doesn't. Above this amount, you approve the guarantee yourself in PayPal.": "你當發起人時，要先擔保全額，直到朋友們付款；正常只付自己那份，有人沒付才由你補。超過這個金額，要你自己在 PayPal 核准擔保。",
+  "Venues are round pins (click one for what it offers, or to plan there); squares are free public places such as park courts and picnic grills (first come, not bookable); blue circles are people's home areas, never addresses.": "圓形是場地（點一下看它提供什麼，或直接在那裡規劃）；方形是免費的公共場所，例如公園球場和烤肉區（先到先用，不能預約）；藍色圓圈是大家住的大概區域，不是地址。",
+  "Runs on Join's own server": "在 Join 自己的伺服器上執行",
+  "Runs on Join's own server, with a small language model for free-form sentences · no outside AI service": "在 Join 自己的伺服器上執行，自由句子交給一個小型語言模型 · 不用外部 AI 服務",
+  "Join's agent": "Join 的 agent",
 };
 export const tr = (s) => (lang === "zh" && ZH[s]) || s;

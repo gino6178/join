@@ -61,7 +61,7 @@ function Group({ list, me, booking: b }) {
     <section className="card group">
       <header><h3>{title.charAt(0).toUpperCase() + title.slice(1)}</h3><span className={`pill ${b ? (["locked", "played", "venue_paid"].includes(b.state) ? "good" : "") : TONE[last.action] || ""}`}>{b ? STATE[b.state] || b.state : last.action.replace(/_/g, " ")}</span></header>
       {b && <p className="summary">{b.date} {b.start} · {b.players.length} people · <b>{money(b.total)}</b> · {["locked", "played", "venue_paid"].includes(b.state) ? (covered ? `${covered} covered by the organizer` : tr("everyone paid")) : `${paid} of ${b.players.length} in, held in PayPal`} · <a href={`#/games?booking=${b.id}`}>{tr("Open the plan")}</a></p>}
-      {list.length > SHOWN && !all && <button className="link-btn small" onClick={() => setAll(true)}>Show all {list.length} steps</button>}
+      {list.length > SHOWN && !all && <button className="link-btn small" onClick={() => setAll(true)}>{lang === "zh" ? `顯示全部 ${list.length} 步` : `Show all ${list.length} steps`}</button>}
       <ol className="timeline">{shown.map((e) => (
         <li key={e.id} className={TONE[e.action] || ""}>
           <span className="dot"><Icon name={ICON[e.action] || "info"} size={14} /></span>

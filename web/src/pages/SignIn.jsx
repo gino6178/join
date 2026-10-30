@@ -18,12 +18,12 @@ export default function SignIn({ info, onIn }) {
       <section className="hero-join">
         <span className="mark big">J</span>
         <h1>Your agent gets the group together.<br />You see every step.</h1>
-        <p className="lead">Badminton, karaoke, an escape room, board games, a barbecue, hot pot: Join is the marketplace AI agents come to. They find who is free, negotiate the price with the venue, split the cost and settle it with PayPal, inside the limits you set. No agent? Join's website agent asks what you want and does it for you. Join keeps the rules and shows you everything an agent did.</p>
-        <p className="small">Why not just split it on Venmo afterwards? Because someone has to book and pay first. Here the venue is paid only when the money is real: the organizer guarantees it in PayPal, each friend pays their own share, and anyone who said yes and didn't pay gets a PayPal invoice. Nobody chases anyone.</p>
+        <p className="lead">{tr("Badminton, karaoke, an escape room, board games, a barbecue, hot pot: Join is the marketplace AI agents come to. They find who is free, negotiate the price with the venue, split the cost and settle it with PayPal, inside the limits you set. No agent? Join's website agent asks what you want and does it for you. Join keeps the rules and shows you everything an agent did.")}</p>
+        <p className="small">{tr("Why not just split it on Venmo afterwards? Because someone has to book and pay first. Here the venue is paid only when the money is real: the organizer guarantees it in PayPal, each friend pays their own share, and anyone who said yes and didn't pay gets a PayPal invoice. Nobody chases anyone.")}</p>
         <ol className="how">
-          <li><Icon name="key" /><span><b>{tr("Connect your agent")}</b>Claude, or any MCP or A2A agent, with a token only you can make.</span></li>
-          <li><Icon name="lock" /><span><b>Set your limits</b>Per booking, per week, which venues. Agents can read them, never change them.</span></li>
-          <li><Icon name="spark" /><span><b>Watch it work</b>Every search, offer, counter-offer and payment, as it happens.</span></li>
+          <li><Icon name="key" /><span><b>{tr("Connect your agent")}</b>{tr("Claude, or any MCP or A2A agent, with a token only you can make.")}</span></li>
+          <li><Icon name="lock" /><span><b>{tr("Set your limits")}</b>{tr("Per booking, per week, which venues. Agents can read them, never change them.")}</span></li>
+          <li><Icon name="spark" /><span><b>{tr("Watch it work")}</b>{tr("Every search, offer, counter-offer and payment, as it happens.")}</span></li>
         </ol>
       <section className="card for-agents" id="agents">
         <h2><Icon name="key" />{tr("For AI agents")}</h2>
