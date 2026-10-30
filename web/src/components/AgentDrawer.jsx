@@ -97,7 +97,7 @@ export default function AgentDrawer({ me, info, open, onClose }) {
           <span>{o.names.map((n) => n.split(" ")[0]).join(", ")}</span>
           {o.missing.length > 0 && <small className="warn-text">{w.notFree(o.missing.map(firstName))}</small>}
           {o.weekCut && <small className="warn-text">{w.card.week(o.limit)}</small>}
-          <span><b>{money(o.askPrice)}</b> {w.card.asked} · {money(o.share)} {w.card.each}{o.fit !== "ok" ? ` · ${w.card[o.fit]}` : ""}</span>
+          <span><b>{money(o.askPrice)}</b> {w.card.asked} · {money(o.share)} {w.card.each}{o.fit !== "ok" ? ` · ${o.fit === "tooFar" && o.byBudget ? w.card.tooFarBudget : w.card[o.fit]}` : ""}</span>
           <span className="stars">{w.stars(o.reviews)}</span>
           {o.reviews?.praise?.length > 0 && <small className="good-text">{w.liked(o.reviews.praise)}</small>}
           {o.reviews?.complaints?.length > 0 && <small className="warn-text">{w.complaints(o.reviews.complaints)}</small>}

@@ -194,7 +194,7 @@ async function advance(b) {
   }
   if (b.state === "held") {
     const others = b.players.filter((pid) => pid !== b.organizer && !b.declined.includes(pid));
-    if (others.every((pid) => b.payments[pid]?.status === "authorized")) await lock(b, "everyone paid");
+    if (others.every((pid) => b.payments[pid]?.status === "authorized")) await lock(b, b.declined.length ? "everyone who is coming paid" : "everyone paid");
   }
 }
 
