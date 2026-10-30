@@ -25,9 +25,9 @@ export function alternatives({ people, activity, date, start, minutes, budgetSha
       const units = freeUnits(v.id, activity, date, terms.start, minutes);
       if (!units.length) continue;
       const q = price(v, terms, now), share = shareOf(q.ask, n);
-      const rv = reviews.summary(v.id, { activity, group: people.map((p) => p.id) });
+      const rv = reviews.summary(v.id, { activity, group: people.map((p) => p.id), viewer: people[0]?.id });
       const cand = { kind: "venue", bookable: true, venue: v.id, name: v.name, start: terms.start, shift: d, unitsFree: units.length, price: q.ask, share, withinBudget: share <= budgetShare, longestTrip: t.longest, trips: t.list, discounts: q.discounts.map((x) => x.kind),
-        rating: rv.count ? rv.score : null, ratingAdjust: reviews.rankAdjust(rv), reviews: reviews.reason(rv), groupLow: rv.groupLow.map((g) => g.name) };
+        rating: rv.count ? rv.score : null, ratingAdjust: reviews.rankAdjust(rv), reviews: reviews.reason(rv), groupLow: rv.groupLow.length, tasteNotes: rv.tasteNotes };
       if (!best || rank(cand) < rank(best)) best = cand;
     }
     if (best) out.push(best);

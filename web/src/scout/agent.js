@@ -62,7 +62,7 @@ export async function negotiate(o, brief, model, say, w) {
   if (first.deal || (first.error && !first.quote)) return first;
   const quotes = [{ n: first.quote, o }];
   // other venues for the same plan, at about the same time, within what the person may pay
-  const alts = ((await alternatives(o, brief, model)).alternatives || []).filter((a) => a.bookable !== false && a.venue !== o.venue && a.withinBudget !== false && !(a.groupLow || []).length).slice(0, 2);
+  const alts = ((await alternatives(o, brief, model)).alternatives || []).filter((a) => a.bookable !== false && a.venue !== o.venue && a.withinBudget !== false && !a.groupLow).slice(0, 2);
   if (alts.length) say(w.shopping(alts.map((a) => a.name)));
   for (const a of alts) {
     const ao = { ...o, venue: a.venue, venueName: a.name, start: a.start, askPrice: a.price, rating: a.rating };

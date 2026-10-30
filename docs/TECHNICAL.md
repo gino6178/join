@@ -59,7 +59,7 @@ same operations with the person's session.
 | Website | `web/src/**` (about 1,150 lines) |
 | Examples | `examples/scripted-agent.mjs`, `claude-agent.mjs`, `venue-agent.mjs`, `toolkit-cli.mjs`, `verify-receipt.mjs` |
 | Website agent | `api/src/scout/understand.js` (186), `web/src/scout/agent.js`, `web/src/scout/words.js`, `web/src/components/AgentDrawer.jsx` |
-| Tests | `api/test/*.test.js`: 45 tests |
+| Tests | `api/test/*.test.js`: 46 tests |
 
 **Money is integer cents inside, USD strings outward.** Times are the town's local time: the process sets `TZ` from
 `world.json` (`America/Los_Angeles`), and the website renders in that zone (`world.js`, `web/src/api.js`).
@@ -109,6 +109,8 @@ old one (`store.js`). Tests keep all state in memory.
 - **Score:** a Bayesian average, `(C·m + Σ wᵢ·starsᵢ) / (C + Σ wᵢ)`, with `C = 3`, `m` the town's recency-weighted mean and `wᵢ = 0.5^(age in days / 180)`. Per activity when it has 3 or more reviews, else the venue's overall.
 - **Aspects:** liked and complained-about aspects counted; shown when at least 2 reviews and a quarter of them mention one (a constrained vocabulary, as HADSF, arXiv 2510.26994, recommends to keep review-based explanations from drifting).
 - **Group:** any group member's own review of 2★ or less is returned (`groupLow`) and adds 30 "minutes" to the venue's cost in ranking (least misery, from group recommender systems).
+- **Tastes:** `tastes(player)` weighs, by recency, each aspect a person praised in a review of 4★ or more or complained about in any review. For a group, each aspect someone cares about (weight ≥ 0.5) that the venue's reviews mention at least twice adds `min(weight, 2) × (praise − complaints) / reviews` to a fit, worth up to 12 minutes either way in ranking; up to two notes say which (`tasteNotes`).
+- **Privacy:** reviews don't show who wrote them, so the viewer's own tastes and low ratings are named ("you care about clean", "you rated it 2★") and a friend's aren't ("someone in your group…").
 - **In ranking:** `find_options` picks each slot's venue by `longest trip + review adjustment + price per person`, where a star above the town's mean is worth 8 minutes; `find_alternatives` ranks the same way; the website agent leaves out alternatives a group member rated low. Options carry `reviews {score, count, praise, complaints, groupLow, demoData, reason}`.
 - **Read:** `venue_reviews` (MCP, REST, A2A; `read` scope), `GET /api/venues/:id/reviews`, `list_venues` (score per venue), Venue view.
 - **Demo data:** `api/data/reviews-seed.json` (174 reviews, generated deterministically by `api/scripts/seed-reviews.mjs`), `seed: true`, labelled "demo data" wherever shown.
@@ -266,9 +268,9 @@ For people who don't bring an agent. A drawer ("No agent? Ask Join's") asks what
 
 ## 11. Tests (api/test/, `npm test`)
 
-There are 45, using Node's test runner, and they run against the stand-in with state in memory.
+There are 46, using Node's test runner, and they run against the stand-in with state in memory.
 - **Negotiation (12):** pricing, the floor never leaking, the serious-offer schedule, lowballs, agreeing at an offer, the mandate before the venue, organizer-only actions, expiry and quota, walking away, alternatives' ordering, bad input, venue policy edits.
-- **Reviews (3):** the Bayesian score and counted aspects; a group member's low rating flagged and the venue avoided by `find_options`; who may review (in the booking, paid, locked, started, once; aspects outside the list dropped). The end-to-end test also checks that the review route is reached and that an agent token can't post.
+- **Reviews (4):** tastes from a person's own reviews moving a venue up or down for the group, with only the viewer named; the Bayesian score and counted aspects; a group member's low rating flagged and the venue avoided by `find_options`; who may review (in the booking, paid, locked, started, once; aspects outside the list dropped). The end-to-end test also checks that the review route is reached and that an agent token can't post.
 - **Transparency log (2):** inclusion and consistency proofs for every tree size to 20, and a rewritten entry caught; a C2SP checkpoint and a witness cosignature that verify, and a changed one that doesn't.
 - **AP2 (2):** open mandates per agent with the limits as AP2 constraints, made again on a limit change, a forged payload refused; a deal's checkout and payment mandates tied by the checkout hash, and an error receipt for a refusal.
 - **Agent tokens (2):** scopes and expiry; signed requests (a good signature, and no signature, a changed body, an old one, another key or another host refused).
@@ -350,7 +352,7 @@ There are 45, using Node's test runner, and they run against the stand-in with s
 npm run setup          # api, web, examples; builds the website
 npm start              # http://localhost:8790 (the stand-in without keys)
 npm run demo           # four agents over MCP; JOIN_ACTIVITY=karaoke for another plan
-npm test               # 45 tests
+npm test               # 46 tests
 npm --prefix api run bench   # the negotiation benchmark
 ```
 

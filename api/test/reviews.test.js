@@ -29,8 +29,9 @@ test("a score is a Bayesian average: a venue with many good reviews outranks one
 });
 
 test("the group's own low rating is flagged and steers the agent away (least misery)", () => {
-  const withHana = reviews.summary("westgate", { activity: "badminton", group: ["you", "hana"] });
-  assert.deepEqual(withHana.groupLow.map((g) => g.name), ["Hana"]);
+  const withHana = reviews.summary("westgate", { activity: "badminton", group: ["you", "hana"], viewer: "you" });
+  assert.deepEqual(withHana.groupLow.map((g) => [g.you, g.stars]), [[false, 2]]); // a friend's rating isn't named
+  assert.equal(/Hana/.test(reviews.reason(withHana)), false);
   assert.ok(reviews.rankAdjust(withHana) >= 30);
   const r = ops.findOptions({ player: "you", client: "t" }, { activity: "badminton", players: 3, with: ["hana"], dates: ["2026-11-04"] });
   for (const o of r.options) assert.notEqual(o.venue, "westgate", "Hana rated Westgate 2★: the agent shouldn't pick it when she's coming");
@@ -51,4 +52,21 @@ test("only someone in a paid, locked booking that has started can review it, onc
   assert.deepEqual([r.review.liked, r.review.disliked, r.review.text], [["clean"], ["access"], "Good courts."]);
   assert.equal(reviews.add("you", b, { stars: 1 }, { canReview: settle.canReview }).error, "already_reviewed");
   assert.equal(reviews.summary("north").latest[0].verified, `booked and paid on Join (${id})`);
+});
+
+test("tastes from a person's own past reviews: a venue good on what the group cares about moves up, bad on it moves down; only the viewer is named", () => {
+  const yuki = reviews.tastes("yuki");
+  assert.ok(yuki.clean > 0.5 && yuki.staff > 0.5); // Yuki praised clean, friendly Midtown
+  const mid = reviews.summary("midtown", { activity: "badminton", group: ["you", "yuki"], viewer: "you" });
+  assert.ok(mid.tasteFit > 0);
+  assert.ok(mid.tasteNotes.some((n) => n.aspect === "clean" && n.good && !n.you));
+  assert.match(reviews.reason(mid), /someone in your group cares about clean/);
+  // Hana, who complained about worn equipment and dirt, looking at Westgate herself
+  const west = reviews.summary("westgate", { activity: "badminton", group: ["hana", "you"], viewer: "hana" });
+  assert.ok(west.tasteFit < 0);
+  assert.ok(west.tasteNotes.some((n) => n.aspect === "equipment" && !n.good && n.you));
+  assert.match(reviews.reason(west), /you mind worn equipment/);
+  // the same venue, without anyone who cares: no fit either way
+  assert.equal(reviews.summary("westgate", { activity: "badminton", group: ["you"], viewer: "you" }).tasteFit, 0);
+  assert.ok(reviews.rankAdjust(mid) < reviews.rankAdjust(reviews.summary("midtown", { activity: "badminton", group: ["you"], viewer: "you" })));
 });

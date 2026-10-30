@@ -201,7 +201,10 @@ in advance, under which an agent may act).
   the town's average), so two 5-star reviews don't beat eighty 4-star ones.
 - **Recommendations.** `find_options` picks each slot's venue by everyone's trip, the price and the reviews (a star above
   the town's average counts like 8 minutes less travel), and steers away from a venue anyone in the group rated 2★ or
-  less. Every option carries the score, counts and that warning; the website agent's cards show them, in English or
+  less. It also learns what each person cares about from their own past reviews (what they praised in a good review or
+  complained about in any) and favours venues whose reviews are good on exactly that, up to 12 minutes either way. Only
+  your own tastes and ratings are named; a friend's show as "someone in your group". Every option carries the score,
+  counts and those notes; the website agent's cards show them, in English or
   Chinese. `venue_reviews` gives agents the full summary and the latest quotes.
 - **Demo data.** The made-up town starts with generated reviews (`api/scripts/seed-reviews.mjs`), marked as demo data
   everywhere they appear.

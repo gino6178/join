@@ -7,7 +7,7 @@ needs to be taken on trust.
 
 **See it fast:** `npm run setup`, `npm start`, then open http://localhost:8790/demo?as=you&go=activity?agent=1 (no
 keys needed; PayPal is simulated and says so). In another terminal, `npm run demo` runs four agents over MCP.
-`npm test` runs 45 tests; `npm --prefix api run bench` runs the negotiation benchmark. Details: [TECHNICAL.md](TECHNICAL.md).
+`npm test` runs 46 tests; `npm --prefix api run bench` runs the negotiation benchmark. Details: [TECHNICAL.md](TECHNICAL.md).
 
 ---
 
@@ -61,7 +61,8 @@ use the demo panel to play the friends, and watch each payment's PayPal status, 
   browsers (`web/src/pages/Games.jsx`, `Seats`).
 - **The negotiation as a chart:** the venue's asks stepping down, the agent's offers, lowballs marked (`Curve`).
 - **Recommendations you can trust:** each option shows its verified-review score, what people liked and complained
-  about (counted, not generated), and a warning if someone in your group rated the venue badly.
+  about (counted, not generated), how it fits what your group cares about (learned from your own past reviews), and a
+  warning if someone in your group rated the venue badly.
 - **Shopping, then a choice:** the website agent compares the venue you picked with up to two others and offers the
   cheapest as buttons; balances with friends are netted across plans and settled with one invoice.
 - **The venue's view:** Bryntum Scheduler with payment state driving the schedule (dashed while the group pays, solid

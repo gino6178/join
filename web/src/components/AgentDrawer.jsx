@@ -99,6 +99,7 @@ export default function AgentDrawer({ me, info, open, onClose }) {
           <span className="stars">{w.stars(o.reviews)}</span>
           {o.reviews?.praise?.length > 0 && <small className="good-text">{w.liked(o.reviews.praise)}</small>}
           {o.reviews?.complaints?.length > 0 && <small className="warn-text">{w.complaints(o.reviews.complaints)}</small>}
+          {(o.reviews?.tasteNotes || []).map((n) => <small key={n.aspect} className={n.good ? "good-text" : "warn-text"}>{w.taste(n)}</small>)}
           {o.reviews?.groupLow?.length > 0 && <small className="warn-text">{w.groupLow(o.reviews.groupLow)}</small>}
           <span className="tags">{(o.discounts || []).length > 0 && <span className="tag good">{o.discounts.map((d) => w.why.discount(d)).join(" + ")}</span>}{world?.venues.find((v) => v.id === o.venue)?.style && <span className="tag">{w.style[world.venues.find((v) => v.id === o.venue).style]}</span>}</span>
           <small className="muted">{o.why.filter((x, i) => i < 2).join(" · ")}</small>
