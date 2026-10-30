@@ -14,7 +14,7 @@ test("Merkle proofs check out for every leaf, and fail for a changed one", () =>
 
 test("a receipt is signed, batched and verifiable; any change breaks it; players are hashed", async () => {
   receipts.receiptsStore.reset(); receipts.auditLogStore.reset();
-  const b = { id: "bk_x", venue: "north", sport: "badminton", date: "2026-11-05", start: "19:00", minutes: 90, court: 2, total: 3000, players: ["you", "leo"], organizer: "you", shares: { you: 1500, leo: 1500 }, declined: [],
+  const b = { id: "bk_x", venue: "north", sport: "badminton", date: "2026-11-05", start: "19:00", minutes: 90, court: 2, total: 3000, players: ["alex", "leo"], organizer: "alex", shares: { you: 1500, leo: 1500 }, declined: [],
     payments: { you: { status: "captured", captured: 1500, orderId: "O1", authorizationId: "A1", captureId: "C1", via: "approval" }, leo: { status: "captured", amount: 1500, orderId: "O2", authorizationId: "A2", captureId: "C2", via: "vault" } }, payout: null };
   const r = receipts.issue(b, { history: [{ at: "t", by: "venue", type: "ask", amount: 3200 }, { at: "t", by: "organizer", type: "offer", amount: 3000 }] }, "locked");
   receipts.issue({ ...b, id: "bk_y" }, null, "locked");
@@ -31,7 +31,7 @@ test("a receipt is signed, batched and verifiable; any change breaks it; players
 test("the transparency log: batches in an RFC 6962 tree, a signed C2SP checkpoint, consistency, a witness's cosignature", async () => {
   receipts.receiptsStore.reset(); receipts.auditLogStore.reset();
   const tlog = await import("../src/proof/tlog.js"), crypto = await import("node:crypto");
-  const mk = (id) => receipts.issue({ id, venue: "north", activity: "badminton", date: "2026-11-05", start: "19:00", minutes: 90, unit: 1, total: 2000, players: ["you"], organizer: "you", shares: { you: 2000 }, declined: [], payments: { you: { status: "captured", captured: 2000 } } }, null, "locked");
+  const mk = (id) => receipts.issue({ id, venue: "north", activity: "badminton", date: "2026-11-05", start: "19:00", minutes: 90, unit: 1, total: 2000, players: ["alex"], organizer: "alex", shares: { you: 2000 }, declined: [], payments: { you: { status: "captured", captured: 2000 } } }, null, "locked");
   const a = mk("bk_a"); await receipts.batch();
   const kept = tlog.parseNote(receipts.logInfo().checkpoint); // someone keeps the checkpoint as it was then
   const b = mk("bk_b"); mk("bk_c"); await receipts.batch();

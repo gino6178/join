@@ -33,7 +33,9 @@ export function openMandates(a) {
 
 export function whoami(a) {
   const p = player(a.player), m = getMandate(a.player);
-  return { player: { id: p.id, name: p.name, interests: p.interests, ...(p.level ? { sportsLevel: p.level } : {}), usuallyFree: p.free, area: p.area?.name },
+  const w = getWorld();
+  return { town: { name: w.town.name, timeZone: w.town.timeZone, currency: w.currency || "USD", now: new Date().toLocaleString("sv-SE", { timeZone: w.town.timeZone }).slice(0, 16), note: "Every date and time on Join is the town's local time; every price is in USD." },
+    player: { id: p.id, name: p.name, interests: p.interests, ...(p.level ? { sportsLevel: p.level } : {}), usuallyFree: p.free, area: p.area?.name },
     mandate: { perGame: usd(m.perGame), perWeek: usd(m.perWeek), guaranteeOnItsOwn: usd(m.cover), venues: m.venues, autopay: m.autopay && settle.hasVault(a.player), note: "Set by the player on the website. Agents can read it, not change it." },
     paypal: { savedForAgent: settle.hasVault(a.player), mode: settle.paypalMode() }, client: a.client,
     ap2: { about: "AP2 open mandates (Trusted Agent Provider model): what your user let you book and pay, signed by Join, bound to your token id (cnf.kid). Present them to any verifier that asks.", ...(({ checkout, payment }) => ({ openCheckoutMandate: checkout, openPaymentMandate: payment }))(openMandates(a)) } };
@@ -45,7 +47,7 @@ export const listActivities = () => ({ activities: getWorld().activities.map((x)
 export function listVenues({ activity } = {}) {
   const w = getWorld();
   return { currency: "USD", town: w.town.name, venues: w.venues.filter((v) => !activity || forActivity(v, activity)).map((v) => ({
-    id: v.id, name: v.name, area: v.area, open: v.open, weekendOpen: v.weekendOpen || null,
+    id: v.id, name: v.name, area: v.area, open: v.open, weekendOpen: v.weekendOpen || v.open, // (the same hours at weekends unless the venue has its own)
     offers: Object.fromEntries(Object.keys(v.offers).map((k) => { const o = forActivity(v, k); return [k, { units: o.units, unit: o.unit, people: `${o.min}-${o.max}`, price: usd(cents(o.price)), per: o.per === "person" ? "person" : `${o.unit} per hour`, minutes: o.minutes }]; })),
     reviews: (({ score, count, praise, complaints, demoData }) => ({ score, count, liked: praise.map((p) => p.label), complaints: complaints.map((p) => p.label), demoData: demoData > 0 }))(reviews.summary(v.id, { activity })),
     negotiates: { style: v.policy.style, maxCounterOffers: v.policy.style === "firm" ? 0 : v.policy.rounds, discounts: [`off-peak ${v.policy.offPeak.pct * 100}% (weekday bookings ending by ${v.policy.offPeak.before})`, `group ${v.policy.group.pct * 100}% (${v.policy.group.min}+ people)`, `last-minute ${v.policy.lastMinute.pct * 100}% (within ${v.policy.lastMinute.withinHours} h)`] },

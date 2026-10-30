@@ -55,7 +55,7 @@ async function approve(url, who, check) {
   return true;
 }
 
-const alex = await agent("you", "Scripted agent");
+const alex = await agent("alex", "Scripted agent");
 const me = await alex.call("whoami");
 say("Alex's agent", `acting for ${me.player.name}; limit $${me.mandate.perGame} a booking (PayPal: ${me.paypal.mode})`);
 // Alex sets a limit on the website (a person's step: agents can't change it). For badminton it is tight, so the first
@@ -70,7 +70,7 @@ const o = found.options[0];
 if (!o) { say("Alex's agent", "nobody is free this week"); process.exit(0); }
 say("Alex's agent", `${o.day} ${o.date} ${o.start}: ${o.names.join(", ")} are free; fairest venue ${o.venueName} (longest trip ${o.longestTrip} min), asks $${o.askPrice}`);
 
-let n = await alex.call("start_negotiation", { venue: o.venue, activity: ACTIVITY, date: o.date, start: o.start, minutes: o.minutes, players: o.players.filter((p) => p !== "you") });
+let n = await alex.call("start_negotiation", { venue: o.venue, activity: ACTIVITY, date: o.date, start: o.start, minutes: o.minutes, players: o.players.filter((p) => p !== "alex") });
 if (n.error) { say("Venue", n.message); }
 else say("Venue", `${n.venueName} asks $${n.ask} ($${n.share} each)${n.overBudget ? `: over Alex's $${BUDGET.toFixed(2)} budget` : ""}`);
 let pick = { venue: o.venue, start: o.start };
@@ -82,7 +82,7 @@ if (alts?.length) {
     if (!n.error) await alex.call("walk_away", { negotiation: n.id });
     say("Alex's agent", `takes ${best.name} at ${best.start}`);
     pick = { venue: best.venue, start: best.start };
-    n = await alex.call("start_negotiation", { venue: best.venue, activity: ACTIVITY, date: o.date, start: best.start, minutes: o.minutes, players: o.players.filter((p) => p !== "you") });
+    n = await alex.call("start_negotiation", { venue: best.venue, activity: ACTIVITY, date: o.date, start: best.start, minutes: o.minutes, players: o.players.filter((p) => p !== "alex") });
     say("Venue", `${n.venueName} asks $${n.ask} ($${n.share} each)`);
   }
 }
@@ -108,14 +108,14 @@ else say("Alex", `authorized (${p.you?.via})`);
 
 // everyone else in the plan: each one's own agent, with its own token
 const names = Object.fromEntries((await (await fetch(`${URL0}/api/world`)).json()).players.map((p) => [p.id, p.name.split(" ")[0]]));
-for (const id of r.players.filter((p) => p !== "you")) {
+for (const id of r.players.filter((p) => p !== "alex")) {
   const label = `${names[id]}'s agent`;
   const a = await agent(id, `${names[id]}'s scripted agent`);
   const games = await a.call("my_plans");
   const b = games.bookings.find((x) => x.id === booking);
   say(label, `invited: ${b.activity} ${b.date} ${b.start}, share $${b.invite?.share}`);
   // the second person's agent haggles over their share with Alex's agent before joining
-  if (id === r.players.filter((p) => p !== "you")[1] && b.invite && +b.invite.share > 1) {
+  if (id === r.players.filter((p) => p !== "alex")[1] && b.invite && +b.invite.share > 1) {
     const ask = Math.max(0, +b.invite.share - 1).toFixed(2);
     await a.call("propose_share", { booking, amount: +ask });
     say(label, `asks to pay $${ask} instead`);

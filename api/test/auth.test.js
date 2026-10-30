@@ -17,19 +17,19 @@ function signed(token, { method = "POST", host = "join.test", path = "/api/agent
 
 test("scopes: a read-only token reads and can't negotiate or pay; an expired token is refused", () => {
   tokensStore.reset();
-  const t = makeToken("you", "reader", { scopes: ["read"] }), a = agentOf({ headers: { authorization: `Bearer ${t.token}` } });
+  const t = makeToken("alex", "reader", { scopes: ["read"] }), a = agentOf({ headers: { authorization: `Bearer ${t.token}` } });
   assert.deepEqual(a.scopes, ["read"]);
   assert.equal(can(a, "find_options"), true);
   assert.equal(can(a, "make_offer"), false);
   assert.equal(can(a, "pay_my_share"), false);
-  const old = makeToken("you", "old", { days: 1 });
+  const old = makeToken("alex", "old", { days: 1 });
   tokensStore.data.tokens.find((x) => x.id === old.id).expires = new Date(Date.now() - 1000).toISOString();
   assert.equal(agentOf({ headers: { authorization: `Bearer ${old.token}` } }), null);
 });
 
 test("a token tied to a key needs every request signed: a good signature passes; no signature, a changed body, an old one or another key fail", () => {
   tokensStore.reset();
-  const t = makeToken("you", "signer", { key: x });
+  const t = makeToken("alex", "signer", { key: x });
   assert.equal(agentOf({ headers: { authorization: `Bearer ${t.token}` } }), null); // the token alone is useless
   const good = signed(t.token);
   assert.match(agentOf(good).client, /signed/);

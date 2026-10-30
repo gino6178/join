@@ -562,7 +562,7 @@
  ],
  "players": [
   {
-   "id": "you",
+   "id": "alex",
    "name": "Alex Rivera",
    "level": "B",
    "free": [
@@ -588,7 +588,7 @@
     "board games",
     "hot pot"
    ],
-   "paypal": "you@join-demo.example"
+   "paypal": "alex@join-demo.example"
   },
   {
    "id": "hana",

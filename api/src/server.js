@@ -143,7 +143,7 @@ app.get("/auth/:provider/callback", async (req, res) => {
 // now publish for language models), next to the machine-readable cards.
 app.get("/llms.txt", (req, res) => res.type("text/plain").send(agentGuide(`${req.protocol}://${req.headers.host}`))); // (the address the agent used)
 app.get("/.well-known/llms.txt", (req, res) => res.redirect("/llms.txt"));
-// one-click demo sign-in for judges and screenshots: /demo?as=you&go=activity (demo mode only)
+// one-click demo sign-in for judges and screenshots: /demo?as=alex&go=activity (demo mode only)
 // Demo only: the town back to its starting state, for a clean run (a judge's first look, a recording). Receipts and the
 // transparency log stay: an append-only log that a button could wipe would prove nothing.
 function resetDemo() {
@@ -153,7 +153,7 @@ app.post("/api/demo/reset", (req, res) => { if (!DEMO) return res.status(404).en
 app.get("/demo", (req, res) => {
   if (!DEMO) return res.status(403).end();
   if (req.query.reset === "1") resetDemo();
-  const sid = createSession(String(req.query.as || "you"));
+  const sid = createSession(String(req.query.as || "alex"));
   if (!sid) return res.status(400).send("unknown player");
   const go = String(req.query.go || "activity").replace(/[^\w/?=&.-]/g, "");
   res.set("Set-Cookie", `${COOKIE}=${sid}; HttpOnly; SameSite=Lax; Path=/`).redirect(`/#/${go}`);

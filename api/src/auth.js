@@ -41,7 +41,7 @@ const NEEDS = { venue_reviews: "read", whoami: "read", list_activities: "read", 
   start_negotiation: "negotiate", make_offer: "negotiate", accept_price: "negotiate", walk_away: "negotiate", propose_share: "negotiate", answer_share: "negotiate",
   decline_invite: "negotiate", cancel_booking: "negotiate", request_reimbursement: "negotiate", pay_my_share: "pay" };
 export const can = (a, tool) => !a?.scopes || a.scopes.includes(NEEDS[tool] || "negotiate");
-export const scopeError = (tool) => ({ error: "scope", message: `This agent's token doesn't allow ${NEEDS[tool] || "that"}: its person chose its scopes on the website (Connect).` });
+export const scopeError = (tool) => ({ error: "scope", message: `This agent's token doesn't allow ${NEEDS[tool] || "that"}: its person chose its scopes on the website (Connect). To do this, ask them for a token with that scope (or, testing with a demo account, make one: see /llms.txt).` });
 
 export function makeToken(playerId, label, { scopes = SCOPES, days = 90, key = null } = {}) {
   const secret = `join_${crypto.randomBytes(24).toString("base64url")}`;

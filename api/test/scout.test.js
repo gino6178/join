@@ -6,7 +6,7 @@ import fs from "node:fs";
 import { byRules, missing } from "../src/scout/understand.js";
 
 const w = JSON.parse(fs.readFileSync(new URL("../data/world.json", import.meta.url), "utf8"));
-const ctx = { activities: w.activities, people: w.players.filter((p) => p.id !== "you"), today: new Date(2026, 9, 30, 12) }; // a Friday
+const ctx = { activities: w.activities, people: w.players.filter((p) => p.id !== "alex"), today: new Date(2026, 9, 30, 12) }; // a Friday
 
 test("English: activity, day, evening, group size and budget", () => {
   const b = byRules("Karaoke Friday night, 4 of us, $15 each", {}, ctx);

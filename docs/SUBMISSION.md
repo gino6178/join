@@ -175,7 +175,7 @@ bryntum-scheduler, node.js, express, react, vite
 1. `git clone https://github.com/gino6178/join && cd join`
 2. `npm run setup` installs everything and builds the website.
 3. `npm start`, then open http://localhost:8790. Sign in by picking any person, or go straight to
-   http://localhost:8790/demo?as=you (Alex).
+   http://localhost:8790/demo?as=alex (Alex).
 4. In another terminal, `npm run demo` runs four agents over MCP: an over-budget venue, alternatives, haggling, an ask
    to pay less, the guarantee, four shares, and the lock. Then refresh the website. Other plans:
    `JOIN_ACTIVITY=karaoke npm run demo` (or `"escape room"`, `"board games"`, `bbq`, `"hot pot"`).

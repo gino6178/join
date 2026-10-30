@@ -17,7 +17,7 @@ PayPal AI Hackathon 2026 · MIT license
 
 ![Join's website agent: three options with verified reviews](docs/screenshots/02-agent.png)
 
-**For judges:** `npm run setup`, `npm start`, open http://localhost:8790/demo?as=you, then `npm run demo` in another
+**For judges:** `npm run setup`, `npm start`, open http://localhost:8790/demo?as=alex, then `npm run demo` in another
 terminal. No keys needed. How Join maps to each judging criterion (Technological Implementation, Design, Potential
 Impact, Innovation, Presentation), with the code behind every claim: [docs/JUDGING.md](docs/JUDGING.md). The submission
 text, testing instructions and screenshots are in [docs/SUBMISSION.md](docs/SUBMISSION.md) and
@@ -74,7 +74,7 @@ Without a model the website agent uses rules only. With Ollama: `ollama pull qwe
 `SCOUT_LLM_URL=http://127.0.0.1:11434`. On a Linux box with an NVIDIA card, `deploy/start.sh` starts Join, its own
 Ollama (port 11437, Qwen2.5 0.5B) together; `deploy/tunnel.sh` gives it a public HTTPS address through a Cloudflare quick tunnel when you want one.
 
-Open http://localhost:8790 and sign in as any demo person (or go straight to http://localhost:8790/demo?as=you). Then, in another terminal, watch four agents set up a plan:
+Open http://localhost:8790 and sign in as any demo person (or go straight to http://localhost:8790/demo?as=alex). Then, in another terminal, watch four agents set up a plan:
 
 ```bash
 npm run demo

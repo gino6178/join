@@ -32,6 +32,15 @@ Testing on your own, with no person to ask? Demo accounts are on here:
 Tools (arguments; ? = optional; tools/list over MCP has the full descriptions and JSON schemas):
 ${tools}
 
+## Times, money and friends
+
+- Every date and time is the town's local time (whoami: town.timeZone, and town.now); every price is in US dollars.
+  If your person lives elsewhere, convert both for them.
+- Friends: the demo town's residents are who find_options invites. People who joined Join themselves are invited
+  only when you name them in with (by their id, which whoami shows them).
+- Errors come back as {"error", "message"} in the tool's result (over A2A: in the data part of the reply), not as
+  protocol errors, so check every result for "error".
+
 ## A typical plan
 
 whoami (your person, their limits, and your AP2 open payment mandate) -> list_activities -> find_options (players
