@@ -19,7 +19,7 @@ export default function AgentDrawer({ me, info, open, onClose }) {
   const [msgs, setMsgs] = useState([{ from: "agent", text: WORDS.en.hello(me.player.name.split(" ")[0]) }]);
   const [brief, setBrief] = useState({});
   const [text, setText] = useState(""), [busy, setBusy] = useState(false);
-  const [cards, setCards] = useState(null), [deal, setDeal] = useState(null), [pending, setPending] = useState(null), [booking, setBooking] = useState(null), [confirm, setConfirm] = useState(null);
+  const [cards, setCards] = useState(null), [deal, setDeal] = useState(null), [pending, setPending] = useState(null), [booking, setBooking] = useState(null), [confirm, setConfirm] = useState(null), [choices, setChoices] = useState(null);
   const [model, setModel] = useState(info?.scout || "rules");
   const end = useRef(null);
   useEffect(() => { end.current?.scrollIntoView({ block: "end" }); }, [msgs, cards, deal, booking]);
@@ -72,13 +72,14 @@ export default function AgentDrawer({ me, info, open, onClose }) {
       return;
     }
     if (r.pending) { setPending({ n: r.pending, o }); say(r.note); return; }
+    if (r.choices) { setChoices(r.choices); say(r.note); return; }
     say(r.error || w.failed);
     // what else there is at that time, within what the person may pay; if nothing, say so and what they can change
     const alts = (r.alternatives || (o ? (await alternatives(o, brief, model)).alternatives : null) || []).filter((a) => a.venue !== o?.venue && a.withinBudget !== false);
     say(alts.length ? w.others(alts.slice(0, 3).map(w.other)) : w.noOthers(brief.activity, each(brief, o?.limit ?? brief.budget ?? 0)));
   };
 
-  const reset = () => { setBrief({}); setCards(null); setDeal(null); setPending(null); setBooking(null); setConfirm(null); say(w.reset); };
+  const reset = () => { setBrief({}); setCards(null); setDeal(null); setPending(null); setBooking(null); setConfirm(null); setChoices(null); say(w.reset); };
   if (!open) return null;
   return (
     <aside className="drawer" role="dialog" aria-label="Join's website agent">
@@ -102,6 +103,10 @@ export default function AgentDrawer({ me, info, open, onClose }) {
         {confirm && <div className="drawer-actions">
           <button className="btn primary small" disabled={busy} onClick={() => choose(confirm)}>{w.go}</button>
           <button className="btn small" disabled={busy} onClick={() => { setConfirm(null); say(w.stopped); }}>{w.notThis}</button>
+        </div>}
+        {choices && <div className="drawer-actions wrap">
+          {choices.map((c) => <button key={c.n.id} className={`btn small ${c === choices[0] ? "primary" : ""}`} disabled={busy} onClick={async () => { setBusy(true); const all = choices; setChoices(null); for (const x of all) if (x !== c) await walkAway(x.n, model); await finish(await acceptDeal(c.n, model), c.o); setBusy(false); }}>{w.book(c.n.venueName, c.n.ask)}</button>)}
+          <button className="btn ghost small" disabled={busy} onClick={async () => { setBusy(true); const all = choices; setChoices(null); for (const x of all) await walkAway(x.n, model); say(w.stopped); setBusy(false); }}>{w.none}</button>
         </div>}
         {pending && <div className="drawer-actions">
           <button className="btn primary small" disabled={busy} onClick={async () => { setBusy(true); const p = pending; setPending(null); await finish(await acceptDeal(p.n, model), p.o); setBusy(false); }}>{w.accept(pending.n.ask)}</button>

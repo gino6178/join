@@ -269,3 +269,4 @@ legend { font-size: var(--fs-14); color: var(--ink-2); padding: 0 6px; }
 .tile { border: 1px solid var(--rule); border-radius: var(--r-md); padding: var(--s3); display: flex; flex-direction: column; gap: 2px; } .tile b { font-size: 26px; line-height: 1.1; } .tile span { font-weight: 600; } .tile small { color: var(--ink-3); }
 .ap2 { margin: var(--s2) 0; } .link-btn { border: 0; background: none; padding: 0; color: var(--agent); cursor: pointer; display: inline-flex; gap: 6px; align-items: center; font: inherit; }
 .ap2-body pre { max-height: 220px; overflow: auto; font-size: 11px; background: var(--control); padding: 8px; border-radius: var(--r-md); }
+.drawer-actions.wrap { flex-wrap: wrap; }
