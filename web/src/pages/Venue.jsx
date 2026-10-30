@@ -29,7 +29,7 @@ export default function Venue({ query }) {
       <div className="seg">{w?.venues.map((x) => <button key={x.id} className={x.id === id ? "on" : ""} onClick={() => { setId(x.id); setDate(null); }}>{x.name}</button>)}</div>
       {dates.length > 0 && <div className="seg small">{dates.map((d) => <button key={d} className={d === day ? "on" : ""} onClick={() => setDate(d)}>{d}</button>)}</div>}
       <section className="card sched">
-        {day ? <Suspense fallback={<p className="muted small">Loading the schedule…</p>}><PlaceScheduler units={units} bookings={live} date={day} kind={LIVE} /></Suspense>
+        {day ? <Suspense fallback={<p className="muted small">Loading the schedule…</p>}><PlaceScheduler key={`${id}:${day}`} units={units} bookings={live} date={day} kind={LIVE} /></Suspense>
           : <p className="muted small">Nothing booked through Join at this venue yet.</p>}
         <p className="small muted legend-row"><span className="lg-bar held" />held while the group pays <span className="lg-bar locked" />paid and locked <span className="lg-bar played" />played</p>
       </section>

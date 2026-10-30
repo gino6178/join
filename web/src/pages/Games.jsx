@@ -47,6 +47,10 @@ function Booking({ b, me, w, focus, demo, done }) {
         {b.players.map((pid) => { const p = b.payments[pid]; return (
           <tr key={pid} className={pid === me ? "me" : ""}><td>{pid === me ? "You" : firstName(w, pid)}{pid === b.organizer && <small> organizer</small>}</td><td>{p.role === "organizer" ? <>{money(p.paid ?? p.share)}<small>{p.paid != null && +p.paid > +p.share ? " (covered others)" : ` · guarantees ${money(p.guarantee)}`}</small></> : money(p.share)}</td><td><span className={`st ${p.status}`}>{PAY[p.status] || p.status}</span></td><td><small>{p.via === "vault" ? "saved PayPal, by the agent" : p.via === "approval" ? "approved in PayPal" : p.via === "sandbox test card" ? "PayPal sandbox test card" : ""}</small></td></tr>); })}
       </tbody></table>
+      {(() => { // who the organizer paid for, said plainly (the table alone reads as if everyone paid)
+        const org = b.payments[b.organizer], short = b.players.filter((pid) => pid !== b.organizer && b.payments[pid]?.status !== "captured");
+        return org?.paid != null && +org.paid > +org.share && short.length ? <p className="small warn-text">{b.organizer === me ? "You" : firstName(w, b.organizer)} covered {short.map((pid) => (pid === me ? "you" : firstName(w, pid))).join(", ")}: {money(+org.paid - +org.share)} on top of {b.organizer === me ? "your" : "their"} own share. {b.organizer === me ? "You can ask anyone who joined and didn't pay to pay you back." : ""}</p> : null;
+      })()}
       {(b.shareAsks || []).filter((x) => x.status === "pending").map((x) => (
         <div key={x.player} className="need ask">
           <span><b>{x.player === me ? "You asked" : `${firstName(w, x.player)} asks`} to pay {money(x.amount)} instead of {money(x.from)}</b><small>{me === b.organizer ? `You would cover ${money(x.from - x.amount)} more.` : "Waiting for the organizer's answer."}</small></span>

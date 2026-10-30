@@ -15,7 +15,7 @@ export default function MapPage({ entries, me }) {
   const alts = fresh ? last.data.alternatives : [];
   return (
     <div className="page wide">
-      <header className="page-head"><h1>Map</h1><p className="muted">{w?.town.name}. Venues are pins; squares are free public places such as park courts and picnic grills (first come, not bookable); dots are people's home areas, never addresses.</p></header>
+      <header className="page-head"><h1>Map</h1><p className="muted">{w ? `${w.town.name}. ` : ""}Venues are pins; squares are free public places such as park courts and picnic grills (first come, not bookable); dots are people's home areas, never addresses.</p></header>
       <div className="map-layout">
         <div className="card map-card"><TownMap world={w} me={me.player.id} over={fresh ? overVenue : null} alternatives={alts} booked={!fresh ? booking?.venue : null} people={!fresh ? booking?.players || [] : [me.player.id]} /></div>
         <aside className="map-side">

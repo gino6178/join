@@ -61,7 +61,8 @@ h2.section { font-size: var(--fs-20); margin: var(--s6) 0 var(--s3); }
 .btn.ghost { border-color: transparent; background: var(--control); }
 .btn.small { padding: 6px 12px; }
 .btn:disabled { opacity: .5; cursor: default; }
-.pill { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: var(--r-pill); background: var(--control); color: var(--ink-2); white-space: nowrap; text-transform: capitalize; }
+.pill { font-size: 12px; font-weight: 600; padding: 3px 10px; border-radius: var(--r-pill); background: var(--control); color: var(--ink-2); white-space: nowrap; display: inline-block; }
+.pill::first-letter { text-transform: uppercase; }
 .pill.good { background: color-mix(in srgb, var(--good) 14%, transparent); color: var(--good); }
 .pill.warn { background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn); }
 .pill.bad { background: color-mix(in srgb, var(--bad) 14%, transparent); color: var(--bad); }

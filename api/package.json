@@ -9,7 +9,8 @@
   "scripts": {
     "start": "node src/server.js",
     "test": "node --test \"test/**/*.test.js\"",
-    "bench": "node bench/negotiation.mjs"
+    "bench": "node bench/negotiation.mjs",
+    "smoke": "node scripts/smoke.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.32.2",

@@ -21,6 +21,9 @@ import * as receipts from "./proof/receipts.js";
 import * as scout from "./scout/understand.js";
 import * as ap2 from "./proof/mandates.js";
 import * as reviews from "./reviews.js";
+import { negotiationsStore } from "./negotiate/engine.js";
+import { mandatesStore } from "./mandate.js";
+import { activityStore } from "./activity.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 // a small .env reader, so the server needs no package for it
@@ -110,8 +113,15 @@ app.post("/api/session", (req, res) => {
   res.set("Set-Cookie", `${COOKIE}=${sid}; HttpOnly; SameSite=Lax; Path=/`).json({ ok: true });
 });
 // one-click demo sign-in for judges and screenshots: /demo?as=you&go=activity (demo mode only)
+// Demo only: the town back to its starting state, for a clean run (a judge's first look, a recording). Receipts and the
+// transparency log stay: an append-only log that a button could wipe would prove nothing.
+function resetDemo() {
+  negotiationsStore.reset(); settle.bookingsStore.reset(); mandatesStore.reset(); activityStore.reset(); ap2.mandatesAp2Store.reset(); reviews.reviewsStore.reset();
+}
+app.post("/api/demo/reset", (req, res) => { if (!DEMO) return res.status(404).end(); resetDemo(); res.json({ ok: true, kept: ["receipts", "transparency log", "agent tokens"] }); });
 app.get("/demo", (req, res) => {
   if (!DEMO) return res.status(403).end();
+  if (req.query.reset === "1") resetDemo();
   const sid = createSession(String(req.query.as || "you"));
   if (!sid) return res.status(400).send("unknown player");
   const go = String(req.query.go || "activity").replace(/[^\w/?=&.-]/g, "");
