@@ -14,11 +14,10 @@ import { mockPaypal } from "./pay/mock.js";
 import { configureToolkit, toolkitMode } from "./pay/toolkit.js";
 import { agentOf, sessionOf, createSession, endSession, makeToken, tokensOf, revoke, COOKIE, VENUE_COOKIE, createVenueSession, venueOf, endVenueSession } from "./auth.js";
 import { getMandate, setMandate } from "./mandate.js";
-import { forPlayer, onActivity } from "./activity.js";
+import { forPlayer, onActivity, record as recordActivity } from "./activity.js";
 import { getWorld, player, venue, setPolicy } from "./world.js";
 import { usd } from "./negotiate/policy.js";
 import * as receipts from "./proof/receipts.js";
-import { evmAnchor } from "./proof/anchor.js";
 import * as scout from "./scout/understand.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
@@ -160,12 +159,37 @@ app.get("/api/venue-me", (req, res) => { const s = venueOf(req); res.json({ venu
 app.get("/api/venues/:id/policy", venueStaff, (req, res) => res.json({ venue: req.params.id, policy: venue(req.params.id).policy }));
 app.put("/api/venues/:id/policy", venueStaff, (req, res) => { const r = setPolicy(req.params.id, req.body || {}); res.status(r.error ? 400 : 200).json(r); });
 // the venue's money, through the PayPal Agent Toolkit: reconciliation, extras, disputes
+app.get("/api/venues/:id/metrics", venueStaff, (req, res) => res.json(settle.venueMetrics(req.params.id)));
 app.get("/api/venues/:id/reconcile", venueStaff, async (req, res) => res.json(await settle.reconcileVenue(req.params.id)));
 app.post("/api/venues/:id/bookings/:booking/extras", venueStaff, async (req, res) => { try { const r = await settle.billExtras(req.params.id, req.params.booking, req.body?.items); res.status(r.error ? 400 : 200).json(r); } catch (e) { res.status(502).json({ error: "paypal", message: e.message }); } });
 app.get("/api/venues/:id/disputes", venueStaff, async (req, res) => { try { res.json({ toolkit: toolkitMode(), disputes: await settle.venueDisputes(req.params.id) }); } catch (e) { res.status(502).json({ error: "paypal", message: e.message }); } });
 app.post("/api/venues/:id/disputes/:dispute/answer", venueStaff, async (req, res) => { try { const r = await settle.answerDispute(req.params.id, req.params.dispute); res.status(r.error ? 400 : 200).json(r); } catch (e) { res.status(502).json({ error: "paypal", message: e.message }); } });
 // (stand-in only) open a dispute on a capture, as a buyer would, to try the flow
 app.post("/api/demo/dispute", (req, res) => { if (pp.mode !== "mock") return res.status(404).end(); const d = pp.openDispute(String(req.body?.capture || "")); if (!d) return res.status(400).json({ error: "no such capture" }); settle.webhook({ event_type: "CUSTOMER.DISPUTE.CREATED", resource: d }).then(() => res.json(d)); });
+// Demo only: the organizer plays the friends they invited, from one window (each step is logged as a demo step)
+app.post("/api/demo/bookings/:id/:act", signedIn, async (req, res) => {
+  if (!DEMO) return res.status(404).end();
+  const b = settle.internal(req.params.id), who = String(req.body?.player || "");
+  if (!b || b.organizer !== req.player) return res.status(403).json({ error: "not_organizer", message: "Only the organizer can play the others in the demo." });
+  const other = (id) => b.players.includes(id) && id !== b.organizer;
+  const said = (summary) => recordActivity({ actor: { kind: "platform" }, who: b.players, action: "demo_step", ref: b.id, summary: `Demo: ${summary}` });
+  const nm = (id) => player(id)?.name.split(" ")[0] || id;
+  try {
+    if (req.params.act === "time-out") { said(`${nm(req.player)} ran the clock out for everyone who hadn't paid.`); return res.json(await settle.expireNow(b.id)); }
+    if (!other(who)) return res.status(400).json({ error: "not_invited", message: "Pick someone invited to this booking." });
+    if (req.params.act === "pay") {
+      // on the stand-in, the friend has saved PayPal and lets their agent pay; on the sandbox, PayPal's test card stands in
+      if (pp.mode === "mock" && !settle.hasVault(who)) { const s = await settle.vaultStart(who); pp.approve({ setup: s.setup }); await settle.vaultFinish(s.setup); setMandate(who, { autopay: true }); }
+      said(`${nm(req.player)} played ${nm(who)}: joined and paid.`);
+      const r = await settle.pay(b.id, who), p = b.payments[who];
+      if (p?.status === "awaiting_approval" && pp.mode === "mock") { pp.approve({ token: p.orderId }); await settle.approved(b.id, who); }
+      return res.json(r);
+    }
+    if (req.params.act === "ask-less") { said(`${nm(req.player)} played ${nm(who)}: asked to pay $1 less.`); return res.json(settle.proposeShare(b.id, who, Math.max(0, b.shares[who] - 100))); }
+    if (req.params.act === "decline") { said(`${nm(req.player)} played ${nm(who)}: can't come.`); return res.json(await settle.decline(b.id, who)); }
+    res.status(404).json({ error: "unknown_act" });
+  } catch (e) { console.error(e); res.status(500).json({ error: "internal" }); }
+});
 app.get("/api/venues/:id/schedule", (req, res) => res.json({ venue: req.params.id, bookings: settle.forVenue(req.params.id) }));
 // live activity for the signed-in player (server-sent events)
 app.get("/api/activity/stream", signedIn, (req, res) => {
@@ -176,16 +200,14 @@ app.get("/api/activity/stream", signedIn, (req, res) => {
 });
 
 // ---- verifiable receipts ----------------------------------------------------------------------------------------------------
-const anchor = await evmAnchor().catch((e) => { console.error("anchor", e.message); return null; });
-app.get("/.well-known/join-receipts.json", (req, res) => res.json({ keys: [receipts.publicKey()], chain: anchor ? { name: anchor.chain, chainId: anchor.chainId, from: anchor.address, mode: anchor.mode, data: "0x4a4f494e<root>" } : null, seals: receipts.seals().map((s) => ({ id: s.id, root: s.root, at: s.at, batches: s.batches, receipts: s.receipts, tx: s.anchor?.tx || null, url: s.anchor?.url || null })) }));
+// Receipts: Join's public key and its audit log's signed head, a receipt, and the log from any entry on
+app.get("/.well-known/join-receipts.json", (req, res) => { const l = receipts.auditLog(); res.json({ keys: [receipts.publicKey()], log: { size: l.head?.size || 0, head: l.head, entries: `${PUBLIC_URL}/api/receipts/log?from=0`, about: "Each entry is a batch's Merkle root and the previous entry's hash; the head is signed with the key above. Keep a copy of a head: later heads must extend it." } }); });
+app.get("/api/receipts/log", (req, res) => res.json(receipts.auditLog(+req.query.from || 0)));
 app.get("/api/receipts/:id", (req, res) => { const r = receipts.show(req.params.id, sessionOf(req)?.player); r ? res.json(r) : res.status(404).json({ error: "no such receipt" }); });
-// (the demo can close a batch now instead of waiting for the next one)
-// (closing a batch now, and the single public seal: in demo mode, or with ADMIN_TOKEN as a bearer token)
+// (closing a batch now instead of waiting for the next one: in demo mode, or with ADMIN_TOKEN as a bearer token)
 const admin = (req) => DEMO || (process.env.ADMIN_TOKEN && req.headers.authorization === `Bearer ${process.env.ADMIN_TOKEN}`);
-const perBatch = () => (anchor?.mode === "each" ? anchor : null);
-app.post("/api/receipts/batch", async (req, res) => { if (!admin(req)) return res.status(403).end(); res.json(await receipts.batch(perBatch())); });
-app.post("/api/receipts/seal", async (req, res) => { if (!admin(req)) return res.status(403).end(); if (!anchor) return res.status(400).json({ error: "no chain configured (ANCHOR_RPC_URL, ANCHOR_PRIVATE_KEY)" }); res.json(await receipts.seal(anchor)); });
-setInterval(() => receipts.batch(perBatch()).then(() => receipts.retry(anchor)).catch((e) => console.error("anchor", e.message)), +(process.env.ANCHOR_MS || 10 * 60e3)).unref();
+app.post("/api/receipts/batch", async (req, res) => { if (!admin(req)) return res.status(403).end(); res.json(await receipts.batch()); });
+setInterval(() => receipts.batch().catch((e) => console.error("receipts", e.message)), +(process.env.RECEIPT_BATCH_MS || 10 * 60e3)).unref();
 
 // ---- PayPal comes back here -------------------------------------------------------------------------------------------
 app.get("/paypal/return", async (req, res) => {
@@ -229,4 +251,4 @@ app.use((err, req, res, next) => {
   if (status >= 500) console.error(err);
   res.status(status).json({ error: status === 413 ? "too_large" : status === 400 ? "bad_json" : "internal", message: status === 413 ? "The request body is too large." : status === 400 ? "The request body isn't valid JSON." : "Something went wrong." });
 });
-app.listen(PORT, () => console.log(`Join on ${PUBLIC_URL}  (PayPal: ${pp.mode}; MCP: ${PUBLIC_URL}/mcp; receipts: ${anchor ? `${anchor.chain}, ${anchor.mode === "each" ? "every batch" : "one seal"}, from ${anchor.address}` : "signed and batched, no chain"}; demo sign-in: ${DEMO ? "on" : "off"})`));
+app.listen(PORT, () => console.log(`Join on ${PUBLIC_URL}  (PayPal: ${pp.mode}; MCP: ${PUBLIC_URL}/mcp; receipts: signed, batched, audit log of ${receipts.auditLog().head?.size || 0} entries; demo sign-in: ${DEMO ? "on" : "off"})`));

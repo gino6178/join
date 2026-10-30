@@ -7,7 +7,6 @@
     "start": "npm --prefix api start",
     "dev:web": "npm --prefix web run dev",
     "test": "npm --prefix api test",
-    "demo": "node examples/scripted-agent.mjs",
-    "chain": "npm --prefix chain install && npm --prefix chain run chain"
+    "demo": "node examples/scripted-agent.mjs"
   }
 }

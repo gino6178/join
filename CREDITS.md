@@ -12,7 +12,6 @@ client).
 | What | Used for |
 |---|---|
 | PayPal REST APIs (sandbox): Orders v2, Payments (authorizations, captures, refunds), Payouts, Vault v3, Webhooks | Splitting and settling a court's fee |
-| Ethereum Sepolia (test network) | A public timestamp for batches of receipts |
 
 ## Libraries
 
@@ -22,7 +21,6 @@ client).
 | Express | MIT |
 | Model Context Protocol TypeScript SDK (`@modelcontextprotocol/sdk`) | MIT |
 | Zod | MIT |
-| viem (Sepolia anchoring) | MIT |
 | React, React DOM, Vite, `@vitejs/plugin-react` | MIT |
 | Bryntum Scheduler (`@bryntum/scheduler`, trial, installed from npm, not included in this repository) | Bryntum commercial license (trial) |
 | Anthropic TypeScript SDK (`@anthropic-ai/sdk`, examples only) | MIT |

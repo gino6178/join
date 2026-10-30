@@ -1,18 +1,18 @@
-# Demo video script (under 3 minutes, English)
+# Demo video script (2:45, English)
 
-Two windows side by side: Claude Code on the left, Join's website on the right (signed in as Alex). Join on PayPal
-sandbox if keys are set; otherwise say "PayPal simulated" once. No music with rights issues; no third-party logos.
+Join's website signed in as Alex, at full width; Claude Code in a second window for the MCP part. PayPal sandbox with
+the test card (`PAYPAL_TEST_CARD=1`), so no buyer sign-in is needed. For the dispute shot, switch to the stand-in
+(no keys), because a sandbox dispute needs a sandbox buyer account; say "PayPal simulated" on that shot. Every number
+on screen comes from the run itself: don't add figures in editing. English captions; no music with rights issues;
+no third-party logos.
 
-| Time | Screen | Voice-over |
-|---|---|---|
-| 0:00-0:15 | Join's sign-in page; the map with sports venues, karaoke, escape rooms, board games, barbecue, hot pot | "Badminton, karaoke, an escape room, a barbecue. Your AI agent can find a time. It can't haggle with the venue or split the bill. Join is the marketplace where it can, with PayPal." |
-| 0:15-0:25 | Limits page: set $8 a booking | "Alex sets a limit: eight dollars a booking. Only Alex can change it. Agents can read it, never change it." |
-| 0:25-0:35 | Connect page: make a token, paste into Claude Code | "Alex brings an agent: Claude, connected over MCP." |
-| 0:35-1:05 | Claude Code: "Set up doubles badminton this weekend, within my limit." Activity page fills in live; the map shows Riverside in red and two alternatives | "Claude finds who's free and the fairest venue. Riverside asks $9.45 each: over budget. Join answers with alternatives nearby, ranked by budget and trip." |
-| 1:05-1:30 | Activity: offer, counter, counter, best and final, deal | "Claude haggles with Westgate. The venue's rules are its own and enforced in code: three counter-offers, then best and final. Deal at $27.72." |
-| 1:30-1:45 | PayPal approval page; Games stepper moves to "Court guaranteed"; Bryntum view shows a dashed bar | "Alex guarantees the whole booking with a PayPal authorization. Nothing is charged yet, and nobody can hold a place for free." |
-| 1:45-2:10 | Sign in as Hana: invitation in "Waiting on you"; her agent asks to pay $5.93; Alex's agent agrees; Hana approves in PayPal | "Friends are invited. Hana's agent asks to pay a dollar less; Alex's agent agrees and Alex covers it. Each pays their own share with PayPal." |
-| 2:10-2:25 | Bryntum bar turns solid; Plans: paid and locked; a quick cut to a karaoke room and a hot pot table booked the same way | "Everyone paid: it's locked. The venue is paid with PayPal Payouts afterwards. Same for a karaoke room or a hot pot dinner." |
-| 2:25-2:40 | Receipt page: the checks turning green | "And a signed receipt of every offer and payment, with PayPal's ids, that anyone can check hasn't been changed." |
-| 2:40-2:50 | The drawer "No agent? Ask Join's": type "好冷 想吃熱呼呼的鍋", then "let's go sing somewhere Saturday night, four of us, $15 each"; three cards; Negotiate; the deal and the PayPal button | "No agent? Join has one on the page. A small Qwen on Join's own server works out what you mean; the same steps, under the same limits." |
-| 2:50-2:58 | Activity page scrolled | "Your agent did the work. You saw every step. Join." |
+| Time | Screen | Voice-over | Criterion |
+|---|---|---|---|
+| 0:00-0:20 | A group chat going in circles ("Fri?" "Sat works" "who books?"); then a booking where one friend never paid and the organizer is left short | "Getting friends together is the easy part. Then someone has to find a time, haggle with the venue, front the money, and chase everyone for their share. Join hands that to AI agents, and settles it with PayPal." | Potential impact |
+| 0:20-0:35 | Claude Code: `claude mcp add ... join`; "Set up badminton this weekend within my limit." Activity page fills in live | "Bring your own agent: Claude, or anything that speaks MCP or A2A. Join is the market and the rules." | Technological implementation |
+| 0:35-1:05 | No agent? The drawer: type "週六晚上四個人唱歌 每人十塊". Three cards with reasons, tags ("group discount", "venue haggles readily"). It states the terms, Alex says go; offer, counter, deal | "No agent? Join has one on the page. A small Qwen on Join's own server works out what you mean; fixed code does the rest. Before it haggles, it tells you what a deal commits you to." | Design, innovation |
+| 1:05-1:20 | Plans: the negotiation chart, the venue's asks stepping down, a lowball marked "venue didn't move" | "Every venue sets its own rules and a floor nobody sees. A lowball doesn't move it; serious offers do." | Innovation |
+| 1:20-1:50 | The guarantee authorized in PayPal. The demo panel: Hana pays, Leo asks $1 less and Alex agrees, Tomás can't come. Bryntum's bar goes from dashed to solid; the payments table shows each capture and what Alex covered | "The organizer guarantees the whole price with a PayPal authorization, so nobody holds a room for free. Friends pay their own shares; at the lock each share is captured and the organizer's authorization only for what's left." | Technological implementation |
+| 1:50-2:15 | The receipt page: the checks turning green, "Cryptographically verified in your browser · N ms". Then, on the stand-in, "Simulate a buyer's dispute": the Activity log shows Join answering it at once | "Every deal gets a receipt, signed and kept in an append-only audit log anyone can check. When a payment is disputed, Join answers PayPal by itself with that receipt and how the payer approved." | Technological implementation, innovation |
+| 2:15-2:35 | Limits: an agent token can read them, not change them; an over-limit accept refused with `over_mandate` in the Activity log. Venue view: the figures tiles | "Your limits are enforced in code before a venue sees an offer, whatever an agent is told. And the venue sees what Join brought in, counted from real bookings." | Design, impact |
+| 2:35-2:45 | The Activity page scrolled; Join's name | "Agents do the work. PayPal moves the money. You see every step. Join." | |

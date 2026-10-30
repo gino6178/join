@@ -193,11 +193,17 @@ test("the venue's side on the PayPal Agent Toolkit: extras invoice, reconciliati
   assert.ok(b.bills[0].payout);
   const rec = await settle.reconcileVenue("north");
   assert.ok(rec.rows.filter((r) => r.kind === "capture").every((r) => r.paypal.startsWith("matched") && r.fee > 0));
+  // a chargeback: Join answers it by itself the moment PayPal reports it, with the receipt and how Leo approved
   const d = pp.openDispute(b.payments.leo.captureId);
-  await settle.webhook({ event_type: "CUSTOMER.DISPUTE.CREATED", resource: d });
+  const w = await settle.webhook({ event_type: "CUSTOMER.DISPUTE.CREATED", resource: d });
+  assert.equal(w.defense.status, "evidence_sent");
+  assert.equal(b.disputes[d.dispute_id].by, "join");
+  assert.equal(b.disputes[d.dispute_id].payer, "leo");
+  assert.match(pp.toolkit("list_disputes").items.find((x) => x.dispute_id === d.dispute_id).evidence, /approved the disputed payment themselves in PayPal/);
+  assert.equal((await settle.webhook({ event_type: "CUSTOMER.DISPUTE.CREATED", resource: d })).defense, undefined); // the same event twice: answered once
   const list = await settle.venueDisputes("north");
   assert.equal(list[0].booking, id);
-  const ans = await settle.answerDispute("north", d.dispute_id);
+  const ans = await settle.answerDispute("north", d.dispute_id); // the venue can still send it again
   assert.equal(ans.status, "evidence_sent");
 });
 
@@ -234,4 +240,17 @@ test("the weekly limit counts what an organizer actually paid for others, and th
   const r = n.error ? n : accept({ id: n.id, by: "you" });
   assert.equal(r.error, "over_mandate");
   assert.match(r.message, /weekly limit/);
+});
+
+test("a venue's figures are counted from its bookings: paid, off-peak, covered by organizers, nothing short", async () => {
+  const id = await deal();
+  await settle.pay(id, "you"); await approve(id, "you"); await approve(id, "leo");
+  now = new Date(now.getTime() + settle.SHARES_MS + 60e3);
+  await settle.tick(); // hana and tomas never paid: the organizer's guarantee covered them
+  const b = settle.internal(id), m = settle.venueMetrics("north");
+  assert.equal(m.bookings.paid, 1);
+  assert.equal(m.revenue, (b.total / 100).toFixed(2));
+  assert.equal(m.shortfall, "0.00");
+  assert.equal(+m.coveredByOrganizers.amount * 100, b.payments.you.captured - b.shares.you);
+  assert.equal(settle.venueMetrics("west").bookings.paid, 0);
 });

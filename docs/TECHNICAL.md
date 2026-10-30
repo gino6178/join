@@ -36,7 +36,7 @@ same operations with the person's session.
  |  engine.js                                           pay/paypal.js  --> PayPal REST (sandbox)
  |                                                      pay/toolkit.js --> PayPal Agent Toolkit
  |                                                      pay/mock.js (stand-in without keys)
- |  world.js (town, venues, offers, people)   proof/ (receipts, Merkle, EVM anchor)    
+ |  world.js (town, venues, offers, people)   proof/ (receipts, Merkle, audit log)    
  |  auth.js (sessions, agent tokens)          store.js (atomic JSON files, api/data/state)
  +---------------------------------------------------------------------------------+
         ^                                                   ^
@@ -53,12 +53,12 @@ same operations with the person's session.
 | Settlement | `api/src/pay/settle.js` (516) |
 | PayPal client | `api/src/pay/paypal.js` (135), `api/src/pay/toolkit.js` (78), `api/src/pay/mock.js` (128) |
 | Mandates, alternatives, auth, log | `mandate.js` (49), `alternatives.js` (57), `auth.js` (58), `activity.js` |
-| Receipts | `api/src/proof/receipts.js` (117), `merkle.js`, `anchor.js` (50) |
+| Receipts | `api/src/proof/receipts.js` (134), `merkle.js` |
 | World and storage | `api/src/world.js` (98), `api/data/world.json`, `api/src/store.js` (37) |
 | Website | `web/src/**` (about 1,150 lines) |
 | Examples | `examples/scripted-agent.mjs`, `claude-agent.mjs`, `venue-agent.mjs`, `toolkit-cli.mjs`, `verify-receipt.mjs` |
 | Website agent | `api/src/scout/understand.js` (186), `web/src/scout/agent.js`, `web/src/scout/words.js`, `web/src/components/AgentDrawer.jsx` |
-| Tests | `api/test/*.test.js`: 34 tests |
+| Tests | `api/test/*.test.js`: 35 tests |
 
 **Money is integer cents inside, USD strings outward.** Times are the town's local time: the process sets `TZ` from
 `world.json` (`America/Los_Angeles`), and the website renders in that zone (`world.js`, `web/src/api.js`).
@@ -153,7 +153,7 @@ old one (`store.js`). Tests keep all state in memory.
 ### 6.5 Loose ends
 - **Paying the organizer back** (`requestReimbursement`): only for someone who joined (said yes) and whose payment never went through. Join sends that person an Invoicing v2 invoice; when PayPal says it is paid, Join sends the same amount to the organizer with Payouts. Someone who declined or never answered owes nothing.
 - **Extras** (`billExtras`): a venue bills the organizer through the Agent Toolkit's `create_invoice` and `send_invoice`. The same items for the same booking return the existing invoice instead of a second one. When the invoice is paid, the amount goes to the venue with Payouts.
-- **Disputes:** found with `list_disputes` and matched to bookings by capture id. `answerDispute` sends Join's signed receipt as evidence (Disputes API `provide-evidence`, multipart).
+- **Disputes, answered automatically:** when PayPal sends `CUSTOMER.DISPUTE.CREATED`, Join matches the disputed capture to its booking and payer and, at once, calls the Disputes API `provide-evidence` (multipart): the booking's signed receipt (with its Merkle path and audit-log entries) as the file, and notes saying how that payment was approved (by the payer in PayPal, with the order, authorization and capture ids; or from saved PayPal by their own agent within limits only they can set). A repeated event is answered once. A venue can also send it from Venue view (`answerDispute`; disputes listed with the toolkit's `list_disputes`).
 
 ## 7. PayPal integration (api/src/pay/)
 
@@ -202,14 +202,15 @@ page at `/mock-paypal/approve`, a 3.49% + $0.49 fee, request-id idempotency, and
 - **Issued on** `locked`, `refunded` and `venue_paid`.
 - **Body:** the negotiation history, the split rule, and each payment with its role, share, status, captured amount, method (`via`) and PayPal order, authorization and capture ids. Players appear only as `sha256(salt:id)`, with one salt per receipt; each player's own copy includes their salt. Also the payout.
 - **Hash:** canonical JSON (keys sorted), then SHA-256, then an Ed25519 signature. The key is made on first run and published at `/.well-known/join-receipts.json`.
-- **Batching:** every `ANCHOR_MS`, open receipts go into a SHA-256 Merkle tree (pairs hashed in sorted order, an odd node carried up). Each receipt keeps its proof path.
-- **Anchoring:** optional, on any EVM chain (`anchor.js`, viem). With `ANCHOR_RPC_URL` and `ANCHOR_PRIVATE_KEY`, a root is sent as the data of a zero-value transaction to self, `0x4a4f494e<root>`. No token or contract.
-  - Mode `each` (the default on chain id 31337): every batch root goes on chain. Used for local testing with `npm run chain` (a Hardhat 2.29.1 node).
-  - Mode `seal` (the default elsewhere): batches stay off chain; `POST /api/receipts/seal` (admin) puts one Merkle tree over all unsealed batch roots in one transaction, and each receipt gets its batch's path to the seal root. This is the single public proof for production (Base Sepolia planned).
-  - `/.well-known/join-receipts.json` publishes the keys, the chain (name, id, sending address, mode) and the seals.
+- **Batching:** every `RECEIPT_BATCH_MS` (10 minutes), open receipts go into a SHA-256 Merkle tree (pairs hashed in sorted order, an odd node carried up). Each receipt keeps its proof path.
+- **Audit log** (`audit-log` store), in the manner of Certificate Transparency (RFC 6962), without a blockchain:
+  - each batch appends an entry `{seq, batch, root, count, at, prev}`, whose hash is SHA-256 of its canonical JSON; `prev` is the previous entry's hash (64 zeros for the first);
+  - after each append Join signs the head, `{type: "JoinAuditLogHead", size, head, at}`, with the same Ed25519 key;
+  - `/.well-known/join-receipts.json` publishes the key and the current signed head; `GET /api/receipts/log?from=N` returns the entries from N and the head.
+  - What it guarantees: anyone who kept a signed head can check that every later head extends it. Changing or dropping an earlier entry changes every hash after it, so Join can't rewrite a logged receipt without the copies people kept disagreeing. What it doesn't: like any log run by one party, it needs someone to keep heads (a venue, a payer, PayPal's dispute file) for that check to bite; there is no outside timestamp.
 - **Verifying:**
-  - `web/src/pages/Receipt.jsx` checks the hash, the Merkle path and the Ed25519 signature (WebCrypto) in the browser.
-  - `examples/verify-receipt.mjs` shares no code with the server, and can also read the transaction over JSON-RPC.
+  - `web/src/pages/Receipt.jsx` checks, in the browser with WebCrypto: the hash, the Ed25519 signature, the Merkle path, each log entry from the receipt's batch to the head, and the head's signature. It shows the time the checks took.
+  - `examples/verify-receipt.mjs` shares no code with the server, fetches the log itself, and can save a head (`--save`) and check a saved one later (`--head`).
 - **What a receipt doesn't prove:** that PayPal moved the money. That is PayPal's record, which the receipt points to by id.
 
 ## 10. Website (web/)
@@ -217,11 +218,11 @@ page at `/mock-paypal/approve`, a 3.49% + $0.49 fee, request-id idempotency, and
 | Page | What it does |
 |---|---|
 | Activity | The live log, plus "Waiting on you": approvals with SDK v6 buttons, invitations, invoices to pay back |
-| Plans | The stepper, a payments table, actions (join, decline, cancel, ask to pay less, answer, ask to be paid back), extras, receipt links |
+| Plans | The stepper, a payments table, actions (join, decline, cancel, ask to pay less, answer, ask to be paid back), extras, receipt links; each negotiation as a chart (the venue's asks stepping down, the agent's offers, lowballs marked); in demo mode, a panel where the organizer plays the friends they invited (pays, asks $1 less, can't come, time runs out), each step the same call the friend's agent would make and logged as a demo step |
 | Map | An SVG town map with over-budget and alternatives overlays |
 | Limits | Edit the mandate; Vault save and remove |
 | Connect | Tokens; Claude Code, Claude Desktop, REST and A2A snippets |
-| Venue view | Bryntum Scheduler (`PlaceScheduler.jsx`: one row per unit, dashed bars while held, solid when locked, refreshed every 3 s); policy editor; reconciliation, extras and disputes (`VenueMoney.jsx`) |
+| Venue view | What Join brought in: paid by groups, share booked off-peak, unpaid by customers, paid out, all counted from the bookings (`venueMetrics`); Bryntum Scheduler (`PlaceScheduler.jsx`: one row per unit, dashed bars while held, solid when locked, refreshed every 3 s); policy editor; reconciliation, extras and disputes (`VenueMoney.jsx`) |
 | Receipt | Checks a receipt in the browser |
 
 ### 10.1 Join's website agent (api/src/scout/, web/src/scout/agent.js, components/AgentDrawer.jsx)
@@ -231,18 +232,18 @@ For people who don't bring an agent. A drawer ("No agent? Ask Join's") asks what
   - Rules decide days (weekdays, 今天/明天/後天, weekends), times of day, group size (digits, English number words, Chinese numerals), budget and named friends.
   - Qwen2.5 0.5B (`qwen2.5:0.5b`, Q4_K_M, about 400 MB) through Ollama (`SCOUT_LLM_URL`) is asked one thing: which activity the message means, or "none" (a JSON-schema enum, few-shot, temperature 0). It is called only when the rules found no activity. Asked for days and group sizes too, a model this small made them up in our tests, so it isn't.
   - Without `SCOUT_LLM_URL`, or if the model fails, rules alone. No model runs in the browser and nothing is downloaded by the person.
-  - Deployment: `deploy/start.sh` runs Join's own Ollama on 127.0.0.1:11437 with its own model folder, the local chain and the server.
+  - Deployment: `deploy/start.sh` runs Join's own Ollama on 127.0.0.1:11437 with its own model folder, and the server; `deploy/tunnel.sh` (optional) gives it a public HTTPS address through a Cloudflare quick tunnel and, with `--apply`, sets `PUBLIC_URL` so Join subscribes to PayPal's webhooks.
 - **Acting, in code.** `agent.js` runs fixed steps through `POST /api/scout/<tool>` (session cookie): `find_options` (three cards with reasons), then `start_negotiation`, offers never under 72% of the ask (a lowball doesn't move venues), halfway on counters, accepting when the price is within the budget and asking the person when it isn't, and `find_alternatives` when the venue says no. It aims at the lower of the stated budget and the person's limit; if even the lowest serious offer is over that, it doesn't haggle and says why, and it never offers to accept a price Join would refuse.
 - **Same rules as any agent.** The route allows 10 read and negotiation tools only (no paying, cancelling or inviting), applies the person's mandate, and is rate-limited like `/api/agent`. Activity entries carry the client "Join website agent (qwen2.5:0.5b)" or "(rules)".
 - **Paying stays with the person:** after the deal the drawer shows the PayPal SDK v6 button for the guarantee (or, with the sandbox test card, the authorization result).
 
 ## 11. Tests (api/test/, `npm test`)
 
-There are 34, using Node's test runner, and they run against the stand-in with state in memory.
+There are 35, using Node's test runner, and they run against the stand-in with state in memory.
 - **Negotiation (12):** pricing, the floor never leaking, the serious-offer schedule, lowballs, agreeing at an offer, the mandate before the venue, organizer-only actions, expiry and quota, walking away, alternatives' ordering, bad input, venue policy edits.
-- **Receipts (3):** Merkle proofs for 1 to 13 leaves; signature, tamper detection and hashed players; a seal over several batches.
+- **Receipts (3):** Merkle proofs for 1 to 13 leaves; signature, tamper detection and hashed players; the audit log (receipts from early and late batches verify to the latest head, a kept head is still in the log, and a changed root, a dropped entry or a forged head is caught).
 - **Website agent (6):** the sentences our test agents found the rules got wrong, and the checks on a brief from the browser; also the rules reader in English and Chinese, weekends and named friends, a brief built over several messages; and against a stand-in Ollama, that Qwen fills in only the activity, only when the rules found none, and that an answer outside the list is ignored.
-- **Settlement (12):** also the guarantee limit (`cover`) for saved PayPal, the terms said up front, and the week counting what an organizer covered;
+- **Settlement (13):** also the venue's figures counted from its bookings; the automatic dispute answer (sent once, saying how the payer approved); the guarantee limit (`cover`) for saved PayPal, the terms said up front, and the week counting what an organizer covered;
   - guarantee first, invitations before any charge, the full lock and payout
   - timeout with the organizer covering, release, void and refund cancellation
   - Vault autopay within the mandate and approval above it
@@ -268,13 +269,13 @@ There are 34, using Node's test runner, and they run against the stand-in with s
 - A venue agent reconciled with the toolkit and verified an extras invoice. Its findings became fixes (§4.2, §6.5).
 
 **Join's website agent (30 Oct 2026):**
-- Deployed with `deploy/start.sh` on a Linux machine (RTX 3090) on the local network, Ollama serving `qwen2.5:0.5b`, PayPal sandbox and the local chain. From the website: "let's go sing somewhere saturday night, four of us, $15 each" gave three options; the agent offered $29.16 on a $32.40 ask, the venue countered $29.40, the agent accepted, and PayPal authorized the guarantee (sandbox test card). "好冷 想吃熱呼呼的鍋 週六晚上 四個人 每人20塊" became hot pot through Qwen; the venue's $25.20 a person was over Alex's $15 limit, and the agent said so without haggling.
+- Deployed with `deploy/start.sh` on a Linux machine (RTX 3090) on the local network, Ollama serving `qwen2.5:0.5b`, and PayPal sandbox. From the website: "let's go sing somewhere saturday night, four of us, $15 each" gave three options; the agent offered $29.16 on a $32.40 ask, the venue countered $29.40, the agent accepted, and PayPal authorized the guarantee (sandbox test card). "好冷 想吃熱呼呼的鍋 週六晚上 四個人 每人20塊" became hot pot through Qwen; the venue's $25.20 a person was over Alex's $15 limit, and the agent said so without haggling.
 - Qwen's answers, warm: about 40-350 ms each. In 15 test messages it found karaoke, BBQ ("grilling meat outdoors"), board games ("cards and dice at a cafe") and hot pot, and answered "none" for "我想跟朋友出去玩". It missed "想找人玩解謎 把我們關在房間裡那種" (escape room), which the rules now catch.
 - Two Claude Sonnet agents then tested the deployed website agent: one through the drawer in a browser (7 conversations in English and Chinese, 3 deals), one over HTTP (41 single messages, 5 conversations, about 220 requests including malformed and hostile ones). The tool allow-list, the spending limit, ownership checks and prompt injection held. Their findings were fixed: clock times, next week's weekdays, written dates, party sizes and Chinese budgets in the rules (the 22 sentences the rules got wrong are now regression tests); named friends silently replaced by others; friends added later not growing the group; replies switching to English; a card promising to haggle where the limit made it impossible; stack traces and server paths in body-parser errors; an unchecked brief from the browser.
 - An earlier version ran Qwen2.5 1.5B in the browser with WebLLM; its kernels failed to compile on an NVIDIA Pascal GPU in Chrome 152, which is one reason it moved to the server.
 
 **Built and tested only against the stand-in:**
-- Dispute evidence.
+- Dispute evidence, now sent automatically when PayPal reports a dispute (opening a dispute in the sandbox needs a sandbox buyer account, which we did not use).
 - Webhook self-registration (it needs public HTTPS).
 - Pay Later and Venmo buttons (PayPal reported them ineligible for the desktop sandbox payment).
 - A buyer's approval through the SDK popup end to end (no sandbox buyer login was used).
@@ -282,7 +283,6 @@ There are 34, using Node's test runner, and they run against the stand-in with s
 
 **Not run:**
 - `examples/claude-agent.mjs` and `examples/venue-agent.mjs` through the Anthropic API (no key). Their MCP wiring is tested.
-- The public seal on Base Sepolia (no testnet key yet). Anchoring ran on a local Hardhat node in both modes: `each` (a batch per block) and `seal` (two batches and three receipts in one transaction).
 
 ## 13. Known limitations and open risks (review targets)
 
@@ -313,8 +313,7 @@ There are 34, using Node's test runner, and they run against the stand-in with s
 npm run setup          # api, web, examples; builds the website
 npm start              # http://localhost:8790 (the stand-in without keys)
 npm run demo           # four agents over MCP; JOIN_ACTIVITY=karaoke for another plan
-npm test               # 34 tests
-npm run chain          # optional: a local Hardhat node for receipt anchoring
+npm test               # 35 tests
 ```
 
 - **Sandbox:** set `PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET` in `api/.env` (template: `api/.env.example`), and optionally `PAYPAL_TEST_CARD=1`.

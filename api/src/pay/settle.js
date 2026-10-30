@@ -229,6 +229,15 @@ async function refundAll(b, why) {
 }
 
 // One pass over the bookings that are waiting on time or on PayPal. The server runs it every few seconds.
+// Demo only (server.js allows it in demo mode): the time for shares runs out now
+export async function expireNow(bookingId) {
+  const b = get(bookingId);
+  if (!b || b.state !== "held") return { error: "not_held", message: "Only a booking waiting for shares can run out of time." };
+  b.holdUntil = clock().getTime() - 1; db.save();
+  await tick();
+  return view(b, b.organizer);
+}
+
 export async function tick() {
   const now = clock().getTime();
   for (const b of db.data.bookings) {
@@ -454,17 +463,49 @@ export async function venueDisputes(venueId) {
   const list = await toolkit.disputes([...byCapture.keys()]);
   return list.map((d) => ({ ...d, booking: d.transactions.map((t) => byCapture.get(t)).find(Boolean) || null, receipt: receipts.forBooking(d.transactions.map((t) => byCapture.get(t)).find(Boolean) || "").at(-1)?.id || null }));
 }
-// The venue answers a chargeback with Join's signed receipt for that booking: what was agreed, who paid what, and when
+// What Join did for a venue, counted from its bookings (nothing estimated): what groups paid, how much of it came in
+// off-peak, what haggling cost, what organizers covered for friends who didn't pay (money the venue would otherwise be
+// chasing), whether any booking was paid short, and what was paid out to the venue.
+export function venueMetrics(venueId) {
+  const all = db.data.bookings.filter((b) => b.venue === venueId), paid = all.filter((b) => ["locked", "played", "venue_paid"].includes(b.state));
+  const sum = (xs, f) => xs.reduce((a, x) => a + (f(x) || 0), 0);
+  const offPeak = paid.filter((b) => (negotiation(b.negotiation)?.discounts || []).some((d) => d.kind === "off-peak"));
+  const captured = (b) => sum(Object.values(b.payments), (p) => (p.status === "captured" ? p.captured ?? p.amount : 0));
+  const covered = (b) => Math.max(0, (b.payments[b.organizer]?.captured ?? 0) - b.shares[b.organizer]);
+  return {
+    bookings: { paid: paid.length, released: all.filter((b) => b.state === "released").length, cancelled: all.filter((b) => ["cancelled", "refunded"].includes(b.state)).length, open: all.filter((b) => ["awaiting_organizer", "held", "locking"].includes(b.state)).length },
+    revenue: usd(sum(paid, (b) => b.total)),
+    offPeak: { bookings: offPeak.length, revenue: usd(sum(offPeak, (b) => b.total)), share: paid.length ? Math.round((100 * offPeak.length) / paid.length) : 0 },
+    haggledOff: usd(sum(paid, (b) => (negotiation(b.negotiation)?.list || b.total) - b.total)),
+    coveredByOrganizers: { amount: usd(sum(paid, covered)), bookings: paid.filter((b) => covered(b) > 0).length },
+    shortfall: usd(sum(paid, (b) => Math.max(0, b.total - captured(b)))),
+    paidOut: { amount: usd(sum(all.filter((b) => b.payout), (b) => b.payout.amount)), bookings: all.filter((b) => b.payout).length },
+    disputes: { opened: sum(all, (b) => Object.keys(b.disputes || {}).length), answered: sum(all, (b) => Object.values(b.disputes || {}).filter((d) => d.status === "evidence_sent").length) },
+  };
+}
+
+// Join's answer to a chargeback: the booking's signed receipt (the negotiation, each payment and its PayPal ids, its
+// Merkle path and audit-log entries), and how the disputed payment was approved: by the payer in PayPal, or from their
+// saved PayPal within limits only they can set (the mandate, AP2's intent mandate). The venue can send it (answerDispute),
+// and Join sends it by itself the moment PayPal reports a dispute (the webhook), so nobody has to notice in time.
+async function defend(b, disputeId, payerId, by) {
+  const rid = receipts.forBooking(b.id).at(-1)?.id;
+  if (!rid) return { error: "no_receipt", message: "This booking has no receipt yet." };
+  const r = receipts.show(rid), p = payerId ? b.payments[payerId] : null, m = payerId ? getMandate(payerId) : null;
+  const how = !p ? "" : p.via === "vault" ? ` The disputed payment was made from the payer's saved PayPal by their own agent, within limits only the payer can set on Join (at most $${usd(m.perGame)} a booking, $${usd(m.perWeek)} a week); authorization ${p.authorizationId}, capture ${p.captureId}.`
+    : ` The payer approved the disputed payment themselves in PayPal (order ${p.orderId}, authorization ${p.authorizationId}, capture ${p.captureId}).`;
+  const notes = `Join booking ${b.id}: ${b.activity} at ${venue(b.venue).name}, ${b.date} ${b.start}, ${place(b)}, $${usd(b.total)} for ${b.players.length} people, locked ${b.lockedAt || ""}.${how} The attached receipt is signed by Join (Ed25519, key ${r.kid}) and lists the negotiation and every payment with its PayPal ids; it is in Join's audit log as entry #${r.batch?.log ?? "(next batch)"}. Verify it at ${publicUrl}/#/receipt/${rid}.`;
+  await pp.provideEvidence(disputeId, { notes, file: JSON.stringify(r) });
+  (b.disputes ||= {})[disputeId] = { ...(b.disputes?.[disputeId] || {}), status: "evidence_sent", receipt: rid, by, at: at() }; db.save();
+  record({ actor: by === "join" ? { kind: "platform" } : { kind: "venue", venue: b.venue }, who: [...b.players], action: "dispute_answered", ref: b.id,
+    summary: `${by === "join" ? "Join" : venue(b.venue).name} answered PayPal dispute ${disputeId} with the booking's signed receipt${p ? ` and how ${name(payerId)}'s payment was approved` : ""}.` });
+  return { dispute: disputeId, status: "evidence_sent", receipt: rid };
+}
 export async function answerDispute(venueId, disputeId) {
   const d = (await venueDisputes(venueId)).find((x) => x.id === disputeId);
   if (!d || !d.booking) return { error: "no_dispute", message: "No such dispute on this venue's bookings." };
-  const b = get(d.booking), rid = d.receipt;
-  if (!rid) return { error: "no_receipt", message: "This booking has no receipt yet." };
-  const r = receipts.show(rid);
-  await pp.provideEvidence(disputeId, { notes: `Join booking ${b.id}: ${b.activity} at ${venue(b.venue).name}, ${b.date} ${b.start}, ${place(b)}. The attached receipt is signed by Join (Ed25519, key ${r.kid}) and lists the negotiation, each payment and its PayPal ids. Verify it at /api/receipts/${rid}.`, file: JSON.stringify(r) });
-  (b.disputes ||= {})[disputeId] = { status: "evidence_sent", receipt: rid, at: at() }; db.save();
-  record({ actor: { kind: "venue", venue: b.venue }, who: b.players, action: "dispute_answered", ref: b.id, summary: `${venue(b.venue).name} answered PayPal dispute ${disputeId} with Join's signed receipt.` });
-  return { dispute: disputeId, status: "evidence_sent", receipt: rid };
+  const b = get(d.booking), payer = Object.entries(b.payments).find(([, p]) => d.transactions.includes(p.captureId))?.[0] || null;
+  return defend(b, disputeId, payer, "venue");
 }
 
 // ---- Vault: save PayPal once, then the agent pays within the mandate -------------------------------------------------
@@ -497,8 +538,14 @@ export async function webhook(event) {
   if (type === "CUSTOMER.DISPUTE.CREATED") {
     const ids = (r.disputed_transactions || []).map((t) => t.seller_transaction_id);
     const hit = find((p) => ids.includes(p.captureId));
-    if (hit) { (hit.b.disputes ||= {})[r.dispute_id] = { status: "open", reason: r.reason, at: at() }; db.save(); record({ actor: { kind: "paypal" }, who: [hit.b.organizer], action: "dispute_opened", ref: hit.b.id, summary: `PayPal: a dispute was opened on a payment for this booking (${String(r.reason || "").toLowerCase().replace(/_/g, " ")}).` }); }
-    return hit ? { ok: true } : null;
+    if (!hit) return null;
+    if (hit.b.disputes?.[r.dispute_id]) return { ok: true }; // (PayPal may send an event twice)
+    (hit.b.disputes ||= {})[r.dispute_id] = { status: "open", reason: r.reason, payer: hit.pid, at: at() }; db.save();
+    record({ actor: { kind: "paypal" }, who: [hit.b.organizer], action: "dispute_opened", ref: hit.b.id, summary: `PayPal: a dispute was opened on ${name(hit.pid)}'s payment for this booking (${String(r.reason || "").toLowerCase().replace(/_/g, " ")}).` });
+    // answer it at once, with the evidence Join already holds
+    const d = await serial(hit.b.id, () => defend(hit.b, r.dispute_id, hit.pid, "join")).catch((e) => ({ error: e.message }));
+    if (d?.error) { hit.b.disputes[r.dispute_id].error = d.message || d.error; db.save(); }
+    return { ok: true, defense: d };
   }
   if (type?.startsWith("PAYMENT.CAPTURE.")) {
     // (a refund event's resource is the refund; its capture is the link marked "up")

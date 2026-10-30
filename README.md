@@ -70,7 +70,7 @@ npm start
 
 Without a model the website agent uses rules only. With Ollama: `ollama pull qwen2.5:0.5b`, then start with
 `SCOUT_LLM_URL=http://127.0.0.1:11434`. On a Linux box with an NVIDIA card, `deploy/start.sh` starts Join, its own
-Ollama (port 11437, Qwen2.5 0.5B) and the local chain together.
+Ollama (port 11437, Qwen2.5 0.5B) together; `deploy/tunnel.sh` gives it a public HTTPS address through a Cloudflare quick tunnel when you want one.
 
 Open http://localhost:8790 and sign in as any demo person (or go straight to http://localhost:8790/demo?as=you). Then, in another terminal, watch four agents set up a plan:
 
@@ -143,7 +143,8 @@ What ran against the PayPal sandbox: the JS SDK v6 PayPal button (rendered and l
 v2 authorize, partial and final captures, voids, refunds, Payouts, Vault setup tokens, Invoicing (create, send,
 status), and the Agent Toolkit's `list_transactions`, `create_invoice`, `send_invoice`, `get_invoice` and
 `list_disputes`. Pay Later and Venmo buttons appear only when PayPal says the payer is eligible (they weren't for a
-desktop sandbox payment). Dispute evidence, webhook self-registration (needs public HTTPS) and the venue agent (needs an
+desktop sandbox payment). Dispute evidence (sent automatically; opening a sandbox dispute needs a sandbox buyer
+account), webhook self-registration (needs public HTTPS: `deploy/tunnel.sh --apply`) and the venue agent (needs an
 Anthropic key) are built and tested against the stand-in, not yet run on the sandbox.
 
 | PayPal | In Join |
@@ -156,9 +157,15 @@ Anthropic key) are built and tested against the stand-in, not yet run on the san
 | **Vault v3** (setup token, payment token, `vault_id`) | Save PayPal once; the agent pays within the person's mandate without a redirect |
 | **Invoicing v2** | A person who joined but never paid gets an invoice for their share; when it's paid, the organizer is paid back (Payouts). A venue's extras are invoiced too, and paid out to the venue |
 | **PayPal Agent Toolkit** (`@paypal/agent-toolkit`): `list_transactions`, `create_invoice`, `send_invoice`, `get_invoice`, `list_disputes` | Join's back office for venues: reconciliation against PayPal's transaction records, billing extras, disputes (`api/src/pay/toolkit.js`); and a venue's own Claude agent with the toolkit as an in-process MCP server (`examples/venue-agent.mjs`) |
-| **Disputes**: `provide-evidence` | A venue answers a chargeback with Join's signed receipt for the booking |
+| **Disputes**: `provide-evidence` | The moment PayPal reports a dispute (`CUSTOMER.DISPUTE.CREATED`), Join answers it with the booking's signed receipt and how that payer approved; a venue can also send it |
 | **Webhooks** management API + `verify-webhook-signature` | Join subscribes itself to 14 events when it has a public HTTPS address; webhooks confirm, return URLs and polling drive |
 | Sandbox test card | Optional demo stand-in for each payer's approval (`PAYPAL_TEST_CARD=1`, sandbox only) |
+
+**What one group plan runs through PayPal.** Four friends booking a court: four Orders v2 (one per payer, the
+organizer's for the whole price), four authorizations, four captures when it locks (the organizer's only for what is
+left), and one Payout to the venue after the game. Anyone who joined but didn't pay adds an invoice and a Payout back to
+the organizer; extras add an invoice and a Payout to the venue; a dispute adds `provide-evidence`. A plan that would
+otherwise be settled in a group chat becomes payments with PayPal on both sides.
 
 **Why Payouts and not multiparty (yet).** Join captures each share to its own account and pays the venue after the
 booking, because a payout to the venue can't be pulled back, and cancellations until 24 hours before must stay
@@ -174,21 +181,19 @@ in advance, under which an agent may act).
 When a booking is locked, refunded or its venue paid, Join issues a receipt: the negotiation step by step, each
 payment with its PayPal ids, and the players only as salted hashes (each player's own copy carries their salt). Join
 signs it with Ed25519 (public key at `/.well-known/join-receipts.json`). Every few minutes the new receipts go into a
-SHA-256 Merkle tree whose root can be written to an EVM chain as the data of a zero-value transaction from Join's
-address to itself (`0x4a4f494e` "JOIN" + the root): no token, no stablecoin, no contract, only a public timestamp.
+SHA-256 Merkle tree, and the tree's root is appended to Join's **audit log**: a hash chain in the manner of
+Certificate Transparency (RFC 6962), where every entry carries the hash of the one before and Join signs the log's
+head after each append. No blockchain, no fees, no waiting for blocks.
 
-- **Locally:** `npm run chain` starts a Hardhat node (chain id 31337) and every batch goes on it.
-- **In production:** batches stay off chain and one transaction seals all of them on a public chain (Base Sepolia
-  in our setup). `POST /api/receipts/seal` makes the seal; each receipt then carries its path to the seal's root.
+- In the browser: `/#/receipt/<id>` checks, with WebCrypto, the receipt's hash, Join's signature, the Merkle path to
+  its batch, every log entry from that batch to the latest head, and the head's signature.
+- Independently: `node examples/verify-receipt.mjs <id> --save head.json` shares no code with Join and does the same
+  checks. Keep the head it saves: later, `--head head.json` checks that today's log still extends it, so an earlier
+  entry can't be changed or dropped without it showing.
 
-- In the browser: `/#/receipt/<id>` checks the hash, the signature and the Merkle path itself, and links the
-  transaction on the chain's explorer.
-- Independently: `node examples/verify-receipt.mjs <id> --rpc <the chain's RPC URL>` shares no code with Join and also
-  reads the transaction from the chain.
-
-What a receipt proves: it existed exactly so by that block. Whether PayPal moved the money is PayPal's record; the
-receipt points to it by id. To anchor, set `ANCHOR_RPC_URL` and `ANCHOR_PRIVATE_KEY` (locally, one of the Hardhat node's development
-accounts; for the public seal, a key made only for this, with a little testnet ether). Without them, receipts are still signed and batched, and say they are not on chain.
+What a receipt proves: Join signed it exactly so and logged it in that batch, and anyone holding a later head can
+tell if Join rewrote it. Whether PayPal moved the money is PayPal's record; the receipt points to it by id. Join also
+sends the receipt to PayPal as evidence the moment a payment is disputed.
 
 ## Layout
 
@@ -198,7 +203,7 @@ accounts; for the public seal, a key made only for this, with a little testnet e
 | `api/src/pay/` | PayPal client (`paypal.js`), the Agent Toolkit back office (`toolkit.js`), the stand-in (`mock.js`), settlement (`settle.js`) |
 | `api/src/ops.js` | What an agent can do; MCP (`mcp.js`), REST and A2A (`a2a.js`) all call it |
 | `api/src/alternatives.js`, `mandate.js`, `auth.js`, `activity.js` | Alternatives, limits, tokens, the activity log |
-| `api/src/proof/` | Receipts (`receipts.js`), Merkle trees (`merkle.js`), EVM anchoring (`anchor.js`) |
+| `api/src/proof/` | Receipts and the audit log (`receipts.js`), Merkle trees (`merkle.js`) |
 | `api/data/world.json` | The made-up demo town (USD, placed on San Jose, CA) |
 | `web/` | The website (React, Vite) |
 | `examples/` | Agents from outside: scripted (no key), a Claude player agent, a Claude venue agent on the PayPal Agent Toolkit; the receipt verifier |
@@ -212,5 +217,5 @@ keeps a few of Serve's pure functions (free-time intersection, travel time, the 
 timetable, atomic JSON writes) and its visual design. Everything else was removed (Serve's own models, guards,
 memory, voice, video, Messenger, the community loop, the feed) or written new for this hackathon: the negotiation
 layer, venue rules, the map alternatives, mandates, invitations and the negotiated split, per-player tokens, the
-PayPal settlement, verifiable receipts anchored on an EVM chain, Join's website agent, the MCP / REST / A2A interfaces, the activity log, the
+PayPal settlement, verifiable receipts with a signed audit log, automatic dispute answers, Join's website agent, the MCP / REST / A2A interfaces, the activity log, the
 website with Bryntum Scheduler, and the examples.

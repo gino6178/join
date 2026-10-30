@@ -245,3 +245,25 @@ legend { font-size: var(--fs-14); color: var(--ink-2); padding: 0 6px; }
 .drawer-input { display: flex; gap: var(--s2); padding: var(--s3) var(--s4); border-top: 1px solid var(--rule); }
 .drawer-input input { flex: 1; min-width: 0; font: inherit; padding: 10px 12px; border-radius: var(--r-pill); border: 1px solid var(--rule-strong); background: var(--bg); color: var(--ink); }
 .warn-text { color: var(--bad); font-size: 12px; }
+.verified-badge { display: inline-flex; align-items: center; gap: 8px; padding: 8px 14px; border-radius: var(--r-pill); background: color-mix(in srgb, var(--good, #1a7f4b) 14%, var(--bg)); color: var(--good, #1a7f4b); font-weight: 700; margin: 4px 0 10px; }
+
+/* Demo: the organizer plays the friends they invited */
+.seats { border: 1.5px dashed var(--rule-strong); border-radius: var(--r-md); padding: var(--s3) var(--s4); margin: var(--s3) 0; display: flex; flex-direction: column; gap: var(--s2); }
+.seats-head { margin: 0; display: flex; flex-direction: column; } .seats-head small { color: var(--ink-3); }
+.seat { display: flex; align-items: center; gap: var(--s2); flex-wrap: wrap; }
+.seat small { color: var(--ink-3); } .seat-btns { margin-left: auto; display: flex; gap: 6px; flex-wrap: wrap; }
+.seats > .btn { align-self: flex-start; }
+
+/* the negotiation chart */
+.curve { margin: var(--s2) 0 0; } .curve svg { width: 100%; height: auto; display: block; }
+.curve text { font-size: 11px; fill: var(--ink-3); } .curve .lbl { fill: var(--ink-3); }
+.curve .grid { stroke: var(--rule); } .curve line.list { stroke: var(--ink-3); stroke-dasharray: 4 4; }
+.curve path { fill: none; stroke-width: 2.5; } .curve path.ask { stroke: var(--warn); } .curve path.offer { stroke: var(--agent); }
+.curve circle.ask { fill: var(--warn); } .curve circle.ask.final { stroke: var(--ink); stroke-width: 2; } .curve circle.offer { fill: var(--agent); }
+.curve circle.offer.low { fill: var(--bad); } .curve .lowtxt { fill: var(--bad); font-weight: 600; }
+.curve .key { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin: 0 4px 0 8px; vertical-align: -1px; } .curve .key.ask { background: var(--warn); } .curve .key.offer { background: var(--agent); }
+/* Bryntum: a booking's bar changes smoothly from held (dashed) to locked (solid) */
+.bryntum-wrap .b-sch-event { transition: background-color .6s ease, border-color .6s ease, color .6s ease; }
+.tags { display: flex; gap: 6px; flex-wrap: wrap; } .tag { font-size: 12px; padding: 2px 8px; border-radius: var(--r-pill); background: var(--control); color: var(--ink-2, var(--ink)); } .tag.good { background: color-mix(in srgb, var(--good) 16%, var(--bg)); color: var(--good); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: var(--s3); margin: var(--s2) 0; }
+.tile { border: 1px solid var(--rule); border-radius: var(--r-md); padding: var(--s3); display: flex; flex-direction: column; gap: 2px; } .tile b { font-size: 26px; line-height: 1.1; } .tile span { font-weight: 600; } .tile small { color: var(--ink-3); }

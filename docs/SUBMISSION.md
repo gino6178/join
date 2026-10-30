@@ -65,7 +65,8 @@ supplies the rules and the money. Someone without an agent uses Join's own, on t
   - When everyone has paid, the booking is locked and the venue is paid afterwards with Payouts.
 - **Loose ends, settled with PayPal.** Someone who said yes but never paid gets a PayPal invoice, and the organizer is
   paid back with Payouts. A venue bills extras like overtime with an invoice, reconciles against PayPal's records, and
-  answers a chargeback with Join's signed receipt.
+  sees what Join brought in, counted from its bookings. When a payment is disputed, Join answers PayPal by itself at
+  once, with the signed receipt and how that payer approved the payment.
 - **No agent? Use Join's.** A drawer on the website asks what you want ("karaoke Friday night, 4 of us, $15 each",
   or the same in Chinese), shows three options with reasons, haggles and accepts as you under your limits, then hands
   you the PayPal button. It understands people on Join's own server: rules, plus Qwen2.5 0.5B (Ollama) for
@@ -112,9 +113,9 @@ supplies the rules and the money. Someone without an agent uses Join's own, on t
   Qwen2.5 0.5B on Join's own server through Ollama for the one thing rules are bad at: which activity a free-form
   sentence means. Its answer is held to a JSON schema and used only when the rules found none. It calls the same tools
   as any agent.
-- **Receipts on chain, no tokens:** batch roots in a zero-value transaction ("JOIN" + root) on a local Hardhat node for
-  testing, and one public seal transaction for production.
-- Node, Express, React, Vite. 34 automated tests, including an end-to-end run of four agents over MCP.
+- **Receipts without a blockchain:** each batch's Merkle root goes into a signed, hash-chained audit log in the
+  manner of Certificate Transparency; the browser checks a receipt, its batch and the log with WebCrypto.
+- Node, Express, React, Vite. 35 automated tests, including an end-to-end run of four agents over MCP.
 
 ### Challenges we ran into
 
@@ -186,7 +187,7 @@ bryntum-scheduler, node.js, express, react, vite
 5. No agent? Click **No agent? Ask Join's** on the website and type a plan, e.g. "karaoke Friday night, 4 of us,
    $15 each" or "好冷 想吃熱呼呼的鍋". Without a model it uses rules; with Ollama (`ollama pull qwen2.5:0.5b`, then
    `SCOUT_LLM_URL=http://127.0.0.1:11434 npm start`) Qwen reads free-form sentences too.
-6. `npm test` runs 34 tests, including the end-to-end MCP run.
+6. `npm test` runs 35 tests, including the end-to-end MCP run.
 
 Without keys, Join runs on a PayPal stand-in that moves no money and says so on every page.
 
@@ -204,12 +205,16 @@ Without keys, Join runs on a PayPal stand-in that moves no money and says so on 
 
 **Venue side:**
 - Open Venue view and sign in as a venue (demo button).
-- Reconcile, bill extras, see disputes. With the stand-in, "Simulate a buyer's dispute" opens one to answer.
+- See what Join brought in, reconcile, bill extras, see disputes. With the stand-in, "Simulate a buyer's dispute" opens
+  one, and Join answers it at once.
 
 **Receipts:** a booking's receipt link opens a page that checks it in the browser;
-`node examples/verify-receipt.mjs <id>` checks it independently. With `npm run chain` (a local Hardhat node) and
-`ANCHOR_RPC_URL` / `ANCHOR_PRIVATE_KEY` set as in `api/.env.example`, each batch root also goes on chain and
-`--rpc http://127.0.0.1:8545` checks the transaction.
+`node examples/verify-receipt.mjs <id> --save head.json` checks it independently and keeps the audit log's signed head;
+`--head head.json` later checks that the log still extends it.
+
+**Playing the friends from one window:** on Plans, as the organizer of a booking that is waiting for shares, the demo
+panel lets you act as each invited friend (pays, asks $1 less, can't come) or run the clock out, and watch the
+split, the lock, the capture and Bryntum change.
 
 ## Was this an existing project?
 
@@ -226,7 +231,7 @@ submission period:
 - invitations and the negotiated split
 - per-person agent tokens
 - all PayPal integration
-- verifiable receipts and their on-chain anchoring
+- verifiable receipts and their signed audit log, automatic dispute answers, the venue's figures
 - Join's website agent
 - the MCP, REST and A2A interfaces
 - the activity log

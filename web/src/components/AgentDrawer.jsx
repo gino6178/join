@@ -94,7 +94,8 @@ export default function AgentDrawer({ me, info, open, onClose }) {
           <span>{o.names.map((n) => n.split(" ")[0]).join(", ")}</span>
           {o.missing.length > 0 && <small className="warn-text">{w.notFree(o.missing.map(firstName))}</small>}
           <span><b>{money(o.askPrice)}</b> {w.card.asked} · {money(o.share)} {w.card.each}{o.fit !== "ok" ? ` · ${w.card[o.fit]}` : ""}</span>
-          <small className="muted">{o.why.join(" · ")}</small>
+          <span className="tags">{(o.discounts || []).length > 0 && <span className="tag good">{o.discounts.map((d) => w.why.discount(d)).join(" + ")}</span>}{world?.venues.find((v) => v.id === o.venue)?.style && <span className="tag">{w.style[world.venues.find((v) => v.id === o.venue).style]}</span>}</span>
+          <small className="muted">{o.why.filter((x, i) => i < 2).join(" · ")}</small>
           <button className="btn primary small" disabled={busy || o.fit === "tooFar"} onClick={() => ask(o)}>{w.card.negotiate}</button>
         </div>)}
         {confirm && <div className="drawer-actions">
