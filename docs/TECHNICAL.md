@@ -316,7 +316,9 @@ There are 47, using Node's test runner, and they run against the stand-in with s
 
 - Paying the venue after the game (30 Oct 2026, on the server): a badminton booking at Midtown, locked with four
   captured shares ($33.54), was ended with the demo control; Join sent PayPal Payouts batch `UBYPQ2FWAPDLS` to the
-  venue's sandbox address and issued a `venue_paid` receipt. (The sandbox reported no fee on the test-card captures,
+  venue's sandbox address and issued a `venue_paid` receipt; PayPal reported the batch `SUCCESS` and the item
+  `UNCLAIMED` (the demo venue's address isn't a sandbox account, so the money waits to be claimed), which Join
+  recorded by polling the batch. (The sandbox reported no fee on the test-card captures,
   so the payout was the full total.)
 - Sonnet agents as users of the live server, from its address alone, in two rounds; their reports and what changed:
   [live-testing.md](live-testing.md).
