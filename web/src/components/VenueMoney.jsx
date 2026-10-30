@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { api, money } from "../api.js";
 import Icon from "./Icon.jsx";
+import { useWorld, firstName } from "./Actor.jsx";
 
 // The venue's money, for its staff, on the PayPal Agent Toolkit (Join's back office calls the same tools PayPal gives AI
 // agents): every capture and payout matched to PayPal's own transaction records, extras billed to a group's organizer
 // with a PayPal invoice, and chargebacks answered with Join's signed receipt as evidence.
 export default function VenueMoney({ id, bookings, reload }) {
+  const w = useWorld();
   const [met, setMet] = useState(null), [rec, setRec] = useState(null), [disp, setDisp] = useState(null), [msg, setMsg] = useState(null), [err, setErr] = useState(null), [busy, setBusy] = useState(false);
   const load = () => {
     api(`/api/venues/${id}/metrics`).then(setMet).catch(() => {});
@@ -28,16 +30,16 @@ export default function VenueMoney({ id, bookings, reload }) {
         <p className="small muted">Haggling took {money(met.haggledOff)} off list prices, never below your floor. {met.bookings.released} hold{met.bookings.released === 1 ? "" : "s"} went back to you unpaid; {met.disputes.opened ? `${met.disputes.answered} of ${met.disputes.opened} chargeback${met.disputes.opened === 1 ? "" : "s"} answered with Join's receipt.` : "no chargebacks."}</p>
       </section>}
       <section className="card">
-        <h3><Icon name="list" size={18} />Reconciliation <small className="muted">PayPal Agent Toolkit · list_transactions{rec?.mode === "stand-in" ? " · stand-in" : ""}</small></h3>
+        <h3><Icon name="list" size={18} />Reconciliation <small className="muted" title="PayPal Agent Toolkit, list_transactions">checked against PayPal's own records{rec?.mode === "stand-in" ? " (stand-in)" : ""}</small></h3>
         {msg && <p className="note good">{msg}</p>}{err && <p className="err">{err}</p>}
-        {!rec ? <p className="muted small">Loading…</p> : !rec.rows.length ? <p className="muted small">No payments yet.</p> : <table className="pays"><thead><tr><th>Booking</th><th>What</th><th>Amount</th><th>PayPal fee</th><th>In PayPal's records</th></tr></thead><tbody>
-          {rec.rows.map((r) => <tr key={r.id}><td><small>{r.booking.slice(-6)}</small></td><td>{r.kind === "payout" ? "payout to you" : `share (${r.who})`}</td><td>{money(r.amount / 100)}</td><td>{r.fee != null ? money(r.fee / 100) : ""}</td><td><span className={`st ${r.paypal.startsWith("matched") || r.paypal.startsWith("confirmed") ? "captured" : "awaiting_approval"}`}>{r.paypal}</span></td></tr>)}
+        {!rec ? <p className="muted small">Asking PayPal for its records… (a few seconds)</p> : !rec.rows.length ? <p className="muted small">No payments yet.</p> : <table className="pays"><thead><tr><th>Booking</th><th>What</th><th>Amount</th><th>PayPal fee</th><th>In PayPal's records</th></tr></thead><tbody>
+          {rec.rows.map((r) => <tr key={r.id}><td><small>{r.booking.slice(-6)}</small></td><td>{r.kind === "payout" ? "payout to you" : `${firstName(w, r.who)}'s share`}</td><td>{money(r.amount / 100)}</td><td>{r.fee != null ? money(r.fee / 100) : <small className="muted" title="PayPal reports the fee once the payment shows in its transaction records">not yet</small>}</td><td><span className={`st ${r.paypal.startsWith("matched") || r.paypal.startsWith("confirmed") ? "captured" : "awaiting_approval"}`}>{r.paypal}</span></td></tr>)}
         </tbody></table>}
         {rec?.error && <p className="small err">{rec.error}</p>}
       </section>
       {paid.length > 0 && <section className="card">
-        <h3><Icon name="send" size={18} />Bill extras <small className="muted">PayPal invoice to the organizer · create_invoice, send_invoice</small></h3>
-        {paid.map((b) => <Extras key={b.id} b={b} busy={busy} onBill={(items) => act(() => api(`/api/venues/${id}/bookings/${b.id}/extras`, { method: "POST", body: { items } }), (r) => `Invoice sent: ${money(r.total)}.`)} />)}
+        <h3><Icon name="send" size={18} />Bill extras <small className="muted" title="PayPal Agent Toolkit: create_invoice, send_invoice">a PayPal invoice to the group's organizer</small></h3>
+        {paid.map((b) => <Extras key={b.id} b={b} busy={busy} onBill={(items) => confirm(`Send the organizer a PayPal invoice for ${money(items.reduce((t, i) => t + +i.amount, 0) / 100)}?`) && act(() => api(`/api/venues/${id}/bookings/${b.id}/extras`, { method: "POST", body: { items } }), (r) => `Invoice sent: ${money(r.total)}.${r.url ? " " : ""}`)} />)}
       </section>}
       <section className="card">
         <h3><Icon name="warn" size={18} />Disputes <small className="muted">list_disputes · answered with the signed receipt</small></h3>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { tr, lang, setLang } from "../i18n.js";
 import { api } from "../api.js";
 import Icon from "../components/Icon.jsx";
 
@@ -20,12 +21,12 @@ export default function SignIn({ info, onIn }) {
         <p className="lead">Badminton, karaoke, an escape room, board games, a barbecue, hot pot: Join is the marketplace AI agents come to. They find who is free, negotiate the price with the venue, split the cost and settle it with PayPal, inside the limits you set. No agent? Join's website agent asks what you want and does it for you. Join keeps the rules and shows you everything an agent did.</p>
         <p className="small">Why not just split it on Venmo afterwards? Because someone has to book and pay first. Here the venue is paid only when the money is real: the organizer guarantees it in PayPal, each friend pays their own share, and anyone who said yes and didn't pay gets a PayPal invoice. Nobody chases anyone.</p>
         <ol className="how">
-          <li><Icon name="key" /><span><b>Connect your agent</b>Claude, or any MCP or A2A agent, with a token only you can make.</span></li>
+          <li><Icon name="key" /><span><b>{tr("Connect your agent")}</b>Claude, or any MCP or A2A agent, with a token only you can make.</span></li>
           <li><Icon name="lock" /><span><b>Set your limits</b>Per booking, per week, which venues. Agents can read them, never change them.</span></li>
           <li><Icon name="spark" /><span><b>Watch it work</b>Every search, offer, counter-offer and payment, as it happens.</span></li>
         </ol>
       <section className="card for-agents" id="agents">
-        <h2><Icon name="key" />For AI agents</h2>
+        <h2><Icon name="key" />{tr("For AI agents")}</h2>
         <p>An agent can use Join from this address alone. Start with <a href="/llms.txt">/llms.txt</a>: what Join is, how to get in for your person, the tools and the rules.</p>
         <ul className="small">
           <li>MCP: <code>{location.origin}/mcp</code> · REST: <code>/api/agent/&lt;tool&gt;</code> · A2A: <a href="/.well-known/agent-card.json">agent card</a></li>
@@ -35,16 +36,16 @@ export default function SignIn({ info, onIn }) {
       </section>
       </section>
       <section className="card pick">
-        <h2>Sign in</h2>
+        <h2>{tr("Sign in")} <button className="link-btn small" onClick={() => setLang(lang === "zh" ? "en" : "zh")}>{lang === "zh" ? "English" : "中文"}</button></h2>
         <div className="social">
           {on.map((p) => <a key={p.id} className="btn social-btn" style={{ "--brand": BRAND[p.id] }} href={`/auth/${p.id}/start`}>Continue with {p.name}</a>)}
           {off.length > 0 && <p className="small muted">{off.map((p) => p.name).join(", ")} sign-in {off.length === 1 ? "turns" : "turn"} on when this server has {off.length === 1 ? "its" : "their"} keys (see the README).</p>}
         </div>
         {auth?.demo && <form className="fresh" onSubmit={fresh}>
-          <label><span>New here? Make a demo account</span><input value={name} onChange={(e) => setName(e.target.value)} placeholder="Your first name" maxLength={40} required /></label>
-          <button className="btn primary">Start</button>
+          <label><span>{tr("New here? Make a demo account")}</span><input value={name} onChange={(e) => setName(e.target.value)} placeholder={tr("Your first name")} maxLength={40} required /></label>
+          <button className="btn primary">{tr("Start")}</button>
         </form>}
-        <h3>Or be one of the demo town's residents</h3>
+        <h3>{tr("Or be one of the demo town's residents")}</h3>
         <p className="muted">A made-up town placed on San Jose, CA. {info?.paypal === "mock" ? "PayPal is simulated: no money moves." : "PayPal sandbox: test money only."}</p>
         {err && <p className="err">{err.message}</p>}
         {info?.demoSignin && <p className="small muted">Someone else has been playing in this town? <button className="link-btn small" onClick={async () => { if (confirm("Reset the demo town? Plans, bookings, limits and activity start fresh; receipts and the transparency log are kept.")) { await api("/api/demo/reset", { method: "POST" }); location.reload(); } }}>Reset the demo town</button></p>}

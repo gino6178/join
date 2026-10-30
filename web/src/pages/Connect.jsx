@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { tr, lang, setLang } from "../i18n.js";
 import { api } from "../api.js";
 import Icon from "../components/Icon.jsx";
 import { webMcpAvailable } from "../webmcp.js";
@@ -22,7 +23,7 @@ export default function Connect({ me, info, reload }) {
   ];
   return (
     <div className="page">
-      <header className="page-head"><h1>Connect your agent</h1><p className="muted">Bring your own agent: Claude, any agent that speaks MCP, A2A or HTTP, or the agent built into your browser (WebMCP). No agent? Use Join's, bottom right. It acts for you, {me.player.name.split(" ")[0]}, and only for you.</p></header>
+      <header className="page-head"><h1>{tr("Connect your agent")}</h1><p className="muted">Bring your own agent: Claude, any agent that speaks MCP, A2A or HTTP, or the agent built into your browser (WebMCP). No agent? Use Join's, bottom right. It acts for you, {me.player.name.split(" ")[0]}, and only for you.</p></header>
       <form className="card form row" onSubmit={make}>
         <label><span>Name this agent</span><input value={label} onChange={(e) => setLabel(e.target.value)} maxLength={40} /></label>
         <button className="btn primary"><Icon name="key" size={18} />Make a token</button>

@@ -103,12 +103,17 @@ export function byRules(text, brief, { activities, people, today }) {
   if (others) out.players = Math.max(1, +others[1]);
   else if (whole) out.players = Math.max(1, +whole[1] - 1);
 
-  // budget per person, in dollars; "200 total" / "總共200" is split over the group once its size is known
-  const money = n.match(/\$\s*(\d+(?:\.\d+)?)/) || n.match(/(\d+(?:\.\d+)?)\s*(?:dollars|bucks|usd|塊|元|美金)/) || n.match(/budget\s*(?:is|of)?\s*(\d+(?:\.\d+)?)/);
+  // budget per person, in dollars; "200 total" / "總共200" is split over the group once its size is known. New Taiwan
+  // dollars ("300台幣", "NT$300", "TWD 300", or 塊/元 of 100 or more, which no one means in US dollars for a court) are
+  // turned into dollars at TWD_PER_USD (32 by default), and the reply says so.
+  const twd = n.match(/(?:nt\$|ntd|twd)\s*(\d+(?:\.\d+)?)/) || n.match(/(\d+(?:\.\d+)?)\s*(?:台幣|新台幣|ntd|twd|nt)/) || ((m) => (m && +m[1] >= 100 ? m : null))(n.match(/(\d+(?:\.\d+)?)\s*(?:塊|元)(?!美)/));
+  const money = twd || n.match(/\$\s*(\d+(?:\.\d+)?)/) || n.match(/(\d+(?:\.\d+)?)\s*(?:dollars|bucks|usd|塊|元|美金)/) || n.match(/budget\s*(?:is|of)?\s*(\d+(?:\.\d+)?)/);
   if (money && +money[1] > 0) {
+    const rate = twd ? +(process.env.TWD_PER_USD || 32) : 1, amount = +money[1] / rate;
     const total = /total|in all|altogether|總共|一共|全部/.test(n) && !/each|apiece|per person|每人|每個人/.test(n);
-    if (!total) out.budget = +money[1];
-    else if (out.players != null) out.budget = Math.round((+money[1] / (out.players + 1)) * 100) / 100;
+    if (!total) out.budget = Math.round(amount * 100) / 100;
+    else if (out.players != null) out.budget = Math.round((amount / (out.players + 1)) * 100) / 100;
+    if (twd && out.budget) out.budgetNote = `NT$${+money[1]}${total ? " total" : ""} ≈ $${out.budget} each at ${rate} NT$ to the dollar`;
   }
 
   const named = people.filter((p) => t.includes(p.name.split(" ")[0].toLowerCase()) || text.includes(p.name.split(" ")[0])).map((p) => p.id);
@@ -164,8 +169,8 @@ export async function understand(history, brief, ctx) {
   const gap = missing(next), zh = /[\u4e00-\u9fff]/.test(last) || (!/[a-z]/i.test(last) && ctx.lang === "zh");
   const names = (next.with || []).map((id) => ctx.people.find((p) => p.id === id)?.name.split(" ")[0]).filter(Boolean);
   const reply = gap.length ? (zh ? ASK_ZH : ASK)[gap[0]]
-    : zh ? `好，幫你找${next.players + 1}個人的${ZH_NAME[next.activity] || next.activity}${names.length ? `（你、${names.join("、")}${next.players > names.length ? " 和其他朋友" : ""}）` : ""}${next.budget ? `，每人約 $${next.budget}` : ""}…`
-      : `Looking for ${next.activity} for ${next.players + 1}${names.length ? ` (you, ${names.join(", ")}${next.players > names.length ? " and others" : ""})` : ""}${next.budget ? `, about $${next.budget} each` : ""}…`;
+    : zh ? `好，幫你找${next.players + 1}個人的${ZH_NAME[next.activity] || next.activity}${names.length ? `（你、${names.join("、")}${next.players > names.length ? " 和其他朋友" : ""}）` : ""}${next.budget ? `，每人約 $${next.budget}${next.budgetNote ? `（${next.budgetNote.replace(/ each at (\d+) NT\$ to the dollar/, "，以 1 美元 = $1 台幣換算")}；Join 的價格都是美元）` : ""}` : ""}…`
+      : `Looking for ${next.activity} for ${next.players + 1}${names.length ? ` (you, ${names.join(", ")}${next.players > names.length ? " and others" : ""})` : ""}${next.budget ? `, about $${next.budget} each${next.budgetNote ? ` (${next.budgetNote}; prices on Join are in US dollars)` : ""}` : ""}…`;
   return { brief: next, missing: gap, reply, model, lang: zh ? "zh" : "en" };
 }
 

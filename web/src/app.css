@@ -29,10 +29,24 @@ code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospac
 .icon-btn { border: 0; background: none; padding: 6px; border-radius: 8px; cursor: pointer; color: var(--ink-3); }
 .icon-btn:hover { background: var(--control); color: var(--ink); }
 @media (max-width: 1099px) { .nav span, .brand span:last-child, .who span:nth-child(2), .pp-mode { display: none; } .nav, .who { justify-content: center; } }
+/* phones: the menu is a tab bar at the bottom with a label under each icon; the brand and sign-out stay at the top;
+   the "ask Join's agent" button sits above the tab bar, and pages leave room for both */
 @media (max-width: 640px) {
   .shell { grid-template-columns: 1fr; }
-  .side { position: sticky; height: auto; flex-direction: row; align-items: center; padding: var(--s2) var(--s3); border-right: 0; border-bottom: 1px solid var(--rule); z-index: var(--z-nav); overflow-x: auto; }
-  .side nav { display: flex; } .side-foot { margin: 0 0 0 auto; display: flex; } .who { padding: 0; }
+  .side { position: fixed; left: 0; right: 0; bottom: 0; top: auto; height: auto; flex-direction: row; padding: 0; border-right: 0; border-top: 1px solid var(--rule); z-index: var(--z-nav); background: var(--paper, var(--bg)); }
+  .side .brand { display: none; }
+  .side nav { display: grid; grid-template-columns: repeat(6, 1fr); width: 100%; gap: 0; }
+  .side .nav { flex-direction: column; gap: 2px; padding: 8px 0 10px; min-height: 56px; justify-content: center; align-items: center; border-radius: 0; }
+  .side .nav span { display: block; text-align: center; } .side .nav span small { display: none; } .side .nav span b { font-size: 11px; font-weight: 600; }
+  .side-foot { position: fixed; top: 8px; right: 8px; margin: 0; z-index: var(--z-nav); }
+  .side-foot .pp-mode { display: none; } .who { padding: 0; gap: 4px; } .who > span:nth-child(2) { display: none; }
+  .who .icon-btn { min-width: 44px; min-height: 44px; }
+  .main { padding-bottom: 140px; }
+  .agent-fab { bottom: 72px; right: 12px; }
+  .leaflet-container .leaflet-popup-close-button { width: 32px; height: 32px; font-size: 24px; line-height: 30px; }
+  .leaflet-control-zoom a { width: 40px !important; height: 40px !important; line-height: 40px !important; }
+  .drawer-head .icon-btn { min-width: 44px; min-height: 44px; }
+  input[type="radio"], input[type="checkbox"] { width: 20px; height: 20px; }
 }
 
 /* pages */
@@ -296,3 +310,6 @@ legend { font-size: var(--fs-14); color: var(--ink-2); padding: 0 6px; }
 .rm-acts button { padding: 6px 10px; border-radius: 8px; border: 0; background: #111; color: #fff; cursor: pointer; font: inherit; }
 @media (max-width: 700px) { .rmap { height: 380px; } }
 .plain-link { color: inherit; text-decoration: none; border-bottom: 1px dotted currentColor; }
+.lg.booked { background: #7c3aed; border-radius: 50%; }
+.lg.venue { background: #fff; border: 2px solid var(--ink); }
+.pp-ids { display: block; font-family: ui-monospace, monospace; font-size: 11px; opacity: .7; }

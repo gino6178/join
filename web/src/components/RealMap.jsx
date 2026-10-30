@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from "react";
+import { tr, lang, setLang } from "../i18n.js";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -38,14 +39,15 @@ export default function RealMap({ world, me, over = null, alternatives = [], peo
     // people's home areas (only the people in this plan, and you)
     for (const p of world.players.filter((x) => x.area && (people.includes(x.id) || x.id === me))) {
       const ll = at(p.area); pts.push(ll);
-      L.circle(ll, { radius: 350, color: p.id === me ? "#2f6fdf" : "#7aa7f0", weight: 1, fillOpacity: 0.25 }).addTo(g).bindTooltip(`${p.id === me ? "You" : p.name.split(" ")[0]}: home area`);
+      L.circle(ll, { radius: 350, color: p.id === me ? "#2f6fdf" : "#7aa7f0", weight: 1, fillOpacity: 0.25, interactive: false }).addTo(g); // (not tappable: taps go to the venues)
       const t = target && spot(target);
-      if (t) L.polyline([ll, at(t)], { color: p.id === me ? "#2f6fdf" : "#7aa7f0", weight: 2, dashArray: "4 6" }).addTo(g);
+      if (t) L.polyline([ll, at(t)], { color: p.id === me ? "#2f6fdf" : "#7aa7f0", weight: 2, dashArray: "4 6", interactive: false }).addTo(g);
     }
     for (const v of world.venues) {
       const ll = at(v), n = altIndex[v.id], red = v.id === over, here = v.id === booked; pts.push(ll);
       const offers = Object.entries(v.offers || {}).map(([k, o]) => `${esc(k)}: $${o.price} per ${esc(o.per)}`).join("<br>");
-      const m = L.circleMarker(ll, { radius: here || n ? 11 : 8, color: "#111", weight: 2, fillColor: red ? "#e5484d" : here ? "#2da44e" : n ? "#2da44e" : "#fff", fillOpacity: 1 }).addTo(g);
+      const touch = matchMedia("(pointer: coarse)").matches;
+      const m = L.circleMarker(ll, { radius: (here || n ? 11 : 8) + (touch ? 4 : 0), color: "#111", weight: 2, fillColor: red ? "#e5484d" : here ? "#7c3aed" : n ? "#2da44e" : "#fff", fillOpacity: 1 }).addTo(g);
       if (n) m.bindTooltip(String(n), { permanent: true, direction: "center", className: "rm-num" });
       else m.bindTooltip(esc(v.name), { direction: "top" });
       m.bindPopup(`<b>${esc(v.name)}</b><br><small>${esc(v.area)} · open ${esc(v.open?.[0] || "")}-${esc(v.open?.[1] || "")}</small><br>${offers}<div class="rm-acts"><button data-plan="${esc(Object.keys(v.offers || {})[0] || "")}" data-venue="${esc(v.name)}">Plan here with Join's agent</button><a href="#/venue?id=${esc(v.id)}">Its rooms and courts</a></div>`);
@@ -66,7 +68,7 @@ export default function RealMap({ world, me, over = null, alternatives = [], peo
 
   const aroundMe = () => {
     if (center) { setCenter(null); save(null); setNote(null); return; }
-    if (!navigator.geolocation || !window.isSecureContext) { setNote("This browser only shares your location on https or localhost, so the map stays where the sample town is."); return; }
+    if (!navigator.geolocation || !window.isSecureContext) { setNote("Your browser only shares your location with secure (https) sites, and this demo server isn't one, so the map stays where the sample town is."); return; }
     navigator.geolocation.getCurrentPosition(
       (p) => { const x = { lat: p.coords.latitude, lon: p.coords.longitude }; setCenter(x); save(x); setNote("The sample town's venues are placed around you. They are made up: only the map underneath is real."); },
       () => setNote("Your location wasn't shared, so the map stays where the sample town is."), { timeout: 8000 });
@@ -75,8 +77,8 @@ export default function RealMap({ world, me, over = null, alternatives = [], peo
     <div className="rmap-wrap">
       <div ref={box} className="rmap" role="application" aria-label="Map of the venues" />
       <div className="rmap-bar">
-        <button className="btn small" onClick={aroundMe}>{center ? "Back to the sample town" : "Show around me"}</button>
-        <small className="muted">{note || (center ? "Placed around you (made-up venues on a real map)." : `${world?.town.name || ""}. Click a venue for what it offers.`)}</small>
+        <button className="btn small" onClick={aroundMe}>{center ? tr("Back to the sample town") : tr("Show around me")}</button>
+        <small className="muted">{note || (center ? "Placed around you (made-up venues on a real map)." : `${world?.town.name || ""}. Tap or click a venue for what it offers.`)}</small>
       </div>
     </div>
   );

@@ -19,7 +19,7 @@ let clock = () => new Date();
 export const setOpsClock = (fn) => { clock = fn; };
 const first = (id) => player(id)?.name?.split(" ")[0] || id;
 const by = (a) => ({ kind: "agent", player: a.player, client: a.client });
-const toCents = (x) => (typeof x === "number" && Number.isFinite(x) && x > 0 && x < 10000 ? Math.round(x * 100) : null);
+const toCents = (x) => { const n = typeof x === "string" && /^\s*\$?\d+(\.\d+)?\s*$/.test(x) ? +x.replace(/[$\s]/g, "") : x; return typeof n === "number" && Number.isFinite(n) && n > 0 && n < 10000 ? Math.round(n * 100) : null; }; // (a number, or a string like "30.50")
 const said = (a) => `${first(a.player)}'s agent${a.client ? ` (${a.client})` : ""}`;
 
 // The agent's AP2 open mandates (what the person let it book and pay), signed by Join; made again whenever the person
@@ -54,7 +54,7 @@ export function listVenues({ activity } = {}) {
 
 // Who is free and when, and the fair venue for each: the organizer's usual free times (or the window they give), the
 // people interested in the activity who are free then, and the venue with a free unit whose longest trip is shortest.
-export function findOptions(a, { activity = "badminton", dates = [], from = null, to = null, minutes = null, players = 3, people = null, with: want = [] } = {}) {
+export function findOptions(a, { activity = "badminton", date = null, dates = date ? [date] : [], from = null, to = null, minutes = null, players = 3, people = null, with: want = [] } = {}) {
   if (Number.isInteger(people) && people >= 1) players = people - 1; // ("people" is the whole group, your user included)
   const now = clock(), me = player(a.player), act = getActivity(activity);
   if (!act) return { error: "unknown_activity", message: `activity is one of ${ACTIVITIES().join(", ")}.` };
@@ -64,7 +64,7 @@ export function findOptions(a, { activity = "badminton", dates = [], from = null
   if ((from && !isTime(from)) || (to && !isTime(to)) || dates.some((d) => !isDate(d))) return { error: "bad_time", message: "dates are YYYY-MM-DD, from and to HH:MM." };
   const need = Math.max(1, Math.min(11, players | 0));
   const days = dates.length ? dates.slice(0, 7) : Array.from({ length: 7 }, (_, i) => addDays(ymd(now), i));
-  const mine = windows(me.free), others = getWorld().players.filter((p) => p.id !== me.id && ((p.interests || []).includes(activity) || want.includes(p.id)));
+  const mine = windows(me.free), others = getWorld().players.filter((p) => p.id !== me.id && (want.includes(p.id) || (!p.joined && (p.interests || []).includes(activity)))); // (people who joined Join themselves are invited only when asked for by name)
   const opts = [];
   for (const d of days) {
     const date = dateOf(d);
@@ -149,14 +149,17 @@ function mandateCheck(a, presented, { venue: venueId, share, authorized = share,
   record({ actor: by(a), who: [a.player], action: "mandate_refused", summary: `${said(a)} was refused: ${r.message}` });
   return { error: r.error, message: r.message, ...(r.receipt ? { ap2Receipt: r.receipt } : {}) };
 }
+// whether this caller may start a payment: the person on the website (or Join's website agent, in their session), or an
+// agent token with the pay scope
+const mayPay = (a) => !a.scopes || a.scopes.includes("pay");
 const ownShare = (total, k) => total - Math.floor(total / k) * (k - 1);
 
 export function makeOffer(a, { negotiation, amount, mandate }) {
   const c = toCents(amount);
-  if (!c) return { error: "bad_amount", message: "amount is the total for the booking in USD, e.g. 30 or 31.5." };
+  if (!c) return { error: "bad_amount", message: "amount is the total for the booking in USD as a number, e.g. 30 or 31.5 (not the per-person share)." };
   const cur = neg.status({ id: negotiation, by: a.player });
   if (!cur.error) { const no = mandateCheck(a, mandate, { venue: cur.venue, share: ownShare(Math.min(c, cents(cur.ask)), cur.players.length), date: cur.date, start: cur.start }); if (no) return no; }
-  const r = neg.offer({ id: negotiation, by: a.player, amount: c });
+  const r = settle.deferGuarantee(!mayPay(a), () => neg.offer({ id: negotiation, by: a.player, amount: c }));
   const n = r.error ? r.negotiation : r;
   if (n) record({ actor: by(a), who: n.players, action: r.error ? "offer_refused" : r.status === "agreed" ? "deal" : r.status === "rejected" ? "venue_rejected" : "venue_countered", ref: n.id,
     summary: r.error ? `${said(a)} offered $${usd(c)}: ${r.message}` : r.status === "agreed" ? `${said(a)} offered $${usd(c)}. ${n.venueName} agreed: $${n.agreed.amount}. ${first(a.player)} guarantees it in PayPal until the others pay; own share $${organizerShare(n)}, at most $${n.agreed.amount}.` : r.status === "rejected" ? `${said(a)} offered $${usd(c)}. ${n.venueName} stood at $${n.ask}: no deal.` : `${said(a)} offered $${usd(c)}. ${n.venueName} countered $${n.ask}${n.final ? " (best and final)" : ""}.`,
@@ -167,7 +170,7 @@ export function makeOffer(a, { negotiation, amount, mandate }) {
 export function acceptPrice(a, { negotiation, mandate }) {
   const cur = neg.status({ id: negotiation, by: a.player });
   if (!cur.error) { const no = mandateCheck(a, mandate, { venue: cur.venue, share: ownShare(cents(cur.ask), cur.players.length), date: cur.date, start: cur.start }); if (no) return no; }
-  const r = neg.accept({ id: negotiation, by: a.player });
+  const r = settle.deferGuarantee(!mayPay(a), () => neg.accept({ id: negotiation, by: a.player }));
   const n = r.error ? r.negotiation : r;
   if (n) record({ actor: by(a), who: n.players, action: r.error ? "accept_refused" : "deal", ref: n.id, summary: r.error ? `${said(a)} tried to accept $${n.ask}: ${r.message}` : `${said(a)} accepted ${n.venueName}'s $${n.agreed.amount}. Next: ${first(a.player)} guarantees the whole $${n.agreed.amount} in PayPal until the others pay; ${first(a.player)}'s own share is $${organizerShare(n)}, and at most $${n.agreed.amount} if nobody else pays.`, data: r.alternatives ? { alternatives: r.alternatives } : null });
   return withTerms(a, withRefusal(a, r));

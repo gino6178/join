@@ -72,7 +72,7 @@ export function open({ by, players = [], venue: venueId, activity, date, start, 
   if (!offer.minutes.includes(minutes)) return err("bad_length", `${activity} is booked for ${offer.minutes.join(", ")} minutes.`);
   if (startOf(date, start) <= now) return err("in_the_past", "That time has passed.");
   const ids = [...new Set([by, ...players])];
-  if (ids.length > 12 || ids.some((id) => !player(id))) return err("bad_players", "players must be known player ids, 12 at most.");
+  if (ids.length > 12 || ids.some((id) => !player(id))) return err("bad_players", `players must be people's ids, 12 at most (find_options lists them in options[].players; names are in options[].names)${ids.filter((id) => !player(id)).length ? `. Not known: ${ids.filter((id) => !player(id)).slice(0, 3).join(", ")}` : ""}.`);
   if (ids.length < offer.min || ids.length > offer.max) return err("group_size", `One ${offer.unit} for ${activity} takes ${offer.min} to ${offer.max} people; this group is ${ids.length}.`);
   const day = ymd(now);
   const used = db.data.negotiations.filter((n) => n.by === by && n.venue === venueId && n.openedDay === day).length;

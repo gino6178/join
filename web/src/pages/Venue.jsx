@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from "react";
+import { tr, lang, setLang } from "../i18n.js";
 import { api, useApi, money } from "../api.js";
 import { useWorld } from "../components/Actor.jsx";
 import VenueMoney from "../components/VenueMoney.jsx";
@@ -25,7 +26,7 @@ export default function Venue({ query }) {
   const units = v ? Object.entries(v.offers).map(([a, o]) => ({ activity: a, unit: w.activities.find((x) => x.id === a)?.unit || "unit", count: o.units })) : [];
   return (
     <div className="page wide">
-      <header className="page-head"><h1>Venue view</h1><p className="muted">What a venue sees: its courts, rooms or tables, with the bookings Join's agents made. Dashed: held while the group pays. Solid: paid and locked.</p></header>
+      <header className="page-head"><h1>{tr("Venue view")}</h1><p className="muted">{tr("What a venue sees: its courts, rooms or tables, with the bookings Join's agents made. Dashed: held while the group pays. Solid: paid and locked.")}</p></header>
       <div className="seg">{w?.venues.map((x) => <button key={x.id} className={x.id === id ? "on" : ""} onClick={() => { setId(x.id); setDate(null); }}>{x.name}</button>)}</div>
       {dates.length > 0 && <div className="seg small">{dates.map((d) => <button key={d} className={d === day ? "on" : ""} onClick={() => setDate(d)}>{d}</button>)}</div>}
       <section className="card sched">

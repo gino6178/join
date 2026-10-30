@@ -36,6 +36,8 @@ export default function PlaceScheduler({ units, bookings, date, kind }) {
         resources={resources}
         events={events}
         startDate={new Date(y, m - 1, d, 7)}
+        // (scrolled to the day's first booking, or to the evening when most bookings are, not to 7 am)
+        visibleDate={{ date: new Date(Math.max(new Date(y, m - 1, d, 7).getTime(), (events.length ? Math.min(...events.map((e) => e.startDate.getTime())) : new Date(y, m - 1, d, 18).getTime()) - 2 * 3600e3)), block: "start" }}
         endDate={new Date(y, m - 1, d + 1, 0)}
         viewPreset="hourAndDay"
         rowHeight={52}

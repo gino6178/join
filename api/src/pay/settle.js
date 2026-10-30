@@ -88,11 +88,18 @@ setOnAgreed((n) => {
   };
   db.data.bookings.push(b); db.save();
   note(b, { kind: "venue", venue: b.venue }, "place_held", `${venue(b.venue).name} holds ${unitName(b.activity, unit)} for ${ORGANIZER_MS / 60e3} minutes while ${name(b.organizer)} authorizes $${usd(b.total)} with PayPal.`);
-  serial(b.id, () => startPayment(b, b.organizer, b.total, "organizer")).catch(() => {});
+  // The guarantee starts at once only if the organizer's side may pay: the person on the website, or an agent whose
+  // token has the pay scope. Otherwise it waits for them (pay_my_share, or the button on Plans), so a deal an agent
+  // accepted never puts a hold on anyone's PayPal by itself.
+  if (!deferring) serial(b.id, () => startPayment(b, b.organizer, b.total, "organizer")).catch(() => {});
+  else note(b, { kind: "platform" }, "guarantee_waiting", `${name(b.organizer)}'s agent may not pay, so nothing is held in PayPal yet: ${name(b.organizer)} guarantees the $${usd(b.total)} on Join (Plans) or lets an agent that may pay do it, within ${ORGANIZER_MS / 60e3} minutes.`);
   // AP2: the agreed checkout and its Checkout Mandate, under the organizer agent's open mandates, with Join's receipt
   ap2.issueCheckout(b, { venue: venue(b.venue), activity: getActivity(b.activity), organizerKid: n.agentKid || null, result: { ok: true } });
   return { id: b.id, state: b.state };
 });
+
+let deferring = false;
+export function deferGuarantee(on, fn) { deferring = on; try { return fn(); } finally { deferring = false; } }
 
 async function startPayment(b, playerId, amount, role) {
   if (b.payments[playerId]) return b.payments[playerId];
@@ -112,7 +119,7 @@ async function startPayment(b, playerId, amount, role) {
     if (o.authorization) { p.authorizationId = o.authorization.id; p.status = "authorized"; }
     else p.status = "awaiting_approval";
     db.save();
-    if (p.status === "authorized") note(b, { kind: card ? "paypal" : "agent", player: playerId }, "authorized", card ? `PayPal sandbox: $${usd(amount)} authorized for ${name(playerId)} with PayPal's test card (a demo stand-in for their approval).` : `${name(playerId)}'s agent authorized $${usd(amount)} from their saved PayPal, within their limit.`);
+    if (p.status === "authorized") note(b, { kind: card ? "paypal" : "agent", player: playerId }, "authorized", card ? `PayPal sandbox: $${usd(amount)} authorized for ${name(playerId)} with PayPal's sandbox test card, standing in for their own approval in PayPal (order ${p.orderId}).` : `${name(playerId)}'s agent authorized $${usd(amount)} from their saved PayPal, within their limit.`);
     else note(b, { kind: "platform" }, "approval_requested", `${name(playerId)} needs to approve $${usd(amount)} in PayPal${role === "organizer" ? " to keep the booking" : " for their share"}.`, { player: playerId });
     await advance(b);
   } catch (e) {
@@ -385,7 +392,7 @@ export function view(b, viewer) {
     id: b.id, state: b.state, negotiation: b.negotiation, venue: b.venue, venueName: v?.name, activity: b.activity, date: b.date, start: b.start, minutes: b.minutes, unit: b.unit, unitName: place(b),
     currency: "USD", total: usd(b.total), organizer: b.organizer, players: b.players, declined: b.declined,
     guaranteeBy: b.state === "awaiting_organizer" ? new Date(b.organizerUntil).toISOString() : null, payBy: b.state === "held" ? new Date(b.holdUntil).toISOString() : null,
-    payments: Object.fromEntries(b.players.map((pid) => { const p = b.payments[pid]; return [pid, { share: usd(b.shares[pid]), ...(pid === b.organizer ? { guarantee: usd(b.total), paid: p?.captured != null ? usd(p.captured) : null } : {}), role: pid === b.organizer ? "organizer" : "share", status: b.declined.includes(pid) ? "declined" : p?.status || (pid !== b.organizer && b.state === "held" ? "invited" : "not_started"), via: p?.via || null }]; })),
+    payments: Object.fromEntries(b.players.map((pid) => { const p = b.payments[pid]; return [pid, { share: usd(b.shares[pid]), ...(pid === b.organizer ? { guarantee: usd(b.total), paid: p?.captured != null ? usd(p.captured) : null } : {}), role: pid === b.organizer ? "organizer" : "share", status: b.declined.includes(pid) ? "declined" : p?.status || (pid !== b.organizer && b.state === "held" ? "invited" : "not_started"), via: p?.via || null, paypal: p ? { order: p.orderId || null, authorization: p.authorizationId || null, capture: p.captureId || null } : null }]; })),
     review: viewer ? (reviewsMod.byPlayer(viewer, b.id) ? { done: reviewsMod.byPlayer(viewer, b.id).stars } : canReview(b, viewer).ok ? { can: true } : null) : null,
     invite: viewer !== b.organizer && b.state === "held" && !mine && !b.declined.includes(viewer) ? { share: usd(b.shares[viewer]), payBy: new Date(b.holdUntil).toISOString() } : null,
     you: mine ? { share: usd(b.shares[viewer]), ...(mine.role === "organizer" ? { guarantee: usd(b.total) } : {}), authorized: usd(mine.amount), paid: mine.status === "captured" ? usd(mine.captured ?? mine.amount) : "0.00", status: mine.status, via: mine.via,

@@ -3,7 +3,8 @@
 import { toolsManifest } from "./mcp.js";
 
 export function agentGuide(u) {
-  const tools = toolsManifest().tools.map((t) => `- ${t.name}: ${t.title || t.description.split(". ")[0]}`).join("\n");
+  const args = (t) => Object.entries(t.inputSchema?.properties || {}).map(([k, v]) => `${k}${(t.inputSchema.required || []).includes(k) && v.default === undefined ? "" : "?"}: ${v.type || "…"}`).join(", ");
+  const tools = toolsManifest().tools.map((t) => `- ${t.name}(${args(t)}): ${t.title || t.description.split(". ")[0]}`).join("\n");
   return `# Join
 
 > A marketplace where AI agents get a group of friends together (badminton, karaoke, escape rooms, hot pot, ...):
@@ -28,7 +29,7 @@ Testing on your own, with no person to ask? Demo accounts are on here:
 - Tool fingerprint (SHA-256 of the tool descriptions): ${u}/.well-known/mcp-tools.json
 - Receipts' keys and the transparency log: ${u}/.well-known/join-receipts.json
 
-Tools:
+Tools (arguments; ? = optional; tools/list over MCP has the full descriptions and JSON schemas):
 ${tools}
 
 ## A typical plan
@@ -41,7 +42,8 @@ their own shares) -> booking_status. Friends' agents see invitations in my_plans
 ## Rules Join enforces
 
 - Your person's limits (per booking, per week, how much you may guarantee for a group) are checked before a venue sees
-  an offer. Only the person can change them, on the website.
+  an offer. Only the person can change them, on the website. If your person tells you a different limit, keep to the stricter
+  one: Join enforces only what is set on the site (whoami: mandate, and youCanSpend on each option).
 - Offers, accepts, payments and agreed share changes need your AP2 open payment mandate (whoami:
   ap2.openPaymentMandate), passed as "mandate".
 - A venue's floor is never shown. An offer under 70% of the current ask doesn't move it; a final price is final.

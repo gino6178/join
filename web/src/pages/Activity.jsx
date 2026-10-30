@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { tr, lang, setLang } from "../i18n.js";
 import { api, useApi, when, money, clock } from "../api.js";
 import Actor, { useWorld, firstName } from "../components/Actor.jsx";
 import Icon from "../components/Icon.jsx";
@@ -26,7 +27,7 @@ export default function Activity({ entries, me }) {
   }, [entries, games.data]);
   return (
     <div className="page">
-      <header className="page-head"><h1>Activity</h1><p className="muted">Everything the agents did for you, as it happens. Join writes each line from the facts; nothing here was written by an AI.</p></header>
+      <header className="page-head"><h1>{tr("Activity")}</h1><p className="muted">{tr("Everything the agents did for you, as it happens. Join writes each line from the facts; nothing here was written by an AI.")}</p></header>
       {waiting.length > 0 && <section className="needs">
         <h2><Icon name="bolt" size={18} />Waiting on you</h2>
         {waiting.map((b) => b.invite ? <Invite key={b.id} b={b} done={games.reload} /> : <div key={b.id} className="need">
@@ -37,8 +38,8 @@ export default function Activity({ entries, me }) {
       {owing.map((b) => <section key={b.id} className="needs"><div className="need"><span><b>Pay back {firstOf(b.organizer)}: {money(b.owes.amount)}</b><small>{b.venueName} · {b.activity} · {b.date} {b.start}. They covered your share; this is a PayPal invoice.</small></span><a className="btn primary" href={b.owes.url} target="_blank" rel="noreferrer">Pay the invoice</a></div></section>)}
       {!entries.length && <div className="empty card start">
         <Icon name="spark" size={28} />
-        <p><b>Plan something with friends.</b> Tell Join's agent what you'd like to do, or bring your own agent. Every step, whoever takes it, shows up here.</p>
-        <span className="row-btns"><button className="btn primary" onClick={() => dispatchEvent(new Event("join:open-agent"))}>Plan something</button><a className="btn ghost" href="#/connect">Use my own agent</a></span>
+        <p><b>{tr("Plan something with friends.")}</b> Tell Join's agent what you'd like to do, or bring your own agent. Every step, whoever takes it, shows up here.</p>
+        <span className="row-btns"><button className="btn primary" onClick={() => dispatchEvent(new Event("join:open-agent"))}>{tr("Plan something")}</button><a className="btn ghost" href="#/connect">{tr("Use my own agent")}</a></span>
       </div>}
       {groups.map((g) => <Group key={g.k} list={g.list} me={me.player.id} booking={(games.data?.bookings || []).find((b) => b.id === g.k || b.negotiation === g.k)} />)}
     </div>
@@ -48,17 +49,18 @@ export default function Activity({ entries, me }) {
 // One plan's steps. A booking leads with a one-line summary (where, when, how much, who has paid); the steps below show
 // the latest few, with the rest a click away.
 const SHOWN = 3;
-const STATE = { awaiting_organizer: "waiting for the guarantee", held: "friends paying", locking: "locking", locked: "paid and locked", played: "played", venue_paid: "venue paid", released: "released", cancelled: "cancelled", refunded: "refunded" };
+const STATE = { awaiting_organizer: "waiting for the guarantee", held: "friends paying", locking: "locking", locked: "paid and locked", played: "played", venue_paid: "venue paid", released: "released", cancelled: "cancelled", refunded: tr("refunded") };
 function Group({ list, me, booking: b }) {
   const [all, setAll] = useState(false);
   const head = list.find((e) => e.action === "negotiation_opened") || list[0];
   const title = b ? `${b.activity[0].toUpperCase()}${b.activity.slice(1)} at ${b.venueName}` : head.action === "negotiation_opened" ? head.summary.replace(/^.*? asked /, "").replace(/\. Venue asks.*$/, "") : list[0].ref ? "A booking" : "Searches";
   const last = list.at(-1), shown = all ? list : list.slice(-SHOWN);
+  const covered = b ? Object.entries(b.payments || {}).filter(([pid, p]) => pid !== b.organizer && p.status !== "captured").length : 0;
   const paid = b ? Object.values(b.payments || {}).filter((p) => p.status === "captured" || p.status === "authorized").length : 0;
   return (
     <section className="card group">
       <header><h3>{title.charAt(0).toUpperCase() + title.slice(1)}</h3><span className={`pill ${b ? (["locked", "played", "venue_paid"].includes(b.state) ? "good" : "") : TONE[last.action] || ""}`}>{b ? STATE[b.state] || b.state : last.action.replace(/_/g, " ")}</span></header>
-      {b && <p className="summary">{b.date} {b.start} · {b.players.length} people · <b>{money(b.total)}</b> · {["locked", "played", "venue_paid"].includes(b.state) ? "everyone paid" : `${paid} of ${b.players.length} in, held in PayPal`} · <a href={`#/games?booking=${b.id}`}>Open the plan</a></p>}
+      {b && <p className="summary">{b.date} {b.start} · {b.players.length} people · <b>{money(b.total)}</b> · {["locked", "played", "venue_paid"].includes(b.state) ? (covered ? `${covered} covered by the organizer` : tr("everyone paid")) : `${paid} of ${b.players.length} in, held in PayPal`} · <a href={`#/games?booking=${b.id}`}>{tr("Open the plan")}</a></p>}
       {list.length > SHOWN && !all && <button className="link-btn small" onClick={() => setAll(true)}>Show all {list.length} steps</button>}
       <ol className="timeline">{shown.map((e) => (
         <li key={e.id} className={TONE[e.action] || ""}>

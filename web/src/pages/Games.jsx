@@ -1,13 +1,14 @@
 import { useState } from "react";
+import { tr, lang, setLang } from "../i18n.js";
 import { api, useApi, money, dayLabel, clock } from "../api.js";
 import { useWorld, firstName } from "../components/Actor.jsx";
 import Icon from "../components/Icon.jsx";
 import PayPalButtons from "../components/PayPalButtons.jsx";
 
 // Deals and bookings: where each one stands, who has paid, and the buttons a person may press themselves.
-const STEPS = [["awaiting_organizer", "Deal"], ["held", "Guaranteed"], ["locked", "Paid and locked"], ["played", "Played"], ["venue_paid", "Venue paid"]];
+const STEPS = [["awaiting_organizer", tr("Deal")], ["held", tr("Guaranteed")], ["locked", tr("Paid and locked")], ["played", tr("Played")], ["venue_paid", tr("Venue paid")]];
 const ENDED = { released: "Released: nobody was charged", cancelled: "Cancelled: nobody was charged", refunded: "Cancelled: everyone refunded" };
-const PAY = { invited: "invited, no answer yet", not_started: "not started", creating: "starting", awaiting_approval: "waiting for approval", authorized: "in · held in PayPal", captured: "paid", voided: "voided", dropped: "didn't pay (covered)", declined: "declined", refunded: "refunded", failed: "failed", capture_failed: "failed", too_late: "too late" };
+const PAY = { invited: tr("invited, no answer yet"), not_started: "not started", creating: "starting", awaiting_approval: tr("waiting for approval"), authorized: tr("in · held in PayPal"), captured: tr("paid"), voided: "voided", dropped: tr("didn't pay (covered)"), declined: tr("declined"), refunded: tr("refunded"), failed: "failed", capture_failed: "failed", too_late: "too late" };
 
 export default function Games({ entries, me, query, demo }) {
   const [tick, setTick] = useState(0);
@@ -17,7 +18,7 @@ export default function Games({ entries, me, query, demo }) {
   if (!g.data) return <div className="page"><p className="muted">Loading…</p></div>;
   return (
     <div className="page">
-      <header className="page-head"><h1>Plans</h1><p className="muted">Each deal your agent made, and how it is being paid.</p></header>
+      <header className="page-head"><h1>{tr("Plans")}</h1><p className="muted">{tr("Each deal your agent made, and how it is being paid.")}</p></header>
       {query.get("cancelled") && <p className="note warn">You left PayPal without approving. Your agent can send you the link again.</p>}
       <Balances tick={entries.length + tick} done={() => setTick((t) => t + 1)} />
       {!g.data.bookings.length && <p className="empty card">No bookings yet.</p>}
@@ -43,37 +44,38 @@ function Booking({ b, me, w, focus, demo, done }) {
       {!ENDED[b.state] && <ol className="stepper">{STEPS.map(([s, label], i) => <li key={s} className={i < at ? "done" : i === at ? "now" : ""}><span />{label}</li>)}</ol>}
       {b.guaranteeBy && <p className="small"><Icon name="clock" size={14} />Held until {clock(b.guaranteeBy)} for {firstName(w, b.organizer)} to guarantee the whole booking in PayPal.</p>}
       {b.payBy && <p className="small"><Icon name="clock" size={14} />Shares due by {clock(b.payBy)}. {firstName(w, b.organizer)} covers anyone who doesn't pay.</p>}
-      <table className="pays"><thead><tr><th>Player</th><th>Pays</th><th>Status</th><th>How</th></tr></thead><tbody>
+      <table className="pays"><thead><tr><th>{tr("Player")}</th><th>{tr("Pays")}</th><th>{tr("Status")}</th><th>{tr("How")}</th></tr></thead><tbody>
         {b.players.map((pid) => { const p = b.payments[pid]; return (
-          <tr key={pid} className={pid === me ? "me" : ""}><td><span className="avatar sm">{firstName(w, pid)[0]}</span> {pid === me ? "You" : firstName(w, pid)}{pid === b.organizer && <small> organizer</small>}</td><td>{p.role === "organizer" ? <>{money(p.paid ?? p.share)}<small>{p.paid != null && +p.paid > +p.share ? " (covered others)" : ` · guarantees ${money(p.guarantee)}`}</small></> : money(p.share)}</td><td><span className={`st ${p.status}`}>{PAY[p.status] || p.status}</span></td><td><small>{p.via === "vault" ? "saved PayPal, by the agent" : p.via === "approval" ? "approved in PayPal" : p.via === "sandbox test card" ? "PayPal sandbox test card" : ""}</small></td></tr>); })}
+          <tr key={pid} className={pid === me ? "me" : ""}><td><span className="avatar sm">{firstName(w, pid)[0]}</span> {pid === me ? tr("You") : firstName(w, pid)}{pid === b.organizer && <small> organizer</small>}</td><td>{p.role === "organizer" ? <>{money(p.paid ?? p.share)}<small>{p.paid != null && +p.paid > +p.share ? " (covered others)" : ` · guarantees ${money(p.guarantee)}`}</small></> : money(p.share)}</td><td><span className={`st ${p.status}`}>{PAY[p.status] || p.status}</span></td><td><small>{p.via === "vault" ? tr("saved PayPal, by the agent") : p.via === "approval" ? tr("approved in PayPal") : p.via === "sandbox test card" ? tr("PayPal sandbox test card") : ""}{p.paypal?.order && <span className="pp-ids" title="PayPal's own ids for this payment (order, authorization, capture)">{[p.paypal.order, p.paypal.capture || p.paypal.authorization].filter(Boolean).join(" · ")}</span>}</small></td></tr>); })}
       </tbody></table>
       {(() => { // who the organizer paid for, said plainly (the table alone reads as if everyone paid)
         const org = b.payments[b.organizer], short = b.players.filter((pid) => pid !== b.organizer && b.payments[pid]?.status !== "captured");
-        return org?.paid != null && +org.paid > +org.share && short.length ? <p className="small warn-text">{b.organizer === me ? "You" : firstName(w, b.organizer)} covered {short.map((pid) => (pid === me ? "you" : firstName(w, pid))).join(", ")}: {money(+org.paid - +org.share)} on top of {b.organizer === me ? "your" : "their"} own share. {b.organizer === me ? "You can ask anyone who joined and didn't pay to pay you back." : ""}</p> : null;
+        return org?.paid != null && +org.paid > +org.share && short.length ? <p className="small warn-text">{b.organizer === me ? tr("You") : firstName(w, b.organizer)} covered {short.map((pid) => (pid === me ? "you" : firstName(w, pid))).join(", ")}: {money(+org.paid - +org.share)} on top of {b.organizer === me ? "your" : "their"} own share. {b.organizer === me ? "You can ask anyone who joined and didn't pay to pay you back." : ""}</p> : null;
       })()}
       {(b.shareAsks || []).filter((x) => x.status === "pending").map((x) => (
         <div key={x.player} className="need ask">
           <span><b>{x.player === me ? "You asked" : `${firstName(w, x.player)} asks`} to pay {money(x.amount)} instead of {money(x.from)}</b><small>{me === b.organizer ? `You would cover ${money(x.from - x.amount)} more.` : "Waiting for the organizer's answer."}</small></span>
-          {me === b.organizer && <span className="need-btns"><button className="btn ghost" disabled={!!busy} onClick={() => act("answer-share", { player: x.player, accept: false })}>Keep it</button><button className="btn primary" disabled={!!busy} onClick={() => act("answer-share", { player: x.player, accept: true })}>Agree</button></span>}
+          {me === b.organizer && <span className="need-btns"><button className="btn ghost" disabled={!!busy} onClick={() => act("answer-share", { player: x.player, accept: false })}>{tr("Keep it")}</button><button className="btn primary" disabled={!!busy} onClick={() => act("answer-share", { player: x.player, accept: true })}>{tr("Agree")}</button></span>}
         </div>))}
       {b.invite && !(b.shareAsks || []).some((x) => x.status === "pending") && <AskLess onAsk={(amount) => act("propose-share", { amount })} share={b.invite.share} busy={!!busy} />}
       {b.review?.can && (["played", "venue_paid"].includes(b.state) ? <ReviewForm b={b} done={done} /> : <EarlyReview b={b} done={done} />)}
       {b.review?.done && <p className="small"><Icon name="check" size={14} />You rated {b.venueName} {b.review.done}★. Thank you: agents read verified reviews like yours when they pick venues.</p>}
       <Mandates id={b.id} />
       {b.receipts?.length > 0 && <p className="small"><Icon name="verify" size={14} />Receipts: {b.receipts.map((x) => <a key={x.id} href={`#/receipt/${x.id}`}>{RECEIPT[x.event] || x.event}</a>).reduce((a, x) => [...a, a.length ? " · " : "", x], [])}</p>}
-      {(b.extras || []).map((x, i) => <p key={i} className="small"><Icon name="store" size={14} />{b.venueName} billed extras ({x.items.join(", ")}): {money(x.total)}, {x.status === "paid" ? "paid" : "waiting to be paid"}{x.url && <> · <a href={x.url} target="_blank" rel="noreferrer">pay the PayPal invoice</a></>}</p>)}
-      {(b.reimbursements || []).map((r) => <p key={r.player} className="small"><Icon name="send" size={14} />{r.player === me ? "You" : firstName(w, r.player)}: PayPal invoice for {money(r.amount)}, {r.status === "sent" ? "waiting to be paid" : r.status === "repaid" ? `paid; ${firstName(w, b.organizer)} was paid back with PayPal Payouts` : r.status.replace(/_/g, " ")}</p>)}
+      {(b.extras || []).map((x, i) => <p key={i} className="small"><Icon name="store" size={14} />{b.venueName} billed extras ({x.items.join(", ")}): {money(x.total)}, {x.status === "paid" ? tr("paid") : "waiting to be paid"}{x.url && <> · <a href={x.url} target="_blank" rel="noreferrer">pay the PayPal invoice</a></>}</p>)}
+      {(b.reimbursements || []).map((r) => <p key={r.player} className="small"><Icon name="send" size={14} />{r.player === me ? tr("You") : firstName(w, r.player)}: PayPal invoice for {money(r.amount)}, {r.status === "sent" ? "waiting to be paid" : r.status === "repaid" ? `paid; ${firstName(w, b.organizer)} was paid back with PayPal Payouts` : r.status.replace(/_/g, " ")}</p>)}
       {b.payout && <p className="small"><Icon name="send" size={14} />Venue paid {money(b.payout.amount)} with PayPal Payouts ({String(b.payout.status).toLowerCase()}), after PayPal's fees.</p>}
       {demo && me === b.organizer && b.state === "held" && <Seats b={b} w={w} done={done} />}
       {err && <p className="err">{err}</p>}
       <div className="actions">
+        {me === b.organizer && b.state === "awaiting_organizer" && !b.you?.status && <button className="btn primary" disabled={!!busy} onClick={() => act("pay")}>Guarantee it in PayPal ({money(b.total)})</button>}
         {b.you?.approveUrl && <PayPalButtons bookingId={b.id} orderId={b.you.orderId} approveUrl={b.you.approveUrl} label={me === b.organizer && b.state === "awaiting_organizer" ? "Guarantee the booking in PayPal" : "Pay your share in PayPal"} onDone={done} />}
-        {me === b.organizer && ["locked", "played", "venue_paid"].includes(b.state) && b.players.filter((pid) => pid !== me && ["dropped", "failed", "capture_failed", "voided"].includes(b.payments[pid]?.status) && !(b.reimbursements || []).some((r) => r.player === pid)).map((pid) => (
+        {me === b.organizer && ["locked", "played", "venue_paid"].includes(b.state) && b.players.filter((pid) => pid !== me && ["dropped", "failed", "capture_failed", "voided", "invited", "not_started"].includes(b.payments[pid]?.status) && !(b.reimbursements || []).some((r) => r.player === pid)).map((pid) => (
           <button key={pid} className="btn ghost" disabled={!!busy} onClick={() => act("reimburse", { player: pid })}>Ask {firstName(w, pid)} to pay you back</button>))}
         {me !== b.organizer && ["awaiting_organizer", "held"].includes(b.state) && !b.payments[me]?.status?.match(/declined|captured/) && <>
           {!b.you && b.state === "held" && <button className="btn primary" disabled={!!busy} onClick={() => act("pay")}>Join and pay {money(b.invite?.share || 0)}</button>}
           <button className="btn" disabled={!!busy} onClick={() => act("decline")}>I can't play</button></>}
-        {me === b.organizer && ["awaiting_organizer", "held", "locked"].includes(b.state) && <button className="btn ghost" disabled={!!busy} onClick={() => act("cancel")}>Cancel booking</button>}
+        {me === b.organizer && ["awaiting_organizer", "held", "locked"].includes(b.state) && <button className="btn ghost" disabled={!!busy} onClick={() => act("cancel")}>{tr("Cancel booking")}</button>}
         <span className="pp">PayPal {b.paypal === "mock" ? "simulated" : b.paypal}</span>
       </div>
     </section>
@@ -144,11 +146,11 @@ function Curve({ hist, list, max }) {
 
 // A verified review: stars, what was good and what wasn't (from a fixed list, so agents can count them), a few words.
 // Only for people who were in the booking and paid; agents can't write reviews.
-const RECEIPT = { locked: "receipt: paid and locked", refunded: "receipt: refunded", venue_paid: "receipt: venue paid" };
+const RECEIPT = { locked: tr("receipt: paid and locked"), refunded: tr("receipt: refunded"), venue_paid: tr("receipt: venue paid") };
 // Reviews open once the game is over. The demo town lets them in earlier (so a judge needn't wait), behind a click.
 function EarlyReview({ b, done }) {
   const [open, setOpen] = useState(false);
-  return open ? <ReviewForm b={b} done={done} /> : <p className="small muted">Reviews open after the game. <button className="link-btn small" onClick={() => setOpen(true)}>Demo: review it now</button></p>;
+  return open ? <ReviewForm b={b} done={done} /> : <p className="small muted">{tr("Reviews open after the game.")} <button className="link-btn small" onClick={() => setOpen(true)}>{tr("Demo: review it now")}</button></p>;
 }
 function ReviewForm({ b, done }) {
   const [stars, setStars] = useState(0), [liked, setLiked] = useState([]), [disliked, setDisliked] = useState([]), [text, setText] = useState(""), [err, setErr] = useState(null);
@@ -190,29 +192,30 @@ function Mandates({ id }) {
 
 // Demo only: the organizer plays the friends they invited, so the whole split can be seen from one window. Each step is
 // the same call the friend's own agent would make, and the activity log marks it as a demo step.
-const SEAT_STATUS = { authorized: "in · held in PayPal", awaiting_approval: "waiting for PayPal", declined: "can't come" };
+const SEAT_STATUS = { authorized: tr("in · held in PayPal"), awaiting_approval: "waiting for PayPal", declined: "can't come" };
 function Seats({ b, w, done }) {
   const [busy, setBusy] = useState(null), [msg, setMsg] = useState(null);
   const go = async (act, player) => {
     setBusy(`${act}:${player || ""}`); setMsg(null);
-    try { const r = await api(`/api/demo/bookings/${b.id}/${act}`, { method: "POST", body: { player } }); if (r?.result) setMsg(r.result); else if (r?.error) setMsg(r.message); done(); }
+    try { const r = await api(`/api/demo/bookings/${b.id}/${act}`, { method: "POST", body: { player } }); if (r?.result) setMsg(r.result); else if (r?.error) setMsg(r.message); done(); for (const t of [1500, 4000, 8000]) setTimeout(done, t); } // (the lock and captures finish a moment later)
     catch (e) { setMsg(e.message); }
     setBusy(null);
   };
   const others = b.players.filter((p) => p !== b.organizer);
   return (
     <div className="seats">
-      <p className="seats-head"><b>Demo: play your friends</b><small>Each button is what that friend's own agent would do. Logged as a demo step.</small></p>
+      <p className="seats-head"><b>{tr("Demo: play your friends")}</b><small>{tr("Each button is what that friend's own agent would do. Logged as a demo step.")}</small></p>
       {others.map((pid) => { const st = b.payments[pid]?.status, open = !st || st === "invited"; return (
         <div key={pid} className="seat">
           <span className="avatar">{firstName(w, pid)[0]}</span><b>{firstName(w, pid)}</b><small>{money(b.payments[pid]?.share)} · {SEAT_STATUS[st] || (open ? "invited" : st)}</small>
-          {open && <span className="seat-btns">
-            <button className="btn primary small" disabled={!!busy} onClick={() => go("pay", pid)}>{b.paypal === "mock" ? "Pays (saved PayPal)" : "Pays (sandbox card)"}</button>
-            {!(b.shareAsks || []).some((x) => x.player === pid) && <button className="btn small" disabled={!!busy} onClick={() => go("ask-less", pid)}>Asks $1 less</button>}
-            <button className="btn ghost small" disabled={!!busy} onClick={() => go("decline", pid)}>Can't come</button>
+          {open && w?.players.find((x) => x.id === pid)?.joined && <small className="muted">a real member: they answer themselves</small>}
+          {open && !w?.players.find((x) => x.id === pid)?.joined && <span className="seat-btns">
+            <button className="btn primary small" disabled={!!busy} onClick={() => go("pay", pid)}>{b.paypal === "mock" ? tr("Pays (saved PayPal)") : tr("Pays (sandbox card)")}</button>
+            {!(b.shareAsks || []).some((x) => x.player === pid) && <button className="btn small" disabled={!!busy} onClick={() => go("ask-less", pid)}>{tr("Asks $1 less")}</button>}
+            <button className="btn ghost small" disabled={!!busy} onClick={() => go("decline", pid)}>{tr("Can't come")}</button>
           </span>}
         </div>); })}
-      <button className="btn ghost small" disabled={!!busy} onClick={() => go("time-out")}>Time runs out now (you cover whoever hasn't paid)</button>
+      <button className="btn ghost small" disabled={!!busy} onClick={() => go("time-out")}>{tr("Time runs out now (you cover whoever hasn't paid)")}</button>
       {msg && <p className="small muted">{msg}</p>}
     </div>
   );

@@ -108,7 +108,7 @@ app.get("/api/world", (req, res) => {
   res.json({ town: w.town, currency: w.currency, note: w.note,
     activities: w.activities,
     venues: w.venues.map((v) => ({ id: v.id, name: v.name, area: v.area, x: v.x, y: v.y, open: v.open, offers: v.offers, style: v.policy.style })),
-    players: w.players.map((p) => ({ id: p.id, name: p.name, level: p.level, area: p.area, interests: p.interests })), publicPlaces: w.publicPlaces });
+    players: w.players.map((p) => ({ id: p.id, name: p.name, level: p.level, area: p.area, interests: p.interests, ...(p.joined ? { joined: true } : {}) })), publicPlaces: w.publicPlaces });
 });
 app.post("/api/session", (req, res) => {
   if (!DEMO) return res.status(403).json({ error: "demo sign-in is off" });
@@ -245,6 +245,7 @@ app.post("/api/demo/bookings/:id/:act", signedIn, async (req, res) => {
   await demoScope.run(true, async () => { try {
     if (req.params.act === "time-out") { said(`${nm(req.player)} ran the clock out for everyone who hadn't paid.`); return res.json(await settle.expireNow(b.id)); }
     if (!other(who)) return res.status(400).json({ error: "not_invited", message: "Pick someone invited to this booking." });
+    if (player(who)?.joined) return res.status(403).json({ error: "real_person", message: `${nm(who)} joined Join themselves: only they (or their agent) can answer.` }); // (the demo panel plays only the made-up residents)
     if (req.params.act === "pay") {
       // on the stand-in, the friend has saved PayPal and lets their agent pay; on the sandbox, PayPal's test card stands in
       if (pp.mode === "mock" && !settle.hasVault(who)) { const s = await settle.vaultStart(who); pp.approve({ setup: s.setup }); await settle.vaultFinish(s.setup); setMandate(who, { autopay: true }); }
@@ -282,7 +283,7 @@ app.get("/api/receipts/:id", (req, res) => { const r = receipts.show(req.params.
 // (closing a batch now instead of waiting for the next one: in demo mode, or with ADMIN_TOKEN as a bearer token)
 const admin = (req) => DEMO || (process.env.ADMIN_TOKEN && req.headers.authorization === `Bearer ${process.env.ADMIN_TOKEN}`);
 app.post("/api/receipts/batch", async (req, res) => { if (!admin(req)) return res.status(403).end(); res.json(await receipts.batch()); });
-setInterval(() => receipts.batch().catch((e) => console.error("receipts", e.message)), +(process.env.RECEIPT_BATCH_MS || 10 * 60e3)).unref();
+setInterval(() => receipts.batch().catch((e) => console.error("receipts", e.message)), +(process.env.RECEIPT_BATCH_MS || 2 * 60e3)).unref();
 
 // ---- PayPal comes back here -------------------------------------------------------------------------------------------
 app.get("/paypal/return", async (req, res) => {
@@ -317,7 +318,10 @@ if (pp.mode === "mock") {
 
 // ---- the website ----------------------------------------------------------------------------------------------------------
 const WEB = path.join(HERE, "../../web/dist");
-if (fs.existsSync(WEB)) { app.use(express.static(WEB)); app.get(/^\/(?!api|mcp|paypal|a2a|mock-paypal).*/, (req, res) => res.sendFile(path.join(WEB, "index.html"))); }
+// an MCP server card, for clients that look for one, and a JSON 404 (not the website) for anything else agents probe
+app.get("/.well-known/mcp.json", (req, res) => { const u = `${req.protocol}://${req.headers.host}`, t = mcp.toolsManifest(); res.json({ name: "Join", description: "A marketplace where AI agents get a group together and settle it with PayPal (sandbox).", url: `${u}/mcp`, transport: "streamable-http", authentication: { type: "bearer", howToGetOne: `${u}/llms.txt` }, guide: `${u}/llms.txt`, tools: t.tools.map((x) => x.name), toolsDigest: t.digest }); });
+app.all(/^\/(\.well-known|api)\//, (req, res) => res.status(404).json({ error: "not_found", message: `Nothing at ${req.path}. Agents: start at /llms.txt.` }));
+if (fs.existsSync(WEB)) { app.use(express.static(WEB)); app.get(/^\/(?!api|mcp|paypal|a2a|mock-paypal|\.well-known).*/, (req, res) => res.sendFile(path.join(WEB, "index.html"))); }
 
 setInterval(() => settle.tick().catch((e) => console.error("tick", e.message)), +(process.env.TICK_MS || 5000)).unref();
 app.use((err, req, res, next) => {

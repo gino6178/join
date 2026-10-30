@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { tr, lang, setLang } from "./i18n.js";
 import { api, useActivity, setZone } from "./api.js";
 import Icon from "./components/Icon.jsx";
 import Activity from "./pages/Activity.jsx";
@@ -17,12 +18,12 @@ import { registerWebMcp, unregisterWebMcp } from "./webmcp.js";
 // spending limits and which agents may act for them.
 const route = () => { const [p, q = ""] = location.hash.replace(/^#\/?/, "").split("?"); return { page: p || "activity", query: new URLSearchParams(q) }; };
 const NAV = [
-  { k: "activity", label: "Activity", icon: "spark", note: "What the agents did" },
-  { k: "games", label: "Plans", icon: "book", note: "Deals, payments, bookings" },
-  { k: "map", label: "Map", icon: "pin", note: "Venues and alternatives" },
-  { k: "limits", label: "Limits", icon: "lock", note: "What your agent may spend" },
-  { k: "connect", label: "Connect", icon: "key", note: "Your agents' access" },
-  { k: "venue", label: "Venue view", icon: "store", note: "A venue's rooms and courts" },
+  { k: "activity", label: tr("Activity"), icon: "spark", note: tr("What the agents did") },
+  { k: "games", label: tr("Plans"), icon: "book", note: tr("Deals, payments, bookings") },
+  { k: "map", label: tr("Map"), icon: "pin", note: tr("Venues and alternatives") },
+  { k: "limits", label: tr("Limits"), icon: "lock", note: tr("What your agent may spend") },
+  { k: "connect", label: tr("Connect"), icon: "key", note: tr("Your agents' access") },
+  { k: "venue", label: tr("Venue view"), icon: "store", note: tr("A venue's rooms and courts") },
 ];
 
 export default function App() {
@@ -48,7 +49,7 @@ function Scout({ me, info }) {
   const asked = () => new URLSearchParams(location.hash.split("?")[1] || "").has("agent");
   const [open, setOpen] = useState(asked);
   useEffect(() => { const f = () => asked() && setOpen(true), g = () => setOpen(true); addEventListener("hashchange", f); addEventListener("join:open-agent", g); return () => { removeEventListener("hashchange", f); removeEventListener("join:open-agent", g); }; }, []);
-  return <>{!open && <button className="btn primary agent-fab" onClick={() => setOpen(true)}><Icon name="spark" size={16} />No agent? Ask Join's</button>}<AgentDrawer me={me} info={info} open={open} onClose={() => setOpen(false)} /></>;
+  return <>{!open && <button className="btn primary agent-fab" onClick={() => setOpen(true)}><Icon name="spark" size={16} />{tr("No agent? Ask Join's")}</button>}<AgentDrawer me={me} info={info} open={open} onClose={() => setOpen(false)} /></>;
 }
 
 function Shell({ me, info, page, onOut, children }) {
@@ -63,8 +64,9 @@ function Shell({ me, info, page, onOut, children }) {
           </a>))}
         </nav>
         <div className="side-foot">
-          {info && <p className={`pp-mode ${info.paypal}`}><Icon name="card" size={16} />PayPal {info.paypal === "mock" ? "simulated: no money moves" : info.paypal}</p>}
-          {me && <p className="who"><span className="avatar">{me.player.name[0]}</span><span><b>{me.player.name}</b><small>{me.player.area?.name}</small></span><button className="icon-btn" onClick={out} title="Sign out" aria-label="Sign out"><Icon name="out" size={18} /></button></p>}
+          <button className="link-btn small lang-btn" onClick={() => setLang(lang === "zh" ? "en" : "zh")} aria-label="Language">{lang === "zh" ? "English" : "中文"}</button>
+          {info && <p className={`pp-mode ${info.paypal}`} title={info.paypal === "mock" ? "Payments go to a PayPal stand-in on this server: nothing reaches PayPal." : "Real calls to PayPal's sandbox (its test environment): orders, authorizations, captures, payouts and invoices, with test money. Plans shows each payment's PayPal ids."}><Icon name="card" size={16} />PayPal {info.paypal === "mock" ? "simulated: no money moves" : "sandbox: test money"}</p>}
+          {me && <p className="who"><span className="avatar">{me.player.name[0]}</span><span><b>{me.player.name}</b><small>{me.player.area?.name}</small></span><button className="icon-btn" onClick={out} title={tr("Sign out")} aria-label="Sign out"><Icon name="out" size={18} /></button></p>}
         </div>
       </aside>
       <main className="main">{children}</main>

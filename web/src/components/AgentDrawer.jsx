@@ -85,7 +85,7 @@ export default function AgentDrawer({ me, info, open, onClose }) {
   return (
     <aside className="drawer" role="dialog" aria-label="Join's website agent">
       <header className="drawer-head">
-        <span><b><Icon name="spark" size={16} /> Join's agent</b><small>{(info?.scout || "rules") === "rules" ? "Simple rules on Join's server" : `Rules, and Qwen (${info.scout}) on Join's own server when they don't understand · no AI service, no key`}</small></span>
+        <span><b><Icon name="spark" size={16} /> Join's agent</b><small>{(info?.scout || "rules") === "rules" ? "Runs on Join's own server" : "Runs on Join's own server, with a small language model for free-form sentences · no outside AI service"}</small></span>
         <button className="icon-btn" onClick={onClose} aria-label="Close"><Icon name="close" size={18} /></button>
       </header>
       <div className="drawer-body">
@@ -104,7 +104,8 @@ export default function AgentDrawer({ me, info, open, onClose }) {
           {o.reviews?.groupLow?.length > 0 && <small className="warn-text">{w.groupLow(o.reviews.groupLow)}</small>}
           <span className="tags">{(o.discounts || []).length > 0 && <span className="tag good">{o.discounts.map((d) => w.why.discount(d)).join(" + ")}</span>}{world?.venues.find((v) => v.id === o.venue)?.style && <span className="tag">{w.style[world.venues.find((v) => v.id === o.venue).style]}</span>}</span>
           <small className="muted">{o.why.filter((x, i) => i < 2).join(" · ")}</small>
-          <button className="btn primary small" disabled={busy || o.fit === "tooFar"} onClick={() => ask(o)}>{w.card.negotiate}</button>
+          {o.fit === "tooFar" ? <><small className="warn-text">{w.card.tooFarWhy(o.limit)}</small><a className="btn small" href="#/limits" onClick={onClose}>{w.card.raise}</a></>
+            : <button className="btn primary small" disabled={busy} onClick={() => ask(o)}>{w.card.negotiate}</button>}
         </div>)}
         {confirm && <div className="drawer-actions">
           <button className="btn primary small" disabled={busy} onClick={() => choose(confirm)}>{w.go}</button>

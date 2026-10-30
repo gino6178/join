@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { tr, lang, setLang } from "../i18n.js";
 import { api, money } from "../api.js";
 import Icon from "../components/Icon.jsx";
 import { sha256 as nobleSha256, sha512 } from "@noble/hashes/sha2.js";
@@ -64,9 +65,9 @@ export default function Receipt({ id }) {
   const row = (state, label, detail) => <li className={state === true ? "yes" : state === false ? "no" : "wait"}><Icon name={state === true ? "check" : state === false ? "close" : "clock"} size={16} /><span><b>{label}</b><small>{detail}</small></span></li>;
   return (
     <div className="page">
-      <header className="page-head"><h1>Receipt</h1><p className="muted">Proof that this deal and its payments have not changed since they were recorded. Checked here, in your browser.</p></header>
+      <header className="page-head"><h1>{tr("Receipt")}</h1><p className="muted">Proof that this deal and its payments have not changed since they were recorded. Checked here, in your browser.</p></header>
       <section className="card">
-        <h3><Icon name="verify" size={18} />{b.event === "locked" ? "Paid and locked" : b.event === "refunded" ? "Cancelled and refunded" : "Venue paid"}</h3>
+        <h3><Icon name="verify" size={18} />{b.event === "locked" ? tr("Paid and locked") : b.event === "refunded" ? "Cancelled and refunded" : tr("Venue paid")}</h3>
         <p>{b.activity} · {b.date} {b.start} · {b.minutes} min · {b.unitName} · <b>{money(b.total / 100)}</b></p>
         {verified && <p className="verified-badge"><Icon name="verify" size={18} />Cryptographically verified in your browser · {c.ms} ms{subtle ? "" : " (noble)"}</p>}
         <ul className="can checks">
@@ -80,15 +81,15 @@ export default function Receipt({ id }) {
       </section>
       {r.you && <p className="note good">You are in this receipt as <code>{r.you.player.slice(0, 16)}…</code> (your player id, hashed with your salt). Other players can't be identified from it.</p>}
       <section className="card">
-        <h3>The negotiation</h3>
-        <ol className="neg-steps">{b.negotiation.map((h, i) => <li key={i}><b>{h.by === "organizer" ? "Organizer's agent" : h.by === "venue" ? "Venue" : h.by}</b> {h.type}{h.amount != null && ` ${money(h.amount / 100)}`}</li>)}</ol>
+        <h3>{tr("The negotiation")}</h3>
+        <ol className="neg-steps">{b.negotiation.map((h, i) => <li key={i}><b>{h.by === "organizer" ? "Organizer's agent" : h.by === "venue" ? tr("Venue") : h.by}</b> {h.type}{h.amount != null && ` ${money(h.amount / 100)}`}</li>)}</ol>
         <h3>The payments</h3>
-        <table className="pays"><thead><tr><th>Player</th><th>Share</th><th>Paid</th><th>PayPal ids</th></tr></thead><tbody>
+        <table className="pays"><thead><tr><th>{tr("Player")}</th><th>Share</th><th>Paid</th><th>PayPal ids</th></tr></thead><tbody>
           {b.payments.map((p, i) => <tr key={i}><td><code>{p.player.slice(0, 10)}…</code>{p.role === "organizer" && <small> organizer</small>}</td><td>{money(p.share / 100)}</td><td>{p.captured ? money(p.captured / 100) : p.status}</td><td><small>{[p.paypal.order, p.paypal.capture].filter(Boolean).join(" · ")}</small></td></tr>)}
         </tbody></table>
         <p className="small muted">What this proves: Join signed this receipt exactly so, and logged it in the batch above. Whether PayPal moved the money is PayPal's record; the ids above point to it.</p>
       </section>
-      <section className="card snippet"><h3>Check it yourself</h3><pre>{`node examples/verify-receipt.mjs ${r.id} --save checkpoint.txt`}</pre></section>
+      <section className="card snippet"><h3>Check it yourself</h3><p className="small muted">The checks above already ran in your browser. To check again without trusting this page, run Join's verifier from <a href="https://github.com/gino6178/join" target="_blank" rel="noreferrer">its public repository</a> (it shares no code with Join's server):</p><pre>{`node examples/verify-receipt.mjs ${r.id} --save checkpoint.txt`}</pre></section>
     </div>
   );
 }

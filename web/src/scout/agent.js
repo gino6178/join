@@ -78,7 +78,7 @@ export async function negotiate(o, brief, model, say, w) {
   // the person's pick, unless another venue is cheaper by $1 each or more: then they choose
   if (mine && (best === mine || (+mine.n.ask - +best.n.ask) / people < 1) && +mine.n.ask <= target) {
     for (const q of fits.filter((x) => x !== mine)) await walkAway(q.n, model);
-    if (fits.length > 1) say(w.kept(mine.n.venueName, mine.n.ask));
+    if (fits.length > 1) say(best === mine ? w.kept(mine.n.venueName, mine.n.ask) : w.keptCheaper(mine.n.venueName, mine.n.ask, best.n.venueName, best.n.ask));
     return acceptDeal(mine.n, model);
   }
   return { choices: fits.map((q) => ({ n: q.n, o: q.o, over: +q.n.ask > target })), note: fits.length > 1 ? w.compare(fits.map((q) => ({ name: q.n.venueName, ask: q.n.ask, share: q.n.share, start: q.o.start, rating: q.o.rating ?? q.o.reviews?.score }))) : w.bestOverBudget(best.n.ask, best.n.share, cap) };
