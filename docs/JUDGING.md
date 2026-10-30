@@ -45,6 +45,9 @@ keys needed; PayPal is simulated and says so). In another terminal, `npm run dem
   Also:
   receipts in an RFC 6962 transparency log with C2SP checkpoints and witness cosignatures (`api/src/proof/tlog.js`,
   `examples/witness.mjs`); signed agent requests per RFC 9421 (`api/src/auth.js`); WebMCP (`web/src/webmcp.js`).
+- **Tested as users, on the live server:** Sonnet agents given only the address (a newcomer, a Chinese-speaking
+  student on a phone, an organizer, a judge and venue owner, an outside agent) in two rounds; what they found and what
+  changed is in [live-testing.md](live-testing.md).
 - **Tested by agents, not only by us:** Claude Sonnet agents played friends and a venue on the sandbox, tried a dozen
   ways to misuse the tools, and tested the website agent with about 220 requests. Their findings became fixes and
   regression tests (TECHNICAL.md §12).
