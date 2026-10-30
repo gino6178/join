@@ -14,8 +14,8 @@ export default function Connect({ me, info, reload }) {
   const snippets = [
     ["Claude Code", `claude mcp add --transport http join ${url} --header "Authorization: Bearer ${tok}"`],
     ["Claude Desktop (claude_desktop_config.json)", JSON.stringify({ mcpServers: { join: { command: "npx", args: ["-y", "mcp-remote", url, "--header", `Authorization: Bearer ${tok}`] } } }, null, 2)],
-    ["Any HTTP client (REST)", `curl -X POST ${url.replace(/\/mcp$/, "")}/api/agent/find_options \\\n  -H "Authorization: Bearer ${tok}" -H "Content-Type: application/json" \\\n  -d '{"sport":"badminton","players":3}'`],
-    ["A2A agents", `Agent Card: ${url.replace(/\/mcp$/, "")}/.well-known/agent-card.json\nSend one data part: {"action":"find_options","sport":"badminton","players":3}\nwith Authorization: Bearer ${tok}`],
+    ["Any HTTP client (REST)", `curl -X POST ${url.replace(/\/mcp$/, "")}/api/agent/find_options \\\n  -H "Authorization: Bearer ${tok}" -H "Content-Type: application/json" \\\n  -d '{"activity":"karaoke","players":3}'`],
+    ["A2A agents", `Agent Card: ${url.replace(/\/mcp$/, "")}/.well-known/agent-card.json\nSend one data part: {"action":"find_options","activity":"karaoke","players":3}\nwith Authorization: Bearer ${tok}`],
   ];
   return (
     <div className="page">

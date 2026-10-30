@@ -1,7 +1,7 @@
 // Each player's spending mandate: what their agent may commit them to. Set by the player on the website (signed in as
 // themselves), never by an agent: the agent's token can read it, not change it. Money in integer cents.
-//   perGame    the most their share of one game may be
-//   perWeek    the most their shares may add up to in the 7 days around a game
+//   perGame    the most their share of one booking may be (a court, a karaoke room, a dinner table)
+//   perWeek    the most their shares may add up to in the 7 days around a booking
 //   venues     null for any venue, or the only venues their agent may book
 //   autopay    the player saved a PayPal payment method (Vault) and lets their agent pay within these limits without
 //              asking each time; otherwise every payment waits for the player's approval in PayPal
@@ -31,7 +31,7 @@ export function setMandate(playerId, m) {
 // Does a share fit the player's mandate? spentThisWeek is what their other games around that date already commit them to.
 export function fits(playerId, { venue, share, spentThisWeek = 0 }) {
   const m = getMandate(playerId), why = [];
-  if (share > m.perGame) why.push(`their share ($${(share / 100).toFixed(2)}) is over their per-game limit ($${(m.perGame / 100).toFixed(2)})`);
+  if (share > m.perGame) why.push(`their share ($${(share / 100).toFixed(2)}) is over their per-booking limit ($${(m.perGame / 100).toFixed(2)})`);
   if (spentThisWeek + share > m.perWeek) why.push(`it would take them over their weekly limit ($${(m.perWeek / 100).toFixed(2)})`);
   if (m.venues && !m.venues.includes(venue)) why.push("that venue is not on their list");
   return { ok: why.length === 0, why, mandate: m };

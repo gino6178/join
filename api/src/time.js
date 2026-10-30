@@ -9,7 +9,7 @@ export const dateOf = (s) => { const [y, m, d] = s.split("-").map(Number); retur
 export const addDays = (s, n) => { const d = dateOf(s); d.setDate(d.getDate() + n); return ymd(d); };
 export const isDate = (s) => typeof s === "string" && /^\d{4}-\d{2}-\d{2}$/.test(s) && ymd(dateOf(s)) === s;
 export const isTime = (s) => typeof s === "string" && /^([01]\d|2[0-3]):[0-5]\d$/.test(s);
-// when a game starts, as a Date (local time)
+// when a booking starts, as a Date (local time)
 export const startOf = (date, start) => { const d = dateOf(date); d.setMinutes(toMin(start)); return d; };
 
 // A player's usual free times, written "Thu 18-22": the windows, as minutes on a weekday

@@ -1,6 +1,6 @@
 {
  "demo": true,
- "note": "A made-up town for the demo. Venues, prices, players and free courts are simulated; a real venue plugs in through the adapter in api/src/world.js.",
+ "note": "A made-up town for the demo. Venues, prices, people and free slots are simulated; a real venue plugs in through the adapter in api/src/world.js.",
  "town": {
   "name": "Sample town (placed on San Jose, CA)",
   "w": 10,
@@ -147,24 +147,6 @@
    ],
    "peakBusy": 0.75,
    "offBusy": 0.35,
-   "sports": {
-    "badminton": {
-     "courts": 6,
-     "price": 28
-    },
-    "tennis": {
-     "courts": 2,
-     "price": 36
-    },
-    "pickleball": {
-     "courts": 4,
-     "price": 24
-    },
-    "basketball": {
-     "courts": 1,
-     "price": 64
-    }
-   },
    "policy": {
     "style": "firm",
     "floorPct": 0.9,
@@ -182,7 +164,29 @@
     },
     "rounds": 3
    },
-   "payee": "riverside-venue@join.example"
+   "payee": "riverside-venue@join.example",
+   "offers": {
+    "badminton": {
+     "units": 6,
+     "per": "hour",
+     "price": 28
+    },
+    "tennis": {
+     "units": 2,
+     "per": "hour",
+     "price": 36
+    },
+    "pickleball": {
+     "units": 4,
+     "per": "hour",
+     "price": 24
+    },
+    "basketball": {
+     "units": 1,
+     "per": "hour",
+     "price": 64
+    }
+   }
   },
   {
    "id": "north",
@@ -196,18 +200,230 @@
    ],
    "peakBusy": 0.6,
    "offBusy": 0.25,
-   "sports": {
+   "policy": {
+    "style": "standard",
+    "floorPct": 0.8,
+    "offPeak": {
+     "pct": 0.15,
+     "before": "17:00"
+    },
+    "group": {
+     "min": 4,
+     "pct": 0.1
+    },
+    "lastMinute": {
+     "withinHours": 6,
+     "pct": 0.2
+    },
+    "rounds": 3
+   },
+   "payee": "north-venue@join.example",
+   "offers": {
     "badminton": {
-     "courts": 8,
+     "units": 8,
+     "per": "hour",
      "price": 24
     },
     "basketball": {
-     "courts": 2,
+     "units": 2,
+     "per": "hour",
      "price": 56
     },
     "volleyball": {
-     "courts": 1,
+     "units": 1,
+     "per": "hour",
      "price": 52
+    }
+   }
+  },
+  {
+   "id": "lakeside",
+   "name": "Lakeside School Gym",
+   "area": "Lakeside",
+   "x": 7.3,
+   "y": 5.7,
+   "open": [
+    "18:00",
+    "22:00"
+   ],
+   "weekendOpen": [
+    "08:00",
+    "18:00"
+   ],
+   "peakBusy": 0.5,
+   "offBusy": 0.5,
+   "policy": {
+    "style": "eager",
+    "floorPct": 0.7,
+    "offPeak": {
+     "pct": 0.15,
+     "before": "17:00"
+    },
+    "group": {
+     "min": 4,
+     "pct": 0.1
+    },
+    "lastMinute": {
+     "withinHours": 6,
+     "pct": 0.2
+    },
+    "rounds": 3
+   },
+   "payee": "lakeside-venue@join.example",
+   "offers": {
+    "badminton": {
+     "units": 4,
+     "per": "hour",
+     "price": 20
+    },
+    "pickleball": {
+     "units": 2,
+     "per": "hour",
+     "price": 18
+    }
+   }
+  },
+  {
+   "id": "midtown",
+   "name": "Midtown Community Gym",
+   "area": "Midtown",
+   "x": 5.1,
+   "y": 3.9,
+   "open": [
+    "08:00",
+    "22:00"
+   ],
+   "peakBusy": 0.65,
+   "offBusy": 0.3,
+   "policy": {
+    "style": "standard",
+    "floorPct": 0.82,
+    "offPeak": {
+     "pct": 0.15,
+     "before": "17:00"
+    },
+    "group": {
+     "min": 4,
+     "pct": 0.1
+    },
+    "lastMinute": {
+     "withinHours": 6,
+     "pct": 0.2
+    },
+    "rounds": 3
+   },
+   "payee": "midtown-venue@join.example",
+   "offers": {
+    "badminton": {
+     "units": 5,
+     "per": "hour",
+     "price": 26
+    },
+    "tennis": {
+     "units": 2,
+     "per": "hour",
+     "price": 32
+    },
+    "table tennis": {
+     "units": 6,
+     "per": "hour",
+     "price": 12
+    }
+   }
+  },
+  {
+   "id": "westgate",
+   "name": "Westgate Badminton Club",
+   "area": "Westgate",
+   "x": 1.2,
+   "y": 2.4,
+   "open": [
+    "09:00",
+    "22:00"
+   ],
+   "peakBusy": 0.55,
+   "offBusy": 0.3,
+   "policy": {
+    "style": "standard",
+    "floorPct": 0.78,
+    "offPeak": {
+     "pct": 0.15,
+     "before": "17:00"
+    },
+    "group": {
+     "min": 4,
+     "pct": 0.1
+    },
+    "lastMinute": {
+     "withinHours": 6,
+     "pct": 0.2
+    },
+    "rounds": 3
+   },
+   "payee": "westgate-venue@join.example",
+   "offers": {
+    "badminton": {
+     "units": 6,
+     "per": "hour",
+     "price": 22
+    }
+   }
+  },
+  {
+   "id": "echo",
+   "name": "Echo Karaoke",
+   "area": "Midtown",
+   "x": 4.6,
+   "y": 3.3,
+   "open": [
+    "14:00",
+    "23:59"
+   ],
+   "peakBusy": 0.6,
+   "offBusy": 0.25,
+   "offers": {
+    "karaoke": {
+     "units": 8,
+     "per": "hour",
+     "price": 36
+    }
+   },
+   "policy": {
+    "style": "eager",
+    "floorPct": 0.65,
+    "offPeak": {
+     "pct": 0.15,
+     "before": "17:00"
+    },
+    "group": {
+     "min": 4,
+     "pct": 0.1
+    },
+    "lastMinute": {
+     "withinHours": 6,
+     "pct": 0.2
+    },
+    "rounds": 3
+   },
+   "payee": "echo-venue@join.example"
+  },
+  {
+   "id": "lockbox",
+   "name": "Lockbox Escape Rooms",
+   "area": "North",
+   "x": 6.9,
+   "y": 1.2,
+   "open": [
+    "10:00",
+    "23:00"
+   ],
+   "peakBusy": 0.55,
+   "offBusy": 0.2,
+   "offers": {
+    "escape room": {
+     "units": 4,
+     "per": "person",
+     "price": 32
     }
    },
    "policy": {
@@ -227,37 +443,30 @@
     },
     "rounds": 3
    },
-   "payee": "north-venue@join.example"
+   "payee": "lockbox-venue@join.example"
   },
   {
-   "id": "lakeside",
-   "name": "Lakeside School Gym",
-   "area": "Lakeside",
-   "x": 7.3,
-   "y": 5.7,
+   "id": "dice",
+   "name": "Dice & Co Board Game Cafe",
+   "area": "Riverside",
+   "x": 2.7,
+   "y": 6.2,
    "open": [
-    "18:00",
-    "22:00"
-   ],
-   "weekendOpen": [
-    "08:00",
-    "18:00"
+    "11:00",
+    "23:00"
    ],
    "peakBusy": 0.5,
-   "offBusy": 0.5,
-   "sports": {
-    "badminton": {
-     "courts": 4,
-     "price": 20
-    },
-    "pickleball": {
-     "courts": 2,
-     "price": 18
+   "offBusy": 0.2,
+   "offers": {
+    "board games": {
+     "units": 10,
+     "per": "person",
+     "price": 8
     }
    },
    "policy": {
-    "style": "eager",
-    "floorPct": 0.7,
+    "style": "standard",
+    "floorPct": 0.75,
     "offPeak": {
      "pct": 0.15,
      "before": "17:00"
@@ -272,37 +481,68 @@
     },
     "rounds": 3
    },
-   "payee": "lakeside-venue@join.example"
+   "payee": "dice-venue@join.example"
   },
   {
-   "id": "midtown",
-   "name": "Midtown Community Gym",
-   "area": "Midtown",
-   "x": 5.1,
-   "y": 3.9,
+   "id": "lakegrill",
+   "name": "Lakeside BBQ Pits",
+   "area": "Lakeside",
+   "x": 8.6,
+   "y": 5.4,
    "open": [
-    "08:00",
-    "22:00"
+    "10:00",
+    "21:00"
+   ],
+   "peakBusy": 0.7,
+   "offBusy": 0.3,
+   "offers": {
+    "bbq": {
+     "units": 6,
+     "per": "hour",
+     "price": 30
+    }
+   },
+   "policy": {
+    "style": "firm",
+    "floorPct": 0.95,
+    "offPeak": {
+     "pct": 0.15,
+     "before": "17:00"
+    },
+    "group": {
+     "min": 4,
+     "pct": 0.1
+    },
+    "lastMinute": {
+     "withinHours": 6,
+     "pct": 0.2
+    },
+    "rounds": 3
+   },
+   "payee": "lakegrill-venue@join.example"
+  },
+  {
+   "id": "potluck",
+   "name": "Westgate Hot Pot House",
+   "area": "Westgate",
+   "x": 1.6,
+   "y": 1.9,
+   "open": [
+    "11:30",
+    "23:00"
    ],
    "peakBusy": 0.65,
-   "offBusy": 0.3,
-   "sports": {
-    "badminton": {
-     "courts": 5,
-     "price": 26
-    },
-    "tennis": {
-     "courts": 2,
-     "price": 32
-    },
-    "table tennis": {
-     "courts": 6,
-     "price": 12
+   "offBusy": 0.25,
+   "offers": {
+    "hot pot": {
+     "units": 12,
+     "per": "person",
+     "price": 28
     }
    },
    "policy": {
     "style": "standard",
-    "floorPct": 0.82,
+    "floorPct": 0.85,
     "offPeak": {
      "pct": 0.15,
      "before": "17:00"
@@ -317,44 +557,7 @@
     },
     "rounds": 3
    },
-   "payee": "midtown-venue@join.example"
-  },
-  {
-   "id": "westgate",
-   "name": "Westgate Badminton Club",
-   "area": "Westgate",
-   "x": 1.2,
-   "y": 2.4,
-   "open": [
-    "09:00",
-    "22:00"
-   ],
-   "peakBusy": 0.55,
-   "offBusy": 0.3,
-   "sports": {
-    "badminton": {
-     "courts": 6,
-     "price": 22
-    }
-   },
-   "policy": {
-    "style": "standard",
-    "floorPct": 0.78,
-    "offPeak": {
-     "pct": 0.15,
-     "before": "17:00"
-    },
-    "group": {
-     "min": 4,
-     "pct": 0.1
-    },
-    "lastMinute": {
-     "withinHours": 6,
-     "pct": 0.2
-    },
-    "rounds": 3
-   },
-   "payee": "westgate-venue@join.example"
+   "payee": "potluck-venue@join.example"
   }
  ],
  "players": [
@@ -367,19 +570,24 @@
     "Tue 19-22",
     "Thu 18-22",
     "Sat 08-14",
-    "Sun 09-13"
+    "Sun 09-13",
+    "Fri 18-23",
+    "Sat 18-23"
    ],
    "area": {
     "x": 2.4,
     "y": 5.8,
     "name": "Riverside"
    },
-   "sports": [
+   "prefers": "any",
+   "interests": [
     "badminton",
     "tennis",
-    "pickleball"
-   ],
-   "prefers": "any"
+    "pickleball",
+    "karaoke",
+    "board games",
+    "hot pot"
+   ]
   },
   {
    "id": "hana",
@@ -388,7 +596,9 @@
    "free": [
     "Tue 19-22",
     "Thu 18-22",
-    "Sat 09-13"
+    "Sat 09-13",
+    "Fri 18-23",
+    "Sat 18-23"
    ],
    "prefers": "doubles",
    "area": {
@@ -396,9 +606,12 @@
     "y": 6.3,
     "name": "Riverside"
    },
-   "sports": [
+   "interests": [
     "badminton",
-    "tennis"
+    "tennis",
+    "karaoke",
+    "escape room",
+    "hot pot"
    ]
   },
   {
@@ -408,7 +621,8 @@
    "free": [
     "Mon 19-22",
     "Thu 19-22",
-    "Sun 10-14"
+    "Sun 10-14",
+    "Sat 14-20"
    ],
    "prefers": "doubles",
    "area": {
@@ -416,9 +630,11 @@
     "y": 0.9,
     "name": "North"
    },
-   "sports": [
+   "interests": [
     "badminton",
-    "basketball"
+    "basketball",
+    "bbq",
+    "board games"
    ]
   },
   {
@@ -428,7 +644,9 @@
    "free": [
     "Wed 18-22",
     "Thu 19-22",
-    "Sat 08-12"
+    "Sat 08-12",
+    "Fri 18-23",
+    "Sat 17-23"
    ],
    "prefers": "any",
    "area": {
@@ -436,10 +654,15 @@
     "y": 4.6,
     "name": "Riverside"
    },
-   "sports": [
+   "interests": [
     "badminton",
     "pickleball",
-    "tennis"
+    "tennis",
+    "escape room",
+    "bbq",
+    "hot pot",
+    "karaoke",
+    "board games"
    ]
   },
   {
@@ -449,7 +672,8 @@
    "free": [
     "Tue 18-21",
     "Fri 19-22",
-    "Sat 14-18"
+    "Sat 14-18",
+    "Sat 18-23"
    ],
    "prefers": "singles",
    "area": {
@@ -457,9 +681,10 @@
     "y": 2.1,
     "name": "North"
    },
-   "sports": [
+   "interests": [
     "badminton",
-    "tennis"
+    "tennis",
+    "board games"
    ]
   },
   {
@@ -469,7 +694,9 @@
    "free": [
     "Mon 18-21",
     "Thu 18-21",
-    "Sun 09-12"
+    "Sun 09-12",
+    "Fri 18-23",
+    "Sat 15-22"
    ],
    "prefers": "doubles",
    "area": {
@@ -477,9 +704,13 @@
     "y": 7.1,
     "name": "Lakeside"
    },
-   "sports": [
+   "interests": [
     "badminton",
-    "volleyball"
+    "volleyball",
+    "karaoke",
+    "bbq",
+    "board games",
+    "hot pot"
    ]
   },
   {
@@ -489,7 +720,8 @@
    "free": [
     "Thu 19-22",
     "Fri 18-22",
-    "Sat 09-12"
+    "Sat 09-12",
+    "Sat 17-23"
    ],
    "prefers": "any",
    "area": {
@@ -497,9 +729,12 @@
     "y": 5.4,
     "name": "Riverside"
    },
-   "sports": [
+   "interests": [
     "badminton",
-    "basketball"
+    "basketball",
+    "escape room",
+    "karaoke",
+    "hot pot"
    ]
   },
   {
@@ -509,7 +744,8 @@
    "free": [
     "Tue 19-22",
     "Wed 19-22",
-    "Sat 10-14"
+    "Sat 10-14",
+    "Fri 18-23"
    ],
    "prefers": "singles",
    "area": {
@@ -517,9 +753,13 @@
     "y": 3.6,
     "name": "Westgate"
    },
-   "sports": [
+   "interests": [
     "badminton",
-    "tennis"
+    "tennis",
+    "board games",
+    "escape room",
+    "karaoke",
+    "hot pot"
    ]
   },
   {
@@ -528,7 +768,8 @@
    "level": "C",
    "free": [
     "Sat 08-12",
-    "Sun 08-12"
+    "Sun 08-12",
+    "Sat 14-20"
    ],
    "prefers": "doubles",
    "area": {
@@ -536,9 +777,11 @@
     "y": 5,
     "name": "Lakeside"
    },
-   "sports": [
+   "interests": [
     "badminton",
-    "pickleball"
+    "pickleball",
+    "bbq",
+    "hot pot"
    ]
   },
   {
@@ -548,7 +791,9 @@
    "free": [
     "Mon 19-22",
     "Thu 18-21",
-    "Sun 14-18"
+    "Sun 14-18",
+    "Fri 18-23",
+    "Sat 18-22"
    ],
    "prefers": "any",
    "area": {
@@ -556,10 +801,14 @@
     "y": 1.6,
     "name": "North"
    },
-   "sports": [
+   "interests": [
     "badminton",
     "tennis",
-    "table tennis"
+    "table tennis",
+    "karaoke",
+    "board games",
+    "hot pot",
+    "escape room"
    ]
   },
   {
@@ -569,7 +818,9 @@
    "free": [
     "Thu 19-22",
     "Sat 09-12",
-    "Sun 09-12"
+    "Sun 09-12",
+    "Fri 19-23",
+    "Sat 15-22"
    ],
    "prefers": "doubles",
    "area": {
@@ -577,9 +828,14 @@
     "y": 2.9,
     "name": "Midtown"
    },
-   "sports": [
+   "interests": [
     "badminton",
-    "basketball"
+    "basketball",
+    "escape room",
+    "bbq",
+    "hot pot",
+    "karaoke",
+    "board games"
    ]
   },
   {
@@ -589,7 +845,8 @@
    "free": [
     "Wed 18-21",
     "Fri 19-22",
-    "Sun 10-13"
+    "Sun 10-13",
+    "Sat 16-23"
    ],
    "prefers": "doubles",
    "area": {
@@ -597,57 +854,211 @@
     "y": 0.7,
     "name": "North"
    },
-   "sports": [
+   "interests": [
     "badminton",
-    "pickleball"
+    "pickleball",
+    "board games",
+    "karaoke",
+    "hot pot"
    ]
   }
  ],
- "publicCourts": [
+ "activities": [
+  {
+   "id": "badminton",
+   "name": "Badminton",
+   "kind": "sport",
+   "unit": "court",
+   "min": 2,
+   "max": 4,
+   "minutes": [
+    60,
+    90,
+    120
+   ]
+  },
+  {
+   "id": "tennis",
+   "name": "Tennis",
+   "kind": "sport",
+   "unit": "court",
+   "min": 2,
+   "max": 4,
+   "minutes": [
+    60,
+    90,
+    120
+   ]
+  },
+  {
+   "id": "pickleball",
+   "name": "Pickleball",
+   "kind": "sport",
+   "unit": "court",
+   "min": 2,
+   "max": 4,
+   "minutes": [
+    60,
+    90,
+    120
+   ]
+  },
+  {
+   "id": "basketball",
+   "name": "Basketball",
+   "kind": "sport",
+   "unit": "court",
+   "min": 4,
+   "max": 10,
+   "minutes": [
+    60,
+    90,
+    120
+   ]
+  },
+  {
+   "id": "volleyball",
+   "name": "Volleyball",
+   "kind": "sport",
+   "unit": "court",
+   "min": 6,
+   "max": 12,
+   "minutes": [
+    60,
+    90,
+    120
+   ]
+  },
+  {
+   "id": "table tennis",
+   "name": "Table tennis",
+   "kind": "sport",
+   "unit": "table",
+   "min": 2,
+   "max": 4,
+   "minutes": [
+    60,
+    90,
+    120
+   ]
+  },
+  {
+   "id": "karaoke",
+   "name": "Karaoke",
+   "kind": "night out",
+   "unit": "room",
+   "min": 2,
+   "max": 10,
+   "minutes": [
+    60,
+    120,
+    180
+   ]
+  },
+  {
+   "id": "escape room",
+   "name": "Escape room",
+   "kind": "games",
+   "unit": "room",
+   "min": 2,
+   "max": 6,
+   "minutes": [
+    60
+   ]
+  },
+  {
+   "id": "board games",
+   "name": "Board games",
+   "kind": "games",
+   "unit": "table",
+   "min": 2,
+   "max": 8,
+   "minutes": [
+    120,
+    180
+   ]
+  },
+  {
+   "id": "bbq",
+   "name": "Barbecue",
+   "kind": "outdoors",
+   "unit": "pit",
+   "min": 4,
+   "max": 12,
+   "minutes": [
+    120,
+    180
+   ]
+  },
+  {
+   "id": "hot pot",
+   "name": "Hot pot dinner",
+   "kind": "food",
+   "unit": "table",
+   "min": 2,
+   "max": 10,
+   "minutes": [
+    90,
+    120
+   ]
+  }
+ ],
+ "publicPlaces": [
   {
    "id": "pub-guadalupe",
    "name": "Guadalupe River Park courts",
    "x": 3.6,
    "y": 4.2,
-   "sports": [
+   "lit": true,
+   "indoor": false,
+   "activities": [
     "basketball",
     "pickleball"
-   ],
-   "lit": true,
-   "indoor": false
+   ]
   },
   {
    "id": "pub-rosegarden",
    "name": "Rose Garden tennis courts",
    "x": 1.8,
    "y": 3.1,
-   "sports": [
+   "lit": false,
+   "indoor": false,
+   "activities": [
     "tennis",
     "pickleball"
-   ],
-   "lit": false,
-   "indoor": false
+   ]
   },
   {
    "id": "pub-lakeside-park",
    "name": "Lakeside Park courts",
    "x": 8.1,
    "y": 6.4,
-   "sports": [
+   "lit": true,
+   "indoor": false,
+   "activities": [
     "basketball",
     "volleyball",
     "badminton"
-   ],
-   "lit": true,
-   "indoor": false
+   ]
   },
   {
    "id": "pub-north-school",
    "name": "North Elementary blacktop",
    "x": 5.9,
    "y": 1.1,
-   "sports": [
+   "lit": false,
+   "indoor": false,
+   "activities": [
     "basketball"
+   ]
+  },
+  {
+   "id": "pub-guadalupe-picnic",
+   "name": "Guadalupe River Park picnic grills",
+   "x": 3.9,
+   "y": 4.5,
+   "activities": [
+    "bbq"
    ],
    "lit": false,
    "indoor": false

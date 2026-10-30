@@ -19,7 +19,7 @@ export default function Limits({ me, reload, query }) {
       <header className="page-head"><h1>Limits</h1><p className="muted">What your agents may commit you to. Join refuses anything over these before a venue sees it. Only you can change them, here.</p></header>
       {msg && <p className="note good">{msg}</p>}{err && <p className="err">{err}</p>}
       <form className="card form" onSubmit={submit}>
-        <label><span>Most for one game (your share)</span><span className="money-in">$<input type="number" min="0" step="0.5" value={perGame} onChange={(e) => setPerGame(e.target.value)} /></span></label>
+        <label><span>Most for one booking (your share)</span><span className="money-in">$<input type="number" min="0" step="0.5" value={perGame} onChange={(e) => setPerGame(e.target.value)} /></span></label>
         <label><span>Most in one week</span><span className="money-in">$<input type="number" min="0" step="1" value={perWeek} onChange={(e) => setPerWeek(e.target.value)} /></span></label>
         <fieldset><legend>Venues</legend>
           <label className="check"><input type="radio" checked={venues === null} onChange={() => setVenues(null)} />Any venue</label>
@@ -31,11 +31,11 @@ export default function Limits({ me, reload, query }) {
       <section className="card form">
         <h3><Icon name="card" size={18} />Let your agent pay without asking each time</h3>
         {me.vault ? <>
-          <p>PayPal is saved for Join. {m.autopay ? `Your agent pays your share by itself when it is within ${money(m.perGame / 100)} a game and ${money(m.perWeek / 100)} a week; anything more still waits for you.` : "Turned off: every payment waits for your approval in PayPal."}</p>
+          <p>PayPal is saved for Join. {m.autopay ? `Your agent pays your share by itself when it is within ${money(m.perGame / 100)} a booking and ${money(m.perWeek / 100)} a week; anything more still waits for you.` : "Turned off: every payment waits for your approval in PayPal."}</p>
           <label className="check"><input type="checkbox" checked={m.autopay} onChange={(e) => save({ autopay: e.target.checked })} />My agent may pay within my limits</label>
           <button className="btn ghost" onClick={forget}>Remove saved PayPal</button>
         </> : <>
-          <p className="muted">Approve once in PayPal and save it for Join (PayPal Vault). Then your agent can pay your share of a game within your limits without sending you to PayPal each time. You can turn it off or remove it here at any time.</p>
+          <p className="muted">Approve once in PayPal and save it for Join (PayPal Vault). Then your agent can pay your share of a booking within your limits without sending you to PayPal each time. You can turn it off or remove it here at any time.</p>
           <button className="btn primary" onClick={vault}>Save PayPal for my agent</button>
         </>}
       </section>

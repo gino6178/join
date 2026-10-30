@@ -8,7 +8,8 @@ Make a token on Join's website (**Connect your agent**), then:
 claude mcp add --transport http join http://localhost:8790/mcp --header "Authorization: Bearer join_YOUR_TOKEN"
 ```
 
-Then ask: *"Use Join to set up doubles badminton on Thursday evening, at most $10 each."*
+Then ask: *"Use Join to book karaoke with three friends on Friday night, at most $10 each."* (or a game of
+badminton, an escape room, a barbecue, a hot pot dinner)
 
 **Claude Desktop** (`claude_desktop_config.json`), through the `mcp-remote` bridge:
 
@@ -23,5 +24,5 @@ Claude's custom connectors on claude.ai connect from Anthropic's cloud, so they 
 and runs the tool loop.
 
 ```bash
-JOIN_TOKEN=join_YOUR_TOKEN node claude-agent.mjs "Find me doubles this week within my budget"
+JOIN_TOKEN=join_YOUR_TOKEN node claude-agent.mjs "Book karaoke for four on Friday night within my budget"
 ```

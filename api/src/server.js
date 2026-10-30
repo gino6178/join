@@ -63,8 +63,8 @@ app.use(["/api/session", "/api/venue-session", "/api/tokens"], limit("people", 3
 app.all("/mcp", (req, res) => mcp.handle(req, res).catch((e) => { console.error("mcp", e); if (!res.headersSent) res.status(500).json({ jsonrpc: "2.0", error: { code: -32603, message: "internal error" }, id: null }); }));
 
 // the same tools as plain REST, for agents and scripts that don't speak MCP: POST /api/agent/<tool> with JSON arguments
-const TOOLS = { whoami: ops.whoami, list_venues: (a, x) => ops.listVenues(x), find_options: ops.findOptions, start_negotiation: ops.startNegotiation, make_offer: ops.makeOffer, accept_price: ops.acceptPrice,
-  walk_away: ops.walkAway, find_alternatives: ops.findAlternatives, my_games: ops.myGames, game_status: ops.gameStatus, pay_my_share: ops.payMyShare, decline_game: ops.declineGame, cancel_booking: ops.cancelBooking,
+const TOOLS = { whoami: ops.whoami, list_activities: () => ops.listActivities(), list_venues: (a, x) => ops.listVenues(x), find_options: ops.findOptions, start_negotiation: ops.startNegotiation, make_offer: ops.makeOffer, accept_price: ops.acceptPrice,
+  walk_away: ops.walkAway, find_alternatives: ops.findAlternatives, my_plans: ops.myGames, booking_status: ops.gameStatus, pay_my_share: ops.payMyShare, decline_invite: ops.declineGame, cancel_booking: ops.cancelBooking,
   propose_share: ops.proposeShare, answer_share: ops.answerShare };
 app.post("/api/agent/:tool", async (req, res) => {
   const a = agentOf(req);
@@ -83,8 +83,9 @@ app.get("/api/info", (req, res) => res.json({ timeZone: getWorld().town.timeZone
 app.get("/api/world", (req, res) => {
   const w = getWorld();
   res.json({ town: w.town, currency: w.currency, note: w.note,
-    venues: w.venues.map((v) => ({ id: v.id, name: v.name, area: v.area, x: v.x, y: v.y, open: v.open, sports: Object.fromEntries(Object.entries(v.sports).map(([s, x]) => [s, { courts: x.courts, perHour: x.price }])), style: v.policy.style })),
-    players: w.players.map((p) => ({ id: p.id, name: p.name, level: p.level, area: p.area, sports: p.sports })), publicCourts: w.publicCourts });
+    activities: w.activities,
+    venues: w.venues.map((v) => ({ id: v.id, name: v.name, area: v.area, x: v.x, y: v.y, open: v.open, offers: v.offers, style: v.policy.style })),
+    players: w.players.map((p) => ({ id: p.id, name: p.name, level: p.level, area: p.area, interests: p.interests })), publicPlaces: w.publicPlaces });
 });
 app.post("/api/session", (req, res) => {
   if (!DEMO) return res.status(403).json({ error: "demo sign-in is off" });
@@ -93,7 +94,7 @@ app.post("/api/session", (req, res) => {
   res.set("Set-Cookie", `${COOKIE}=${sid}; HttpOnly; SameSite=Lax; Path=/`).json({ ok: true });
 });
 app.delete("/api/session", signedIn, (req, res) => { endSession(req.sid); res.set("Set-Cookie", `${COOKIE}=; Max-Age=0; Path=/`).json({ ok: true }); });
-app.get("/api/me", signedIn, (req, res) => { const p = player(req.player), m = getMandate(req.player); res.json({ player: { id: p.id, name: p.name, area: p.area, sports: p.sports, free: p.free }, mandate: { ...m, perGameUsd: usd(m.perGame), perWeekUsd: usd(m.perWeek) }, vault: settle.hasVault(req.player), tokens: tokensOf(req.player) }); });
+app.get("/api/me", signedIn, (req, res) => { const p = player(req.player), m = getMandate(req.player); res.json({ player: { id: p.id, name: p.name, area: p.area, interests: p.interests, free: p.free }, mandate: { ...m, perGameUsd: usd(m.perGame), perWeekUsd: usd(m.perWeek) }, vault: settle.hasVault(req.player), tokens: tokensOf(req.player) }); });
 app.put("/api/mandate", signedIn, (req, res) => { const r = setMandate(req.player, req.body || {}); res.status(r.error ? 400 : 200).json(r); });
 app.post("/api/tokens", signedIn, (req, res) => res.json(makeToken(req.player, req.body?.label)));
 app.delete("/api/tokens/:id", signedIn, (req, res) => res.json({ ok: revoke(req.player, req.params.id) }));

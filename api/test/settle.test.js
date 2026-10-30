@@ -4,13 +4,13 @@ import { open, accept, setClock, negotiationsStore } from "../src/negotiate/engi
 import * as settle from "../src/pay/settle.js";
 import { mockPaypal } from "../src/pay/mock.js";
 import { setMandate, mandatesStore } from "../src/mandate.js";
-import { freeCourts } from "../src/world.js";
+import { freeUnits } from "../src/world.js";
 import { forRef, activityStore } from "../src/activity.js";
 
 const DATE = "2026-11-05";
 let now, pp;
 const clock = () => now;
-const freeStart = (v) => { for (const s of ["18:00", "18:30", "19:00", "19:30", "20:00"]) if (freeCourts(v, "badminton", DATE, s, 90).length) return s; throw new Error("no court"); };
+const freeStart = (v) => { for (const s of ["18:00", "18:30", "19:00", "19:30", "20:00"]) if (freeUnits(v, "badminton", DATE, s, 90).length) return s; throw new Error("no court"); };
 
 beforeEach(() => {
   now = new Date(2026, 10, 2, 10, 0);
@@ -22,7 +22,7 @@ beforeEach(() => {
 });
 
 async function deal(players = ["leo", "hana", "tomas"]) {
-  const n = open({ by: "you", players, venue: "north", sport: "badminton", date: DATE, start: freeStart("north"), minutes: 90 });
+  const n = open({ by: "you", players, venue: "north", activity: "badminton", date: DATE, start: freeStart("north"), minutes: 90 });
   const r = accept({ id: n.id, by: "you" });
   assert.equal(r.status, "agreed");
   return r.booking.id;
@@ -64,7 +64,7 @@ test("everyone pays: each share captured, the organizer's authorization captured
   assert.equal(captured, b.total);
   assert.equal(b.payments.you.captured, b.shares.you);
   // the court can't be offered again while it's locked
-  assert.equal(freeCourts("north", "badminton", b.date, b.start, 90).includes(b.court), false);
+  assert.equal(freeUnits("north", "badminton", b.date, b.start, 90).includes(b.unit), false);
   now = new Date(2026, 10, 5, 23, 0);
   await settle.tick();
   await settle.tick();
@@ -94,7 +94,7 @@ test("the organizer never guarantees: the court goes back and nobody is charged"
   await settle.tick();
   const b = settle.internal(id);
   assert.equal(b.state, "released");
-  assert.ok(freeCourts("north", "badminton", b.date, b.start, 90).includes(b.court));
+  assert.ok(freeUnits("north", "badminton", b.date, b.start, 90).includes(b.unit));
 });
 
 test("cancelled before the lock voids; after the lock and 24 h ahead refunds everyone", async () => {
@@ -124,7 +124,7 @@ test("with saved PayPal and within the mandate, the agent pays without a redirec
   assert.equal(b.payments.leo.status, "authorized");
   assert.equal(b.payments.leo.via, "vault");
   assert.equal(b.payments.hana.status, "awaiting_approval");
-  assert.match(b.payments.hana.why, /per-game limit/);
+  assert.match(b.payments.hana.why, /per-booking limit/);
 });
 
 test("a payment step repeated after a crash is the same PayPal call", async () => {

@@ -16,11 +16,11 @@ import Receipt from "./pages/Receipt.jsx";
 const route = () => { const [p, q = ""] = location.hash.replace(/^#\/?/, "").split("?"); return { page: p || "activity", query: new URLSearchParams(q) }; };
 const NAV = [
   { k: "activity", label: "Activity", icon: "spark", note: "What the agents did" },
-  { k: "games", label: "Games", icon: "book", note: "Deals, payments, bookings" },
+  { k: "games", label: "Plans", icon: "book", note: "Deals, payments, bookings" },
   { k: "map", label: "Map", icon: "pin", note: "Venues and alternatives" },
   { k: "limits", label: "Limits", icon: "lock", note: "What your agent may spend" },
   { k: "connect", label: "Connect", icon: "key", note: "Your agents' access" },
-  { k: "venue", label: "Venue view", icon: "store", note: "A venue's courts" },
+  { k: "venue", label: "Venue view", icon: "store", note: "A venue's rooms and courts" },
 ];
 
 export default function App() {

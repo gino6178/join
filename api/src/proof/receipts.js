@@ -13,6 +13,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { store, stateFile } from "../store.js";
 import { canonical, sha256, merkle } from "./merkle.js";
+import { unitName } from "../world.js";
 
 const db = store(stateFile("receipts"), { receipts: [], batches: [] });
 export const receiptsStore = db;
@@ -37,7 +38,7 @@ export function issue(b, n, event) {
   const salt = crypto.randomBytes(16).toString("hex");
   const body = {
     type: "JoinReceipt", version: 1, event, issued: new Date().toISOString(),
-    booking: b.id, venue: b.venue, sport: b.sport, date: b.date, start: b.start, minutes: b.minutes, court: b.court, currency: "USD", total: b.total,
+    booking: b.id, venue: b.venue, activity: b.activity, date: b.date, start: b.start, minutes: b.minutes, unit: b.unit, unitName: unitName(b.activity, b.unit), currency: "USD", total: b.total,
     negotiation: (n?.history || []).map((h) => ({ at: h.at, by: h.by === "organizer" ? "organizer" : h.by, type: h.type, amount: h.amount ?? null })),
     split: b.splitRule || "even",
     payments: b.players.map((pid) => { const p = b.payments[pid] || {}; return {

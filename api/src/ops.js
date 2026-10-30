@@ -2,7 +2,7 @@
 // takes the acting agent ({ player, client }) and plain arguments, checks them, does it, and writes what it did to the
 // activity log in code-made words, so the people involved can see every step on the website.
 // Money crosses as USD strings ("31.50") outward and integer cents inward.
-import { getWorld, venue, player, freeCourts, forSport, SPORTS } from "./world.js";
+import { getWorld, venue, player, freeUnits, forActivity, ACTIVITIES, activity as getActivity, unitName } from "./world.js";
 import * as neg from "./negotiate/engine.js";
 import { price, cents, usd } from "./negotiate/policy.js";
 import { alternatives as alts, shareOf } from "./alternatives.js";
@@ -21,30 +21,35 @@ const said = (a) => `${first(a.player)}'s agent${a.client ? ` (${a.client})` : "
 
 export function whoami(a) {
   const p = player(a.player), m = getMandate(a.player);
-  return { player: { id: p.id, name: p.name, level: p.level, sports: p.sports, usuallyFree: p.free, area: p.area?.name },
+  return { player: { id: p.id, name: p.name, interests: p.interests, ...(p.level ? { sportsLevel: p.level } : {}), usuallyFree: p.free, area: p.area?.name },
     mandate: { perGame: usd(m.perGame), perWeek: usd(m.perWeek), venues: m.venues, autopay: m.autopay && settle.hasVault(a.player), note: "Set by the player on the website. Agents can read it, not change it." },
     paypal: { savedForAgent: settle.hasVault(a.player), mode: settle.paypalMode() }, client: a.client };
 }
 
-export function listVenues({ sport } = {}) {
+// What people can get together for, and what one booking of each holds
+export const listActivities = () => ({ activities: getWorld().activities.map((x) => ({ id: x.id, name: x.name, kind: x.kind, books: `one ${x.unit} for ${x.min}-${x.max} people`, minutes: x.minutes })) });
+
+export function listVenues({ activity } = {}) {
   const w = getWorld();
-  return { currency: "USD", town: w.town.name, venues: w.venues.filter((v) => !sport || forSport(v, sport)).map((v) => ({
+  return { currency: "USD", town: w.town.name, venues: w.venues.filter((v) => !activity || forActivity(v, activity)).map((v) => ({
     id: v.id, name: v.name, area: v.area, open: v.open, weekendOpen: v.weekendOpen || null,
-    sports: Object.fromEntries(Object.entries(v.sports).map(([s, x]) => [s, { courts: x.courts, perHour: usd(cents(x.price)) }])),
-    negotiates: { style: v.policy.style, maxCounterOffers: v.policy.style === "firm" ? 0 : v.policy.rounds, discounts: [`off-peak ${v.policy.offPeak.pct * 100}% (weekday games ending by ${v.policy.offPeak.before})`, `group ${v.policy.group.pct * 100}% (${v.policy.group.min}+ players)`, `last-minute ${v.policy.lastMinute.pct * 100}% (within ${v.policy.lastMinute.withinHours} h)`] },
-  })), publicCourts: (w.publicCourts || []).filter((p) => !sport || p.sports.includes(sport)).map((p) => ({ id: p.id, name: p.name, sports: p.sports, lit: p.lit, bookable: false })) };
+    offers: Object.fromEntries(Object.keys(v.offers).map((k) => { const o = forActivity(v, k); return [k, { units: o.units, unit: o.unit, people: `${o.min}-${o.max}`, price: usd(cents(o.price)), per: o.per === "person" ? "person" : `${o.unit} per hour`, minutes: o.minutes }]; })),
+    negotiates: { style: v.policy.style, maxCounterOffers: v.policy.style === "firm" ? 0 : v.policy.rounds, discounts: [`off-peak ${v.policy.offPeak.pct * 100}% (weekday bookings ending by ${v.policy.offPeak.before})`, `group ${v.policy.group.pct * 100}% (${v.policy.group.min}+ people)`, `last-minute ${v.policy.lastMinute.pct * 100}% (within ${v.policy.lastMinute.withinHours} h)`] },
+  })), publicPlaces: (w.publicPlaces || []).filter((p) => !activity || p.activities.includes(activity)).map((p) => ({ id: p.id, name: p.name, activities: p.activities, lit: p.lit, bookable: false })) };
 }
 
 // Who is free and when, and the fair venue for each: the organizer's usual free times (or the window they give), the
-// players who play the sport and are free then, and the venue with a free court whose longest trip is shortest.
-export function findOptions(a, { sport = "badminton", dates = [], from = null, to = null, minutes = 90, players = 3, with: want = [] } = {}) {
-  const now = clock(), me = player(a.player);
-  if (!SPORTS.includes(sport)) return { error: "no_sport", message: `sport is one of ${SPORTS.join(", ")}.` };
-  if (![60, 90, 120].includes(minutes)) return { error: "bad_length", message: "minutes is 60, 90 or 120." };
+// people interested in the activity who are free then, and the venue with a free unit whose longest trip is shortest.
+export function findOptions(a, { activity = "badminton", dates = [], from = null, to = null, minutes = null, players = 3, with: want = [] } = {}) {
+  const now = clock(), me = player(a.player), act = getActivity(activity);
+  if (!act) return { error: "unknown_activity", message: `activity is one of ${ACTIVITIES().join(", ")}.` };
+  minutes ??= act.minutes.includes(90) ? 90 : act.minutes[0];
+  if (!act.minutes.includes(minutes)) return { error: "bad_length", message: `${activity} is booked for ${act.minutes.join(", ")} minutes.` };
+  if (players + 1 < act.min || players + 1 > act.max) return { error: "group_size", message: `One ${act.unit} for ${activity} takes ${act.min} to ${act.max} people, you included.` };
   if ((from && !isTime(from)) || (to && !isTime(to)) || dates.some((d) => !isDate(d))) return { error: "bad_time", message: "dates are YYYY-MM-DD, from and to HH:MM." };
   const need = Math.max(1, Math.min(11, players | 0));
   const days = dates.length ? dates.slice(0, 7) : Array.from({ length: 7 }, (_, i) => addDays(ymd(now), i));
-  const mine = windows(me.free), others = getWorld().players.filter((p) => p.id !== me.id && (p.sports || []).includes(sport));
+  const mine = windows(me.free), others = getWorld().players.filter((p) => p.id !== me.id && (p.interests || []).includes(activity));
   const opts = [];
   for (const d of days) {
     const date = dateOf(d);
@@ -52,14 +57,15 @@ export function findOptions(a, { sport = "badminton", dates = [], from = null, t
       if (startOf(d, hm(s)) <= new Date(now.getTime() + 60 * 60e3)) continue;
       if (!from && !freeAt(mine, date, s, minutes)) continue;
       const free = others.filter((p) => freeAt(windows(p.free), date, s, minutes))
-        .map((p) => ({ p, score: (want.includes(p.id) ? 10 : 0) - Math.abs("CBA".indexOf(p.level) - "CBA".indexOf(me.level)) - (p.prefers && p.prefers !== "any" && p.prefers !== (need === 1 ? "singles" : "doubles") ? 1 : 0) }))
+        // (for a sport, players close to your level first; for anything else, everyone interested is as good)
+        .map((p) => ({ p, score: (want.includes(p.id) ? 10 : 0) - (act.kind === "sport" ? Math.abs("CBA".indexOf(p.level) - "CBA".indexOf(me.level)) + (p.prefers && p.prefers !== "any" && p.prefers !== (need === 1 ? "singles" : "doubles") ? 1 : 0) : 0) }))
         .sort((x, y) => y.score - x.score);
       if (free.length < need) continue;
       const group = [me, ...free.slice(0, need).map((x) => x.p)];
       let best = null;
       for (const v of getWorld().venues) {
-        if (!forSport(v, sport) || !freeCourts(v.id, sport, d, hm(s), minutes).length) continue;
-        const t = trips(group, v), q = price(v, { sport, date: d, start: hm(s), minutes, players: group.length }, now);
+        if (!forActivity(v, activity) || !freeUnits(v.id, activity, d, hm(s), minutes).length) continue;
+        const t = trips(group, v), q = price(v, { activity, date: d, start: hm(s), minutes, players: group.length }, now);
         if (!best || t.longest < best.longestTrip || (t.longest === best.longestTrip && q.ask < best.ask)) best = { venue: v.id, venueName: v.name, longestTrip: t.longest, trips: t.list, ask: q.ask, discounts: q.discounts.map((x) => x.kind) };
       }
       if (!best) continue;
@@ -72,24 +78,24 @@ export function findOptions(a, { sport = "badminton", dates = [], from = null, t
   opts.sort((x, y) => y.score - x.score);
   const out = [];
   for (const o of opts) { if (out.length >= 5) break; if (out.some((x) => x.date === o.date && Math.abs(toMin(x.start) - toMin(o.start)) < 120)) continue; out.push(o); }
-  record({ actor: by(a), who: [a.player], action: "searched", summary: `${said(a)} looked for ${sport} ${need === 1 ? "singles" : `with ${need} others`} over ${days.length} day${days.length > 1 ? "s" : ""}: ${out.length} option${out.length === 1 ? "" : "s"} found.` });
+  record({ actor: by(a), who: [a.player], action: "searched", summary: `${said(a)} looked for ${activity} with ${need} other${need === 1 ? "" : "s"} over ${days.length} day${days.length > 1 ? "s" : ""}: ${out.length} option${out.length === 1 ? "" : "s"} found.` });
   return { options: out.map(({ score, ...o }) => o), mandate: { perGame: usd(getMandate(a.player).perGame) }, note: out.length ? "Prices are the venue's opening ask; negotiate with start_negotiation." : "Nothing fits. Try other days, a wider window or fewer players." };
 }
 
-export function startNegotiation(a, { venue: venueId, sport, date, start, minutes = 90, players = [] }) {
-  const r = neg.open({ by: a.player, players, venue: venueId, sport, date, start, minutes });
+export function startNegotiation(a, { venue: venueId, activity, date, start, minutes = 90, players = [] }) {
+  const r = neg.open({ by: a.player, players, venue: venueId, activity, date, start, minutes });
   const v = venue(venueId);
   if (r.error) {
-    record({ actor: by(a), who: [a.player], action: "negotiation_refused", summary: `${said(a)} asked ${v?.name || venueId} for ${sport} on ${date} ${start}: ${r.message}`, data: r.alternatives ? { alternatives: r.alternatives } : null });
+    record({ actor: by(a), who: [a.player], action: "negotiation_refused", summary: `${said(a)} asked ${v?.name || venueId} for ${activity} on ${date} ${start}: ${r.message}`, data: r.alternatives ? { alternatives: r.alternatives } : null });
     return r;
   }
-  record({ actor: by(a), who: r.players, action: "negotiation_opened", ref: r.id, summary: `${said(a)} asked ${r.venueName} for a ${r.sport} court on ${r.date} ${r.start} for ${r.players.map(first).join(", ")}. Venue asks $${r.ask} ($${r.share} each)${r.discounts.length ? `, with ${r.discounts.map((d) => d.kind).join(" + ")} discount` : ""}.`, data: { ask: r.ask, list: r.list, ...(r.overBudget ? { overBudget: true, alternatives: r.alternatives } : {}) } });
+  record({ actor: by(a), who: r.players, action: "negotiation_opened", ref: r.id, summary: `${said(a)} asked ${r.venueName} for a ${getActivity(r.activity).unit} for ${r.activity} on ${r.date} ${r.start} for ${r.players.map(first).join(", ")}. Venue asks $${r.ask} ($${r.share} each)${r.discounts.length ? `, with ${r.discounts.map((d) => d.kind).join(" + ")} discount` : ""}.`, data: { ask: r.ask, list: r.list, ...(r.overBudget ? { overBudget: true, alternatives: r.alternatives } : {}) } });
   return r;
 }
 
 export function makeOffer(a, { negotiation, amount }) {
   const c = toCents(amount);
-  if (!c) return { error: "bad_amount", message: "amount is the total for the court in USD, e.g. 30 or 31.5." };
+  if (!c) return { error: "bad_amount", message: "amount is the total for the booking in USD, e.g. 30 or 31.5." };
   const r = neg.offer({ id: negotiation, by: a.player, amount: c });
   const n = r.error ? r.negotiation : r;
   if (n) record({ actor: by(a), who: n.players, action: r.error ? "offer_refused" : r.status === "agreed" ? "deal" : r.status === "rejected" ? "venue_rejected" : "venue_countered", ref: n.id,
@@ -101,7 +107,7 @@ export function makeOffer(a, { negotiation, amount }) {
 export function acceptPrice(a, { negotiation }) {
   const r = neg.accept({ id: negotiation, by: a.player });
   const n = r.error ? r.negotiation : r;
-  if (n) record({ actor: by(a), who: n.players, action: r.error ? "accept_refused" : "deal", ref: n.id, summary: r.error ? `${said(a)} tried to accept $${n.ask}: ${r.message}` : `${said(a)} accepted ${n.venueName}'s $${n.agreed.amount}. Next: ${first(a.player)} guarantees the court in PayPal.`, data: r.alternatives ? { alternatives: r.alternatives } : null });
+  if (n) record({ actor: by(a), who: n.players, action: r.error ? "accept_refused" : "deal", ref: n.id, summary: r.error ? `${said(a)} tried to accept $${n.ask}: ${r.message}` : `${said(a)} accepted ${n.venueName}'s $${n.agreed.amount}. Next: ${first(a.player)} guarantees the booking in PayPal.`, data: r.alternatives ? { alternatives: r.alternatives } : null });
   return r;
 }
 
@@ -111,12 +117,12 @@ export function walkAway(a, { negotiation }) {
   return r;
 }
 
-export function findAlternatives(a, { sport, date, start, minutes = 90, players = [], budget = null, exclude = null }) {
+export function findAlternatives(a, { activity, date, start, minutes = 90, players = [], budget = null, exclude = null }) {
   if (!isDate(date) || !isTime(start)) return { error: "bad_time", message: "date is YYYY-MM-DD and start HH:MM." };
   const ids = [...new Set([a.player, ...players])].filter((id) => player(id));
   const share = budget != null ? toCents(budget) : getMandate(a.player).perGame;
-  const list = alts({ people: ids.map(player), sport, date, start, minutes, budgetShare: share, exclude, from: exclude ? venue(exclude) : null, now: clock() });
-  record({ actor: by(a), who: [a.player], action: "alternatives", summary: `${said(a)} looked for other places for ${sport} on ${date} around ${start}: ${list.length} found.`, data: { alternatives: list } });
+  const list = alts({ people: ids.map(player), activity, date, start, minutes, budgetShare: share, exclude, from: exclude ? venue(exclude) : null, now: clock() });
+  record({ actor: by(a), who: [a.player], action: "alternatives", summary: `${said(a)} looked for other places for ${activity} on ${date} around ${start}: ${list.length} found.`, data: { alternatives: list } });
   return { alternatives: list, budgetPerPerson: usd(share) };
 }
 

@@ -2,7 +2,7 @@
 // and runs the tool loop until Claude has an answer for the player. Join itself runs no model; this file is one
 // example of the agents that come to it from outside.
 //
-//   JOIN_TOKEN=join_... node claude-agent.mjs "Set up doubles on Thursday evening, at most $10 each"
+//   JOIN_TOKEN=join_... node claude-agent.mjs "Book karaoke for four on Friday night, at most $10 each"
 //
 // Needs Anthropic credentials (ANTHROPIC_API_KEY, or an `ant auth login` profile) and a Join token made on the website
 // (Connect your agent). JOIN_URL defaults to http://localhost:8790.
@@ -12,7 +12,7 @@ import { StreamableHTTPClientTransport } from "@modelcontextprotocol/sdk/client/
 
 const JOIN = (process.env.JOIN_URL || "http://localhost:8790").replace(/\/$/, "");
 const TOKEN = process.env.JOIN_TOKEN;
-const ask = process.argv.slice(2).join(" ") || "Find me a doubles badminton game this week within my budget and set it up.";
+const ask = process.argv.slice(2).join(" ") || "Get three friends together this week for something we all like, within my budget, and set it up.";
 if (!TOKEN) { console.error("Set JOIN_TOKEN to a token from Join's website (Connect your agent)."); process.exit(1); }
 
 // Join's tools, as Claude tools
@@ -23,7 +23,7 @@ const tools = joinTools.map((t) => ({ name: t.name, description: t.description, 
 const instructions = mcp.getInstructions() || "";
 
 const client = new Anthropic();
-const system = `You are the user's agent for organizing pickup games on Join.\n\n${instructions}\n\nToday is ${new Date().toISOString().slice(0, 10)}. Prices are in USD. When a payment needs the user's approval, give them the approveUrl and stop.`;
+const system = `You are the user's agent for getting a group together on Join.\n\n${instructions}\n\nToday is ${new Date().toISOString().slice(0, 10)}. Prices are in USD. When a payment needs the user's approval, give them the approveUrl and stop.`;
 const messages = [{ role: "user", content: ask }];
 
 for (let turn = 0; turn < 25; turn++) {

@@ -4,7 +4,7 @@ import { useWorld, firstName } from "../components/Actor.jsx";
 import Icon from "../components/Icon.jsx";
 
 // Deals and bookings: where each one stands, who has paid, and the buttons a person may press themselves.
-const STEPS = [["awaiting_organizer", "Deal"], ["held", "Court guaranteed"], ["locked", "Paid and locked"], ["played", "Played"], ["venue_paid", "Venue paid"]];
+const STEPS = [["awaiting_organizer", "Deal"], ["held", "Guaranteed"], ["locked", "Paid and locked"], ["played", "Played"], ["venue_paid", "Venue paid"]];
 const ENDED = { released: "Released: nobody was charged", cancelled: "Cancelled: nobody was charged", refunded: "Cancelled: everyone refunded" };
 const PAY = { invited: "invited, no answer yet", not_started: "not started", creating: "starting", awaiting_approval: "waiting for approval", authorized: "authorized", captured: "paid", voided: "voided", dropped: "didn't pay (covered)", declined: "declined", refunded: "refunded", failed: "failed", capture_failed: "failed", too_late: "too late" };
 
@@ -16,7 +16,7 @@ export default function Games({ entries, me, query }) {
   if (!g.data) return <div className="page"><p className="muted">Loading…</p></div>;
   return (
     <div className="page">
-      <header className="page-head"><h1>Games</h1><p className="muted">Each deal your agent made, and how it is being paid.</p></header>
+      <header className="page-head"><h1>Plans</h1><p className="muted">Each deal your agent made, and how it is being paid.</p></header>
       {query.get("cancelled") && <p className="note warn">You left PayPal without approving. Your agent can send you the link again.</p>}
       {!g.data.bookings.length && <p className="empty card">No bookings yet.</p>}
       {g.data.bookings.map((b) => <Booking key={b.id} b={b} me={me.player.id} w={w} focus={b.id === focus} done={() => setTick((t) => t + 1)} />)}
@@ -35,11 +35,11 @@ function Booking({ b, me, w, focus, done }) {
   return (
     <section className={`card booking ${focus ? "focus" : ""}`}>
       <header>
-        <div><h3>{b.venueName} · court {b.court}</h3><p className="muted">{b.sport} · {dayLabel(b.date)} {b.start} · {b.minutes} min · {money(b.total)} total</p></div>
+        <div><h3>{b.venueName} · {b.unitName}</h3><p className="muted">{b.activity} · {dayLabel(b.date)} {b.start} · {b.minutes} min · {money(b.total)} total</p></div>
         {ENDED[b.state] ? <span className="pill warn">{ENDED[b.state]}</span> : <span className="pill good">{STEPS[at]?.[1]}</span>}
       </header>
       {!ENDED[b.state] && <ol className="stepper">{STEPS.map(([s, label], i) => <li key={s} className={i < at ? "done" : i === at ? "now" : ""}><span />{label}</li>)}</ol>}
-      {b.guaranteeBy && <p className="small"><Icon name="clock" size={14} />Held until {clock(b.guaranteeBy)} for {firstName(w, b.organizer)} to guarantee the whole court in PayPal.</p>}
+      {b.guaranteeBy && <p className="small"><Icon name="clock" size={14} />Held until {clock(b.guaranteeBy)} for {firstName(w, b.organizer)} to guarantee the whole booking in PayPal.</p>}
       {b.payBy && <p className="small"><Icon name="clock" size={14} />Shares due by {clock(b.payBy)}. {firstName(w, b.organizer)} covers anyone who doesn't pay.</p>}
       <table className="pays"><thead><tr><th>Player</th><th>Pays</th><th>Status</th><th>How</th></tr></thead><tbody>
         {b.players.map((pid) => { const p = b.payments[pid]; return (
@@ -55,7 +55,7 @@ function Booking({ b, me, w, focus, done }) {
       {b.payout && <p className="small"><Icon name="send" size={14} />Venue paid {money(b.payout.amount)} with PayPal Payouts ({String(b.payout.status).toLowerCase()}), after PayPal's fees.</p>}
       {err && <p className="err">{err}</p>}
       <div className="actions">
-        {b.you?.approveUrl && <a className="btn primary" href={b.you.approveUrl}>{me === b.organizer && b.state === "awaiting_organizer" ? "Guarantee the court in PayPal" : "Pay your share in PayPal"}</a>}
+        {b.you?.approveUrl && <a className="btn primary" href={b.you.approveUrl}>{me === b.organizer && b.state === "awaiting_organizer" ? "Guarantee the booking in PayPal" : "Pay your share in PayPal"}</a>}
         {me !== b.organizer && ["awaiting_organizer", "held"].includes(b.state) && !b.payments[me]?.status?.match(/declined|captured/) && <>
           {!b.you && b.state === "held" && <button className="btn primary" disabled={!!busy} onClick={() => act("pay")}>Join and pay {money(b.invite?.share || 0)}</button>}
           <button className="btn" disabled={!!busy} onClick={() => act("decline")}>I can't play</button></>}
@@ -71,7 +71,7 @@ function Negotiation({ n, w }) {
   const max = Math.max(...hist.map((h) => +h.amount), +n.list);
   return (
     <section className="card nego">
-      <header><div><h3>{n.venueName}</h3><p className="muted">{n.sport} · {dayLabel(n.date)} {n.start} · {n.players.map((p) => firstName(w, p)).join(", ")}</p></div><span className={`pill ${n.status === "agreed" ? "good" : n.status === "open" ? "" : "warn"}`}>{n.status}{n.agreed ? ` at ${money(n.agreed.amount)}` : ""}</span></header>
+      <header><div><h3>{n.venueName}</h3><p className="muted">{n.activity} · {dayLabel(n.date)} {n.start} · {n.players.map((p) => firstName(w, p)).join(", ")}</p></div><span className={`pill ${n.status === "agreed" ? "good" : n.status === "open" ? "" : "warn"}`}>{n.status}{n.agreed ? ` at ${money(n.agreed.amount)}` : ""}</span></header>
       <div className="bars">
         <div className="bar list"><span style={{ width: "100%" }} /><b>list {money(n.list)}</b></div>
         {hist.map((h, i) => <div key={i} className={`bar ${h.by === "organizer" ? "offer" : "ask"}`}><span style={{ width: `${(100 * +h.amount) / max}%` }} /><b>{h.by === "organizer" ? "your agent" : "venue"} {h.type} {money(h.amount)}</b></div>)}

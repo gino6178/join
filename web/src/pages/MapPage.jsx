@@ -5,7 +5,7 @@ import { useWorld } from "../components/Actor.jsx";
 import Icon from "../components/Icon.jsx";
 
 // The map, following the latest thing that happened: a price over budget marks that venue red and numbers the
-// alternatives Join offered instead; a booking shows the court and everyone's trip to it.
+// alternatives Join offered instead; a booking shows the place and everyone's trip to it.
 export default function MapPage({ entries, me }) {
   const w = useWorld(), games = useApi("/api/games", entries.length);
   const last = useMemo(() => [...entries].reverse().find((e) => e.data?.alternatives?.length), [entries]);
@@ -15,7 +15,7 @@ export default function MapPage({ entries, me }) {
   const alts = fresh ? last.data.alternatives : [];
   return (
     <div className="page wide">
-      <header className="page-head"><h1>Map</h1><p className="muted">{w?.town.name}. Venues are pins; squares are free public courts (first come, not bookable); dots are players' home areas, never addresses.</p></header>
+      <header className="page-head"><h1>Map</h1><p className="muted">{w?.town.name}. Venues are pins; squares are free public places such as park courts and picnic grills (first come, not bookable); dots are people's home areas, never addresses.</p></header>
       <div className="map-layout">
         <div className="card map-card"><TownMap world={w} me={me.player.id} over={fresh ? overVenue : null} alternatives={alts} booked={!fresh ? booking?.venue : null} people={!fresh ? booking?.players || [] : [me.player.id]} /></div>
         <aside className="map-side">
@@ -25,11 +25,11 @@ export default function MapPage({ entries, me }) {
             <ol className="alt-list">{alts.map((a, i) => <li key={a.venue}><span className="n">{i + 1}</span><span><b>{a.name}</b> {a.start} · {a.bookable ? `${money(a.price)} total` : "free"}<small>{a.why}</small></span></li>)}</ol>
           </section> : booking ? <section className="card">
             <h3><Icon name="lock" size={18} />{booking.venueName}</h3>
-            <p className="small">Court {booking.court} · {booking.date} {booking.start} · {booking.state.replace(/_/g, " ")}</p>
+            <p className="small">{booking.unitName} · {booking.date} {booking.start} · {booking.state.replace(/_/g, " ")}</p>
             <p className="small muted">The fairest venue: the one where the longest trip in the group is shortest.</p>
           </section> : <section className="card"><p className="muted small">When your agent's deal is over your budget, the alternatives Join offered appear here.</p></section>}
           <section className="card legend">
-            <p><span className="lg venue" />Venue</p><p><span className="lg over" />Over your budget</p><p><span className="lg alt" />Alternative</p><p><span className="lg pub" />Public court</p><p><span className="lg me" />You</p>
+            <p><span className="lg venue" />Venue</p><p><span className="lg over" />Over your budget</p><p><span className="lg alt" />Alternative</p><p><span className="lg pub" />Public place</p><p><span className="lg me" />You</p>
           </section>
         </aside>
       </div>

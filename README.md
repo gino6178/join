@@ -1,10 +1,11 @@
 # Join
 
-**Agents can find a game. They can't haggle for the court or split the bill.**
+**Agents can find a time. They can't haggle with the venue or split the bill.**
 
-Join is the agent-ready marketplace for pickup sports. Players' own AI agents come to it (Claude, or any MCP or A2A
-client) to find who is free, **negotiate the court's price with the venue**, split the fee and **settle it with
-PayPal**, inside spending limits each player set. The court is locked only when the money is real, and the people
+Join is the agent-ready marketplace for getting a group together: a game of badminton, a karaoke room, an escape room,
+a board game table, a barbecue pit, a hot pot dinner. People's own AI agents come to it (Claude, or any MCP or A2A
+client) to find who is free, **negotiate the price with the venue**, split the cost and **settle it with PayPal**,
+inside spending limits each person set. A booking is locked only when the money is real, and the people
 involved see every step their agents took.
 
 Join runs **no AI model of its own**. It is the market and the rules; the intelligence is in the agents that use it.
@@ -15,16 +16,17 @@ PayPal AI Hackathon 2026 · MIT license
 
 ## What happens
 
-1. **Your agent looks for a game.** `find_options`: when you and enough players are free, and the fairest venue for
+1. **Your agent looks for a plan.** `list_activities`, then `find_options`: when you and enough people who like the
+   activity are free, and the fairest venue for
    each time (the one where the longest trip in the group is shortest), with its opening price.
 2. **It negotiates.** `start_negotiation` → `make_offer` → `accept_price`. The venue's side is run by Join from the
    venue's policy: list price, off-peak / group / last-minute discounts, a concession schedule (firm, standard or
    eager) over at most three counter-offers, the last one best and final, and a floor that never leaves the engine.
-3. **Over budget? Alternatives from the map.** If the price is over your per-game limit, the venue says no, or the
-   court is gone, the answer carries other venues and free public courts nearby, ranked by budget, start time and
+3. **Over budget? Alternatives from the map.** If the price is over your per-booking limit, the venue says no, or the
+   place is gone, the answer carries other venues and free public places (park courts, picnic grills) nearby, ranked by budget, start time and
    the group's longest trip, each with a reason written by code.
-4. **The organizer guarantees the court.** A deal is binding: the organizer authorizes the **whole** price with PayPal
-   (Orders v2, intent `AUTHORIZE`) within 10 minutes, or the court goes back. Nobody can hold a court for free.
+4. **The organizer guarantees the booking.** A deal is binding: the organizer authorizes the **whole** price with
+   PayPal (Orders v2, intent `AUTHORIZE`) within 10 minutes, or the place goes back. Nobody can hold a room for free.
 5. **The others are invited, then pay their share.** Each player's agent (or the player, on the website) joins or
    declines; nothing is started for anyone who hasn't said yes. Before joining, an invitee's agent may ask to pay less;
    the organizer's agent accepts (the organizer covers the difference, within their own limit) or refuses. Joining
@@ -32,12 +34,12 @@ PayPal AI Hackathon 2026 · MIT license
    their agent pays it without a redirect.
 6. **Locked.** When everyone has paid (or the 20 minutes run out) each share is captured and the rest is captured from
    the organizer's authorization: they cover whoever didn't pay. Cancel more than 24 hours ahead: full refunds.
-7. **The venue is paid after the game** (PayPal Payouts, net of fees), so a cancellation can still be refunded.
+7. **The venue is paid afterwards** (PayPal Payouts, net of fees), so a cancellation can still be refunded.
 8. **A receipt anyone can check.** Locking, refunding and paying the venue each issue a receipt (see below).
 
 The website shows each person what the agents did (**Activity**), what waits on them (an approval in PayPal), where
-each payment stands (**Games**), the venue and alternatives on the town map (**Map**), the limits only they can set
-(**Limits**), and which agents may act for them (**Connect**). A **Venue view** shows a venue its courts on **Bryntum
+each payment stands (**Plans**), the venue and alternatives on the town map (**Map**), the limits only they can set
+(**Limits**), and which agents may act for them (**Connect**). A **Venue view** shows a venue its courts, rooms or tables on **Bryntum
 Scheduler** (dashed while a group pays, solid the moment it is paid and locked), and lets the venue's staff set the
 rules Join negotiates by: style, floor, number of counter-offers, off-peak / group / last-minute discounts.
 
@@ -57,11 +59,13 @@ npm run setup
 npm start
 ```
 
-Open http://localhost:8790 and sign in as any demo player. Then, in another terminal, watch four agents set up a game:
+Open http://localhost:8790 and sign in as any demo player. Then, in another terminal, watch four agents set up a plan:
 
 ```bash
 npm run demo
 ```
+
+Any other plan: `JOIN_ACTIVITY=karaoke npm run demo` (or `"escape room"`, `"board games"`, `bbq`, `"hot pot"`).
 
 The scripted agent (`examples/scripted-agent.mjs`) uses Join over MCP exactly as Claude would, with no API key: an
 over-budget venue, alternatives, three rounds of haggling, the organizer's guarantee, three shares, the lock.
@@ -102,14 +106,14 @@ tampering); and an end-to-end run of four agents over MCP.
 | A2A (JSON-RPC, `message/send`) | `POST /a2a`, card at `/.well-known/agent-card.json` | agents that speak A2A |
 
 All three take a player's token (`Authorization: Bearer join_...`) and offer the same tools: `whoami`, `list_venues`,
-`find_options`, `start_negotiation`, `make_offer`, `accept_price`, `walk_away`, `find_alternatives`, `my_games`,
-`game_status`, `pay_my_share`, `propose_share`, `answer_share`, `decline_game`, `cancel_booking`.
+`list_activities`, `find_options`, `start_negotiation`, `make_offer`, `accept_price`, `walk_away`, `find_alternatives`,
+`my_plans`, `booking_status`, `pay_my_share`, `propose_share`, `answer_share`, `decline_invite`, `cancel_booking`.
 
 **What the platform guarantees, whatever the agent does**
 
 - A token acts for one player, is shown once and kept as a hash, and can be revoked. It can't change the player's
   limits, save a payment method or make tokens: those need the person, signed in.
-- The mandate (per-game, per-week, venues) is checked before a venue sees an offer, and again before an agent pays.
+- The mandate (per-booking, per-week, venues) is checked before a venue sees an offer, and again before an agent pays.
 - A venue's floor is never sent anywhere; only its policy price and scheduled counters are. Five negotiations per
   player, venue and day, and each expires in 15 minutes.
 - Only structured fields cross between agents. Every line on the Activity page is written by code from the facts.
@@ -121,9 +125,9 @@ All three take a player's token (`Authorization: Bearer join_...`) and offer the
 | PayPal | In Join |
 |---|---|
 | Orders v2, intent `AUTHORIZE`, approval links | The organizer's guarantee and each player's share |
-| Authorizations: capture (final), void | Lock the court; release it; decline |
+| Authorizations: capture (final), void | Lock the booking; release it; decline |
 | Captures: refund | Cancellation more than 24 h ahead |
-| Payouts | The venue's money, after the game, net of fees |
+| Payouts | The venue's money, afterwards, net of fees |
 | Vault v3 (setup token → payment token → `vault_id`) | Save PayPal once; the agent pays within the mandate |
 | Webhooks + `verify-webhook-signature` | Confirmations (order approved, captures, payouts) |
 | PayPal MCP server / Agent Toolkit | A venue's own agent reconciles and invoices ([examples/venue](examples/venue/README.md)) |

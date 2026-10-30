@@ -34,8 +34,8 @@ export default function Receipt({ id }) {
     <div className="page">
       <header className="page-head"><h1>Receipt</h1><p className="muted">Proof that this deal and its payments have not changed since they were recorded. Checked here, in your browser.</p></header>
       <section className="card">
-        <h3><Icon name="verify" size={18} />{b.event === "locked" ? "Court paid and locked" : b.event === "refunded" ? "Cancelled and refunded" : "Venue paid"}</h3>
-        <p>{b.sport} · {b.date} {b.start} · {b.minutes} min · court {b.court} · <b>{money(b.total / 100)}</b></p>
+        <h3><Icon name="verify" size={18} />{b.event === "locked" ? "Paid and locked" : b.event === "refunded" ? "Cancelled and refunded" : "Venue paid"}</h3>
+        <p>{b.activity} · {b.date} {b.start} · {b.minutes} min · {b.unitName} · <b>{money(b.total / 100)}</b></p>
         <ul className="can checks">
           {row(c?.hash, "The receipt is complete and unchanged", `SHA-256 ${r.hash.slice(0, 24)}…`)}
           {row(c?.signature, c?.signature === null ? "Signature: check with the verifier script" : "Signed by Join", `Ed25519, key ${r.kid}`)}

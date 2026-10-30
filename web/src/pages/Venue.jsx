@@ -2,12 +2,12 @@ import { lazy, Suspense, useEffect, useState } from "react";
 import { api, useApi, money } from "../api.js";
 import { useWorld } from "../components/Actor.jsx";
 
-// A venue's side: its courts over a day, with the games Join booked. A court held while a group pays is dashed; once
-// everyone has paid it is solid; a court that went back is gone. The schedule is public; the venue's rules are for its
+// A venue's side: its courts, rooms or tables over a day, with the bookings Join made. Held while a group pays is
+// dashed; once everyone has paid it is solid; a booking that went back is gone. The schedule is public; the venue's rules are for its
 // staff (Policy, below).
 const LIVE = { awaiting_organizer: "held", held: "held", locking: "held", locked: "locked", played: "played", venue_paid: "played" };
 // Bryntum Scheduler is large, so it loads only on this page
-const CourtScheduler = lazy(() => import("../components/CourtScheduler.jsx"));
+const PlaceScheduler = lazy(() => import("../components/PlaceScheduler.jsx"));
 
 export default function Venue({ query }) {
   const w = useWorld();
@@ -21,20 +21,20 @@ export default function Venue({ query }) {
   const dates = [...new Set(live.map((b) => b.date))].sort();
   const [date, setDate] = useState(null);
   const day = date || dates[0];
-  const courts = v ? Math.max(...Object.values(v.sports).map((x) => x.courts)) : 0;
+  const units = v ? Object.entries(v.offers).map(([a, o]) => ({ activity: a, unit: w.activities.find((x) => x.id === a)?.unit || "unit", count: o.units })) : [];
   return (
     <div className="page wide">
-      <header className="page-head"><h1>Venue view</h1><p className="muted">What a venue sees: its courts, with the games Join's agents booked. Dashed: held while the group pays. Solid: paid and locked.</p></header>
+      <header className="page-head"><h1>Venue view</h1><p className="muted">What a venue sees: its courts, rooms or tables, with the bookings Join's agents made. Dashed: held while the group pays. Solid: paid and locked.</p></header>
       <div className="seg">{w?.venues.map((x) => <button key={x.id} className={x.id === id ? "on" : ""} onClick={() => { setId(x.id); setDate(null); }}>{x.name}</button>)}</div>
       {dates.length > 0 && <div className="seg small">{dates.map((d) => <button key={d} className={d === day ? "on" : ""} onClick={() => setDate(d)}>{d}</button>)}</div>}
       <section className="card sched">
-        {day ? <Suspense fallback={<p className="muted small">Loading the schedule…</p>}><CourtScheduler courts={courts} bookings={live} date={day} kind={LIVE} /></Suspense>
-          : <p className="muted small">No games booked through Join at this venue yet.</p>}
+        {day ? <Suspense fallback={<p className="muted small">Loading the schedule…</p>}><PlaceScheduler units={units} bookings={live} date={day} kind={LIVE} /></Suspense>
+          : <p className="muted small">Nothing booked through Join at this venue yet.</p>}
         <p className="small muted legend-row"><span className="lg-bar held" />held while the group pays <span className="lg-bar locked" />paid and locked <span className="lg-bar played" />played</p>
       </section>
       <Policy id={id} name={v?.name} />
-      {s.data?.bookings?.length > 0 && <section className="card"><h3>Bookings and payouts</h3><table className="pays"><thead><tr><th>Date</th><th>Time</th><th>Court</th><th>Total</th><th>State</th><th>Paid out</th></tr></thead><tbody>
-        {s.data.bookings.map((b) => <tr key={b.id}><td>{b.date}</td><td>{b.start}</td><td>{b.court}</td><td>{money(b.total)}</td><td>{b.state.replace(/_/g, " ")}</td><td>{b.payout ? money(b.payout) : ""}</td></tr>)}
+      {s.data?.bookings?.length > 0 && <section className="card"><h3>Bookings and payouts</h3><table className="pays"><thead><tr><th>Date</th><th>Time</th><th>Place</th><th>Total</th><th>State</th><th>Paid out</th></tr></thead><tbody>
+        {s.data.bookings.map((b) => <tr key={b.id}><td>{b.date}</td><td>{b.start}</td><td>{b.unitName}</td><td>{money(b.total)}</td><td>{b.state.replace(/_/g, " ")}</td><td>{b.payout ? money(b.payout) : ""}</td></tr>)}
       </tbody></table></section>}
     </div>
   );

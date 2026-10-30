@@ -1,20 +1,20 @@
 // Settling a deal with PayPal: from the moment the organizer's agent and the venue agree a price, to the venue being
 // paid after the game. One booking per deal; each player pays their own share with their own PayPal.
 //
-//   awaiting_organizer  The court is held for ORGANIZER_MS while the organizer authorizes the WHOLE price (an order with
-//                       intent AUTHORIZE). Nothing else happens until they do, so nobody can hold a court for free.
-//   held                The organizer's authorization guarantees the court. Every other player is invited, for
+//   awaiting_organizer  The court, room or table is held for ORGANIZER_MS while the organizer authorizes the WHOLE price (an order with
+//                       intent AUTHORIZE). Nothing else happens until they do, so nobody can hold a place for free.
+//   held                The organizer's authorization guarantees the booking. Every other player is invited, for
 //                       SHARES_MS: their agent (or they, on the website) joins or declines. Nothing is started for
 //                       anyone who hasn't said yes. Joining starts their share: a player who saved PayPal (Vault) and
 //                       whose mandate covers the share is authorized by their agent at once; everyone else approves in
 //                       PayPal.
 //   locked              Everyone authorized, or the time ran out: each share is captured, and the rest of the price is
-//                       captured from the organizer's authorization (they cover whoever didn't pay). The court is the
+//                       captured from the organizer's authorization (they cover whoever didn't pay). The place is the
 //                       group's. Until CANCEL_BEFORE_MS before the game it can still be cancelled with full refunds.
 //   played              The game's end has passed.
 //   venue_paid          The venue was sent what PayPal left after fees (Payouts). Paying after the game, not before,
 //                       keeps refunds possible while the game can still be cancelled.
-//   released / cancelled / refunded   The court went back to the venue; nothing was charged, or everything refunded.
+//   released / cancelled / refunded   The place went back to the venue; nothing was charged, or everything refunded.
 //
 // The state moves on three signals, any of which is enough: the payer coming back to the return URL, polling the
 // order (tick), and PayPal's webhooks. Each PayPal POST is written to the booking's journal before it is made and
@@ -22,7 +22,9 @@
 // call instead of making a second one.
 import crypto from "node:crypto";
 import { store, stateFile } from "../store.js";
-import { setTaken, venue, player, freeCourts } from "../world.js";
+import { setTaken, venue, player, freeUnits, unitName } from "../world.js";
+// "room 3" (or "Room 3" to start a sentence)
+const place = (b, cap = false) => { const t = unitName(b.activity, b.unit); return cap ? t[0].toUpperCase() + t.slice(1) : t; };
 import { setOnAgreed, internal as negotiation } from "../negotiate/engine.js";
 import * as receipts from "../proof/receipts.js";
 import { getMandate, fits } from "../mandate.js";
@@ -48,8 +50,8 @@ const at = () => clock().toISOString();
 const chains = new Map();
 const serial = (id, fn) => { const p = (chains.get(id) || Promise.resolve()).then(fn, fn); chains.set(id, p.catch(() => {})); return p; };
 
-// the courts this platform holds, so the venue adapter doesn't offer them again
-setTaken(() => db.data.bookings.filter((b) => LIVE.includes(b.state)).map((b) => ({ venue: b.venue, sport: b.sport, date: b.date, from: toMin(b.start), to: toMin(b.start) + b.minutes, court: b.court })));
+// the units (courts, rooms, tables) this platform holds, so the venue adapter doesn't offer them again
+setTaken(() => db.data.bookings.filter((b) => LIVE.includes(b.state)).map((b) => ({ venue: b.venue, activity: b.activity, date: b.date, from: toMin(b.start), to: toMin(b.start) + b.minutes, unit: b.unit })));
 
 export function split(total, ids, organizer) {
   const each = Math.floor(total / ids.length), out = {};
@@ -68,16 +70,16 @@ const note = (b, actor, action, summary, data = null) => record({ actor, who: b.
 
 // ---- from a deal to a booking -----------------------------------------------------------------------------------
 setOnAgreed((n) => {
-  const now = clock(), court = freeCourts(n.venue, n.sport, n.date, n.start, n.minutes)[0];
-  if (!court) return { error: "no_court" };
+  const now = clock(), unit = freeUnits(n.venue, n.activity, n.date, n.start, n.minutes)[0];
+  if (!unit) return { error: "none_free" };
   const b = {
-    id: `bk_${crypto.randomBytes(6).toString("hex")}`, negotiation: n.id, venue: n.venue, sport: n.sport, date: n.date, start: n.start, minutes: n.minutes, court,
+    id: `bk_${crypto.randomBytes(6).toString("hex")}`, negotiation: n.id, venue: n.venue, activity: n.activity, date: n.date, start: n.start, minutes: n.minutes, unit,
     total: n.agreed.amount, players: n.players, organizer: n.by, shares: split(n.agreed.amount, n.players, n.by),
     state: "awaiting_organizer", created: now.toISOString(), organizerUntil: now.getTime() + ORGANIZER_MS, holdUntil: null,
     payments: {}, declined: [], payout: null, journal: [], paypalMode: paypalMode(),
   };
   db.data.bookings.push(b); db.save();
-  note(b, { kind: "venue", venue: b.venue }, "court_held", `${venue(b.venue).name} holds court ${court} for ${ORGANIZER_MS / 60e3} minutes while ${name(b.organizer)} authorizes $${usd(b.total)} with PayPal.`);
+  note(b, { kind: "venue", venue: b.venue }, "place_held", `${venue(b.venue).name} holds ${unitName(b.activity, unit)} for ${ORGANIZER_MS / 60e3} minutes while ${name(b.organizer)} authorizes $${usd(b.total)} with PayPal.`);
   serial(b.id, () => startPayment(b, b.organizer, b.total, "organizer")).catch(() => {});
   return { id: b.id, state: b.state };
 });
@@ -89,7 +91,7 @@ async function startPayment(b, playerId, amount, role) {
   const auto = !!(vault && m.autopay && f.ok);
   const p = { role, amount, status: "creating", via: auto ? "vault" : "approval", orderId: null, approveUrl: null, authorizationId: null, captureId: null, net: null, why: auto ? null : !vault || !m.autopay ? "approve in PayPal" : `needs your approval: ${f.why.join("; ")}` };
   b.payments[playerId] = p; db.save();
-  const description = `${v.name}, ${b.sport}, ${b.date} ${b.start} (${role === "organizer" ? "whole court, guaranteed by the organizer" : "your share"})`;
+  const description = `${v.name}, ${b.activity}, ${b.date} ${b.start} (${role === "organizer" ? "the whole booking, guaranteed by the organizer" : "your share"})`;
   try {
     const o = await paypalStep(b, `order:${playerId}`, (rid) => pp.createOrder({ amount, reference: `${b.id}:${playerId}`, description, returnUrl: `${publicUrl}/paypal/return?booking=${b.id}&player=${playerId}`, cancelUrl: `${publicUrl}/paypal/cancel?booking=${b.id}&player=${playerId}`, vaultId: auto ? vault.tokenId : null, requestId: rid }));
     p.orderId = o.id; p.approveUrl = o.approveUrl;
@@ -97,7 +99,7 @@ async function startPayment(b, playerId, amount, role) {
     else p.status = "awaiting_approval";
     db.save();
     if (p.status === "authorized") note(b, { kind: "agent", player: playerId }, "authorized", `${name(playerId)}'s agent authorized $${usd(amount)} from their saved PayPal, within their limit.`);
-    else note(b, { kind: "platform" }, "approval_requested", `${name(playerId)} needs to approve $${usd(amount)} in PayPal${role === "organizer" ? " to keep the court" : " for their share"}.`, { player: playerId });
+    else note(b, { kind: "platform" }, "approval_requested", `${name(playerId)} needs to approve $${usd(amount)} in PayPal${role === "organizer" ? " to keep the booking" : " for their share"}.`, { player: playerId });
     await advance(b);
   } catch (e) {
     p.status = "failed"; p.error = e.message; db.save();
@@ -125,7 +127,7 @@ export function approved(bookingId, playerId) {
     try {
       const a = await paypalStep(b, `authorize:${playerId}`, (rid) => pp.authorizeOrder(p.orderId, rid));
       p.authorizationId = a.id; p.status = "authorized"; p.expiresAt = a.expiresAt; db.save();
-      note(b, { kind: "player", player: playerId }, "authorized", `${name(playerId)} approved in PayPal: $${usd(p.amount)} authorized${p.role === "organizer" ? ", so the court is guaranteed" : ""}.`);
+      note(b, { kind: "player", player: playerId }, "authorized", `${name(playerId)} approved in PayPal: $${usd(p.amount)} authorized${p.role === "organizer" ? ", so the booking is guaranteed" : ""}.`);
       await advance(b);
     } catch (e) { p.status = "failed"; p.error = e.message; db.save(); }
     return view(b, playerId);
@@ -143,9 +145,9 @@ async function advance(b) {
   if (b.state === "awaiting_organizer" && org?.status === "authorized") {
     b.state = "held"; b.holdUntil = now + SHARES_MS; db.save();
     const until = hm(new Date(b.holdUntil).getHours() * 60 + new Date(b.holdUntil).getMinutes());
-    note(b, { kind: "platform" }, "held", `${name(b.organizer)} guaranteed the court: court ${b.court} is held until ${until}. ${name(b.organizer)} covers anyone who doesn't join and pay by then.`);
+    note(b, { kind: "platform" }, "held", `${name(b.organizer)} guaranteed the booking: ${place(b)} is held until ${until}. ${name(b.organizer)} covers anyone who doesn't join and pay by then.`);
     for (const pid of b.players) if (pid !== b.organizer && !b.declined.includes(pid))
-      record({ actor: { kind: "agent", player: b.organizer }, who: [pid], action: "invited", ref: b.id, summary: `${name(b.organizer)}'s agent invited you: ${b.sport} on ${b.date} ${b.start} at ${venue(b.venue).name}, court ${b.court}. Your share is $${usd(b.shares[pid])}. Join or decline by ${until}.`, data: { share: usd(b.shares[pid]), payBy: until } });
+      record({ actor: { kind: "agent", player: b.organizer }, who: [pid], action: "invited", ref: b.id, summary: `${name(b.organizer)}'s agent invited you: ${b.activity} on ${b.date} ${b.start} at ${venue(b.venue).name}, ${place(b)}. Your share is $${usd(b.shares[pid])}. Join or decline by ${until}.`, data: { share: usd(b.shares[pid]), payBy: until } });
   }
   if (b.state === "held") {
     const others = b.players.filter((pid) => pid !== b.organizer && !b.declined.includes(pid));
@@ -180,7 +182,7 @@ async function lock(b, reason) {
   b.state = "locked"; b.lockedAt = at(); db.save();
   receipts.issue(b, negotiation(b.negotiation), "locked");
   const short = b.players.filter((pid) => pid !== b.organizer && b.payments[pid]?.status !== "captured");
-  note(b, { kind: "platform" }, "locked", `Court ${b.court} at ${venue(b.venue).name} is locked: $${usd(b.total)} paid (${reason}).${short.length ? ` ${name(b.organizer)} covered ${short.map(name).join(", ")} ($${usd(rest - b.shares[b.organizer])}).` : ""}`);
+  note(b, { kind: "platform" }, "locked", `${place(b, true)} at ${venue(b.venue).name} is locked: $${usd(b.total)} paid (${reason}).${short.length ? ` ${name(b.organizer)} covered ${short.map(name).join(", ")} ($${usd(rest - b.shares[b.organizer])}).` : ""}`);
 }
 
 async function release(b, state, why) {
@@ -215,7 +217,7 @@ export async function tick() {
         if (p.status !== "awaiting_approval" || !p.orderId) continue;
         try { const o = await pp.getOrder(p.orderId); if (o.status === "APPROVED") setTimeout(() => approved(b.id, pid), 0); } catch {}
       }
-      if (b.state === "awaiting_organizer" && now > b.organizerUntil) await release(b, "released", `${name(b.organizer)} didn't authorize in time, so ${venue(b.venue).name} has court ${b.court} back. Nobody was charged.`);
+      if (b.state === "awaiting_organizer" && now > b.organizerUntil) await release(b, "released", `${name(b.organizer)} didn't authorize in time, so ${venue(b.venue).name} has ${place(b)} back. Nobody was charged.`);
       else if (b.state === "held" && now > b.holdUntil) await lock(b, "the time to pay ran out");
       else if (b.state === "locked" && now > startOf(b.date, b.start).getTime() + b.minutes * 60e3) { b.state = "played"; db.save(); note(b, { kind: "platform" }, "played", "The game is over."); }
       if (b.state === "played" && !b.payout) await payVenue(b);
@@ -230,7 +232,7 @@ async function payVenue(b) {
   const v = venue(b.venue);
   const net = Object.values(b.payments).filter((p) => p.status === "captured").reduce((a, p) => a + (p.net ?? p.captured ?? p.amount), 0);
   try {
-    const r = await paypalStep(b, "payout", () => pp.payout({ batchId: `join-${b.id}`, receiver: v.payee, amount: net, note: `Join: court ${b.court}, ${b.sport}, ${b.date} ${b.start}` }));
+    const r = await paypalStep(b, "payout", () => pp.payout({ batchId: `join-${b.id}`, receiver: v.payee, amount: net, note: `Join: ${place(b)}, ${b.activity}, ${b.date} ${b.start}` }));
     b.payout = { batchId: r.batchId, status: "PENDING", amount: net, receiver: v.payee }; b.state = "venue_paid"; db.save();
     receipts.issue(b, negotiation(b.negotiation), "venue_paid");
     note(b, { kind: "platform" }, "venue_paid", `Sent ${v.name} $${usd(net)} with PayPal Payouts (the $${usd(b.total)} paid, less PayPal's fees).`);
@@ -243,7 +245,7 @@ export function pay(bookingId, playerId) {
   if (!b || !b.players.includes(playerId)) return Promise.resolve({ error: "no_booking", message: "No such booking." });
   return serial(b.id, async () => {
     if (b.declined.includes(playerId)) return { error: "declined", message: "You declined this game." };
-    if (playerId !== b.organizer && b.state === "awaiting_organizer") return { ...view(b, playerId), message: `Waiting for ${name(b.organizer)} to guarantee the court first.` };
+    if (playerId !== b.organizer && b.state === "awaiting_organizer") return { ...view(b, playerId), message: `Waiting for ${name(b.organizer)} to guarantee the booking first.` };
     if (!b.payments[playerId] && ["awaiting_organizer", "held"].includes(b.state)) {
       if (playerId !== b.organizer) note(b, { kind: "agent", player: playerId }, "joined", `${name(playerId)} is in: their share of $${usd(b.shares[playerId])} is being paid.`);
       await startPayment(b, playerId, playerId === b.organizer ? b.total : b.shares[playerId], playerId === b.organizer ? "organizer" : "share");
@@ -256,7 +258,7 @@ export function pay(bookingId, playerId) {
 // The fee starts split evenly. An invited player's agent may ask to pay less (proposeShare) before they join; the
 // organizer's agent accepts or refuses (answerShare). Accepting moves the difference onto the organizer's own share,
 // which their guarantee already covers, so the venue is paid the same; it is refused if it would take the organizer
-// over their own per-game limit. Two asks per player, one open at a time, and only as numbers.
+// over their own per-booking limit. Two asks per player, one open at a time, and only as numbers.
 export function proposeShare(bookingId, playerId, amount) {
   const b = get(bookingId);
   if (!b || !b.players.includes(playerId) || playerId === b.organizer) return { error: "no_booking", message: "No such invitation." };
@@ -309,8 +311,8 @@ export function cancel(bookingId, playerId) {
   const b = get(bookingId);
   if (!b || b.organizer !== playerId) return Promise.resolve({ error: "not_organizer", message: "Only the organizer can cancel the booking." });
   return serial(b.id, async () => {
-    if (["awaiting_organizer", "held"].includes(b.state)) await release(b, "cancelled", `${name(playerId)} cancelled before the court was locked. Every authorization was voided; nobody was charged.`);
-    else if (b.state === "locked" && startOf(b.date, b.start).getTime() - clock().getTime() >= CANCEL_BEFORE_MS) await refundAll(b, `${name(playerId)} cancelled more than 24 hours before the game. Everyone was refunded in full and the court went back to the venue.`);
+    if (["awaiting_organizer", "held"].includes(b.state)) await release(b, "cancelled", `${name(playerId)} cancelled before the booking was locked. Every authorization was voided; nobody was charged.`);
+    else if (b.state === "locked" && startOf(b.date, b.start).getTime() - clock().getTime() >= CANCEL_BEFORE_MS) await refundAll(b, `${name(playerId)} cancelled more than 24 hours before the start. Everyone was refunded in full and the place went back to the venue.`);
     else return { error: "too_late", message: b.state === "locked" ? "Less than 24 hours to the game: it can't be cancelled here any more." : `The booking is ${b.state}.` };
     return view(b, playerId);
   });
@@ -319,7 +321,7 @@ export function cancel(bookingId, playerId) {
 export function view(b, viewer) {
   const v = venue(b.venue), mine = b.payments[viewer];
   return {
-    id: b.id, state: b.state, negotiation: b.negotiation, venue: b.venue, venueName: v?.name, sport: b.sport, date: b.date, start: b.start, minutes: b.minutes, court: b.court,
+    id: b.id, state: b.state, negotiation: b.negotiation, venue: b.venue, venueName: v?.name, activity: b.activity, date: b.date, start: b.start, minutes: b.minutes, unit: b.unit, unitName: place(b),
     currency: "USD", total: usd(b.total), organizer: b.organizer, players: b.players, declined: b.declined,
     guaranteeBy: b.state === "awaiting_organizer" ? new Date(b.organizerUntil).toISOString() : null, payBy: b.state === "held" ? new Date(b.holdUntil).toISOString() : null,
     payments: Object.fromEntries(b.players.map((pid) => { const p = b.payments[pid]; return [pid, { share: usd(b.shares[pid]), ...(pid === b.organizer ? { guarantee: usd(b.total), paid: p?.captured != null ? usd(p.captured) : null } : {}), role: pid === b.organizer ? "organizer" : "share", status: b.declined.includes(pid) ? "declined" : p?.status || (pid !== b.organizer && b.state === "held" ? "invited" : "not_started"), via: p?.via || null }]; })),
@@ -333,7 +335,7 @@ export function view(b, viewer) {
 
 export const status = (bookingId, viewer) => { const b = get(bookingId); return b && b.players.includes(viewer) ? view(b, viewer) : { error: "no_booking", message: "No such booking." }; };
 export const mine = (viewer) => db.data.bookings.filter((b) => b.players.includes(viewer)).map((b) => view(b, viewer)).reverse();
-export const forVenue = (venueId) => db.data.bookings.filter((b) => b.venue === venueId).map((b) => ({ id: b.id, state: b.state, sport: b.sport, date: b.date, start: b.start, minutes: b.minutes, court: b.court, total: usd(b.total), players: b.players.length, paid: Object.values(b.payments).filter((p) => p.status === "captured").length, payout: b.payout ? usd(b.payout.amount) : null }));
+export const forVenue = (venueId) => db.data.bookings.filter((b) => b.venue === venueId).map((b) => ({ id: b.id, state: b.state, activity: b.activity, date: b.date, start: b.start, minutes: b.minutes, unit: b.unit, unitName: place(b), total: usd(b.total), players: b.players.length, paid: Object.values(b.payments).filter((p) => p.status === "captured").length, payout: b.payout ? usd(b.payout.amount) : null }));
 export const internal = get;
 
 // ---- Vault: save PayPal once, then the agent pays within the mandate -------------------------------------------------

@@ -12,7 +12,7 @@ const HERE = path.dirname(fileURLToPath(import.meta.url));
 const EX = path.join(HERE, "../../examples");
 const ready = fs.existsSync(path.join(EX, "node_modules/@modelcontextprotocol/sdk"));
 
-test("an agent organizes, negotiates and settles a game over MCP", { skip: !ready && "run npm install in examples/ first", timeout: 60e3 }, async () => {
+test("agents organize, negotiate and settle a group booking over MCP", { skip: !ready && "run npm install in examples/ first", timeout: 60e3 }, async () => {
   const port = 20000 + Math.floor(Math.random() * 20000), url = `http://localhost:${port}`;
   const server = spawn(process.execPath, ["src/server.js"], { cwd: path.join(HERE, ".."), env: { ...process.env, PORT: String(port), PUBLIC_URL: url, PAYPAL_MODE: "mock", PAYPAL_CLIENT_ID: "", TICK_MS: "1000" } });
   try {

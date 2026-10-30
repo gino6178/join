@@ -7,7 +7,7 @@ import Icon from "../components/Icon.jsx";
 // grouped by the deal it belongs to. Each line says who did it (your agent and which one, another player's agent, the
 // venue, PayPal, Join) in words made by code from the facts. On top, what is waiting on you.
 const ICON = { searched: "list", alternatives: "pin", negotiation_opened: "chat", venue_countered: "chat", deal: "check", venue_rejected: "warn", offer_refused: "warn", accept_refused: "warn", negotiation_refused: "warn",
-  walked_away: "back", invited: "send", joined: "check", share_asked: "chat", share_accepted: "check", share_refused: "close", court_held: "clock", approval_requested: "card", authorized: "verify", held: "lock", locked: "lock", played: "check", venue_paid: "send", payout_status: "send", released: "back", cancelled: "close", refunded: "back", declined: "close", vault_saved: "card", pay_requested: "card" };
+  walked_away: "back", invited: "send", joined: "check", share_asked: "chat", share_accepted: "check", share_refused: "close", place_held: "clock", approval_requested: "card", authorized: "verify", held: "lock", locked: "lock", played: "check", venue_paid: "send", payout_status: "send", released: "back", cancelled: "close", refunded: "back", declined: "close", vault_saved: "card", pay_requested: "card" };
 const TONE = { deal: "good", locked: "good", venue_paid: "good", authorized: "good", venue_rejected: "bad", offer_refused: "warn", accept_refused: "warn", negotiation_refused: "warn", released: "warn", payment_failed: "bad", capture_failed: "bad" };
 
 export default function Activity({ entries, me }) {
@@ -27,11 +27,11 @@ export default function Activity({ entries, me }) {
       {waiting.length > 0 && <section className="needs">
         <h2><Icon name="bolt" size={18} />Waiting on you</h2>
         {waiting.map((b) => b.invite ? <Invite key={b.id} b={b} done={games.reload} /> : <div key={b.id} className="need">
-          <span><b>{b.organizer === me.player.id ? "Guarantee the court" : "Pay your share"}: {money(b.you.amount)}</b><small>{b.venueName} · {b.sport} · {b.date} {b.start}{b.you.note ? ` · ${b.you.note}` : ""}</small></span>
+          <span><b>{b.organizer === me.player.id ? "Guarantee the booking" : "Pay your share"}: {money(b.you.amount)}</b><small>{b.venueName} · {b.activity} · {b.date} {b.start}{b.you.note ? ` · ${b.you.note}` : ""}</small></span>
           <a className="btn primary" href={b.you.approveUrl}>Approve in PayPal</a>
         </div>)}
       </section>}
-      {!entries.length && <div className="empty card"><Icon name="key" size={28} /><p><b>No activity yet.</b> Connect an agent and ask it to set up a game; every step it takes shows up here.</p><a className="btn" href="#/connect">Connect your agent</a></div>}
+      {!entries.length && <div className="empty card"><Icon name="key" size={28} /><p><b>No activity yet.</b> Connect an agent and ask it to get a group together; every step it takes shows up here.</p><a className="btn" href="#/connect">Connect your agent</a></div>}
       {groups.map((g) => <Group key={g.k} list={g.list} me={me.player.id} />)}
     </div>
   );
@@ -72,7 +72,7 @@ export function Invite({ b, done }) {
   };
   return (
     <div className="need">
-      <span><b>You're invited: {b.sport}, {b.date} {b.start}</b><small>{b.venueName} · court {b.court} · your share {money(b.invite.share)} · answer by {clock(b.invite.payBy)}</small>{err && <small className="err">{err}</small>}</span>
+      <span><b>You're invited: {b.activity}, {b.date} {b.start}</b><small>{b.venueName} · {b.unitName} · your share {money(b.invite.share)} · answer by {clock(b.invite.payBy)}</small>{err && <small className="err">{err}</small>}</span>
       <span className="need-btns"><button className="btn ghost" disabled={busy} onClick={() => act("decline")}>Can't make it</button><button className="btn primary" disabled={busy} onClick={() => act("pay")}>Join and pay</button></span>
     </div>
   );
