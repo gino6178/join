@@ -7,6 +7,8 @@
 // whose payload follows AP2's JSON schema field for field; selective disclosure (SD-JWT) is not used.
 //
 //   Open Checkout Mandate  mandate.checkout.open.1  what the agent may book: the allowed venues, one booking of an activity
+// (Units as AP2's schemas define them: payment.amount_range's min and max are integers in minor units (cents);
+// payment.budget's max is a plain number, so it is in dollars here.)
 //   Open Payment Mandate   mandate.payment.open.1   what it may pay: at most the per-booking limit (payment.amount_range),
 //                                                   at most the weekly limit (payment.budget, recurring weekly), only to
 //                                                   allowed venues, only for a checkout the open checkout mandate allows

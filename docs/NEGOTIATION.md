@@ -29,23 +29,24 @@ opening ask, of its list price, and of its secret floor.
 
 Time waster: 5 negotiations opened with one venue on one day, then refused (`quota`).
 
-**What it shows.**
-- **No strategy ever paid under a floor**, and lowballing saves nothing: the lowballer paid the full opening ask.
-- **Patience wins.** The patient buyer (Join's website agent: just over 70% of the ask each round, never an offer once
-  the price is final, then the final price) got a deal every time and the lowest price of the strategies that always
-  got one. This matches recent work on LLM bargaining, where aggressive anchoring, calibrated concessions and patience
-  did best and fast conceders did worst (Bergemann et al., *Training Language Models for Bilateral Trade with Private
-  Information*, arXiv 2604.16472, 2026).
-- **Conceding early loses deals, not only money.** "Offer 90%, take the counter" and "split the difference" lost a
-  third of their deals: a `firm` venue's price is final from the start, and an offer under a final price ends the
-  negotiation. Join's buyer checks for a final price before offering.
-- **Probing for the floor doesn't pay:** the binary-search prober paid more than the patient buyer.
+**What it shows, and what it doesn't.** These are rule-based buyers on a deterministic engine, so the table checks
+that the venues' rules behave as designed; it is not evidence about how LLMs bargain (that is the next section).
+- **No strategy paid under a floor.** That is guaranteed by the schedule itself (it never goes below the floor); the run
+  confirms nothing slips through the accept and offer paths.
+- **Lowballing saves nothing,** as the 70% rule intends: the lowballer paid the full opening ask. The rule is published
+  in `make_offer`'s description, so this is about wasted rounds, not a secret defence.
+- **The patient buyer pays the least among strategies that always get a deal** (95.7% of the opening ask): any offer
+  just over 70% moves the venue along its own schedule, so offering more only gives money away. Join's website agent
+  uses it. The differences are small (a few percent), because each venue decides how far it will come down.
+- **Conceding early loses deals:** "offer 90%, take the counter" and "split the difference" lost a third of their
+  deals, because a `firm` venue's price is final from the start and an offer under a final price ends the negotiation.
+  Join's buyer checks for a final price before offering.
 - **Time-wasting is capped:** the sixth negotiation with one venue on one day is refused (`quota`).
 
-The strategies follow the automated-negotiation literature: time-dependent tactics, where "Boulware" holds out and
-"Conceder" gives in early (Faratin, Sierra and Jennings 1998; see Baarslag et al., *Optimal Negotiation Decision
-Functions in Time-Sensitive Domains*), and the adversarial buyer personas used to stress-test seller agents (extreme
-lowballers, probers, time wasters).
+The strategies are the standard ones from the automated-negotiation literature: time-dependent tactics, where
+"Boulware" holds out and "Conceder" gives in early (Faratin, Sierra and Jennings 1998; see Baarslag et al., *Optimal
+Negotiation Decision Functions in Time-Sensitive Domains*), and the adversarial buyer personas used to stress-test
+seller agents (lowballers, probers, time wasters).
 
 ## Shopping across venues
 

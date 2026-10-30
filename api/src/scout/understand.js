@@ -159,7 +159,7 @@ export async function understand(history, brief, ctx) {
   let model = "rules";
   if (!next.activity && qwenOn()) {
     try { const a = await activityByQwen(last, ctx.activities); model = MODEL; if (a) next.activity = a; } catch {}
-  } else if (qwenOn()) model = MODEL;
+  } // (when the rules found the activity, Qwen wasn't asked, and the message is credited to the rules)
   // the reply's language: Chinese if the message has Chinese, English if it has letters, else the conversation's
   const gap = missing(next), zh = /[\u4e00-\u9fff]/.test(last) || (!/[a-z]/i.test(last) && ctx.lang === "zh");
   const names = (next.with || []).map((id) => ctx.people.find((p) => p.id === id)?.name.split(" ")[0]).filter(Boolean);

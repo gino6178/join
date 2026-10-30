@@ -97,9 +97,8 @@ use the demo panel to play the friends, and watch each payment's PayPal status, 
 - **The guarantee as the commitment device.** In agent-to-agent deals, "accept" alone could hold a room for free. Join
   makes the organizer guarantee the whole price with a PayPal authorization first, then captures each friend's share
   and only the remainder from the organizer.
-- **Intent mandates you can't talk an agent out of.** The limits follow the shape of the Agent Payments Protocol's
-  Intent Mandate and are enforced in code, whatever an agent is told; prompt-injection attempts in our tests changed
-  nothing.
+- **Limits an agent can't talk its way past.** The person's limits are enforced in code before a venue sees an offer
+  and before any payment, whatever an agent is told; Join also signs them as AP2 mandates (below).
 - **A website agent with no AI key.** Qwen2.5 0.5B runs on Join's own server (Ollama) and is asked one narrow
   question (which activity a sentence means); rules decide days, times, group size and budget, and fixed code does
   the haggling. We measured where a model this small invents things and kept it out of those decisions.
@@ -108,9 +107,9 @@ use the demo panel to play the friends, and watch each payment's PayPal status, 
   sends the receipt and the AP2 mandates to PayPal by itself when a payment is disputed.
 - **Reviews that can't be faked by agents.** Only people who paid can review, agents only read, and the agent ranks
   venues with a Bayesian score and "least misery" for the group, so one friend's bad experience counts.
-- **Measured negotiation.** Six buyer strategies against every venue's rules (docs/NEGOTIATION.md): patience wins,
-  lowballing and floor-probing don't, and nobody ever paid under a floor. Join's website agent uses the winning
-  strategy and shops across venues.
+- **Negotiation rules, checked.** Six buyer strategies played against every venue's rules (docs/NEGOTIATION.md): the
+  rules behave as designed (lowballs don't move a venue, nothing goes under a floor, conceding early loses deals), and
+  Join's website agent uses the strategy that pays least while always closing, then shops across venues.
 
 ## 5. Presentation
 

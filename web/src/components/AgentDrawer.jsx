@@ -84,7 +84,7 @@ export default function AgentDrawer({ me, info, open, onClose }) {
   return (
     <aside className="drawer" role="dialog" aria-label="Join's website agent">
       <header className="drawer-head">
-        <span><b><Icon name="spark" size={16} /> Join's agent</b><small>{model === "rules" ? "Simple rules on Join's server" : `Qwen (${model}) on Join's own server · no AI service, no key`}</small></span>
+        <span><b><Icon name="spark" size={16} /> Join's agent</b><small>{(info?.scout || "rules") === "rules" ? "Simple rules on Join's server" : `Rules, and Qwen (${info.scout}) on Join's own server when they don't understand · no AI service, no key`}</small></span>
         <button className="icon-btn" onClick={onClose} aria-label="Close"><Icon name="close" size={18} /></button>
       </header>
       <div className="drawer-body">

@@ -1,6 +1,6 @@
 // A player's agent on Claude: it connects to Join's MCP server with the player's token, hands Join's tools to Claude,
-// and runs the tool loop until Claude has an answer for the player. Join itself runs no model; this file is one
-// example of the agents that come to it from outside.
+// and runs the tool loop until Claude has an answer for the player. Join's own server runs only a small Qwen, to tell
+// which activity a sentence means for its website agent; agents like this one come to it from outside.
 //
 //   JOIN_TOKEN=join_... node claude-agent.mjs "Book karaoke for four on Friday night, at most $10 each"
 //
