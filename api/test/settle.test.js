@@ -132,3 +132,24 @@ test("a payment step repeated after a crash is the same PayPal call", async () =
   const b = await pp.createOrder({ amount: 1000, reference: "x", requestId: "bk:order:you" });
   assert.equal(a.id, b.id);
 });
+
+test("players negotiate the split: an invitee asks to pay less; the organizer covers it, within their own limit", async () => {
+  const id = await deal(["leo", "hana"]);
+  await settle.pay(id, "you"); await approve(id, "you");
+  const b = settle.internal(id), even = b.shares.leo;
+  assert.equal(settle.proposeShare(id, "leo", even).error, "bad_amount");
+  assert.ok(settle.proposeShare(id, "leo", even - 300).shareAsks.length);
+  assert.equal(settle.proposeShare(id, "leo", even - 400).error, "pending");
+  assert.equal(settle.answerShare(id, "leo", "leo", true).error, "not_organizer");
+  settle.answerShare(id, "you", "leo", true);
+  assert.equal(b.shares.leo, even - 300);
+  assert.equal(b.shares.you + b.shares.leo + b.shares.hana, b.total);
+  // over the organizer's own limit: refused by the platform
+  setMandate("you", { perGame: b.shares.you });
+  settle.proposeShare(id, "hana", 0);
+  assert.equal(settle.answerShare(id, "you", "hana", true).error, "over_mandate");
+  await approve(id, "leo"); await approve(id, "hana");
+  assert.equal(b.state, "locked");
+  assert.equal(b.payments.leo.amount, even - 300);
+  assert.equal(b.payments.you.captured, b.total - b.payments.leo.amount - b.payments.hana.amount);
+});

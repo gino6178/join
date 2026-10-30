@@ -92,6 +92,15 @@ for (const [id, label] of [["leo", "Leo's agent"], ["hana", "Hana's agent"], ["t
   const a = await agent(id, label.replace("'s agent", "") + "'s scripted agent");
   const games = await a.call("my_games");
   const b = games.bookings.find((x) => x.id === booking);
+  say(label, `invited: ${b.sport} ${b.date} ${b.start}, share $${b.invite?.share}`);
+  // Hana's agent haggles over her share with Alex's agent before she joins
+  if (id === "hana" && b.invite && +b.invite.share > 1) {
+    const ask = Math.max(0, +b.invite.share - 1).toFixed(2);
+    await a.call("propose_share", { booking, amount: +ask });
+    say(label, `asks to pay $${ask} instead`);
+    const ans = await alex.call("answer_share", { booking, player: "hana", accept: true });
+    say("Alex's agent", ans.error ? `can't cover it: ${ans.message}` : `agrees: Alex covers the $1.00`);
+  }
   p = await a.call("pay_my_share", { booking: b.id });
   say(label, `pays the share: $${p.you?.amount}`);
   if (p.you?.approveUrl) await approve(p.you.approveUrl, label.split("'")[0]);

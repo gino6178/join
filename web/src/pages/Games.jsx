@@ -30,7 +30,7 @@ export default function Games({ entries, me, query }) {
 
 function Booking({ b, me, w, focus, done }) {
   const [busy, setBusy] = useState(null), [err, setErr] = useState(null);
-  const act = async (a) => { setBusy(a); setErr(null); try { const r = await api(`/api/bookings/${b.id}/${a}`, { method: "POST" }); if (a === "pay" && r.you?.approveUrl) { location.href = r.you.approveUrl; return; } done(); } catch (e) { setErr(e.message); } setBusy(null); };
+  const act = async (a, body) => { setBusy(a); setErr(null); try { const r = await api(`/api/bookings/${b.id}/${a}`, { method: "POST", body }); if (a === "pay" && r.you?.approveUrl) { location.href = r.you.approveUrl; return; } done(); } catch (e) { setErr(e.message); } setBusy(null); };
   const at = STEPS.findIndex(([s]) => s === (b.state === "locking" ? "held" : b.state));
   return (
     <section className={`card booking ${focus ? "focus" : ""}`}>
@@ -45,6 +45,12 @@ function Booking({ b, me, w, focus, done }) {
         {b.players.map((pid) => { const p = b.payments[pid]; return (
           <tr key={pid} className={pid === me ? "me" : ""}><td>{pid === me ? "You" : firstName(w, pid)}{pid === b.organizer && <small> organizer</small>}</td><td>{p.role === "organizer" ? <>{money(p.paid ?? p.share)}<small>{p.paid != null && +p.paid > +p.share ? " (covered others)" : ` · guarantees ${money(p.guarantee)}`}</small></> : money(p.share)}</td><td><span className={`st ${p.status}`}>{PAY[p.status] || p.status}</span></td><td><small>{p.via === "vault" ? "saved PayPal, by the agent" : p.via === "approval" ? "approved in PayPal" : ""}</small></td></tr>); })}
       </tbody></table>
+      {(b.shareAsks || []).filter((x) => x.status === "pending").map((x) => (
+        <div key={x.player} className="need ask">
+          <span><b>{x.player === me ? "You asked" : `${firstName(w, x.player)} asks`} to pay {money(x.amount)} instead of {money(x.from)}</b><small>{me === b.organizer ? `You would cover ${money(x.from - x.amount)} more.` : "Waiting for the organizer's answer."}</small></span>
+          {me === b.organizer && <span className="need-btns"><button className="btn ghost" disabled={!!busy} onClick={() => act("answer-share", { player: x.player, accept: false })}>Keep it</button><button className="btn primary" disabled={!!busy} onClick={() => act("answer-share", { player: x.player, accept: true })}>Agree</button></span>}
+        </div>))}
+      {b.invite && !(b.shareAsks || []).some((x) => x.status === "pending") && <AskLess onAsk={(amount) => act("propose-share", { amount })} share={b.invite.share} busy={!!busy} />}
       {b.receipts?.length > 0 && <p className="small"><Icon name="verify" size={14} />Receipts: {b.receipts.map((x) => <a key={x.id} href={`#/receipt/${x.id}`}>{x.event.replace("_", " ")}</a>).reduce((a, x) => [...a, a.length ? " · " : "", x], [])}</p>}
       {b.payout && <p className="small"><Icon name="send" size={14} />Venue paid {money(b.payout.amount)} with PayPal Payouts ({String(b.payout.status).toLowerCase()}), after PayPal's fees.</p>}
       {err && <p className="err">{err}</p>}
@@ -72,5 +78,17 @@ function Negotiation({ n, w }) {
       </div>
       {n.discounts?.length > 0 && <p className="small muted">Discounts: {n.discounts.map((d) => `${d.kind} (${d.why})`).join(", ")}</p>}
     </section>
+  );
+}
+
+// An invited player can ask to pay less before joining; the organizer's agent (or the organizer) answers.
+function AskLess({ share, onAsk, busy }) {
+  const [v, setV] = useState("");
+  return (
+    <form className="ask-less" onSubmit={(e) => { e.preventDefault(); if (v !== "") onAsk(+v); }}>
+      <span className="small muted">Your share is {money(share)}. Ask to pay</span>
+      <span className="money-in">$<input type="number" min="0" step="0.5" max={share} value={v} onChange={(e) => setV(e.target.value)} placeholder={(+share - 1).toFixed(2)} /></span>
+      <button className="btn ghost small" disabled={busy || v === ""}>Ask</button>
+    </form>
   );
 }

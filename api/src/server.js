@@ -44,12 +44,28 @@ app.post("/paypal/webhook", express.raw({ type: "*/*", limit: "256kb" }), async 
 });
 app.use(express.json({ limit: "64kb" }));
 
+// Rate limits: a fixed window per caller (the agent's token when there is one, else the address). Agents get room for a
+// busy negotiation; signing in and making tokens get less.
+const windows = new Map();
+function limit(per, max) {
+  return (req, res, next) => {
+    const who = `${per}:${(req.headers.authorization || "").slice(-16) || req.ip}`, now = Date.now(), w = windows.get(who);
+    if (!w || now - w.start > 60e3) { windows.set(who, { start: now, n: 1 }); return next(); }
+    if (++w.n > max) return res.status(429).set("Retry-After", String(Math.ceil((w.start + 60e3 - now) / 1000))).json({ error: "rate_limited", message: `More than ${max} requests a minute. Slow down.` });
+    next();
+  };
+}
+setInterval(() => { const now = Date.now(); for (const [k, w] of windows) if (now - w.start > 60e3) windows.delete(k); }, 60e3).unref();
+app.use(["/mcp", "/api/agent", "/a2a"], limit("agent", +(process.env.AGENT_RPM || 120)));
+app.use(["/api/session", "/api/venue-session", "/api/tokens"], limit("people", 30));
+
 // ---- agents -------------------------------------------------------------------------------------------------------
 app.all("/mcp", (req, res) => mcp.handle(req, res).catch((e) => { console.error("mcp", e); if (!res.headersSent) res.status(500).json({ jsonrpc: "2.0", error: { code: -32603, message: "internal error" }, id: null }); }));
 
 // the same tools as plain REST, for agents and scripts that don't speak MCP: POST /api/agent/<tool> with JSON arguments
 const TOOLS = { whoami: ops.whoami, list_venues: (a, x) => ops.listVenues(x), find_options: ops.findOptions, start_negotiation: ops.startNegotiation, make_offer: ops.makeOffer, accept_price: ops.acceptPrice,
-  walk_away: ops.walkAway, find_alternatives: ops.findAlternatives, my_games: ops.myGames, game_status: ops.gameStatus, pay_my_share: ops.payMyShare, decline_game: ops.declineGame, cancel_booking: ops.cancelBooking };
+  walk_away: ops.walkAway, find_alternatives: ops.findAlternatives, my_games: ops.myGames, game_status: ops.gameStatus, pay_my_share: ops.payMyShare, decline_game: ops.declineGame, cancel_booking: ops.cancelBooking,
+  propose_share: ops.proposeShare, answer_share: ops.answerShare };
 app.post("/api/agent/:tool", async (req, res) => {
   const a = agentOf(req);
   if (!a) return res.status(401).json({ error: "unauthorized", message: "Send a player's agent token: Authorization: Bearer join_..." });
@@ -85,9 +101,9 @@ app.get("/api/activity", signedIn, (req, res) => res.json({ entries: forPlayer(r
 app.get("/api/games", signedIn, (req, res) => res.json(ops.myGames({ player: req.player })));
 // the person can do from the website what their agent can (approving payments is in PayPal itself)
 app.post("/api/bookings/:id/:act", signedIn, async (req, res) => {
-  const a = { player: req.player, client: null }, act = { pay: ops.payMyShare, decline: ops.declineGame, cancel: ops.cancelBooking }[req.params.act];
+  const a = { player: req.player, client: null }, act = { pay: ops.payMyShare, decline: ops.declineGame, cancel: ops.cancelBooking, "propose-share": ops.proposeShare, "answer-share": ops.answerShare }[req.params.act];
   if (!act) return res.status(404).end();
-  const r = await act(a, { booking: req.params.id }); res.status(r.error ? 400 : 200).json(r);
+  const r = await act(a, { ...(req.body || {}), booking: req.params.id }); res.status(r.error ? 400 : 200).json(r);
 });
 app.post("/api/vault", signedIn, async (req, res) => { try { res.json(await settle.vaultStart(req.player)); } catch (e) { res.status(502).json({ error: "paypal", message: e.message }); } });
 app.delete("/api/vault", signedIn, (req, res) => { setMandate(req.player, { autopay: false }); res.json(settle.vaultForget(req.player)); });

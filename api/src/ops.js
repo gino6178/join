@@ -129,6 +129,8 @@ export async function payMyShare(a, { booking }) {
   return r.you?.approveUrl ? { ...r, nextStep: "PAYER_ACTION_REQUIRED: show approveUrl to your user. They approve in PayPal; check game_status afterwards." } : r;
 }
 export const declineGame = (a, { booking }) => settle.decline(booking, a.player);
+export function proposeShare(a, { booking, amount }) { const c = amount === 0 ? 0 : toCents(amount); return c === null ? { error: "bad_amount", message: "amount is your share in USD." } : settle.proposeShare(booking, a.player, c); }
+export const answerShare = (a, { booking, player: p, accept }) => settle.answerShare(booking, a.player, p, accept === true);
 export async function cancelBooking(a, { booking }) {
   const r = await settle.cancel(booking, a.player);
   if (r.error) record({ actor: by(a), who: [a.player], action: "cancel_refused", ref: booking, summary: `${said(a)} tried to cancel: ${r.message}` });

@@ -9,6 +9,8 @@
     "preview": "vite preview --port 5191"
   },
   "dependencies": {
+    "@bryntum/scheduler": "npm:@bryntum/scheduler-trial@^7.3.8",
+    "@bryntum/scheduler-react": "^7.3.8",
     "react": "^19.1.1",
     "react-dom": "^19.1.1"
   },

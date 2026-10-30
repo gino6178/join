@@ -1,18 +1,21 @@
-import { useEffect, useState } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { api, useApi, money } from "../api.js";
 import { useWorld } from "../components/Actor.jsx";
 
 // A venue's side: its courts over a day, with the games Join booked. A court held while a group pays is dashed; once
 // everyone has paid it is solid; a court that went back is gone. The schedule is public; the venue's rules are for its
 // staff (Policy, below).
-const START = 7 * 60, END = 23 * 60, pct = (m) => `${(100 * (m - START)) / (END - START)}%`;
-const toMin = (s) => { const [h, m] = s.split(":").map(Number); return h * 60 + m; };
 const LIVE = { awaiting_organizer: "held", held: "held", locking: "held", locked: "locked", played: "played", venue_paid: "played" };
+// Bryntum Scheduler is large, so it loads only on this page
+const CourtScheduler = lazy(() => import("../components/CourtScheduler.jsx"));
 
 export default function Venue({ query }) {
   const w = useWorld();
   const [id, setId] = useState(query.get("id") || "westgate");
-  const s = useApi(`/api/venues/${id}/schedule`);
+  const [tick, setTick] = useState(0);
+  // the schedule follows payments as they happen
+  useEffect(() => { const t = setInterval(() => setTick((x) => x + 1), 3000); return () => clearInterval(t); }, []);
+  const s = useApi(`/api/venues/${id}/schedule`, tick);
   const v = w?.venues.find((x) => x.id === id);
   const live = (s.data?.bookings || []).filter((b) => LIVE[b.state]);
   const dates = [...new Set(live.map((b) => b.date))].sort();
@@ -25,12 +28,9 @@ export default function Venue({ query }) {
       <div className="seg">{w?.venues.map((x) => <button key={x.id} className={x.id === id ? "on" : ""} onClick={() => { setId(x.id); setDate(null); }}>{x.name}</button>)}</div>
       {dates.length > 0 && <div className="seg small">{dates.map((d) => <button key={d} className={d === day ? "on" : ""} onClick={() => setDate(d)}>{d}</button>)}</div>}
       <section className="card sched">
-        <div className="hours">{Array.from({ length: (END - START) / 60 + 1 }, (_, i) => <span key={i} style={{ left: pct(START + i * 60) }}>{String(7 + i).padStart(2, "0")}</span>)}</div>
-        {Array.from({ length: courts }, (_, k) => (
-          <div key={k} className="lane"><b>Court {k + 1}</b><div className="track">
-            {live.filter((b) => b.court === k + 1 && b.date === day).map((b) => <span key={b.id} className={`slot ${LIVE[b.state]}`} style={{ left: pct(toMin(b.start)), width: `calc(${pct(toMin(b.start) + b.minutes)} - ${pct(toMin(b.start))})` }} title={`${b.sport} ${b.start}, ${b.players} players, ${money(b.total)}, ${b.state}`}>{b.sport} · {money(b.total)}</span>)}
-          </div></div>))}
-        {!live.length && <p className="muted small">No games booked through Join at this venue yet.</p>}
+        {day ? <Suspense fallback={<p className="muted small">Loading the schedule…</p>}><CourtScheduler courts={courts} bookings={live} date={day} kind={LIVE} /></Suspense>
+          : <p className="muted small">No games booked through Join at this venue yet.</p>}
+        <p className="small muted legend-row"><span className="lg-bar held" />held while the group pays <span className="lg-bar locked" />paid and locked <span className="lg-bar played" />played</p>
       </section>
       <Policy id={id} name={v?.name} />
       {s.data?.bookings?.length > 0 && <section className="card"><h3>Bookings and payouts</h3><table className="pays"><thead><tr><th>Date</th><th>Time</th><th>Court</th><th>Total</th><th>State</th><th>Paid out</th></tr></thead><tbody>

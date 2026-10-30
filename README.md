@@ -26,17 +26,20 @@ PayPal AI Hackathon 2026 · MIT license
 4. **The organizer guarantees the court.** A deal is binding: the organizer authorizes the **whole** price with PayPal
    (Orders v2, intent `AUTHORIZE`) within 10 minutes, or the court goes back. Nobody can hold a court for free.
 5. **The others are invited, then pay their share.** Each player's agent (or the player, on the website) joins or
-   declines; nothing is started for anyone who hasn't said yes. Joining authorizes their share in PayPal, or, if they
-   saved PayPal for their agent (Vault) and the share fits their limits, their agent pays it without a redirect.
+   declines; nothing is started for anyone who hasn't said yes. Before joining, an invitee's agent may ask to pay less;
+   the organizer's agent accepts (the organizer covers the difference, within their own limit) or refuses. Joining
+   authorizes their share in PayPal, or, if they saved PayPal for their agent (Vault) and the share fits their limits,
+   their agent pays it without a redirect.
 6. **Locked.** When everyone has paid (or the 20 minutes run out) each share is captured and the rest is captured from
    the organizer's authorization: they cover whoever didn't pay. Cancel more than 24 hours ahead: full refunds.
 7. **The venue is paid after the game** (PayPal Payouts, net of fees), so a cancellation can still be refunded.
+8. **A receipt anyone can check.** Locking, refunding and paying the venue each issue a receipt (see below).
 
 The website shows each person what the agents did (**Activity**), what waits on them (an approval in PayPal), where
 each payment stands (**Games**), the venue and alternatives on the town map (**Map**), the limits only they can set
-(**Limits**), and which agents may act for them (**Connect**). A **Venue view** shows a venue its courts (dashed while
-a group pays, solid once paid), and lets the venue's staff set the rules Join negotiates by: style, floor, number of
-counter-offers, off-peak / group / last-minute discounts.
+(**Limits**), and which agents may act for them (**Connect**). A **Venue view** shows a venue its courts on **Bryntum
+Scheduler** (dashed while a group pays, solid the moment it is paid and locked), and lets the venue's staff set the
+rules Join negotiates by: style, floor, number of counter-offers, off-peak / group / last-minute discounts.
 
 Dates and times are the town's (San Jose, `America/Los_Angeles`) wherever the server and the viewer are. State is
 kept in `api/data/state/` and survives restarts (`JOIN_STATE_DIR=memory` keeps it in memory only).
@@ -86,8 +89,9 @@ More in [examples/claude](examples/claude/README.md), including a Claude API age
 npm test
 ```
 
-Negotiation, alternatives and mandates; settlement (guarantee, shares, lock, organizer covers, release, void,
-refunds, Vault autopay, idempotent PayPal calls); and an end-to-end run of the scripted agent over MCP.
+Negotiation, venue rules, alternatives and mandates; settlement (guarantee, invitations, the negotiated split, lock,
+organizer covers, release, void, refunds, Vault autopay, idempotent PayPal calls); receipts (signatures, Merkle proofs,
+tampering); and an end-to-end run of four agents over MCP.
 
 ## How agents connect
 
@@ -99,7 +103,7 @@ refunds, Vault autopay, idempotent PayPal calls); and an end-to-end run of the s
 
 All three take a player's token (`Authorization: Bearer join_...`) and offer the same tools: `whoami`, `list_venues`,
 `find_options`, `start_negotiation`, `make_offer`, `accept_price`, `walk_away`, `find_alternatives`, `my_games`,
-`game_status`, `pay_my_share`, `decline_game`, `cancel_booking`.
+`game_status`, `pay_my_share`, `propose_share`, `answer_share`, `decline_game`, `cancel_booking`.
 
 **What the platform guarantees, whatever the agent does**
 
@@ -127,6 +131,23 @@ All three take a player's token (`Authorization: Bearer join_...`) and offer the
 The player's mandate follows the shape of the Agent Payments Protocol's Intent Mandate (conditions a person approved
 in advance, under which an agent may act).
 
+## Verifiable receipts
+
+When a booking is locked, refunded or its venue paid, Join issues a receipt: the negotiation step by step, each
+payment with its PayPal ids, and the players only as salted hashes (each player's own copy carries their salt). Join
+signs it with Ed25519 (public key at `/.well-known/join-receipts.json`). Every few minutes the new receipts go into a
+SHA-256 Merkle tree whose root is written to **Ethereum Sepolia** as the data of a zero-value transaction from Join's
+address to itself: no token, no contract, only a public timestamp.
+
+- In the browser: `/#/receipt/<id>` checks the hash, the signature and the Merkle path itself, and links the
+  transaction on Etherscan.
+- Independently: `node examples/verify-receipt.mjs <id> --rpc <Sepolia RPC URL>` shares no code with Join and also
+  reads the transaction from the chain.
+
+What a receipt proves: it existed exactly so by that block. Whether PayPal moved the money is PayPal's record; the
+receipt points to it by id. To anchor, set `ANCHOR_RPC_URL` and `ANCHOR_PRIVATE_KEY` (a key made only for this, with a
+little Sepolia ether from a faucet). Without them, receipts are still signed and batched, and say they are not on chain.
+
 ## Layout
 
 | Path | What |
@@ -135,9 +156,11 @@ in advance, under which an agent may act).
 | `api/src/pay/` | PayPal client (`paypal.js`), the stand-in (`mock.js`), settlement (`settle.js`) |
 | `api/src/ops.js` | What an agent can do; MCP (`mcp.js`), REST and A2A (`a2a.js`) all call it |
 | `api/src/alternatives.js`, `mandate.js`, `auth.js`, `activity.js` | Alternatives, limits, tokens, the activity log |
+| `api/src/proof/` | Receipts (`receipts.js`), Merkle trees (`merkle.js`), Sepolia anchoring (`anchor.js`) |
 | `api/data/world.json` | The made-up demo town (USD, placed on San Jose, CA) |
 | `web/` | The website (React, Vite) |
-| `examples/` | Agents from outside: scripted, Claude, venue |
+| `examples/` | Agents from outside: scripted, Claude, venue; the receipt verifier |
+| `docs/` | Devpost text and the demo video script |
 
 ## What's new since 1 October 2026
 
@@ -145,5 +168,6 @@ Join began from our earlier project Serve, imported unchanged as the [`baseline`
 keeps a few of Serve's pure functions (free-time intersection, travel time, the venue in the middle, the demo
 timetable, atomic JSON writes) and its visual design. Everything else was removed (Serve's own models, guards,
 memory, voice, video, Messenger, the community loop, the feed) or written new for this hackathon: the negotiation
-layer, the map alternatives, mandates, per-player tokens, the PayPal settlement, the MCP / REST / A2A interfaces, the
-activity log, the website and the examples.
+layer, venue rules, the map alternatives, mandates, invitations and the negotiated split, per-player tokens, the
+PayPal settlement, verifiable receipts anchored on Sepolia, the MCP / REST / A2A interfaces, the activity log, the
+website with Bryntum Scheduler, and the examples.

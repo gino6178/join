@@ -252,6 +252,44 @@ export function pay(bookingId, playerId) {
   });
 }
 
+// ---- the split, negotiated between players --------------------------------------------------------------------------------
+// The fee starts split evenly. An invited player's agent may ask to pay less (proposeShare) before they join; the
+// organizer's agent accepts or refuses (answerShare). Accepting moves the difference onto the organizer's own share,
+// which their guarantee already covers, so the venue is paid the same; it is refused if it would take the organizer
+// over their own per-game limit. Two asks per player, one open at a time, and only as numbers.
+export function proposeShare(bookingId, playerId, amount) {
+  const b = get(bookingId);
+  if (!b || !b.players.includes(playerId) || playerId === b.organizer) return { error: "no_booking", message: "No such invitation." };
+  if (b.state !== "held" || b.payments[playerId] || b.declined.includes(playerId)) return { error: "too_late", message: "Only an invited player who hasn't joined yet can ask." };
+  if (!Number.isInteger(amount) || amount < 0 || amount >= b.shares[playerId]) return { error: "bad_amount", message: `Ask for less than your share of $${usd(b.shares[playerId])}.` };
+  const asks = (b.shareAsks ||= []).filter((x) => x.player === playerId);
+  if (asks.some((x) => x.status === "pending")) return { error: "pending", message: "You already have an open ask." };
+  if (asks.length >= 2) return { error: "limit", message: "Two asks per game." };
+  const ask = { player: playerId, from: b.shares[playerId], amount, status: "pending", at: at() };
+  b.shareAsks.push(ask); db.save();
+  record({ actor: { kind: "agent", player: playerId }, who: [playerId, b.organizer], action: "share_asked", ref: b.id, summary: `${name(playerId)}'s agent asked to pay $${usd(amount)} instead of $${usd(ask.from)}. ${name(b.organizer)} would cover the $${usd(ask.from - amount)}.`, data: { from: usd(ask.from), amount: usd(amount) } });
+  return view(b, playerId);
+}
+
+export function answerShare(bookingId, organizerId, playerId, accept) {
+  const b = get(bookingId);
+  if (!b || b.organizer !== organizerId) return { error: "not_organizer", message: "Only the organizer answers." };
+  const ask = (b.shareAsks || []).find((x) => x.player === playerId && x.status === "pending");
+  if (!ask) return { error: "no_ask", message: "No open ask from that player." };
+  if (b.state !== "held" || b.payments[playerId]) { ask.status = "expired"; db.save(); return { error: "too_late", message: "That ask is no longer open." }; }
+  const diff = b.shares[playerId] - ask.amount, f = fits(organizerId, { venue: b.venue, share: b.shares[organizerId] + diff });
+  if (accept && !f.ok) {
+    ask.status = "refused"; db.save();
+    record({ actor: { kind: "platform" }, who: [playerId, organizerId], action: "share_refused", ref: b.id, summary: `${name(organizerId)}'s agent can't take on $${usd(diff)} more: ${f.why.join("; ")}.` });
+    return { error: "over_mandate", message: f.why.join("; "), booking: view(b, organizerId) };
+  }
+  ask.status = accept ? "accepted" : "refused"; ask.answered = at();
+  if (accept) { b.shares[playerId] = ask.amount; b.shares[organizerId] += diff; b.splitRule = "negotiated"; }
+  db.save();
+  record({ actor: { kind: "agent", player: organizerId }, who: [playerId, organizerId], action: accept ? "share_accepted" : "share_refused", ref: b.id, summary: accept ? `${name(organizerId)}'s agent agreed: ${name(playerId)} pays $${usd(ask.amount)}, ${name(organizerId)} covers $${usd(diff)} more.` : `${name(organizerId)}'s agent kept ${name(playerId)}'s share at $${usd(b.shares[playerId])}.` });
+  return view(b, organizerId);
+}
+
 export function decline(bookingId, playerId) {
   const b = get(bookingId);
   if (!b || !b.players.includes(playerId) || playerId === b.organizer) return Promise.resolve({ error: "no_booking", message: "No such booking, or you organize it (cancel it instead)." });
@@ -288,6 +326,7 @@ export function view(b, viewer) {
     invite: viewer !== b.organizer && b.state === "held" && !mine && !b.declined.includes(viewer) ? { share: usd(b.shares[viewer]), payBy: new Date(b.holdUntil).toISOString() } : null,
     you: mine ? { amount: usd(mine.amount), status: mine.status, via: mine.via, approveUrl: mine.status === "awaiting_approval" ? mine.approveUrl : null, note: mine.why } : null,
     payout: b.payout ? { amount: usd(b.payout.amount), status: b.payout.item || b.payout.status } : null,
+    split: b.splitRule || "even", shareAsks: (b.shareAsks || []).filter((x) => viewer === b.organizer || x.player === viewer).map((x) => ({ ...x, from: usd(x.from), amount: usd(x.amount) })),
     paypal: paypalMode(), receipts: receipts.forBooking(b.id),
   };
 }

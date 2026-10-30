@@ -7,7 +7,7 @@ import Icon from "../components/Icon.jsx";
 // grouped by the deal it belongs to. Each line says who did it (your agent and which one, another player's agent, the
 // venue, PayPal, Join) in words made by code from the facts. On top, what is waiting on you.
 const ICON = { searched: "list", alternatives: "pin", negotiation_opened: "chat", venue_countered: "chat", deal: "check", venue_rejected: "warn", offer_refused: "warn", accept_refused: "warn", negotiation_refused: "warn",
-  walked_away: "back", invited: "send", joined: "check", court_held: "clock", approval_requested: "card", authorized: "verify", held: "lock", locked: "lock", played: "check", venue_paid: "send", payout_status: "send", released: "back", cancelled: "close", refunded: "back", declined: "close", vault_saved: "card", pay_requested: "card" };
+  walked_away: "back", invited: "send", joined: "check", share_asked: "chat", share_accepted: "check", share_refused: "close", court_held: "clock", approval_requested: "card", authorized: "verify", held: "lock", locked: "lock", played: "check", venue_paid: "send", payout_status: "send", released: "back", cancelled: "close", refunded: "back", declined: "close", vault_saved: "card", pay_requested: "card" };
 const TONE = { deal: "good", locked: "good", venue_paid: "good", authorized: "good", venue_rejected: "bad", offer_refused: "warn", accept_refused: "warn", negotiation_refused: "warn", released: "warn", payment_failed: "bad", capture_failed: "bad" };
 
 export default function Activity({ entries, me }) {
