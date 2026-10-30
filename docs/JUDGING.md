@@ -7,7 +7,7 @@ needs to be taken on trust.
 
 **See it fast:** `npm run setup`, `npm start`, then open http://localhost:8790/demo?as=you&go=activity?agent=1 (no
 keys needed; PayPal is simulated and says so). In another terminal, `npm run demo` runs four agents over MCP.
-`npm test` runs 35 tests. Details: [TECHNICAL.md](TECHNICAL.md).
+`npm test` runs 42 tests; `npm --prefix api run bench` runs the negotiation benchmark. Details: [TECHNICAL.md](TECHNICAL.md).
 
 ---
 
@@ -39,8 +39,9 @@ keys needed; PayPal is simulated and says so). In another terminal, `npm run dem
 - **Limits enforced in code before a venue sees an offer** (`api/src/mandate.js`, `negotiate/engine.js`): spending
   (your share per booking and per week, counting what you covered for friends) and guaranteeing (how much your agent
   may guarantee for a group on its own) are separate, and agent tokens can read them, never change them.
-- **Receipts** signed with Ed25519, batched in Merkle trees, and appended to a signed, hash-chained audit log in the
-  manner of Certificate Transparency (`api/src/proof/receipts.js`).
+- **Standards, implemented, not name-dropped:** AP2 mandates in AP2's own JSON schemas (`api/src/proof/mandates.js`);
+  receipts in an RFC 6962 transparency log with C2SP checkpoints and witness cosignatures (`api/src/proof/tlog.js`,
+  `examples/witness.mjs`); signed agent requests per RFC 9421 (`api/src/auth.js`); WebMCP (`web/src/webmcp.js`).
 - **Tested by agents, not only by us:** Claude Sonnet agents played friends and a venue on the sandbox, tried a dozen
   ways to misuse the tools, and tested the website agent with about 220 requests. Their findings became fixes and
   regression tests (TECHNICAL.md §12).
@@ -59,6 +60,8 @@ use the demo panel to play the friends, and watch each payment's PayPal status, 
   (pays, asks $1 less, can't come, time runs out), so judges see the split, the lock and the captures without four
   browsers (`web/src/pages/Games.jsx`, `Seats`).
 - **The negotiation as a chart:** the venue's asks stepping down, the agent's offers, lowballs marked (`Curve`).
+- **Shopping, then a choice:** the website agent compares the venue you picked with up to two others and offers the
+  cheapest as buttons; balances with friends are netted across plans and settled with one invoice.
 - **The venue's view:** Bryntum Scheduler with payment state driving the schedule (dashed while the group pays, solid
   when locked), and a dashboard of what Join brought in, counted from its bookings (`PlaceScheduler.jsx`,
   `VenueMoney.jsx`).
@@ -97,9 +100,12 @@ use the demo panel to play the friends, and watch each payment's PayPal status, 
 - **A website agent with no AI key.** Qwen2.5 0.5B runs on Join's own server (Ollama) and is asked one narrow
   question (which activity a sentence means); rules decide days, times, group size and budget, and fixed code does
   the haggling. We measured where a model this small invents things and kept it out of those decisions.
-- **Receipts without a blockchain.** A signed, append-only audit log in the manner of Certificate Transparency: no
-  fees, no waiting for blocks, and a payer, a venue or a dispute team can keep a signed head and later prove the log
-  wasn't rewritten. Join sends the receipt to PayPal by itself when a payment is disputed.
+- **Receipts without a blockchain.** A transparency log as Certificate Transparency runs it: checkpoints signed by Join
+  and cosigned by witnesses (a venue, anyone) who check that the log only grew. No fees, no waiting for blocks. Join
+  sends the receipt and the AP2 mandates to PayPal by itself when a payment is disputed.
+- **Measured negotiation.** Six buyer strategies against every venue's rules (docs/NEGOTIATION.md): patience wins,
+  lowballing and floor-probing don't, and nobody ever paid under a floor. Join's website agent uses the winning
+  strategy and shops across venues.
 
 ## 5. Presentation
 

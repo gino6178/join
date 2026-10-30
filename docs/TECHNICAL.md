@@ -36,7 +36,7 @@ same operations with the person's session.
  |  engine.js                                           pay/paypal.js  --> PayPal REST (sandbox)
  |                                                      pay/toolkit.js --> PayPal Agent Toolkit
  |                                                      pay/mock.js (stand-in without keys)
- |  world.js (town, venues, offers, people)   proof/ (receipts, Merkle, audit log)    
+ |  world.js (town, venues, offers, people)   proof/ (receipts, tlog, AP2 mandates)   
  |  auth.js (sessions, agent tokens)          store.js (atomic JSON files, api/data/state)
  +---------------------------------------------------------------------------------+
         ^                                                   ^
@@ -53,12 +53,13 @@ same operations with the person's session.
 | Settlement | `api/src/pay/settle.js` (516) |
 | PayPal client | `api/src/pay/paypal.js` (135), `api/src/pay/toolkit.js` (78), `api/src/pay/mock.js` (128) |
 | Mandates, alternatives, auth, log | `mandate.js` (49), `alternatives.js` (57), `auth.js` (58), `activity.js` |
-| Receipts | `api/src/proof/receipts.js` (134), `merkle.js` |
+| Receipts, log, mandates | `api/src/proof/receipts.js`, `tlog.js` (RFC 6962, C2SP), `mandates.js` (AP2), `merkle.js` |
+| Benchmark | `api/bench/negotiation.mjs` |
 | World and storage | `api/src/world.js` (98), `api/data/world.json`, `api/src/store.js` (37) |
 | Website | `web/src/**` (about 1,150 lines) |
 | Examples | `examples/scripted-agent.mjs`, `claude-agent.mjs`, `venue-agent.mjs`, `toolkit-cli.mjs`, `verify-receipt.mjs` |
 | Website agent | `api/src/scout/understand.js` (186), `web/src/scout/agent.js`, `web/src/scout/words.js`, `web/src/components/AgentDrawer.jsx` |
-| Tests | `api/test/*.test.js`: 35 tests |
+| Tests | `api/test/*.test.js`: 42 tests |
 
 **Money is integer cents inside, USD strings outward.** Times are the town's local time: the process sets `TZ` from
 `world.json` (`America/Los_Angeles`), and the website renders in that zone (`world.js`, `web/src/api.js`).
@@ -98,14 +99,18 @@ old one (`store.js`). Tests keep all state in memory.
 - Only the organizer may offer, accept or walk away. Every invited player can read the negotiation.
 - Group size and booking length are checked against the activity before anything else.
 
-### 4.3 Alternatives (alternatives.js)
+### 4.3 Buyer strategies and shopping
+
+[NEGOTIATION.md](NEGOTIATION.md) has the benchmark (`api/bench/negotiation.mjs`: six buyer strategies, 28 negotiations each, on the real engine). Join's website agent uses the strategy that did best: an offer just over 70% of the current ask each round, no offer once the price is final, then the final price. It also haggles with up to two other venues free at about the same time and lets the person choose when another is at least $1 a person cheaper (`web/src/scout/agent.js`).
+
+### 4.4 Alternatives (alternatives.js)
 - **Candidates:** every other venue offering the activity whose unit can take the group, at start offsets 0, −30, +30, −60 and +60 minutes, with a free unit.
 - **Rank:** bookable before public, then within budget, then the smallest time shift, then the shortest longest trip, then price.
 - At most one public place is included. The reason given for each candidate is written by code.
 
 ## 5. Mandates (api/src/mandate.js)
 
-- **Fields:** `{ perGame, perWeek, cover, venues | null, autopay }`, in cents. The shape follows the AP2 Intent Mandate.
+- **Fields:** `{ perGame, perWeek, cover, venues | null, autopay }`, in cents. Join also signs them as AP2 open mandates (§9.1).
 - **Two different numbers: what you spend and what you guarantee.**
   - Spending: `perGame` is the most your own share of one booking may be; `perWeek` the most you pay in the 7 days around it. The week counts your shares, plus what you actually paid for others as an organizer (a capture larger than your share because someone didn't pay), less what they paid you back (`settle.spentInWeek`).
   - Guaranteeing: an organizer authorizes the whole price until the others pay. They pay their own share unless someone doesn't, and at most the whole price. `cover` (default $60) is the most their agent may guarantee from saved PayPal on its own; above it, the organizer approves the guarantee in PayPal themselves. A guarantee is not checked against `perGame`: that would make most group bookings impossible (four people at $8 is $32, over a $15 share limit).
@@ -194,24 +199,36 @@ page at `/mock-paypal/approve`, a 3.49% + $0.49 fee, request-id idempotency, and
 
 **People and venues on the website.**
 - Session cookies: `join_session` for a person, `join_venue` for venue staff. Both are `HttpOnly; SameSite=Lax`. Demo sign-in picks a made-up person or venue; there is also `/demo?as=<id>`.
-- Agent tokens: `join_<24 random bytes>`, stored as SHA-256, labelled, revocable, with last-used tracking (`auth.js`).
+- Agent tokens: `join_<24 random bytes>`, stored as SHA-256, labelled, revocable, with last-used tracking (`auth.js`). Each has the scopes the person chose (`read`: whoami, venues, options, alternatives, plans, status; `negotiate`: negotiating, accepting, answering, declining, cancelling, asking to be paid back; `pay`: `pay_my_share`), checked for MCP, REST and A2A alike, and an expiry (1 to 365 days).
+- Signed requests: a token may carry an Ed25519 public key; then every request needs HTTP Message Signatures (RFC 9421) covering `@method`, `@authority`, `@path` and, with a body, `content-digest` (RFC 9530, over the exact bytes received), created within five minutes. Without a valid signature the token is refused. `examples/signed-agent.mjs` signs.
+- Tool fingerprint: `/.well-known/mcp-tools.json` has the instructions and every tool's name, description, JSON schema and annotations, and the SHA-256 of their canonical JSON; the MCP server's version is `1.0.0+tools.<first 16 hex>`.
+- WebMCP (`web/src/webmcp.js`): with `document.modelContext`, a signed-in page registers `join-find-options`, `join-negotiate`, `join-accept` (the person confirms in a dialog) and `join-my-plans`, unregistered on sign-out (by aborting their signal). They call the website agent's endpoints as the person, logged as "Browser agent (WebMCP)".
 - Rate limits: 120 requests a minute per caller on `/mcp`, `/api/agent` and `/a2a`; 30 a minute on sign-in and tokens.
 
 ## 9. Receipts (api/src/proof/)
 
 - **Issued on** `locked`, `refunded` and `venue_paid`.
-- **Body:** the negotiation history, the split rule, and each payment with its role, share, status, captured amount, method (`via`) and PayPal order, authorization and capture ids. Players appear only as `sha256(salt:id)`, with one salt per receipt; each player's own copy includes their salt. Also the payout.
+- **Body:** the negotiation history, the split rule, each payment with its role, share, status, captured amount, method (`via`) and PayPal order, authorization and capture ids, the payout, and the hashes of the deal's AP2 checkout and payment mandates (`ap2`). Players appear only as `sha256(salt:id)`, with one salt per receipt; each player's own copy includes their salt.
 - **Hash:** canonical JSON (keys sorted), then SHA-256, then an Ed25519 signature. The key is made on first run and published at `/.well-known/join-receipts.json`.
-- **Batching:** every `RECEIPT_BATCH_MS` (10 minutes), open receipts go into a SHA-256 Merkle tree (pairs hashed in sorted order, an odd node carried up). Each receipt keeps its proof path.
-- **Audit log** (`audit-log` store), in the manner of Certificate Transparency (RFC 6962), without a blockchain:
-  - each batch appends an entry `{seq, batch, root, count, at, prev}`, whose hash is SHA-256 of its canonical JSON; `prev` is the previous entry's hash (64 zeros for the first);
-  - after each append Join signs the head, `{type: "JoinAuditLogHead", size, head, at}`, with the same Ed25519 key;
-  - `/.well-known/join-receipts.json` publishes the key and the current signed head; `GET /api/receipts/log?from=N` returns the entries from N and the head.
-  - What it guarantees: anyone who kept a signed head can check that every later head extends it. Changing or dropping an earlier entry changes every hash after it, so Join can't rewrite a logged receipt without the copies people kept disagreeing. What it doesn't: like any log run by one party, it needs someone to keep heads (a venue, a payer, PayPal's dispute file) for that check to bite; there is no outside timestamp.
+- **Batching:** every `RECEIPT_BATCH_MS` (10 minutes), open receipts go into a SHA-256 Merkle tree (pairs hashed in sorted order). Each receipt keeps its proof path.
+- **Transparency log** (`tlog.js`, the `transparency-log` store):
+  - each batch is a leaf `{seq, batch, root, count, at}`; leaf hash `SHA-256(0x00 || canonical JSON)`, node hash `SHA-256(0x01 || left || right)`, the tree split at the largest power of two (RFC 6962 / RFC 9162 §2.1). Inclusion proofs (`PATH`) and consistency proofs (`PROOF`), and their verification (RFC 9162 §2.1.3.2, §2.1.4.2), checked in the tests against every tree size up to 20;
+  - after each batch Join signs a **C2SP checkpoint** (c2sp.org/tlog-checkpoint): the note text `origin\nsize\nbase64(root)\n`, a blank line, and `— origin base64(keyID || Ed25519 signature)` with keyID `SHA-256(origin || "\n" || 0x01 || public key)[:4]` (c2sp.org/signed-note). The origin is `<host>/join-receipts` (`LOG_ORIGIN` to change);
+  - **witnesses** (c2sp.org/tlog-cosignature, Ed25519, type 0x04): an operator adds one (`POST /api/receipts/log/witnesses`, demo mode or `ADMIN_TOKEN`); the witness fetches the checkpoint, checks Join's signature (its key trusted on first use) and a consistency proof from the last checkpoint it cosigned, and posts `— name base64(keyID || 8-byte time || signature over "cosignature/v1\ntime T\n" + note text)`. Join verifies it and publishes it on the checkpoint. `examples/witness.mjs` is one;
+  - endpoints: `/api/receipts/log/checkpoint` (text), `/entries?from&to`, `/proof?index&size`, `/consistency?from&to`; `/.well-known/join-receipts.json` lists the origin, the key and the witnesses.
+  - What it guarantees: Join can't change or drop an entry, or show two people two different logs, without a kept checkpoint or a witness's cosignature disagreeing. What it doesn't: the log is run by Join; its strength is the people who keep checkpoints and the witnesses that cosign.
 - **Verifying:**
-  - `web/src/pages/Receipt.jsx` checks, in the browser with WebCrypto: the hash, the Ed25519 signature, the Merkle path, each log entry from the receipt's batch to the head, and the head's signature. It shows the time the checks took.
-  - `examples/verify-receipt.mjs` shares no code with the server, fetches the log itself, and can save a head (`--save`) and check a saved one later (`--head`).
+  - `web/src/pages/Receipt.jsx` checks in the browser (WebCrypto; the audited noble libraries where WebCrypto isn't available, e.g. plain HTTP on a LAN): the hash, the Ed25519 signature, the Merkle path, the inclusion proof in the log, the checkpoint's signature; it lists the cosigning witnesses and the time the checks took.
+  - `examples/verify-receipt.mjs` shares no code with the server, fetches the checkpoint, the entry and the proof itself, and can save a checkpoint (`--save`) and check later with a consistency proof that the log extends it (`--head`).
 - **What a receipt doesn't prove:** that PayPal moved the money. That is PayPal's record, which the receipt points to by id.
+
+### 9.1 AP2 mandates (api/src/proof/mandates.js)
+
+Join signs the mandates of the Agent Payments Protocol (github.com/google-agentic-commerce/AP2, `code/sdk/schemas/ap2`), in the "Trusted Agent Provider" model of AP2's agent-authorization document: Join is the agent provider, the Limits page (the person's session, never an agent's token) is the trusted surface, and Join's key signs.
+- **Format:** compact JWS (EdDSA, the receipts key), payloads field for field as AP2's JSON schemas: `vct`, `constraints`, `cnf`, `iat`, `exp`, and the types `checkout.allowed_merchants`, `checkout.line_items`, `payment.reference`, `payment.amount_range`, `payment.agent_recurrence`, `payment.budget`, `payment.allowed_payees`, `payment.allowed_pisps`. Selective disclosure (SD-JWT) is not used.
+- **Open mandates** (`mandate.checkout.open.1`, `mandate.payment.open.1`) per person and agent, `cnf: {kid: <token id>}` (RFC 7800), made again whenever the person's limits change (`ops.openMandates`); `whoami` returns them.
+- **Per deal:** the checkout (a JWS of the venue, line item, total and booking) and its Checkout Mandate (`mandate.checkout.1`, `checkout_jwt`, `checkout_hash`); each payer's Payment Mandate (`mandate.payment.1`, `transaction_id` = the checkout hash, `payee`, `payment_amount`, `payment_instrument` = the PayPal order or vault token, `pisp` = PayPal); Join's Mandate Receipts (`result`, `reference` = the mandate's hash). A refusal over a limit returns an error receipt (`invalid_mandate`) as `ap2Receipt`.
+- **Where they go:** `GET /api/bookings/:id/ap2` (the people in the booking; "AP2 mandates" on Plans), the receipt body (their hashes) and dispute evidence (in full).
 
 ## 10. Website (web/)
 
@@ -220,8 +237,8 @@ page at `/mock-paypal/approve`, a 3.49% + $0.49 fee, request-id idempotency, and
 | Activity | The live log, plus "Waiting on you": approvals with SDK v6 buttons, invitations, invoices to pay back |
 | Plans | The stepper, a payments table, actions (join, decline, cancel, ask to pay less, answer, ask to be paid back), extras, receipt links; each negotiation as a chart (the venue's asks stepping down, the agent's offers, lowballs marked); in demo mode, a panel where the organizer plays the friends they invited (pays, asks $1 less, can't come, time runs out), each step the same call the friend's agent would make and logged as a demo step |
 | Map | An SVG town map with over-budget and alternatives overlays |
-| Limits | Edit the mandate; Vault save and remove |
-| Connect | Tokens; Claude Code, Claude Desktop, REST and A2A snippets |
+| Limits | Edit the mandate (per booking, per week, the most an agent may guarantee for a group); Vault save and remove |
+| Connect | Tokens with scopes, expiry and an optional public key for signed requests; Claude Code, Claude Desktop, REST, A2A and WebMCP |
 | Venue view | What Join brought in: paid by groups, share booked off-peak, unpaid by customers, paid out, all counted from the bookings (`venueMetrics`); Bryntum Scheduler (`PlaceScheduler.jsx`: one row per unit, dashed bars while held, solid when locked, refreshed every 3 s); policy editor; reconciliation, extras and disputes (`VenueMoney.jsx`) |
 | Receipt | Checks a receipt in the browser |
 
@@ -239,11 +256,14 @@ For people who don't bring an agent. A drawer ("No agent? Ask Join's") asks what
 
 ## 11. Tests (api/test/, `npm test`)
 
-There are 35, using Node's test runner, and they run against the stand-in with state in memory.
+There are 42, using Node's test runner, and they run against the stand-in with state in memory.
 - **Negotiation (12):** pricing, the floor never leaking, the serious-offer schedule, lowballs, agreeing at an offer, the mandate before the venue, organizer-only actions, expiry and quota, walking away, alternatives' ordering, bad input, venue policy edits.
-- **Receipts (3):** Merkle proofs for 1 to 13 leaves; signature, tamper detection and hashed players; the audit log (receipts from early and late batches verify to the latest head, a kept head is still in the log, and a changed root, a dropped entry or a forged head is caught).
+- **Transparency log (2):** inclusion and consistency proofs for every tree size to 20, and a rewritten entry caught; a C2SP checkpoint and a witness cosignature that verify, and a changed one that doesn't.
+- **AP2 (2):** open mandates per agent with the limits as AP2 constraints, made again on a limit change, a forged payload refused; a deal's checkout and payment mandates tied by the checkout hash, and an error receipt for a refusal.
+- **Agent tokens (2):** scopes and expiry; signed requests (a good signature, and no signature, a changed body, an old one, another key or another host refused).
+- **Receipts (3):** Merkle proofs for 1 to 13 leaves; signature, tamper detection and hashed players; the transparency log (receipts from early and late batches verify to the latest checkpoint, a kept checkpoint is extended by consistency, a changed root, a wrong index or a forged checkpoint is caught, and a witness cosigns only the current checkpoint).
 - **Website agent (6):** the sentences our test agents found the rules got wrong, and the checks on a brief from the browser; also the rules reader in English and Chinese, weekends and named friends, a brief built over several messages; and against a stand-in Ollama, that Qwen fills in only the activity, only when the rules found none, and that an answer outside the list is ignored.
-- **Settlement (13):** also the venue's figures counted from its bookings; the automatic dispute answer (sent once, saying how the payer approved); the guarantee limit (`cover`) for saved PayPal, the terms said up front, and the week counting what an organizer covered;
+- **Settlement (14):** also balances across plans netted into one settle-up invoice; also the venue's figures counted from its bookings; the automatic dispute answer (sent once, saying how the payer approved); the guarantee limit (`cover`) for saved PayPal, the terms said up front, and the week counting what an organizer covered;
   - guarantee first, invitations before any charge, the full lock and payout
   - timeout with the organizer covering, release, void and refund cancellation
   - Vault autopay within the mandate and approval above it
@@ -271,7 +291,9 @@ There are 35, using Node's test runner, and they run against the stand-in with s
 **Join's website agent (30 Oct 2026):**
 - Deployed with `deploy/start.sh` on a Linux machine (RTX 3090) on the local network, Ollama serving `qwen2.5:0.5b`, and PayPal sandbox. From the website: "let's go sing somewhere saturday night, four of us, $15 each" gave three options; the agent offered $29.16 on a $32.40 ask, the venue countered $29.40, the agent accepted, and PayPal authorized the guarantee (sandbox test card). "好冷 想吃熱呼呼的鍋 週六晚上 四個人 每人20塊" became hot pot through Qwen; the venue's $25.20 a person was over Alex's $15 limit, and the agent said so without haggling.
 - Qwen's answers, warm: about 40-350 ms each. In 15 test messages it found karaoke, BBQ ("grilling meat outdoors"), board games ("cards and dice at a cafe") and hot pot, and answered "none" for "我想跟朋友出去玩". It missed "想找人玩解謎 把我們關在房間裡那種" (escape room), which the rules now catch.
-- On the same server, after the receipts moved to the audit log: a karaoke booking made through the drawer, then the demo panel on Plans (one friend paid, one asked $1 less and the organizer agreed, the time ran out for the third) locked it on the PayPal sandbox with the organizer's capture covering exactly the $1 and the missing share. Its receipt verified in the browser in 29 ms (with the noble libraries, since plain HTTP on a LAN has no WebCrypto) and with `verify-receipt.mjs`, including a saved head checked again. The venue's figures matched its bookings.
+- On the same server, with the earlier hash-chained log: a karaoke booking made through the drawer, then the demo panel on Plans (one friend paid, one asked $1 less and the organizer agreed, the time ran out for the third) locked it on the PayPal sandbox with the organizer's capture covering exactly the $1 and the missing share. Its receipt verified in the browser in 29 ms (with the noble libraries, since plain HTTP on a LAN has no WebCrypto) and with `verify-receipt.mjs`, including a saved head checked again. The venue's figures matched its bookings.
+- On the same server, with the transparency log, AP2 and shopping (30 Oct 2026): the drawer haggled with three badminton venues (Midtown, North Park, Westgate; each down its schedule to a final price) and let the person book the cheapest, Westgate at $27.72 against the $33.54 they first picked; the booking's AP2 checkout and payment mandates showed on Plans; the demo panel locked it on the PayPal sandbox; its receipt verified in the browser and with `verify-receipt.mjs` against a checkpoint cosigned by a witness running on a different machine (`examples/witness.mjs`).
+- WebMCP: no browser we had exposes `document.modelContext`; with a stand-in object on the page, the four tools registered on sign-in, and `join-find-options` and `join-my-plans` ran and showed in the activity log as "Browser agent (WebMCP)".
 - Two Claude Sonnet agents then tested the deployed website agent: one through the drawer in a browser (7 conversations in English and Chinese, 3 deals), one over HTTP (41 single messages, 5 conversations, about 220 requests including malformed and hostile ones). The tool allow-list, the spending limit, ownership checks and prompt injection held. Their findings were fixed: clock times, next week's weekdays, written dates, party sizes and Chinese budgets in the rules (the 22 sentences the rules got wrong are now regression tests); named friends silently replaced by others; friends added later not growing the group; replies switching to English; a card promising to haggle where the limit made it impossible; stack traces and server paths in body-parser errors; an unchecked brief from the browser.
 - An earlier version ran Qwen2.5 1.5B in the browser with WebLLM; its kernels failed to compile on an NVIDIA Pascal GPU in Chrome 152, which is one reason it moved to the server.
 
@@ -286,6 +308,8 @@ There are 35, using Node's test runner, and they run against the stand-in with s
 - `examples/claude-agent.mjs` and `examples/venue-agent.mjs` through the Anthropic API (no key). Their MCP wiring is tested.
 
 ## 13. Known limitations and open risks (review targets)
+
+0. **AP2:** Join plays both agent provider and verifier, so its mandates show what the person allowed and what was done, signed by Join; they are not yet signed by the person's own key (a passkey, or the User Credential model). No SD-JWT selective disclosure. Witnesses trust Join's log key on first use, and there is no gossip between witnesses yet.
 
 1. **Single process, JSON files.**
    - No database or locking across processes. `serial()` is in memory, so two server instances on the same state would race.
@@ -314,7 +338,8 @@ There are 35, using Node's test runner, and they run against the stand-in with s
 npm run setup          # api, web, examples; builds the website
 npm start              # http://localhost:8790 (the stand-in without keys)
 npm run demo           # four agents over MCP; JOIN_ACTIVITY=karaoke for another plan
-npm test               # 35 tests
+npm test               # 42 tests
+npm --prefix api run bench   # the negotiation benchmark
 ```
 
 - **Sandbox:** set `PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET` in `api/.env` (template: `api/.env.example`), and optionally `PAYPAL_TEST_CARD=1`.

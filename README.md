@@ -123,18 +123,28 @@ tampering); and an end-to-end run of four agents over MCP.
 | MCP (Streamable HTTP) | `POST /mcp` | Claude Code, Claude Desktop, any MCP client |
 | REST | `POST /api/agent/<tool>` | scripts and other HTTP clients |
 | A2A (JSON-RPC, `message/send`) | `POST /a2a`, card at `/.well-known/agent-card.json` | agents that speak A2A |
+| WebMCP (`document.modelContext`) | Join's own pages | an AI agent built into the browser |
 
-All three take a player's token (`Authorization: Bearer join_...`) and offer the same tools: `whoami`, `list_venues`,
-`list_activities`, `find_options`, `start_negotiation`, `make_offer`, `accept_price`, `walk_away`, `find_alternatives`,
-`my_plans`, `booking_status`, `pay_my_share`, `propose_share`, `answer_share`, `request_reimbursement`, `decline_invite`, `cancel_booking`.
+MCP, REST and A2A take a player's token (`Authorization: Bearer join_...`) and offer the same tools: `whoami`,
+`list_venues`, `list_activities`, `find_options`, `start_negotiation`, `make_offer`, `accept_price`, `walk_away`,
+`find_alternatives`, `my_plans`, `booking_status`, `pay_my_share`, `propose_share`, `answer_share`,
+`request_reimbursement`, `decline_invite`, `cancel_booking`. In a browser with WebMCP, Join's pages offer the
+browser's agent four tools while someone is signed in: find options, negotiate, accept (the person confirms on the
+page) and plans.
 
 **What the platform guarantees, whatever the agent does**
 
-- A token acts for one player, is shown once and kept as a hash, and can be revoked. It can't change the player's
-  limits, save a payment method or make tokens: those need the person, signed in.
-- The mandate (per-booking, per-week, venues) is checked before a venue sees an offer, and again before an agent pays.
+- A token acts for one player, is shown once and kept as a hash, and can be revoked. The person chooses its **scopes**
+  (read, negotiate, pay) and how long it lasts, and may tie it to a **public key**: then every request must be signed
+  with it (HTTP Message Signatures, RFC 9421, as Web Bot Auth uses them; `examples/signed-agent.mjs`), so a leaked
+  token alone is useless. A token can't change the player's limits, save a payment method or make tokens.
+- The tool descriptions agents read are fingerprinted: their SHA-256 is at `/.well-known/mcp-tools.json` and in the MCP
+  server's version, so an agent can pin it and notice if they ever change (MCP's "tool poisoning" risk).
+- The mandate (per booking, per week, guarantee, venues) is checked before a venue sees an offer, and again before an
+  agent pays.
 - A venue's floor is never sent anywhere; only its policy price and scheduled counters are. Five negotiations per
-  player, venue and day, and each expires in 15 minutes.
+  player, venue and day, and each expires in 15 minutes. How buyer strategies fare against the venues' rules is
+  measured in [docs/NEGOTIATION.md](docs/NEGOTIATION.md) (`npm --prefix api run bench`).
 - Only structured fields cross between agents. Every line on the Activity page is written by code from the facts.
 - Nothing is charged until a person approves in PayPal, or within the limits they set for Vault autopay.
 - Every PayPal POST carries a `PayPal-Request-Id` from the booking and step, and is journaled before it is sent.
@@ -181,21 +191,36 @@ in advance, under which an agent may act).
 ## Verifiable receipts
 
 When a booking is locked, refunded or its venue paid, Join issues a receipt: the negotiation step by step, each
-payment with its PayPal ids, and the players only as salted hashes (each player's own copy carries their salt). Join
-signs it with Ed25519 (public key at `/.well-known/join-receipts.json`). Every few minutes the new receipts go into a
-SHA-256 Merkle tree, and the tree's root is appended to Join's **audit log**: a hash chain in the manner of
-Certificate Transparency (RFC 6962), where every entry carries the hash of the one before and Join signs the log's
-head after each append. No blockchain, no fees, no waiting for blocks.
+payment with its PayPal ids, the hashes of the deal's AP2 mandates, and the players only as salted hashes. Join signs
+it with Ed25519 (public key at `/.well-known/join-receipts.json`). Every few minutes the new receipts go into a Merkle
+tree (a batch), and each batch becomes an entry in Join's **transparency log**: a Merkle tree exactly as Certificate
+Transparency defines it (RFC 6962 / 9162). After each entry Join signs the tree head as a **C2SP checkpoint** (a signed
+note), and **witnesses** cosign it (c2sp.org/tlog-cosignature) after checking a consistency proof from the last
+checkpoint they saw. No blockchain, no fees, no waiting for blocks.
 
-- In the browser: `/#/receipt/<id>` checks, with WebCrypto, the receipt's hash, Join's signature, the Merkle path to
-  its batch, every log entry from that batch to the latest head, and the head's signature.
-- Independently: `node examples/verify-receipt.mjs <id> --save head.json` shares no code with Join and does the same
-  checks. Keep the head it saves: later, `--head head.json` checks that today's log still extends it, so an earlier
-  entry can't be changed or dropped without it showing.
+- In the browser: `/#/receipt/<id>` checks the receipt's hash, Join's signature, the Merkle path to its batch, the
+  batch's inclusion proof in the log, and the checkpoint's signature, and lists the witnesses that cosigned it.
+- Independently: `node examples/verify-receipt.mjs <id> --save checkpoint.txt` shares no code with Join and does the
+  same checks; later, `--head checkpoint.txt` checks a consistency proof that today's log extends the one you kept.
+- A witness: `node examples/witness.mjs --register` once, then `node examples/witness.mjs` every few minutes. It keeps
+  the last checkpoint it cosigned and refuses to cosign a log that doesn't extend it, so Join can't show different
+  people different histories, or change or drop an entry, without the witnesses noticing.
 
-What a receipt proves: Join signed it exactly so and logged it in that batch, and anyone holding a later head can
-tell if Join rewrote it. Whether PayPal moved the money is PayPal's record; the receipt points to it by id. Join also
-sends the receipt to PayPal as evidence the moment a payment is disputed.
+What a receipt proves: Join signed it exactly so and logged it, and the log hasn't been rewritten since a checkpoint
+someone kept. Whether PayPal moved the money is PayPal's record; the receipt points to it by id. Join sends the receipt
+and the AP2 mandates to PayPal as evidence the moment a payment is disputed.
+
+## AP2 mandates
+
+Join signs the Agent Payments Protocol's mandates (github.com/google-agentic-commerce/AP2, its JSON schemas field for
+field), in AP2's "Trusted Agent Provider" model: Join is the agent provider, the Limits page is the trusted surface.
+- **Open mandates per agent:** an open checkout mandate (allowed venues, one booking of an activity) and an open payment
+  mandate (the per-booking limit as `payment.amount_range`, the weekly limit as `payment.budget`, allowed payees,
+  PayPal as the payment provider), bound to the agent's token (`cnf.kid`) and made again when the person changes a
+  limit. Agents get them from `whoami`.
+- **Per deal:** the checkout (venue, activity, time, total) and its checkout mandate; each payer's payment mandate for
+  that checkout's hash; Join's signed mandate receipts, including an error receipt when it refuses an action over a
+  limit. On a booking in Plans, "AP2 mandates" shows them decoded.
 
 ## Layout
 
@@ -205,7 +230,8 @@ sends the receipt to PayPal as evidence the moment a payment is disputed.
 | `api/src/pay/` | PayPal client (`paypal.js`), the Agent Toolkit back office (`toolkit.js`), the stand-in (`mock.js`), settlement (`settle.js`) |
 | `api/src/ops.js` | What an agent can do; MCP (`mcp.js`), REST and A2A (`a2a.js`) all call it |
 | `api/src/alternatives.js`, `mandate.js`, `auth.js`, `activity.js` | Alternatives, limits, tokens, the activity log |
-| `api/src/proof/` | Receipts and the audit log (`receipts.js`), Merkle trees (`merkle.js`) |
+| `api/src/proof/` | Receipts (`receipts.js`), the transparency log and checkpoints (`tlog.js`), Merkle trees (`merkle.js`), AP2 mandates (`mandates.js`) |
+| `api/bench/` | The negotiation benchmark (`npm --prefix api run bench`) |
 | `api/data/world.json` | The made-up demo town (USD, placed on San Jose, CA) |
 | `web/` | The website (React, Vite) |
 | `examples/` | Agents from outside: scripted (no key), a Claude player agent, a Claude venue agent on the PayPal Agent Toolkit; the receipt verifier |
@@ -219,5 +245,5 @@ keeps a few of Serve's pure functions (free-time intersection, travel time, the 
 timetable, atomic JSON writes) and its visual design. Everything else was removed (Serve's own models, guards,
 memory, voice, video, Messenger, the community loop, the feed) or written new for this hackathon: the negotiation
 layer, venue rules, the map alternatives, mandates, invitations and the negotiated split, per-player tokens, the
-PayPal settlement, verifiable receipts with a signed audit log, automatic dispute answers, Join's website agent, the MCP / REST / A2A interfaces, the activity log, the
+PayPal settlement, verifiable receipts in a witnessed transparency log, AP2 mandates, automatic dispute answers, scoped and signed agent tokens, WebMCP, balances with friends, shopping across venues, Join's website agent, the MCP / REST / A2A interfaces, the activity log, the
 website with Bryntum Scheduler, and the examples.

@@ -13,6 +13,15 @@ client).
 |---|---|
 | PayPal REST APIs (sandbox): Orders v2, Payments (authorizations, captures, refunds), Payouts, Vault v3, Webhooks | Splitting and settling a court's fee |
 
+## Specifications implemented
+
+| What | Where |
+|---|---|
+| Agent Payments Protocol (AP2) mandates, JSON schemas (Apache-2.0) | `api/src/proof/mandates.js` |
+| RFC 6962 / RFC 9162 Merkle trees; C2SP signed-note, tlog-checkpoint, tlog-cosignature | `api/src/proof/tlog.js`, `examples/witness.mjs` |
+| RFC 9421 HTTP Message Signatures, RFC 9530 Content-Digest (as in Web Bot Auth) | `api/src/auth.js`, `examples/signed-agent.mjs` |
+| WebMCP (W3C Web Machine Learning community group) | `web/src/webmcp.js` |
+
 ## Libraries
 
 | What | License |

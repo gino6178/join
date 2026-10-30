@@ -72,6 +72,9 @@ supplies the rules and the money. Someone without an agent uses Join's own, on t
   or the same in Chinese), shows three options with reasons, haggles and accepts as you under your limits, then hands
   you the PayPal button. It understands people on Join's own server: rules, plus Qwen2.5 0.5B (Ollama) for
   free-form sentences like "好冷 想吃熱呼呼的鍋". Nothing to download, no AI key, no AI service.
+- **Shops for you.** The website agent haggles with the venue you picked and up to two others free at the same time,
+  then lets you book the cheapest.
+- **Balances with friends.** Across plans, what friends owe each other is netted, and one PayPal invoice settles it.
 - **See every step.** The website shows each person what the agents did, in words Join writes from the facts: every
   search, offer, counter, invitation and payment.
 - **Limits only people can set.** What you spend (your share per booking, per week) and what your agent may
@@ -114,9 +117,16 @@ supplies the rules and the money. Someone without an agent uses Join's own, on t
   Qwen2.5 0.5B on Join's own server through Ollama for the one thing rules are bad at: which activity a free-form
   sentence means. Its answer is held to a JSON schema and used only when the rules found none. It calls the same tools
   as any agent.
-- **Receipts without a blockchain:** each batch's Merkle root goes into a signed, hash-chained audit log in the
-  manner of Certificate Transparency; the browser checks a receipt, its batch and the log with WebCrypto.
-- Node, Express, React, Vite. 35 automated tests, including an end-to-end run of four agents over MCP.
+- **Receipts without a blockchain:** each batch of receipts is an entry in an RFC 6962 transparency log with signed
+  C2SP checkpoints that independent witnesses cosign after checking consistency; the browser checks a receipt, its
+  inclusion and the checkpoint.
+- **AP2:** Join signs the Agent Payments Protocol's open checkout and payment mandates for each agent, and the checkout
+  and payment mandates of every deal, in AP2's JSON schemas; they go into receipts and dispute evidence.
+- **Agents, safely:** scoped, expiring tokens, optionally tied to a key so every request is signed (RFC 9421, as in Web
+  Bot Auth); a published fingerprint of the MCP tool descriptions; and WebMCP tools for a browser's own agent.
+- **Negotiation, measured:** a benchmark of six buyer strategies against every venue's rules (docs/NEGOTIATION.md);
+  the website agent uses the best one and shops across venues.
+- Node, Express, React, Vite. 42 automated tests, including an end-to-end run of four agents over MCP.
 
 ### Challenges we ran into
 
@@ -188,7 +198,7 @@ bryntum-scheduler, node.js, express, react, vite
 5. No agent? Click **No agent? Ask Join's** on the website and type a plan, e.g. "karaoke Friday night, 4 of us,
    $15 each" or "好冷 想吃熱呼呼的鍋". Without a model it uses rules; with Ollama (`ollama pull qwen2.5:0.5b`, then
    `SCOUT_LLM_URL=http://127.0.0.1:11434 npm start`) Qwen reads free-form sentences too.
-6. `npm test` runs 35 tests, including the end-to-end MCP run.
+6. `npm test` runs 42 tests, including the end-to-end MCP run.
 
 Without keys, Join runs on a PayPal stand-in that moves no money and says so on every page.
 
@@ -210,8 +220,9 @@ Without keys, Join runs on a PayPal stand-in that moves no money and says so on 
   one, and Join answers it at once.
 
 **Receipts:** a booking's receipt link opens a page that checks it in the browser;
-`node examples/verify-receipt.mjs <id> --save head.json` checks it independently and keeps the audit log's signed head;
-`--head head.json` later checks that the log still extends it.
+`node examples/verify-receipt.mjs <id> --save checkpoint.txt` checks it independently and keeps the log's checkpoint;
+`--head checkpoint.txt` later checks a consistency proof. `node examples/witness.mjs --register`, then
+`node examples/witness.mjs`, runs a witness that cosigns checkpoints.
 
 **Playing the friends from one window:** on Plans, as the organizer of a booking that is waiting for shares, the demo
 panel lets you act as each invited friend (pays, asks $1 less, can't come) or run the clock out, and watch the
@@ -232,7 +243,9 @@ submission period:
 - invitations and the negotiated split
 - per-person agent tokens
 - all PayPal integration
-- verifiable receipts and their signed audit log, automatic dispute answers, the venue's figures
+- verifiable receipts in a witnessed transparency log, AP2 mandates, automatic dispute answers, the venue's figures
+- scoped and signed agent tokens, the tool fingerprint, WebMCP, the negotiation benchmark and shopping across venues,
+  balances with friends
 - Join's website agent
 - the MCP, REST and A2A interfaces
 - the activity log
