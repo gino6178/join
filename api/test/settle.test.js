@@ -164,6 +164,9 @@ test("paying the organizer back: an invoice to whoever never paid, then a payout
   assert.equal(b.state, "locked");
   assert.equal((await settle.requestReimbursement(id, "you", "leo")).error, "nothing_owed");
   assert.equal((await settle.requestReimbursement(id, "leo", "hana")).error, "not_organizer");
+  assert.equal((await settle.requestReimbursement(id, "you", "hana")).error, "nothing_owed"); // never said yes
+  // someone who joined but whose payment never went through does owe their share
+  b.payments.hana = { role: "share", amount: b.shares.hana, status: "dropped" };
   const v = await settle.requestReimbursement(id, "you", "hana");
   assert.equal(v.reimbursements[0].status, "sent");
   assert.ok(settle.status(id, "hana").owes.url);
@@ -184,7 +187,8 @@ test("the venue's side on the PayPal Agent Toolkit: extras invoice, reconciliati
   assert.equal(bill.total, "17.00");
   assert.equal((await settle.billExtras("west", id, [{ name: "x", amount: 1 }])).error, "no_booking");
   pp.approve({ invoice: bill.invoice }); await settle.tick();
-  assert.equal(b.bills[0].status, "paid");
+  assert.equal(b.bills[0].status, "paid_out"); // paid by the organizer, then paid out to the venue
+  assert.ok(b.bills[0].payout);
   const rec = await settle.reconcileVenue("north");
   assert.ok(rec.rows.filter((r) => r.kind === "capture").every((r) => r.paypal === "matched" && r.fee > 0));
   const d = pp.openDispute(b.payments.leo.captureId);

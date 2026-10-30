@@ -59,7 +59,7 @@ function Booking({ b, me, w, focus, done }) {
       {err && <p className="err">{err}</p>}
       <div className="actions">
         {b.you?.approveUrl && <PayPalButtons bookingId={b.id} orderId={b.you.orderId} approveUrl={b.you.approveUrl} label={me === b.organizer && b.state === "awaiting_organizer" ? "Guarantee the booking in PayPal" : "Pay your share in PayPal"} onDone={done} />}
-        {me === b.organizer && ["locked", "played", "venue_paid"].includes(b.state) && b.players.filter((pid) => pid !== me && !["captured", "declined"].includes(b.payments[pid]?.status) && !(b.reimbursements || []).some((r) => r.player === pid)).map((pid) => (
+        {me === b.organizer && ["locked", "played", "venue_paid"].includes(b.state) && b.players.filter((pid) => pid !== me && ["dropped", "failed", "capture_failed", "voided"].includes(b.payments[pid]?.status) && !(b.reimbursements || []).some((r) => r.player === pid)).map((pid) => (
           <button key={pid} className="btn ghost" disabled={!!busy} onClick={() => act("reimburse", { player: pid })}>Ask {firstName(w, pid)} to pay you back</button>))}
         {me !== b.organizer && ["awaiting_organizer", "held"].includes(b.state) && !b.payments[me]?.status?.match(/declined|captured/) && <>
           {!b.you && b.state === "held" && <button className="btn primary" disabled={!!busy} onClick={() => act("pay")}>Join and pay {money(b.invite?.share || 0)}</button>}

@@ -1,5 +1,7 @@
 // Join's back office on the PayPal Agent Toolkit (@paypal/agent-toolkit): the same tools PayPal gives AI agents, called
-// here by code for the venue's side of the money.
+// here by code for the venue's side of the money. They run on Join's own PayPal account (the platform's): Join is the
+// merchant that captures shares and invoices extras, and pays venues with Payouts. In the multiparty model (README)
+// the venue's own account would be the payee and these would run on it.
 //   reconcile   list_transactions: each capture and payout Join made for a venue, found in PayPal's own transaction
 //               records, with PayPal's fee (sandbox reporting can lag by hours: not yet there is shown as pending)
 //   bill        create_invoice + send_invoice: a venue bills a group's organizer for extras after the booking

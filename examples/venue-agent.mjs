@@ -1,5 +1,7 @@
-// A venue's own agent on Claude, with PayPal's Agent Toolkit: it reads the venue's bookings on Join and works on the
-// venue's PayPal account with PayPal's own tools (list_transactions, create_invoice, send_invoice, list_disputes, ...).
+// A venue's agent on Claude, with PayPal's Agent Toolkit: it reads the venue's bookings on Join and works with PayPal's own
+// tools (list_transactions, create_invoice, send_invoice, list_disputes, ...) on the PayPal account that receives the
+// money. In this build that is Join's platform account (Join pays venues with Payouts); in the multiparty model it would
+// be the venue's own.
 // The toolkit runs in this process as an MCP server (@paypal/agent-toolkit/mcp), connected to an MCP client here; its
 // tools and one Join tool go to Claude, which runs the loop.
 //

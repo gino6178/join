@@ -122,7 +122,12 @@ All three take a player's token (`Authorization: Bearer join_...`) and offer the
 
 ## PayPal
 
-Everything below has been run against the PayPal sandbox.
+What ran against the PayPal sandbox: the JS SDK v6 PayPal button (rendered and loaded with a browser-safe token), Orders
+v2 authorize, partial and final captures, voids, refunds, Payouts, Vault setup tokens, Invoicing (create, send,
+status), and the Agent Toolkit's `list_transactions`, `create_invoice`, `send_invoice`, `get_invoice` and
+`list_disputes`. Pay Later and Venmo buttons appear only when PayPal says the payer is eligible (they weren't for a
+desktop sandbox payment). Dispute evidence, webhook self-registration (needs public HTTPS) and the venue agent (needs an
+Anthropic key) are built and tested against the stand-in, not yet run on the sandbox.
 
 | PayPal | In Join |
 |---|---|
@@ -132,7 +137,7 @@ Everything below has been run against the PayPal sandbox.
 | **Captures**: refund | Cancellation more than 24 hours ahead |
 | **Payouts** | The venue's money after the booking, net of fees; paying an organizer back |
 | **Vault v3** (setup token, payment token, `vault_id`) | Save PayPal once; the agent pays within the person's mandate without a redirect |
-| **Invoicing v2** | A person who never paid gets an invoice for their share; when it's paid, the organizer is paid back (Payouts) |
+| **Invoicing v2** | A person who joined but never paid gets an invoice for their share; when it's paid, the organizer is paid back (Payouts). A venue's extras are invoiced too, and paid out to the venue |
 | **PayPal Agent Toolkit** (`@paypal/agent-toolkit`): `list_transactions`, `create_invoice`, `send_invoice`, `get_invoice`, `list_disputes` | Join's back office for venues: reconciliation against PayPal's transaction records, billing extras, disputes (`api/src/pay/toolkit.js`); and a venue's own Claude agent with the toolkit as an in-process MCP server (`examples/venue-agent.mjs`) |
 | **Disputes**: `provide-evidence` | A venue answers a chargeback with Join's signed receipt for the booking |
 | **Webhooks** management API + `verify-webhook-signature` | Join subscribes itself to 14 events when it has a public HTTPS address; webhooks confirm, return URLs and polling drive |

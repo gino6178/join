@@ -211,7 +211,7 @@ async function refundAll(b, why) {
 export async function tick() {
   const now = clock().getTime();
   for (const b of db.data.bookings) {
-    const owed = Object.values(b.reimbursements || {}).some((r) => r.status === "sent") || (b.bills || []).some((x) => x.status === "sent");
+    const owed = Object.values(b.reimbursements || {}).some((r) => r.status === "sent") || (b.bills || []).some((x) => x.status === "sent" || x.status === "paid");
     if (!owed && (!LIVE.includes(b.state) || b.state === "venue_paid" && b.payout?.status !== "PENDING")) continue;
     await serial(b.id, async () => {
       // payers who approved but never came back to the return URL
@@ -346,7 +346,8 @@ export const forVenue = (venueId) => db.data.bookings.filter((b) => b.venue === 
 export const internal = get;
 
 // ---- paying the organizer back ---------------------------------------------------------------------------------------------
-// When the organizer covered someone who never paid (they were invited and didn't join in time, or their payment failed),
+// When the organizer covered someone who joined (said yes) but whose payment never went through (they didn't approve it
+// in time, or PayPal declined it),
 // the organizer's agent can ask for the money back: Join sends that person a PayPal invoice (Invoicing) for their share,
 // and when PayPal says it is paid, sends the same amount to the organizer (Payouts). One invoice per person per booking.
 // Someone who declined is never invoiced, and neither is a share the organizer agreed to cover.
@@ -356,7 +357,8 @@ export function requestReimbursement(bookingId, organizerId, playerId) {
   return serial(b.id, async () => {
     if (!["locked", "played", "venue_paid"].includes(b.state)) return { error: "too_early", message: "Ask once the booking is locked." };
     const p = b.payments[playerId];
-    if (!b.players.includes(playerId) || playerId === b.organizer || b.declined.includes(playerId) || p?.status === "captured") return { error: "nothing_owed", message: `${name(playerId)} doesn't owe anything for this booking.` };
+    // (someone who never said yes, or said no, owes nothing: Join never starts anything for a person without their yes)
+    if (!b.players.includes(playerId) || playerId === b.organizer || b.declined.includes(playerId) || !p || p.status === "captured") return { error: "nothing_owed", message: `${name(playerId)} doesn't owe anything for this booking: only someone who joined and then didn't pay can be asked.` };
     if ((b.reimbursements ||= {})[playerId]) return view(b, organizerId);
     const amount = b.shares[playerId], who = player(playerId);
     const r = { player: playerId, amount, status: "creating" };
@@ -404,8 +406,18 @@ export async function billExtras(venueId, bookingId, items) {
 }
 async function checkBills(b) {
   for (const x of b.bills || []) {
+    if (x.status === "paid") { try { const v = venue(b.venue), out = await paypalStep(b, `extras-payout:${x.invoiceId}`, () => pp.payout({ batchId: `join-extras-${x.invoiceId}`, receiver: v.payee, amount: x.total, note: `Join: extras for ${b.activity} on ${b.date}` })); Object.assign(x, { status: "paid_out", payout: out.batchId }); db.save(); } catch {} continue; }
     if (x.status !== "sent") continue;
-    try { const s = await toolkit.invoiceStatus(x.invoiceId); if (s.status === "PAID" || s.status === "MARKED_AS_PAID") { x.status = "paid"; db.save(); record({ actor: { kind: "paypal" }, who: b.players, action: "extras_paid", ref: b.id, summary: `${name(b.organizer)} paid the $${usd(x.total)} extras invoice in PayPal.` }); } } catch {}
+    try {
+      const s = await toolkit.invoiceStatus(x.invoiceId);
+      if (s.status !== "PAID" && s.status !== "MARKED_AS_PAID") continue;
+      x.status = "paid"; db.save();
+      record({ actor: { kind: "paypal" }, who: b.players, action: "extras_paid", ref: b.id, summary: `${name(b.organizer)} paid the $${usd(x.total)} extras invoice in PayPal.` });
+      // the invoice is paid to Join (the platform); the venue gets it with Payouts, like the booking itself
+      const v = venue(b.venue), out = await paypalStep(b, `extras-payout:${x.invoiceId}`, () => pp.payout({ batchId: `join-extras-${x.invoiceId}`, receiver: v.payee, amount: x.total, note: `Join: extras for ${b.activity} on ${b.date}` }));
+      Object.assign(x, { status: "paid_out", payout: out.batchId }); db.save();
+      record({ actor: { kind: "platform" }, who: b.players, action: "extras_paid_out", ref: b.id, summary: `Sent ${v.name} the $${usd(x.total)} for extras with PayPal Payouts.` });
+    } catch {}
   }
 }
 export const reconcileVenue = (venueId) => toolkit.reconcile(db.data.bookings.filter((b) => b.venue === venueId));

@@ -44,13 +44,14 @@ game tables, barbecue pits, dinner tables. It runs no AI model of its own. Peopl
 
 ## How we built it
 
-- **PayPal, all run on the sandbox:**
-  - JS SDK v6 buttons (PayPal, Pay Later, Venmo) so people approve in a PayPal popup.
+- **PayPal** (what ran on the sandbox is listed in the README; dispute evidence, webhook self-registration and the venue
+  agent are built and tested against a stand-in):
+  - JS SDK v6 buttons so people approve in a PayPal popup (Pay Later and Venmo where PayPal says they're eligible).
   - Orders v2 with intent `AUTHORIZE` (one order per payer); captures with `final_capture`, partial for the organizer;
     voids and refunds.
   - Payouts to the venue after the booking.
   - Vault v3, so a person saves PayPal once and their agent pays within their limits.
-  - Invoicing, so a person who never paid gets an invoice and the organizer is paid back with Payouts.
+  - Invoicing, so a person who joined but never paid gets an invoice and the organizer is paid back with Payouts.
   - The **PayPal Agent Toolkit** as Join's back office for venues: `list_transactions` for reconciliation,
     `create_invoice` / `send_invoice` for extras, `list_disputes`, and dispute evidence with the signed receipt.
   - A venue's Claude agent that loads the Agent Toolkit as an in-process MCP server.
