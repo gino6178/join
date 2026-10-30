@@ -93,6 +93,7 @@ export default function AgentDrawer({ me, info, open, onClose }) {
           <b>{o.venueName}</b><span className="muted small">{w.day(o.date)} · {o.start} · {o.minutes} min</span>
           <span>{o.names.map((n) => n.split(" ")[0]).join(", ")}</span>
           {o.missing.length > 0 && <small className="warn-text">{w.notFree(o.missing.map(firstName))}</small>}
+          {o.weekCut && <small className="warn-text">{w.card.week(o.limit)}</small>}
           <span><b>{money(o.askPrice)}</b> {w.card.asked} · {money(o.share)} {w.card.each}{o.fit !== "ok" ? ` · ${w.card[o.fit]}` : ""}</span>
           <span className="tags">{(o.discounts || []).length > 0 && <span className="tag good">{o.discounts.map((d) => w.why.discount(d)).join(" + ")}</span>}{world?.venues.find((v) => v.id === o.venue)?.style && <span className="tag">{w.style[world.venues.find((v) => v.id === o.venue).style]}</span>}</span>
           <small className="muted">{o.why.filter((x, i) => i < 2).join(" · ")}</small>

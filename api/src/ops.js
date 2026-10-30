@@ -79,7 +79,9 @@ export function findOptions(a, { activity = "badminton", dates = [], from = null
   const out = [];
   for (const o of opts) { if (out.length >= 5) break; if (out.some((x) => x.date === o.date && Math.abs(toMin(x.start) - toMin(o.start)) < 120)) continue; out.push(o); }
   record({ actor: by(a), who: [a.player], action: "searched", summary: `${said(a)} looked for ${activity} with ${need} other${need === 1 ? "" : "s"} over ${days.length} day${days.length > 1 ? "s" : ""}: ${out.length} option${out.length === 1 ? "" : "s"} found.` });
-  return { options: out.map(({ score, ...o }) => o), mandate: { perGame: usd(getMandate(a.player).perGame) }, note: out.length ? "Prices are the venue's opening ask; negotiate with start_negotiation." : "Nothing fits. Try other days, a wider window or fewer players." };
+  // what the organizer may still commit to for each option: their per-booking limit, or what's left of that week's
+  const m = getMandate(a.player), canSpend = (o) => Math.max(0, Math.min(m.perGame, m.perWeek - settle.spentInWeek(a.player, o.date, o.start)));
+  return { options: out.map(({ score, ...o }) => ({ ...o, youCanSpend: usd(canSpend(o)) })), mandate: { perGame: usd(m.perGame), perWeek: usd(m.perWeek) }, note: out.length ? "Prices are the venue's opening ask; negotiate with start_negotiation." : "Nothing fits. Try other days, a wider window or fewer players." };
 }
 
 // What accepting means for the organizer, on every reply they get about an open or agreed negotiation: they guarantee

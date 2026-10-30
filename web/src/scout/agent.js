@@ -19,8 +19,10 @@ export async function search(brief, model, w) {
     options: r.options.slice(0, 3).map((o) => {
       const share = +o.share, ask = +o.askPrice, people = o.players.length;
       const why = [w.why.free(people), w.why.trip(o.longestTrip), ...o.discounts.map(w.why.discount)];
-      return { ...o, why, limit, missing: (brief.with || []).filter((id) => !o.players.includes(id)),
-        fit: share <= cap ? "ok" : ask * SERIOUS > cap * people ? "tooFar" : "haggle" };
+      // (the limit for this option: per booking, or what's left of that week's, whichever is less)
+      const lim = Math.min(limit, o.youCanSpend != null ? +o.youCanSpend : limit), c = each(brief, lim);
+      return { ...o, why, limit: lim, weekCut: lim < limit, missing: (brief.with || []).filter((id) => !o.players.includes(id)),
+        fit: share <= c ? "ok" : ask * SERIOUS > c * people ? "tooFar" : "haggle" };
     }),
     limit, cap, note: r.note,
   };
@@ -44,7 +46,7 @@ export async function negotiate(o, brief, model, say, w) {
     if (ask <= target && i > 0) break;
     const offer = Math.round(Math.max(Math.ceil(ask * SERIOUS), Math.min(target, ask * 0.9)) * 100) / 100;
     const r = await tool("make_offer", { negotiation: n.id, amount: offer }, model);
-    if (r.error) { say(r.message); break; }
+    if (r.error) return { error: r.message, alternatives: r.alternatives };
     cur = r;
     if (r.status === "agreed") { say(w.agreedAt(offer, r.venueName)); return { deal: r }; }
     if (r.status === "rejected") return { error: w.saidNo(r.venueName, offer), alternatives: r.alternatives };
