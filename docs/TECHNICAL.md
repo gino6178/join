@@ -47,17 +47,17 @@ same operations with the person's session.
 
 | Area | Files (lines) |
 |---|---|
-| Server, routes | `api/src/server.js` (205) |
-| Agent operations | `api/src/ops.js` (145), `api/src/mcp.js` (67), `api/src/a2a.js` (39) |
-| Negotiation | `api/src/negotiate/policy.js` (61), `api/src/negotiate/engine.js` (170) |
-| Settlement | `api/src/pay/settle.js` (495) |
+| Server, routes | `api/src/server.js` (232) |
+| Agent operations | `api/src/ops.js` (156), `api/src/mcp.js` (67), `api/src/a2a.js` (39) |
+| Negotiation | `api/src/negotiate/policy.js` (61), `api/src/negotiate/engine.js` (173) |
+| Settlement | `api/src/pay/settle.js` (516) |
 | PayPal client | `api/src/pay/paypal.js` (135), `api/src/pay/toolkit.js` (78), `api/src/pay/mock.js` (128) |
-| Mandates, alternatives, auth, log | `mandate.js` (38), `alternatives.js` (57), `auth.js` (58), `activity.js` |
-| Receipts | `api/src/proof/receipts.js` (96), `merkle.js`, `anchor.js` (33) |
+| Mandates, alternatives, auth, log | `mandate.js` (49), `alternatives.js` (57), `auth.js` (58), `activity.js` |
+| Receipts | `api/src/proof/receipts.js` (117), `merkle.js`, `anchor.js` (50) |
 | World and storage | `api/src/world.js` (98), `api/data/world.json`, `api/src/store.js` (37) |
-| Website | `web/src/**` (about 1,000 lines) |
+| Website | `web/src/**` (about 1,150 lines) |
 | Examples | `examples/scripted-agent.mjs`, `claude-agent.mjs`, `venue-agent.mjs`, `toolkit-cli.mjs`, `verify-receipt.mjs` |
-| Website agent | `web/src/scout/understand.js`, `web/src/scout/agent.js`, `web/src/components/AgentDrawer.jsx` |
+| Website agent | `api/src/scout/understand.js` (186), `web/src/scout/agent.js`, `web/src/scout/words.js`, `web/src/components/AgentDrawer.jsx` |
 | Tests | `api/test/*.test.js`: 34 tests |
 
 **Money is integer cents inside, USD strings outward.** Times are the town's local time: the process sets `TZ` from
