@@ -22,6 +22,7 @@ client).
 | Model Context Protocol TypeScript SDK (`@modelcontextprotocol/sdk`) | MIT |
 | Zod | MIT |
 | React, React DOM, Vite, `@vitejs/plugin-react` | MIT |
+| `@noble/hashes`, `@noble/ed25519` (receipt checks in browsers without WebCrypto, e.g. over plain HTTP on a LAN) | MIT |
 | Bryntum Scheduler (`@bryntum/scheduler`, trial, installed from npm, not included in this repository) | Bryntum commercial license (trial) |
 | Anthropic TypeScript SDK (`@anthropic-ai/sdk`, examples only) | MIT |
 
