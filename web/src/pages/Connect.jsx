@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { api } from "../api.js";
 import Icon from "../components/Icon.jsx";
+import { webMcpAvailable } from "../webmcp.js";
 
 // Which agents may act for this person. A token is made for one agent, shown once, kept by Join only as a hash, and can
 // be revoked here. It lets that agent search, negotiate and pay this person's share within their limits; it can't
@@ -19,7 +20,7 @@ export default function Connect({ me, info, reload }) {
   ];
   return (
     <div className="page">
-      <header className="page-head"><h1>Connect your agent</h1><p className="muted">Join has no AI of its own. Bring yours: Claude, or any agent that speaks MCP, A2A or HTTP. It acts for you, {me.player.name.split(" ")[0]}, and only for you.</p></header>
+      <header className="page-head"><h1>Connect your agent</h1><p className="muted">Bring your own agent: Claude, any agent that speaks MCP, A2A or HTTP, or the agent built into your browser (WebMCP). No agent? Use Join's, bottom right. It acts for you, {me.player.name.split(" ")[0]}, and only for you.</p></header>
       <form className="card form row" onSubmit={make}>
         <label><span>Name this agent</span><input value={label} onChange={(e) => setLabel(e.target.value)} maxLength={40} /></label>
         <button className="btn primary"><Icon name="key" size={18} />Make a token</button>
@@ -33,6 +34,10 @@ export default function Connect({ me, info, reload }) {
           <li className="no"><Icon name="close" size={16} />Change your limits, save a payment method, make other tokens</li>
           <li className="no"><Icon name="close" size={16} />Go over your limits, or see a venue's lowest price</li>
         </ul>
+      </section>
+      <section className="card">
+        <h3>Your browser's own agent (WebMCP)</h3>
+        <p className="small">{webMcpAvailable() ? "This browser supports WebMCP: while you're signed in, this page offers its agent four tools: find options, negotiate, accept (you confirm on the page) and your plans. Payments stay in PayPal." : "Browsers with WebMCP let their built-in agent use this page's tools: find options, negotiate, accept (you confirm on the page) and your plans. This browser doesn't offer it yet, so there's nothing to set up."}</p>
       </section>
       {snippets.map(([k, text]) => <section key={k} className="card snippet"><header><h3>{k}</h3><button className="btn ghost small" onClick={() => copy(k, text)}>{copied === k ? "Copied" : "Copy"}</button></header><pre>{text}</pre></section>)}
       <section className="card">

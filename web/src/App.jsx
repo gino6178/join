@@ -10,6 +10,7 @@ import Venue from "./pages/Venue.jsx";
 import SignIn from "./pages/SignIn.jsx";
 import Receipt from "./pages/Receipt.jsx";
 import AgentDrawer from "./components/AgentDrawer.jsx";
+import { registerWebMcp, unregisterWebMcp } from "./webmcp.js";
 
 // Join's website is for the people the agents act for. It does little by itself: it shows what every agent did (the
 // activity), what is waiting on the person (an approval in PayPal), and the two things only a person may set: their
@@ -31,6 +32,8 @@ export default function App() {
   const loadMe = () => api("/api/me").then(setMe).catch(() => setMe(null));
   useEffect(() => { loadMe(); api("/api/info").then((i) => { setZone(i.timeZone); setInfo(i); }).catch(() => {}); }, []);
   const entries = useActivity(!!me);
+  // the page's tools for a browser's built-in agent (WebMCP), while someone is signed in
+  useEffect(() => { if (me) registerWebMcp(); else unregisterWebMcp(); }, [me]);
   if (me === undefined) return <div className="boot" />;
   // a receipt is public: anyone with its link can check it
   if (r.page.startsWith("receipt/")) return <Shell me={me} info={info} page="receipt" onOut={() => setMe(null)}><Receipt id={r.page.slice(8)} /></Shell>;

@@ -137,9 +137,9 @@ app.post("/api/scout/understand", limit("agent", +(process.env.AGENT_RPM || 120)
 });
 app.post("/api/scout/:tool", limit("agent", +(process.env.AGENT_RPM || 120)), signedIn, async (req, res) => {
   if (!SCOUT.includes(req.params.tool)) return res.status(404).json({ error: "unknown_tool", tools: SCOUT });
-  const model = String(req.body?._model || "rules") === "rules" ? "rules" : scout.MODEL;
+  const via = String(req.body?._model || "rules"), model = via === "rules" ? "rules" : scout.MODEL;
   const { _model, ...args } = req.body || {};
-  try { const r = await TOOLS[req.params.tool]({ player: req.player, client: `Join website agent (${model})`, token: "website-agent" }, args); res.status(r?.error ? 400 : 200).json(r); } catch (e) { console.error(e); res.status(500).json({ error: "internal" }); }
+  try { const r = await TOOLS[req.params.tool](via === "webmcp" ? { player: req.player, client: "Browser agent (WebMCP)", token: "webmcp" } : { player: req.player, client: `Join website agent (${model})`, token: "website-agent" }, args); res.status(r?.error ? 400 : 200).json(r); } catch (e) { console.error(e); res.status(500).json({ error: "internal" }); }
 });
 // the JS SDK v6 on the website: a browser-safe token, and the payer's own approval coming back from the PayPal popup
 app.get("/api/paypal/sdk", signedIn, async (req, res) => {
