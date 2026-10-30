@@ -1,0 +1,7 @@
+{
+  "name": "join-chain",
+  "private": true,
+  "description": "A local EVM for testing Join's receipt anchoring (Hardhat; Anvil works the same way).",
+  "scripts": { "chain": "hardhat node --hostname 127.0.0.1 --port 8545" },
+  "devDependencies": { "hardhat": "2.29.1" }
+}

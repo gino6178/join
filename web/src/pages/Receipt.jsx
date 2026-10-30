@@ -19,6 +19,7 @@ async function check(r) {
     out.signature = await crypto.subtle.verify({ name: "Ed25519" }, k, b64u(r.signature), fromHex(r.hash));
   } catch { out.signature = null; } // (a browser without Ed25519 in WebCrypto: use the verifier script)
   if (r.proof && r.batch) { let h = r.hash; for (const s of r.proof) h = await pair(h, s); out.proof = h === r.batch.root; }
+  if (r.seal && r.batch) { let h = r.batch.root; for (const s of r.seal.proof) h = await pair(h, s); out.seal = h === r.seal.root; }
   return out;
 }
 
@@ -28,7 +29,7 @@ export default function Receipt({ id }) {
   useEffect(() => { api("/.well-known/join-receipts.json").then((k) => setChain(k.chain)).catch(() => setChain(null)); }, []);
   if (err) return <div className="page"><p className="err">{err.message}</p></div>;
   if (!r) return <div className="page"><p className="muted">Loading…</p></div>;
-  const b = r.body, a = r.batch?.anchor;
+  const b = r.body, a = r.seal?.anchor || r.batch?.anchor;
   const row = (state, label, detail) => <li className={state === true ? "yes" : state === false ? "no" : "wait"}><Icon name={state === true ? "check" : state === false ? "close" : "clock"} size={16} /><span><b>{label}</b><small>{detail}</small></span></li>;
   return (
     <div className="page">
@@ -40,9 +41,11 @@ export default function Receipt({ id }) {
           {row(c?.hash, "The receipt is complete and unchanged", `SHA-256 ${r.hash.slice(0, 24)}…`)}
           {row(c?.signature, c?.signature === null ? "Signature: check with the verifier script" : "Signed by Join", `Ed25519, key ${r.kid}`)}
           {row(r.batch ? c?.proof : null, r.batch ? "In a batch of receipts" : "Waiting for the next batch", r.batch ? `${r.batch.count} receipts, Merkle root ${r.batch.root.slice(0, 24)}…` : "batches close every few minutes")}
-          {(a?.tx || chain) && row(a?.tx ? true : null, a?.tx ? "Recorded on Ethereum Sepolia" : a?.error ? "Not recorded on chain: the transaction failed" : "Not recorded on chain yet", a?.tx ? `block ${a.block}, transaction ${a.tx.slice(0, 18)}…` : "the next batch goes on chain in a few minutes")}
+          {r.seal && row(c?.seal, "Sealed in Join's public proof", `${r.seal.batches} batches, ${r.seal.receipts} receipts, seal root ${r.seal.root.slice(0, 24)}…`)}
+          {(a?.tx || chain) && row(a?.tx ? true : null, a?.tx ? `Recorded on ${a.chain}` : a?.error ? "Not recorded on chain: the transaction failed" : chain?.mode === "seal" ? "Waiting for the next public seal" : "Not recorded on chain yet", a?.tx ? `block ${a.block}, transaction ${a.tx.slice(0, 18)}…` : chain?.mode === "seal" ? "one transaction seals every batch so far" : "the next batch goes on chain in a few minutes")}
         </ul>
-        {a?.url && <a className="btn" href={a.url} target="_blank" rel="noreferrer">See the transaction on Etherscan</a>}
+        {a?.url && <a className="btn" href={a.url} target="_blank" rel="noreferrer">See the transaction on {a.chain}</a>}
+        {a?.tx && !a.url && <p className="small muted">On a local development chain ({a.chain}): check it with the verifier and the chain's RPC.</p>}
         {chain === null && !a?.tx && <p className="small muted">This Join doesn't publish batch roots on a public chain; the signature and the Merkle path are the proof. With a chain configured, each batch's root also goes on Ethereum Sepolia as a public timestamp.</p>}
       </section>
       {r.you && <p className="note good">You are in this receipt as <code>{r.you.player.slice(0, 16)}…</code> (your player id, hashed with your salt). Other players can't be identified from it.</p>}
@@ -55,7 +58,7 @@ export default function Receipt({ id }) {
         </tbody></table>
         <p className="small muted">What this proves: the receipt existed exactly so by the time of that block. Whether PayPal moved the money is PayPal's record; the ids above point to it.</p>
       </section>
-      <section className="card snippet"><h3>Check it yourself</h3><pre>{`node examples/verify-receipt.mjs ${r.id}${a?.tx ? " --rpc <a Sepolia RPC URL>" : ""}`}</pre></section>
+      <section className="card snippet"><h3>Check it yourself</h3><pre>{`node examples/verify-receipt.mjs ${r.id}${a?.tx ? " --rpc <the chain's RPC URL>" : ""}`}</pre></section>
     </div>
   );
 }

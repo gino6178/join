@@ -3,8 +3,11 @@
 //      negotiation, step by step; what each player paid and how; the PayPal ids of every order, authorization and capture.
 //      Players appear only as salted hashes (each player's own copy carries their salt, so they can find themselves).
 //   2. Join signs the receipt (Ed25519; the public key is at /.well-known/join-receipts.json).
-//   3. Every few minutes the new receipts' hashes go into a Merkle tree, and its root is written to Ethereum Sepolia in
-//      one transaction (anchor.js). Each receipt keeps its path to the root.
+//   3. Every few minutes the new receipts' hashes go into a Merkle tree (a batch). Each receipt keeps its path to the
+//      batch's root. On a local development chain every batch root goes on chain (anchor.js, mode "each").
+//   4. In production a single transaction seals them all: the batch roots go into one more Merkle tree, and only its
+//      root is written to a public chain (mode "seal"). Each batch keeps its path to the seal's root, so a receipt is
+//      checked receipt -> batch root -> seal root -> transaction.
 // Anyone can then check a receipt without trusting Join: hash it, follow the path to the root, find the root in the
 // transaction's data. What it proves: this receipt existed, exactly so, by the time of that block. What it does not:
 // that PayPal moved the money. That is PayPal's record, which the receipt points to by id.
@@ -15,7 +18,8 @@ import { store, stateFile } from "../store.js";
 import { canonical, sha256, merkle } from "./merkle.js";
 import { unitName } from "../world.js";
 
-const db = store(stateFile("receipts"), { receipts: [], batches: [] });
+const db = store(stateFile("receipts"), { receipts: [], batches: [], seals: [] });
+db.data.seals ||= []; // (stores written before seals existed)
 export const receiptsStore = db;
 
 // Join's signing key, made on first run and kept with the state (or in memory for tests)
@@ -71,9 +75,24 @@ export async function batch(anchor) {
   return b;
 }
 
-// Anchor batches that failed or were made before a chain was configured
+// One public proof for everything so far: the batch roots not yet sealed, in one Merkle tree, whose root goes on chain in
+// a single transaction
+export async function seal(anchor) {
+  await batch(null);
+  const open = db.data.batches.filter((b) => !b.seal);
+  if (!open.length) return null;
+  const tree = merkle(open.map((b) => b.root));
+  const s = { id: `seal_${tree.root.slice(0, 12)}`, root: tree.root, at: new Date().toISOString(), batches: open.length, receipts: open.reduce((a, b) => a + b.count, 0), anchor: null };
+  open.forEach((b, i) => { b.seal = s.id; b.sealProof = tree.proof(i); });
+  db.data.seals.push(s); db.save();
+  if (anchor) { try { s.anchor = await anchor(tree.root); } catch (e) { s.anchor = { error: e.message.slice(0, 200) }; } db.save(); }
+  return s;
+}
+export const seals = () => db.data.seals.slice();
+
+// Anchor batches that failed or were made before a chain was configured (mode "each" only)
 export async function retry(anchor) {
-  if (!anchor) return;
+  if (!anchor || anchor.mode !== "each") return;
   for (const b of db.data.batches.filter((x) => !x.anchor || x.anchor.error)) { try { b.anchor = await anchor(b.root); } catch (e) { b.anchor = { error: e.message.slice(0, 200) }; } db.save(); }
 }
 
@@ -81,8 +100,9 @@ export async function retry(anchor) {
 export function show(id, viewer = null) {
   const r = db.data.receipts.find((x) => x.id === id);
   if (!r) return null;
-  const b = r.batch ? db.data.batches.find((x) => x.id === r.batch) : null;
+  const b = r.batch ? db.data.batches.find((x) => x.id === r.batch) : null, s = b?.seal ? db.data.seals.find((x) => x.id === b.seal) : null;
   return { id: r.id, hash: r.hash, body: r.body, signature: r.signature, kid: r.kid, publicKey: publicKey(), proof: r.proof, batch: b ? { id: b.id, root: b.root, at: b.at, count: b.count, anchor: b.anchor } : null,
+    seal: s ? { id: s.id, root: s.root, at: s.at, batches: s.batches, receipts: s.receipts, proof: b.sealProof, anchor: s.anchor } : null,
     ...(viewer && r.salts[viewer] ? { you: { salt: r.salts[viewer], player: salted(r.salts[viewer], viewer) } } : {}) };
 }
 export const forBooking = (bookingId) => db.data.receipts.filter((r) => r.body.booking === bookingId).map((r) => ({ id: r.id, event: r.body.event, issued: r.body.issued, batch: r.batch }));
@@ -92,5 +112,6 @@ export function verify(r) {
   const out = { hash: sha256(canonical(r.body)) === r.hash, signature: false, proof: null };
   try { out.signature = crypto.verify(null, Buffer.from(r.hash, "hex"), crypto.createPublicKey({ key: r.publicKey, format: "jwk" }), Buffer.from(r.signature, "base64url")); } catch {}
   if (r.proof && r.batch) out.proof = merkle.verify(r.hash, r.proof, r.batch.root);
+  if (r.seal && r.batch) out.seal = merkle.verify(r.batch.root, r.seal.proof, r.seal.root);
   return out;
 }

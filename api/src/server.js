@@ -18,7 +18,7 @@ import { forPlayer, onActivity } from "./activity.js";
 import { getWorld, player, venue, setPolicy } from "./world.js";
 import { usd } from "./negotiate/policy.js";
 import * as receipts from "./proof/receipts.js";
-import { sepoliaAnchor } from "./proof/anchor.js";
+import { evmAnchor } from "./proof/anchor.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 // a small .env reader, so the server needs no package for it
@@ -159,12 +159,16 @@ app.get("/api/activity/stream", signedIn, (req, res) => {
 });
 
 // ---- verifiable receipts ----------------------------------------------------------------------------------------------------
-const anchor = sepoliaAnchor();
-app.get("/.well-known/join-receipts.json", (req, res) => res.json({ keys: [receipts.publicKey()], chain: anchor ? { name: "sepolia", chainId: 11155111, from: anchor.address, data: "0x4a4f494e<root>" } : null }));
+const anchor = await evmAnchor().catch((e) => { console.error("anchor", e.message); return null; });
+app.get("/.well-known/join-receipts.json", (req, res) => res.json({ keys: [receipts.publicKey()], chain: anchor ? { name: anchor.chain, chainId: anchor.chainId, from: anchor.address, mode: anchor.mode, data: "0x4a4f494e<root>" } : null, seals: receipts.seals().map((s) => ({ id: s.id, root: s.root, at: s.at, batches: s.batches, receipts: s.receipts, tx: s.anchor?.tx || null, url: s.anchor?.url || null })) }));
 app.get("/api/receipts/:id", (req, res) => { const r = receipts.show(req.params.id, sessionOf(req)?.player); r ? res.json(r) : res.status(404).json({ error: "no such receipt" }); });
 // (the demo can close a batch now instead of waiting for the next one)
-app.post("/api/receipts/batch", async (req, res) => { if (!DEMO) return res.status(403).end(); res.json(await receipts.batch(anchor)); });
-setInterval(() => receipts.batch(anchor).then(() => receipts.retry(anchor)).catch((e) => console.error("anchor", e.message)), +(process.env.ANCHOR_MS || 10 * 60e3)).unref();
+// (closing a batch now, and the single public seal: in demo mode, or with ADMIN_TOKEN as a bearer token)
+const admin = (req) => DEMO || (process.env.ADMIN_TOKEN && req.headers.authorization === `Bearer ${process.env.ADMIN_TOKEN}`);
+const perBatch = () => (anchor?.mode === "each" ? anchor : null);
+app.post("/api/receipts/batch", async (req, res) => { if (!admin(req)) return res.status(403).end(); res.json(await receipts.batch(perBatch())); });
+app.post("/api/receipts/seal", async (req, res) => { if (!admin(req)) return res.status(403).end(); if (!anchor) return res.status(400).json({ error: "no chain configured (ANCHOR_RPC_URL, ANCHOR_PRIVATE_KEY)" }); res.json(await receipts.seal(anchor)); });
+setInterval(() => receipts.batch(perBatch()).then(() => receipts.retry(anchor)).catch((e) => console.error("anchor", e.message)), +(process.env.ANCHOR_MS || 10 * 60e3)).unref();
 
 // ---- PayPal comes back here -------------------------------------------------------------------------------------------
 app.get("/paypal/return", async (req, res) => {
@@ -202,4 +206,4 @@ const WEB = path.join(HERE, "../../web/dist");
 if (fs.existsSync(WEB)) { app.use(express.static(WEB)); app.get(/^\/(?!api|mcp|paypal|a2a|mock-paypal).*/, (req, res) => res.sendFile(path.join(WEB, "index.html"))); }
 
 setInterval(() => settle.tick().catch((e) => console.error("tick", e.message)), +(process.env.TICK_MS || 5000)).unref();
-app.listen(PORT, () => console.log(`Join on ${PUBLIC_URL}  (PayPal: ${pp.mode}; MCP: ${PUBLIC_URL}/mcp; receipts anchored on: ${anchor ? `Sepolia from ${anchor.address}` : "nothing yet (set ANCHOR_RPC_URL and ANCHOR_PRIVATE_KEY)"}; demo sign-in: ${DEMO ? "on" : "off"})`));
+app.listen(PORT, () => console.log(`Join on ${PUBLIC_URL}  (PayPal: ${pp.mode}; MCP: ${PUBLIC_URL}/mcp; receipts: ${anchor ? `${anchor.chain}, ${anchor.mode === "each" ? "every batch" : "one seal"}, from ${anchor.address}` : "signed and batched, no chain"}; demo sign-in: ${DEMO ? "on" : "off"})`));

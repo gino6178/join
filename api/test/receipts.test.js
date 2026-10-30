@@ -28,3 +28,17 @@ test("a receipt is signed, batched and verifiable; any change breaks it; players
   const forged = structuredClone(pub); forged.body.total = 1;
   assert.equal(receipts.verify(forged).hash, false);
 });
+
+test("one public proof: a seal over the batch roots, each receipt verifies receipt -> batch -> seal", async () => {
+  receipts.receiptsStore.reset();
+  const mk = (id) => receipts.issue({ id, venue: "north", activity: "badminton", date: "2026-11-05", start: "19:00", minutes: 90, unit: 1, total: 2000, players: ["you"], organizer: "you", shares: { you: 2000 }, declined: [], payments: { you: { status: "captured", captured: 2000 } } }, null, "locked");
+  const a = mk("bk_a"); await receipts.batch(null);
+  const b = mk("bk_b"); mk("bk_c"); await receipts.batch(null);
+  let sent = null;
+  const s = await receipts.seal(Object.assign(async (root) => (sent = root, { chain: "test", tx: "0x1" }), { mode: "seal" }));
+  assert.equal(s.batches, 2); assert.equal(s.receipts, 3); assert.equal(sent, s.root);
+  for (const r of [a, b]) { const v = receipts.verify(receipts.show(r.id)); assert.deepEqual(v, { hash: true, signature: true, proof: true, seal: true }); }
+  const forged = receipts.show(a.id); forged.batch.root = "00".repeat(32);
+  assert.equal(receipts.verify(forged).seal, false);
+  assert.equal(await receipts.seal(async () => ({})), null); // nothing new to seal
+});

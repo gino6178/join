@@ -6,3 +6,5 @@
 !**/.env.example
 api/data/state/
 web/dist/
+chain/cache/
+chain/artifacts/
