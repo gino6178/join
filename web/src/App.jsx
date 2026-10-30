@@ -8,6 +8,7 @@ import Limits from "./pages/Limits.jsx";
 import Connect from "./pages/Connect.jsx";
 import Venue from "./pages/Venue.jsx";
 import SignIn from "./pages/SignIn.jsx";
+import Receipt from "./pages/Receipt.jsx";
 
 // Join's website is for the people the agents act for. It does little by itself: it shows what every agent did (the
 // activity), what is waiting on the person (an approval in PayPal), and the two things only a person may set: their
@@ -30,6 +31,8 @@ export default function App() {
   useEffect(() => { loadMe(); api("/api/info").then((i) => { setZone(i.timeZone); setInfo(i); }).catch(() => {}); }, []);
   const entries = useActivity(!!me);
   if (me === undefined) return <div className="boot" />;
+  // a receipt is public: anyone with its link can check it
+  if (r.page.startsWith("receipt/")) return <Shell me={me} info={info} page="receipt" onOut={() => setMe(null)}><Receipt id={r.page.slice(8)} /></Shell>;
   if (r.page === "venue") return <Shell me={me} info={info} page="venue" onOut={() => setMe(null)}><Venue query={r.query} /></Shell>;
   if (!me) return <SignIn info={info} onIn={loadMe} />;
   const pages = { activity: <Activity entries={entries} me={me} />, games: <Games entries={entries} me={me} query={r.query} />, map: <MapPage entries={entries} me={me} />, limits: <Limits me={me} reload={loadMe} query={r.query} />, connect: <Connect me={me} info={info} reload={loadMe} /> };

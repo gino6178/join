@@ -23,7 +23,8 @@
 import crypto from "node:crypto";
 import { store, stateFile } from "../store.js";
 import { setTaken, venue, player, freeCourts } from "../world.js";
-import { setOnAgreed } from "../negotiate/engine.js";
+import { setOnAgreed, internal as negotiation } from "../negotiate/engine.js";
+import * as receipts from "../proof/receipts.js";
 import { getMandate, fits } from "../mandate.js";
 import { record } from "../activity.js";
 import { startOf, toMin, hm } from "../time.js";
@@ -73,7 +74,7 @@ setOnAgreed((n) => {
     id: `bk_${crypto.randomBytes(6).toString("hex")}`, negotiation: n.id, venue: n.venue, sport: n.sport, date: n.date, start: n.start, minutes: n.minutes, court,
     total: n.agreed.amount, players: n.players, organizer: n.by, shares: split(n.agreed.amount, n.players, n.by),
     state: "awaiting_organizer", created: now.toISOString(), organizerUntil: now.getTime() + ORGANIZER_MS, holdUntil: null,
-    payments: {}, declined: [], payout: null, journal: [],
+    payments: {}, declined: [], payout: null, journal: [], paypalMode: paypalMode(),
   };
   db.data.bookings.push(b); db.save();
   note(b, { kind: "venue", venue: b.venue }, "court_held", `${venue(b.venue).name} holds court ${court} for ${ORGANIZER_MS / 60e3} minutes while ${name(b.organizer)} authorizes $${usd(b.total)} with PayPal.`);
@@ -177,6 +178,7 @@ async function lock(b, reason) {
     return;
   }
   b.state = "locked"; b.lockedAt = at(); db.save();
+  receipts.issue(b, negotiation(b.negotiation), "locked");
   const short = b.players.filter((pid) => pid !== b.organizer && b.payments[pid]?.status !== "captured");
   note(b, { kind: "platform" }, "locked", `Court ${b.court} at ${venue(b.venue).name} is locked: $${usd(b.total)} paid (${reason}).${short.length ? ` ${name(b.organizer)} covered ${short.map(name).join(", ")} ($${usd(rest - b.shares[b.organizer])}).` : ""}`);
 }
@@ -198,6 +200,7 @@ async function refundAll(b, why) {
     try { await paypalStep(b, `refund:${pid}`, (rid) => pp.refund(p.captureId, { amount, requestId: rid })); p.status = "refunded"; } catch (e) { p.error = e.message; }
   }
   b.state = "refunded"; db.save();
+  receipts.issue(b, negotiation(b.negotiation), "refunded");
   note(b, { kind: "platform" }, "refunded", why);
 }
 
@@ -229,6 +232,7 @@ async function payVenue(b) {
   try {
     const r = await paypalStep(b, "payout", () => pp.payout({ batchId: `join-${b.id}`, receiver: v.payee, amount: net, note: `Join: court ${b.court}, ${b.sport}, ${b.date} ${b.start}` }));
     b.payout = { batchId: r.batchId, status: "PENDING", amount: net, receiver: v.payee }; b.state = "venue_paid"; db.save();
+    receipts.issue(b, negotiation(b.negotiation), "venue_paid");
     note(b, { kind: "platform" }, "venue_paid", `Sent ${v.name} $${usd(net)} with PayPal Payouts (the $${usd(b.total)} paid, less PayPal's fees).`);
   } catch (e) { b.payout = null; journal(b, "payout", "will_retry"); }
 }
@@ -284,7 +288,7 @@ export function view(b, viewer) {
     invite: viewer !== b.organizer && b.state === "held" && !mine && !b.declined.includes(viewer) ? { share: usd(b.shares[viewer]), payBy: new Date(b.holdUntil).toISOString() } : null,
     you: mine ? { amount: usd(mine.amount), status: mine.status, via: mine.via, approveUrl: mine.status === "awaiting_approval" ? mine.approveUrl : null, note: mine.why } : null,
     payout: b.payout ? { amount: usd(b.payout.amount), status: b.payout.item || b.payout.status } : null,
-    paypal: paypalMode(),
+    paypal: paypalMode(), receipts: receipts.forBooking(b.id),
   };
 }
 

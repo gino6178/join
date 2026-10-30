@@ -209,3 +209,7 @@ legend { font-size: var(--fs-14); color: var(--ink-2); padding: 0 6px; }
 .policy small { color: var(--ink-3); font-weight: 400; }
 .form select { font: inherit; padding: 10px 12px; border-radius: var(--r-md); border: 1px solid var(--rule-strong); background: var(--bg); color: var(--ink); }
 .venue-head { display: flex; justify-content: space-between; align-items: center; gap: var(--s3); flex-wrap: wrap; }
+.checks li { align-items: flex-start !important; }
+.checks li span { display: grid; } .checks li small { color: var(--ink-3); word-break: break-all; }
+.checks .wait .icon { color: var(--warn); }
+.neg-steps { margin: 0 0 var(--s4); padding-left: var(--s5); display: grid; gap: 4px; font-size: var(--fs-14); }

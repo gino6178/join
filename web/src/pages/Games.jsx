@@ -45,6 +45,7 @@ function Booking({ b, me, w, focus, done }) {
         {b.players.map((pid) => { const p = b.payments[pid]; return (
           <tr key={pid} className={pid === me ? "me" : ""}><td>{pid === me ? "You" : firstName(w, pid)}{pid === b.organizer && <small> organizer</small>}</td><td>{p.role === "organizer" ? <>{money(p.paid ?? p.share)}<small>{p.paid != null && +p.paid > +p.share ? " (covered others)" : ` · guarantees ${money(p.guarantee)}`}</small></> : money(p.share)}</td><td><span className={`st ${p.status}`}>{PAY[p.status] || p.status}</span></td><td><small>{p.via === "vault" ? "saved PayPal, by the agent" : p.via === "approval" ? "approved in PayPal" : ""}</small></td></tr>); })}
       </tbody></table>
+      {b.receipts?.length > 0 && <p className="small"><Icon name="verify" size={14} />Receipts: {b.receipts.map((x) => <a key={x.id} href={`#/receipt/${x.id}`}>{x.event.replace("_", " ")}</a>).reduce((a, x) => [...a, a.length ? " · " : "", x], [])}</p>}
       {b.payout && <p className="small"><Icon name="send" size={14} />Venue paid {money(b.payout.amount)} with PayPal Payouts ({String(b.payout.status).toLowerCase()}), after PayPal's fees.</p>}
       {err && <p className="err">{err}</p>}
       <div className="actions">
