@@ -90,6 +90,6 @@ A2A · Claude · Bryntum Scheduler · Node.js, Express, React, Vite
 
 ## Links
 
-- Code: TODO (public GitHub repository, MIT)
+- Code: https://github.com/gino6178/join (MIT). What was built during the hackathon: https://github.com/gino6178/join/compare/baseline...main
 - Demo video: TODO (YouTube)
 - Try it: TODO (hosted URL), or run it locally in three commands (README)

@@ -168,7 +168,8 @@ little Sepolia ether from a faucet). Without them, receipts are still signed and
 
 ## What's new since 1 October 2026
 
-Join began from our earlier project Serve, imported unchanged as the [`baseline`](../../tree/baseline) commit. Join
+Join began from our earlier project Serve, imported unchanged as the [`baseline`](../../tree/baseline) commit; [everything
+since](../../compare/baseline...main) was built for this hackathon. Join
 keeps a few of Serve's pure functions (free-time intersection, travel time, the venue in the middle, the demo
 timetable, atomic JSON writes) and its visual design. Everything else was removed (Serve's own models, guards,
 memory, voice, video, Messenger, the community loop, the feed) or written new for this hackathon: the negotiation
