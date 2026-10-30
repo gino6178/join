@@ -34,10 +34,9 @@ Join is an agent-ready marketplace for pickup sports. It runs no AI model of its
   The venue is paid after the game.
 - **See every step.** The website shows each person what the agents did, in words Join writes from the facts:
   every search, offer, counter-offer, invitation and payment.
-- **Verifiable receipts.** Every locked, refunded or paid-out booking gets a receipt: the negotiation, each payment
-  and its PayPal ids, players only as hashes. Join signs it, and anchors batches of receipts on Ethereum Sepolia as a
-  Merkle root in a plain transaction (no token, no contract). Anyone can check a receipt in the browser or with a
-  script that shares no code with Join.
+- **Receipts anyone can check.** Every locked, refunded or paid-out booking gets a signed receipt: the negotiation,
+  each payment and its PayPal ids, players only as hashes. It can be checked in the browser or with a script that
+  shares no code with Join. (Optionally, batches of receipts can also be timestamped on a public chain.)
 - **Limits only people can set.** Per-game and per-week limits and allowed venues are set by the person on the
   website. Agent tokens can read them, never change them.
 
@@ -53,7 +52,7 @@ Join is an agent-ready marketplace for pickup sports. It runs no AI model of its
 - **AI:** Claude is the player's agent in our demo (Claude Code over MCP, and a Claude API agent that bridges Join's
   MCP tools into Claude's tool use). A scripted agent runs the same flow with no API key, for anyone to try.
 - **Bryntum Scheduler** shows a venue its courts: dashed while a group pays, solid the moment it is paid and locked.
-- **Receipts:** Ed25519 signatures, SHA-256 Merkle trees, Sepolia anchoring with viem.
+- **Receipts:** Ed25519 signatures and SHA-256 Merkle trees; optional anchoring of batch roots on Ethereum Sepolia.
 - Node, Express, React, Vite. 22 automated tests, including an end-to-end run of four agents over MCP.
 
 ## Challenges we ran into
@@ -69,7 +68,7 @@ Join is an agent-ready marketplace for pickup sports. It runs no AI model of its
 ## Accomplishments we're proud of
 
 - The whole flow runs end to end with four agents: over budget, alternatives, three rounds of haggling, an invitee
-  asking to pay less, the organizer's guarantee, three shares, the lock, a receipt.
+  asking to pay less, the organizer's guarantee, three shares, the lock, a signed receipt.
 - Nothing on the activity page is written by a model; every line comes from the facts.
 
 ## What we learned
@@ -85,7 +84,7 @@ through the Agent Payments Protocol once PayPal's support for it is available.
 ## Built with
 
 PayPal Orders v2, Payments (Authorizations, Captures, Refunds), Payouts, Vault v3, Webhooks, PayPal MCP server · MCP ·
-A2A · Claude · Bryntum Scheduler · Ethereum Sepolia, viem · Node.js, Express, React, Vite
+A2A · Claude · Bryntum Scheduler · Node.js, Express, React, Vite
 
 ## Links
 

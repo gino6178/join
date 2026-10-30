@@ -13,5 +13,5 @@ sandbox if keys are set; otherwise say "PayPal simulated" once. No music with ri
 | 1:30-1:45 | PayPal approval page; Games stepper moves to "Court guaranteed"; Bryntum view shows a dashed bar | "Alex guarantees the whole court with a PayPal authorization. Nothing is charged yet, and nobody can hold a court for free." |
 | 1:45-2:10 | Sign in as Hana: invitation in "Waiting on you"; her agent asks to pay $5.93; Alex's agent agrees; Hana approves in PayPal | "Friends are invited. Hana's agent asks to pay a dollar less; Alex's agent agrees and Alex covers it. Each pays their own share with PayPal." |
 | 2:10-2:25 | Bryntum bar turns solid; Games: paid and locked | "Everyone paid: the court is locked. The venue is paid with PayPal Payouts after the game." |
-| 2:25-2:45 | Receipt page: four checks, Etherscan transaction | "And a receipt anyone can check: signed, and anchored on Ethereum Sepolia. No token, just proof the deal wasn't changed." |
-| 2:45-2:55 | Activity page scrolled | "Your agent did the work. You saw every step. Join." |
+| 2:25-2:40 | Receipt page: the checks turning green | "And a signed receipt of every offer and payment, with PayPal's ids, that anyone can check hasn't been changed." |
+| 2:40-2:55 | Activity page scrolled | "Your agent did the work. You saw every step. Join." |
