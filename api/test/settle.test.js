@@ -254,3 +254,30 @@ test("a venue's figures are counted from its bookings: paid, off-peak, covered b
   assert.equal(+m.coveredByOrganizers.amount * 100, b.payments.you.captured - b.shares.you);
   assert.equal(settle.venueMetrics("west").bookings.paid, 0);
 });
+
+test("balances across plans: two people who each covered the other settle up with one invoice for the difference", async () => {
+  const toolkit = await import("../src/pay/toolkit.js");
+  toolkit.configureToolkit({ standIn: (m, a) => pp.toolkit(m, a) });
+  // plan 1: you organize; leo joins and never pays; you cover him
+  const id1 = await deal(["leo", "hana"]);
+  await settle.pay(id1, "you"); await approve(id1, "you"); await approve(id1, "hana"); await settle.pay(id1, "leo");
+  // plan 2: leo organizes, the next day; you join and never pay; leo covers you
+  const s2 = ["18:00", "19:00", "20:00"].find((s) => freeUnits("westgate", "badminton", "2026-11-06", s, 90).length);
+  const n2 = open({ by: "leo", players: ["you", "tomas"], venue: "westgate", activity: "badminton", date: "2026-11-06", start: s2, minutes: 90 });
+  const id2 = accept({ id: n2.id, by: "leo" }).booking.id;
+  await settle.pay(id2, "leo"); await approve(id2, "leo"); await approve(id2, "tomas"); await settle.pay(id2, "you");
+  now = new Date(now.getTime() + settle.SHARES_MS + 60e3);
+  await settle.tick();
+  const b1 = settle.internal(id1), b2 = settle.internal(id2), net = b1.shares.leo - b2.shares.you;
+  const l = settle.ledger("you");
+  assert.equal(l.items.length, 2);
+  const leo = l.friends.find((f) => f.friend === "leo");
+  assert.equal(Math.round(+leo.owesYou * 100) - Math.round(+leo.youOwe * 100), net);
+  assert.equal(l.fewestPayments.length, 1); // two debts, one payment
+  if (net > 0) {
+    const s = await settle.settleUp("you", "leo");
+    assert.equal(s.plans, 2); assert.equal(Math.round(+s.amount * 100), net);
+    assert.ok(settle.ledger("you").items.every((d) => d.status.startsWith("settled together")));
+    pp.approve({ invoice: settle.ledger("you").settlements[0].invoiceId || s.url.split("/").pop() });
+  } else assert.equal((await settle.settleUp("you", "leo")).error, "nothing_owed");
+});

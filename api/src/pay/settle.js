@@ -39,7 +39,8 @@ export const SHARES_MS = 20 * 60e3;
 export const CANCEL_BEFORE_MS = 24 * 3600e3;
 const LIVE = ["awaiting_organizer", "held", "locking", "locked", "played", "venue_paid"];
 
-const db = store(stateFile("bookings"), { bookings: [], vaults: {}, setups: {} });
+const db = store(stateFile("bookings"), { bookings: [], vaults: {}, setups: {}, settlements: [] });
+db.data.settlements ||= []; // (stores written before settlements existed)
 export const bookingsStore = db;
 let pp = null, clock = () => new Date(), publicUrl = "http://localhost:8790";
 export function configure({ paypal, now, url } = {}) { if (paypal) pp = paypal; if (now) clock = now; if (url) publicUrl = url; }
@@ -245,6 +246,7 @@ export async function expireNow(bookingId) {
 
 export async function tick() {
   const now = clock().getTime();
+  await checkSettlements();
   for (const b of db.data.bookings) {
     const owed = Object.values(b.reimbursements || {}).some((r) => r.status === "sent") || (b.bills || []).some((x) => x.status === "sent" || x.status === "paid");
     if (!owed && (!LIVE.includes(b.state) || b.state === "venue_paid" && b.payout?.status !== "PENDING")) continue;
@@ -424,6 +426,77 @@ async function checkReimbursements(b) {
   for (const r of Object.values(b.reimbursements || {})) {
     if (r.status !== "sent") continue;
     try { const inv = await pp.getInvoice(r.invoiceId); if (inv.status === "PAID" || inv.status === "MARKED_AS_PAID") await reimbursed(b, r); } catch {}
+  }
+}
+
+// ---- balances with friends, across plans ----------------------------------------------------------------------------
+// What friends owe each other on Join: only a share someone joined (said yes to) and didn't pay, which the organizer
+// covered. Someone who declined or never answered owes nothing. Across several plans, debts between the same two people
+// are netted, and the whole group's balances are reduced to the fewest payments that settle them. Settling up with a
+// friend sends one PayPal invoice for the net amount instead of one per plan; when it's paid, the organizer is paid with
+// Payouts. A debt already invoiced on its own (Plans, "Ask to be paid back") is left to that invoice.
+function debts() {
+  const out = [];
+  for (const b of db.data.bookings) {
+    if (!["locked", "played", "venue_paid"].includes(b.state)) continue;
+    for (const pid of b.players) {
+      const p = b.payments[pid];
+      if (pid === b.organizer || b.declined.includes(pid) || !p || p.status === "captured") continue;
+      const own = b.reimbursements?.[pid], net = db.data.settlements.find((s) => s.items.includes(`${b.id}:${pid}`));
+      out.push({ key: `${b.id}:${pid}`, booking: b.id, activity: b.activity, date: b.date, venue: venue(b.venue)?.name, from: pid, to: b.organizer, amount: b.shares[pid],
+        status: own ? `invoice ${own.status}` : net ? `settled together: ${net.status}` : "open" });
+    }
+  }
+  return out;
+}
+// the fewest payments that settle everyone's balance (largest debtor pays largest creditor, repeat)
+function fewest(balances) {
+  const cred = Object.entries(balances).filter(([, v]) => v > 0).sort((a, b) => b[1] - a[1]), debt = Object.entries(balances).filter(([, v]) => v < 0).map(([k, v]) => [k, -v]).sort((a, b) => b[1] - a[1]);
+  const pay = [];
+  while (cred.length && debt.length) {
+    const x = Math.min(cred[0][1], debt[0][1]);
+    pay.push({ from: debt[0][0], to: cred[0][0], amount: usd(x) });
+    cred[0][1] -= x; debt[0][1] -= x;
+    if (!cred[0][1]) cred.shift(); if (!debt[0][1]) debt.shift();
+    cred.sort((a, b) => b[1] - a[1]); debt.sort((a, b) => b[1] - a[1]);
+  }
+  return pay;
+}
+export function ledger(viewer) {
+  const all = debts(), mine = all.filter((d) => d.from === viewer || d.to === viewer), open = all.filter((d) => d.status === "open");
+  const withFriend = {};
+  for (const d of mine.filter((x) => x.status === "open")) { const f = d.from === viewer ? d.to : d.from; withFriend[f] = (withFriend[f] || 0) + (d.to === viewer ? d.amount : -d.amount); }
+  // the group: everyone connected to the viewer by an open debt
+  const group = new Set([viewer, ...Object.keys(withFriend)]), balances = {};
+  for (const d of open.filter((x) => group.has(x.from) && group.has(x.to))) { balances[d.to] = (balances[d.to] || 0) + d.amount; balances[d.from] = (balances[d.from] || 0) - d.amount; }
+  return { items: mine.map((d) => ({ ...d, amount: usd(d.amount) })),
+    friends: Object.entries(withFriend).filter(([, v]) => v).map(([friend, v]) => ({ friend, name: name(friend), owesYou: usd(Math.max(0, v)), youOwe: usd(Math.max(0, -v)) })),
+    fewestPayments: fewest(balances).map((t) => ({ ...t, fromName: name(t.from), toName: name(t.to) })),
+    settlements: db.data.settlements.filter((s) => s.to === viewer || s.from === viewer).map(({ items, ...s }) => ({ ...s, amount: usd(s.amount), plans: items.length })) };
+}
+export async function settleUp(viewer, friend) {
+  const open = debts().filter((d) => d.status === "open" && ((d.from === friend && d.to === viewer) || (d.from === viewer && d.to === friend)));
+  const net = open.reduce((a, d) => a + (d.to === viewer ? d.amount : -d.amount), 0);
+  if (net <= 0) return { error: "nothing_owed", message: net < 0 ? `You owe ${name(friend)} $${usd(-net)}; they can settle up with you.` : `Nothing open between you and ${name(friend)}.` };
+  const s = { id: `set_${crypto.randomBytes(5).toString("hex")}`, from: friend, to: viewer, amount: net, items: open.map((d) => d.key), status: "creating", at: at() };
+  db.data.settlements.push(s); db.save();
+  try {
+    const inv = await pp.invoice({ recipient: player(friend).paypal, amount: net, item: `Settling up on Join: ${open.length} plan${open.length > 1 ? "s" : ""} with ${name(viewer)}, netted`, note: `${open.map((d) => `${d.activity} ${d.date}: ${d.from === friend ? "+" : "-"}$${usd(d.amount)}`).join("; ")}`, requestId: `settle:${s.id}` });
+    Object.assign(s, { invoiceId: inv.id, url: inv.url, status: "sent" }); db.save();
+    record({ actor: { kind: "platform" }, who: [viewer, friend], action: "settle_up", ref: s.id, summary: `${name(viewer)} settled up with ${name(friend)}: one PayPal invoice for $${usd(net)}, netting ${open.length} plan${open.length > 1 ? "s" : ""} instead of one invoice each.` });
+  } catch (e) { s.status = "failed"; s.error = e.message; db.save(); return { error: "paypal", message: e.message }; }
+  return { settlement: s.id, amount: usd(net), plans: open.length, url: s.url };
+}
+async function checkSettlements() {
+  for (const s of db.data.settlements.filter((x) => x.status === "sent")) {
+    try {
+      const inv = await pp.getInvoice(s.invoiceId);
+      if (inv.status !== "PAID" && inv.status !== "MARKED_AS_PAID") continue;
+      s.status = "paid"; db.save();
+      const out = await pp.payout({ batchId: `join-settle-${s.id}`, receiver: player(s.to).paypal, amount: s.amount, note: `Join: ${name(s.from)} settled up with you` });
+      Object.assign(s, { status: "repaid", payout: out.batchId }); db.save();
+      record({ actor: { kind: "platform" }, who: [s.to, s.from], action: "organizer_repaid", ref: s.id, summary: `${name(s.from)} paid the settle-up invoice; sent ${name(s.to)} $${usd(s.amount)} with PayPal Payouts.` });
+    } catch (e) { s.error = e.message; db.save(); }
   }
 }
 

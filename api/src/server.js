@@ -151,6 +151,9 @@ app.get("/api/paypal/sdk", signedIn, async (req, res) => {
 });
 // a booking's AP2 mandates (checkout, each payment, Join's mandate receipts), for the people in it
 app.get("/api/bookings/:id/ap2", signedIn, (req, res) => { const b = settle.internal(req.params.id); if (!b || !b.players.includes(req.player)) return res.status(404).json({ error: "no such booking" }); res.json(ap2.forBooking(b.id)); });
+// balances with friends across plans, and settling up with one netted PayPal invoice
+app.get("/api/ledger", signedIn, (req, res) => res.json(settle.ledger(req.player)));
+app.post("/api/ledger/settle", signedIn, async (req, res) => { const r = await settle.settleUp(req.player, String(req.body?.friend || "")); res.status(r.error ? 400 : 200).json(r); });
 app.post("/api/bookings/:id/approved", signedIn, async (req, res) => { const r = await settle.approved(req.params.id, req.player); res.status(r?.error ? 400 : 200).json(r); });
 app.post("/api/vault", signedIn, async (req, res) => { try { res.json(await settle.vaultStart(req.player)); } catch (e) { res.status(502).json({ error: "paypal", message: e.message }); } });
 app.delete("/api/vault", signedIn, (req, res) => { setMandate(req.player, { autopay: false }); res.json(settle.vaultForget(req.player)); });

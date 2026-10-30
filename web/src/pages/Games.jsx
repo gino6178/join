@@ -19,6 +19,7 @@ export default function Games({ entries, me, query, demo }) {
     <div className="page">
       <header className="page-head"><h1>Plans</h1><p className="muted">Each deal your agent made, and how it is being paid.</p></header>
       {query.get("cancelled") && <p className="note warn">You left PayPal without approving. Your agent can send you the link again.</p>}
+      <Balances tick={entries.length + tick} done={() => setTick((t) => t + 1)} />
       {!g.data.bookings.length && <p className="empty card">No bookings yet.</p>}
       {g.data.bookings.map((b) => <Booking key={b.id} b={b} me={me.player.id} w={w} focus={b.id === focus} demo={demo} done={() => setTick((t) => t + 1)} />)}
       {g.data.negotiations.length > 0 && <>
@@ -81,6 +82,26 @@ function Negotiation({ n, w }) {
       <header><div><h3>{n.venueName}</h3><p className="muted">{n.activity} · {dayLabel(n.date)} {n.start} · {n.players.map((p) => firstName(w, p)).join(", ")}</p></div><span className={`pill ${n.status === "agreed" ? "good" : n.status === "open" ? "" : "warn"}`}>{n.status}{n.agreed ? ` at ${money(n.agreed.amount)}` : ""}</span></header>
       <Curve hist={hist} list={+n.list} max={max} />
       {n.discounts?.length > 0 && <p className="small muted">Discounts: {n.discounts.map((d) => `${d.kind} (${d.why})`).join(", ")}</p>}
+    </section>
+  );
+}
+
+// What friends owe each other across plans (only shares someone joined and didn't pay, which the organizer covered),
+// netted per friend, the fewest payments that would settle the whole group, and one PayPal invoice to settle up.
+function Balances({ tick, done }) {
+  const l = useApi("/api/ledger", tick), [msg, setMsg] = useState(null), [busy, setBusy] = useState(false);
+  if (!l.data || (!l.data.friends.length && !l.data.settlements.length)) return null;
+  const settle = async (friend) => { setBusy(true); try { const r = await api("/api/ledger/settle", { method: "POST", body: { friend } }); setMsg(`One PayPal invoice for ${money(r.amount)} covers ${r.plans} plan${r.plans > 1 ? "s" : ""}.`); done(); } catch (e) { setMsg(e.message); } setBusy(false); };
+  return (
+    <section className="card">
+      <h3><Icon name="card" size={18} />Balances with friends <small className="muted">across your plans, netted</small></h3>
+      {l.data.friends.map((f) => <div key={f.friend} className="need">
+        <span><b>{+f.owesYou > 0 ? `${f.name} owes you ${money(f.owesYou)}` : `You owe ${f.name} ${money(f.youOwe)}`}</b><small>shares someone joined and didn't pay, which the organizer covered; netted over your plans together</small></span>
+        {+f.owesYou > 0 && <button className="btn primary small" disabled={busy} onClick={() => settle(f.friend)}>Settle up: one invoice</button>}
+      </div>)}
+      {l.data.fewestPayments.length > 0 && <p className="small muted">For the whole group, {l.data.fewestPayments.length} payment{l.data.fewestPayments.length > 1 ? "s" : ""} would settle everything: {l.data.fewestPayments.map((t) => `${t.fromName} → ${t.toName} ${money(t.amount)}`).join(", ")}.</p>}
+      {l.data.settlements.map((s) => <p key={s.id} className="small"><Icon name="send" size={14} />Settle-up for {money(s.amount)} ({s.plans} plans): {s.status === "sent" ? <a href={s.url} target="_blank" rel="noreferrer">invoice sent</a> : s.status}</p>)}
+      {msg && <p className="small muted">{msg}</p>}
     </section>
   );
 }
