@@ -51,7 +51,7 @@ async function approve(url, who, check) {
 
 const alex = await agent("you", "Scripted agent");
 const me = await alex.call("whoami");
-say("Alex's agent", `acting for ${me.player.name}; limit $${me.mandate.perGame} a game (PayPal: ${me.paypal.mode})`);
+say("Alex's agent", `acting for ${me.player.name}; limit $${me.mandate.perGame} a booking (PayPal: ${me.paypal.mode})`);
 // Alex sets a limit on the website (a person's step: agents can't change it). For badminton it is tight, so the first
 // venue is over budget and the alternatives show; JOIN_BUDGET sets it in dollars for any plan.
 const BUDGET = +(process.env.JOIN_BUDGET || (ACTIVITY === "badminton" ? 8 : 40));
@@ -96,7 +96,8 @@ say("Venue", `deal: $${r.agreed.amount} ($${r.agreed.share} each)`);
 const booking = r.booking.id;
 let p = await alex.call("pay_my_share", { booking });
 say("Alex's agent", `Alex guarantees the whole booking: $${p.you.amount}`);
-await approve(p.you.approveUrl, "Alex", () => alex.call("booking_status", { booking }));
+if (p.you?.approveUrl) await approve(p.you.approveUrl, "Alex", () => alex.call("booking_status", { booking }));
+else say("Alex", `authorized (${p.you?.via})`);
 
 // everyone else in the plan: each one's own agent, with its own token
 const names = Object.fromEntries((await (await fetch(`${URL0}/api/world`)).json()).players.map((p) => [p.id, p.name.split(" ")[0]]));
@@ -117,6 +118,7 @@ for (const id of r.players.filter((p) => p !== "you")) {
   p = await a.call("pay_my_share", { booking: b.id });
   say(label, `pays the share: $${p.you?.amount}`);
   if (p.you?.approveUrl) await approve(p.you.approveUrl, names[id], () => a.call("booking_status", { booking }));
+  else say(names[id], `authorized (${p.you?.via})`);
   await a.close();
 }
 const s = await alex.call("booking_status", { booking });
