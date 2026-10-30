@@ -22,7 +22,7 @@
 // call instead of making a second one.
 import crypto from "node:crypto";
 import { store, stateFile } from "../store.js";
-import { setTaken, venue, player, freeUnits, unitName } from "../world.js";
+import { setTaken, venue, player, freeUnits, unitName, activity as getActivity } from "../world.js";
 // "room 3" (or "Room 3" to start a sentence)
 const place = (b, cap = false) => { const t = unitName(b.activity, b.unit); return cap ? t[0].toUpperCase() + t.slice(1) : t; };
 import { setOnAgreed, setSpent, internal as negotiation } from "../negotiate/engine.js";
@@ -32,6 +32,7 @@ import { getMandate, fits, coverFits } from "../mandate.js";
 import { record } from "../activity.js";
 import { startOf, toMin, hm } from "../time.js";
 import { usd } from "../negotiate/policy.js";
+import * as ap2 from "../proof/mandates.js";
 
 export const ORGANIZER_MS = 10 * 60e3;
 export const SHARES_MS = 20 * 60e3;
@@ -82,6 +83,8 @@ setOnAgreed((n) => {
   db.data.bookings.push(b); db.save();
   note(b, { kind: "venue", venue: b.venue }, "place_held", `${venue(b.venue).name} holds ${unitName(b.activity, unit)} for ${ORGANIZER_MS / 60e3} minutes while ${name(b.organizer)} authorizes $${usd(b.total)} with PayPal.`);
   serial(b.id, () => startPayment(b, b.organizer, b.total, "organizer")).catch(() => {});
+  // AP2: the agreed checkout and its Checkout Mandate, under the organizer agent's open mandates, with Join's receipt
+  ap2.issueCheckout(b, { venue: venue(b.venue), activity: getActivity(b.activity), organizerKid: n.agentKid || null, result: { ok: true } });
   return { id: b.id, state: b.state };
 });
 
@@ -98,6 +101,8 @@ async function startPayment(b, playerId, amount, role) {
   try {
     const o = await paypalStep(b, `order:${playerId}`, (rid) => pp.createOrder({ amount, reference: `${b.id}:${playerId}`, description, returnUrl: `${publicUrl}/paypal/return?booking=${b.id}&player=${playerId}`, cancelUrl: `${publicUrl}/paypal/cancel?booking=${b.id}&player=${playerId}`, vaultId: auto ? vault.tokenId : null, card, requestId: rid }));
     p.orderId = o.id; p.approveUrl = o.approveUrl;
+    // AP2: this payer's Payment Mandate for the checkout (the organizer's is the whole price, the guarantee)
+    ap2.issuePayment(b, playerId, { amount, venue: v, instrument: { id: auto ? vault.tokenId : o.id, type: auto ? "paypal.vault_token" : card ? "paypal.sandbox_card" : "paypal.order", description: p.via }, agentKid: auto ? "saved-paypal" : null, result: { ok: true } });
     if (o.authorization) { p.authorizationId = o.authorization.id; p.status = "authorized"; }
     else p.status = "awaiting_approval";
     db.save();
@@ -202,7 +207,7 @@ async function lock(b, reason) {
     return;
   }
   b.state = "locked"; b.lockedAt = at(); db.save();
-  receipts.issue(b, negotiation(b.negotiation), "locked");
+  receipts.issue(Object.assign(b, { ap2: ap2.hashesFor(b.id) }), negotiation(b.negotiation), "locked");
   const short = b.players.filter((pid) => pid !== b.organizer && b.payments[pid]?.status !== "captured");
   note(b, { kind: "platform" }, "locked", `${place(b, true)} at ${venue(b.venue).name} is locked: $${usd(b.total)} paid (${reason}).${short.length ? ` ${name(b.organizer)} covered ${short.map(name).join(", ")} ($${usd(rest - b.shares[b.organizer])}).` : ""}`);
 }
@@ -224,7 +229,7 @@ async function refundAll(b, why) {
     try { await paypalStep(b, `refund:${pid}`, (rid) => pp.refund(p.captureId, { amount, requestId: rid })); p.status = "refunded"; } catch (e) { p.error = e.message; }
   }
   b.state = "refunded"; db.save();
-  receipts.issue(b, negotiation(b.negotiation), "refunded");
+  receipts.issue(Object.assign(b, { ap2: ap2.hashesFor(b.id) }), negotiation(b.negotiation), "refunded");
   note(b, { kind: "platform" }, "refunded", why);
 }
 
@@ -268,7 +273,7 @@ async function payVenue(b) {
   try {
     const r = await paypalStep(b, "payout", () => pp.payout({ batchId: `join-${b.id}`, receiver: v.payee, amount: net, note: `Join: ${place(b)}, ${b.activity}, ${b.date} ${b.start}` }));
     b.payout = { batchId: r.batchId, status: "PENDING", amount: net, receiver: v.payee }; b.state = "venue_paid"; db.save();
-    receipts.issue(b, negotiation(b.negotiation), "venue_paid");
+    receipts.issue(Object.assign(b, { ap2: ap2.hashesFor(b.id) }), negotiation(b.negotiation), "venue_paid");
     note(b, { kind: "platform" }, "venue_paid", `Sent ${v.name} $${usd(net)} with PayPal Payouts (the $${usd(b.total)} paid, less PayPal's fees).`);
   } catch (e) { b.payout = null; journal(b, "payout", "will_retry"); }
 }
@@ -495,7 +500,7 @@ async function defend(b, disputeId, payerId, by) {
   const how = !p ? "" : p.via === "vault" ? ` The disputed payment was made from the payer's saved PayPal by their own agent, within limits only the payer can set on Join (at most $${usd(m.perGame)} a booking, $${usd(m.perWeek)} a week); authorization ${p.authorizationId}, capture ${p.captureId}.`
     : ` The payer approved the disputed payment themselves in PayPal (order ${p.orderId}, authorization ${p.authorizationId}, capture ${p.captureId}).`;
   const notes = `Join booking ${b.id}: ${b.activity} at ${venue(b.venue).name}, ${b.date} ${b.start}, ${place(b)}, $${usd(b.total)} for ${b.players.length} people, locked ${b.lockedAt || ""}.${how} The attached receipt is signed by Join (Ed25519, key ${r.kid}) and lists the negotiation and every payment with its PayPal ids; it is in Join's audit log as entry #${r.batch?.log ?? "(next batch)"}. Verify it at ${publicUrl}/#/receipt/${rid}.`;
-  await pp.provideEvidence(disputeId, { notes, file: JSON.stringify(r) });
+  await pp.provideEvidence(disputeId, { notes: `${notes} The AP2 mandates (checkout, and each payment with Join's mandate receipt) are attached alongside the receipt.`, file: JSON.stringify({ receipt: r, ap2: ap2.forBooking(b.id) }) });
   (b.disputes ||= {})[disputeId] = { ...(b.disputes?.[disputeId] || {}), status: "evidence_sent", receipt: rid, by, at: at() }; db.save();
   record({ actor: by === "join" ? { kind: "platform" } : { kind: "venue", venue: b.venue }, who: [...b.players], action: "dispute_answered", ref: b.id,
     summary: `${by === "join" ? "Join" : venue(b.venue).name} answered PayPal dispute ${disputeId} with the booking's signed receipt${p ? ` and how ${name(payerId)}'s payment was approved` : ""}.` });

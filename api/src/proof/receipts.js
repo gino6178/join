@@ -40,6 +40,9 @@ function signingKey() {
 let key = null;
 const keys = () => (key ||= signingKey());
 export const publicKey = () => keys().pub;
+// (the same key signs AP2 mandates, mandates.js; it never leaves the server)
+export const signBytes = (buf) => crypto.sign(null, buf, keys().priv);
+export const verifyBytes = (buf, sig) => { try { return crypto.verify(null, buf, crypto.createPublicKey({ key: keys().pub, format: "jwk" }), sig); } catch { return false; } };
 
 const salted = (salt, id) => sha256(`${salt}:${id}`);
 
@@ -57,6 +60,7 @@ export function issue(b, n, event) {
       paypal: { order: p.orderId || null, authorization: p.authorizationId || null, capture: p.captureId || null } }; }),
     payout: b.payout ? { amount: b.payout.amount, batch: b.payout.batchId, status: b.payout.item || b.payout.status } : null,
     paypalMode: b.paypalMode || null,
+    ap2: b.ap2 || null, // hashes of the AP2 checkout and payment mandates (mandates.js)
   };
   const hash = sha256(canonical(body));
   const signature = crypto.sign(null, Buffer.from(hash, "hex"), keys().priv).toString("base64url");

@@ -19,6 +19,7 @@ import { getWorld, player, venue, setPolicy } from "./world.js";
 import { usd } from "./negotiate/policy.js";
 import * as receipts from "./proof/receipts.js";
 import * as scout from "./scout/understand.js";
+import * as ap2 from "./proof/mandates.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 // a small .env reader, so the server needs no package for it
@@ -30,6 +31,7 @@ const DEMO = process.env.DEMO_SIGNIN !== "0";
 const real = process.env.PAYPAL_CLIENT_ID && process.env.PAYPAL_CLIENT_SECRET && process.env.PAYPAL_MODE !== "mock";
 const pp = real ? paypal({ clientId: process.env.PAYPAL_CLIENT_ID, secret: process.env.PAYPAL_CLIENT_SECRET, testCard: process.env.PAYPAL_TEST_CARD === "1" }) : mockPaypal({ publicUrl: PUBLIC_URL });
 settle.configure({ paypal: pp, url: PUBLIC_URL });
+ap2.setIssuer(PUBLIC_URL);
 // the back office's PayPal Agent Toolkit uses the same app (or, without keys, the stand-in's records)
 configureToolkit(real ? { token: () => pp.accessToken() } : { standIn: (m, a) => pp.toolkit(m, a) });
 // PayPal's webhooks: Join subscribes itself when it has a public HTTPS address (PayPal only delivers to port 443)
@@ -136,13 +138,15 @@ app.post("/api/scout/:tool", limit("agent", +(process.env.AGENT_RPM || 120)), si
   if (!SCOUT.includes(req.params.tool)) return res.status(404).json({ error: "unknown_tool", tools: SCOUT });
   const model = String(req.body?._model || "rules") === "rules" ? "rules" : scout.MODEL;
   const { _model, ...args } = req.body || {};
-  try { const r = await TOOLS[req.params.tool]({ player: req.player, client: `Join website agent (${model})` }, args); res.status(r?.error ? 400 : 200).json(r); } catch (e) { console.error(e); res.status(500).json({ error: "internal" }); }
+  try { const r = await TOOLS[req.params.tool]({ player: req.player, client: `Join website agent (${model})`, token: "website-agent" }, args); res.status(r?.error ? 400 : 200).json(r); } catch (e) { console.error(e); res.status(500).json({ error: "internal" }); }
 });
 // the JS SDK v6 on the website: a browser-safe token, and the payer's own approval coming back from the PayPal popup
 app.get("/api/paypal/sdk", signedIn, async (req, res) => {
   if (!pp.clientToken) return res.json({ mode: pp.mode, token: null });
   try { res.json({ mode: pp.mode, ...(await pp.clientToken()) }); } catch (e) { res.status(502).json({ error: "paypal", message: e.message }); }
 });
+// a booking's AP2 mandates (checkout, each payment, Join's mandate receipts), for the people in it
+app.get("/api/bookings/:id/ap2", signedIn, (req, res) => { const b = settle.internal(req.params.id); if (!b || !b.players.includes(req.player)) return res.status(404).json({ error: "no such booking" }); res.json(ap2.forBooking(b.id)); });
 app.post("/api/bookings/:id/approved", signedIn, async (req, res) => { const r = await settle.approved(req.params.id, req.player); res.status(r?.error ? 400 : 200).json(r); });
 app.post("/api/vault", signedIn, async (req, res) => { try { res.json(await settle.vaultStart(req.player)); } catch (e) { res.status(502).json({ error: "paypal", message: e.message }); } });
 app.delete("/api/vault", signedIn, (req, res) => { setMandate(req.player, { autopay: false }); res.json(settle.vaultForget(req.player)); });

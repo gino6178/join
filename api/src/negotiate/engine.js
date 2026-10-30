@@ -62,7 +62,7 @@ function expireIfDue(n) {
   return n;
 }
 
-export function open({ by, players = [], venue: venueId, activity, date, start, minutes = 90 }) {
+export function open({ by, players = [], venue: venueId, activity, date, start, minutes = 90, agentKid = null }) {
   const now = clock(), v = venue(venueId), org = player(by);
   if (!org) return err("unknown_player", "No such player.");
   if (!v) return err("unknown_venue", "No such venue.");
@@ -86,7 +86,7 @@ export function open({ by, players = [], venue: venueId, activity, date, start, 
   const n = {
     id: `neg_${crypto.randomBytes(6).toString("hex")}`, by, players: ids, venue: v.id, activity, date, start, minutes,
     list: q.list, ask0: q.ask, ask: q.ask, floor: q.floor, style: q.style, rounds: q.rounds, round: 0, steps: 0, final: q.style === "firm",
-    discounts: q.discounts, status: "open", openedDay: day, expiresAt: now.getTime() + TTL_MS,
+    discounts: q.discounts, status: "open", openedDay: day, expiresAt: now.getTime() + TTL_MS, agentKid,
     history: [{ at: now.toISOString(), by: "venue", type: "ask", amount: q.ask }],
   };
   db.data.negotiations.push(n); db.save();

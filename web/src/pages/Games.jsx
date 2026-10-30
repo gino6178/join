@@ -52,6 +52,7 @@ function Booking({ b, me, w, focus, demo, done }) {
           {me === b.organizer && <span className="need-btns"><button className="btn ghost" disabled={!!busy} onClick={() => act("answer-share", { player: x.player, accept: false })}>Keep it</button><button className="btn primary" disabled={!!busy} onClick={() => act("answer-share", { player: x.player, accept: true })}>Agree</button></span>}
         </div>))}
       {b.invite && !(b.shareAsks || []).some((x) => x.status === "pending") && <AskLess onAsk={(amount) => act("propose-share", { amount })} share={b.invite.share} busy={!!busy} />}
+      <Mandates id={b.id} />
       {b.receipts?.length > 0 && <p className="small"><Icon name="verify" size={14} />Receipts: {b.receipts.map((x) => <a key={x.id} href={`#/receipt/${x.id}`}>{x.event.replace("_", " ")}</a>).reduce((a, x) => [...a, a.length ? " · " : "", x], [])}</p>}
       {(b.extras || []).map((x, i) => <p key={i} className="small"><Icon name="store" size={14} />{b.venueName} billed extras ({x.items.join(", ")}): {money(x.total)}, {x.status === "paid" ? "paid" : "waiting to be paid"}{x.url && <> · <a href={x.url} target="_blank" rel="noreferrer">pay the PayPal invoice</a></>}</p>)}
       {(b.reimbursements || []).map((r) => <p key={r.player} className="small"><Icon name="send" size={14} />{r.player === me ? "You" : firstName(w, r.player)}: PayPal invoice for {money(r.amount)}, {r.status === "sent" ? "waiting to be paid" : r.status === "repaid" ? `paid; ${firstName(w, b.organizer)} was paid back with PayPal Payouts` : r.status.replace(/_/g, " ")}</p>)}
@@ -111,6 +112,25 @@ function Curve({ hist, list, max }) {
       </svg>
       <figcaption className="small muted"><span className="key ask" /> venue's ask <span className="key offer" /> your agent's offer · the venue's floor is never shown</figcaption>
     </figure>
+  );
+}
+
+// The booking's AP2 mandates (Agent Payments Protocol): the checkout the agents agreed, each payer's payment mandate for
+// it, and Join's signed receipts, decoded. Each is a JWS signed with Join's published key.
+function Mandates({ id }) {
+  const [m, setM] = useState(null), [open, setOpen] = useState(false);
+  const load = async () => { setOpen(!open); if (!m) setM(await api(`/api/bookings/${id}/ap2`).catch(() => ({}))); };
+  const short = (x) => (x?.payload ? { vct: x.payload.vct, ...Object.fromEntries(Object.entries(x.payload).filter(([k]) => !["iss", "iat", "exp", "vct", "checkout_jwt"].includes(k))) } : null);
+  return (
+    <div className="ap2">
+      <button className="link-btn small" onClick={load}><Icon name="verify" size={14} />AP2 mandates {open ? "▾" : "▸"}</button>
+      {open && m && (m.checkoutMandate ? <div className="ap2-body">
+        <p className="small muted">Signed by Join (Ed25519, the key at /.well-known/join-receipts.json) as the agent provider, in AP2's schema. The payments refer to the checkout by its hash.</p>
+        <b className="small">Checkout <code>{m.checkout_hash.slice(0, 16)}…</code></b><pre>{JSON.stringify(m.checkout.payload, null, 1)}</pre>
+        {m.open && <><b className="small">Open payment mandate the agent worked under</b><pre>{JSON.stringify(short(m.open.payment), null, 1)}</pre></>}
+        {Object.entries(m.payments).map(([pid, x]) => <div key={pid}><b className="small">Payment mandate: {pid} · receipt {x.receipt?.payload?.result}</b><pre>{JSON.stringify(short(x.mandate), null, 1)}</pre></div>)}
+      </div> : <p className="small muted">No AP2 mandates for this booking.</p>)}
+    </div>
   );
 }
 
