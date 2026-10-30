@@ -87,7 +87,7 @@ function Negotiation({ n, w }) {
     <section className="card nego">
       <header><div><h3>{n.venueName}</h3><p className="muted">{n.activity} · {dayLabel(n.date)} {n.start} · {n.players.map((p) => firstName(w, p)).join(", ")}</p></div><span className={`pill ${n.status === "agreed" ? "good" : n.status === "open" ? "" : "warn"}`}>{n.status}{n.agreed ? ` at ${money(n.agreed.amount)}` : ""}</span></header>
       <Curve hist={hist} list={+n.list} max={max} />
-      {n.discounts?.length > 0 && <p className="small muted">Discounts: {n.discounts.map((d) => `${d.kind} (${d.why})`).join(", ")}</p>}
+      {n.discounts?.length > 0 && <p className="small muted">Discounts: {n.discounts.map((d) => `${d.kind}: ${d.why}`).join(", ")}</p>}
     </section>
   );
 }
@@ -120,10 +120,10 @@ function Curve({ hist, list, max }) {
   const asks = [], offers = [];
   let round = 0, lastAsk = null;
   for (const h of hist) {
-    if (h.by === "organizer") { offers.push({ round, amount: +h.amount, low: lastAsk != null && +h.amount < lastAsk * 0.7, accept: h.type === "accept" }); round++; }
+    if (h.by === "organizer") { offers.push({ round, amount: +h.amount, low: lastAsk != null && +h.amount < lastAsk * 0.7, accept: h.type === "accept" }); if (h.type !== "accept") round++; }
     else { asks.push({ round, amount: +h.amount, final: h.type === "final" }); lastAsk = +h.amount; }
   }
-  const rounds = Math.max(1, round), lo = Math.min(...hist.map((h) => +h.amount)) * 0.9;
+  const rounds = Math.max(1, Math.max(...asks.map((p) => p.round), ...offers.map((p) => p.round))), lo = Math.min(...hist.map((h) => +h.amount)) * 0.9;
   const x = (r) => L + (r / rounds) * (W - L - R), y = (v) => T + (1 - (v - lo) / (max - lo || 1)) * (H - T - B);
   const path = (pts) => pts.map((p, i) => `${i ? "L" : "M"}${x(p.round)},${y(p.amount)}`).join(" ");
   return (
@@ -135,7 +135,7 @@ function Curve({ hist, list, max }) {
         <path d={path(offers)} className="offer" />
         {asks.map((p, i) => <circle key={`a${i}`} cx={x(p.round)} cy={y(p.amount)} r={p.final ? 5.5 : 4} className={`ask ${p.final ? "final" : ""}`}><title>venue ${p.amount.toFixed(2)}{p.final ? " (best and final)" : ""}</title></circle>)}
         {offers.map((p, i) => <g key={`o${i}`}><circle cx={x(p.round)} cy={y(p.amount)} r={4} className={`offer ${p.low ? "low" : ""}`}><title>offer ${p.amount.toFixed(2)}</title></circle>{p.low && <text x={x(p.round) + 7} y={y(p.amount) + 4} className="lowtxt">lowball: venue didn't move</text>}</g>)}
-        {Array.from({ length: rounds + 1 }, (_, r) => <text key={r} x={x(r)} y={H - 8} textAnchor="middle">{r === 0 ? "ask" : `round ${r}`}</text>)}
+        {Array.from({ length: rounds + 1 }, (_, r) => <text key={r} x={x(r)} y={H - 8} textAnchor={r === 0 ? "start" : r === rounds ? "end" : "middle"}>{r === 0 ? "ask" : `round ${r}`}</text>)}
       </svg>
       <figcaption className="small muted"><span className="key ask" /> venue's ask <span className="key offer" /> your agent's offer · the venue's floor is never shown</figcaption>
     </figure>

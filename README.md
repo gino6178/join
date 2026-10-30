@@ -15,7 +15,7 @@ Join holds no AI key, and nothing is sent to an AI service.
 
 PayPal AI Hackathon 2026 · MIT license
 
-![What the agents did](docs/screenshots/1-activity.png)
+![Join's website agent: three options with verified reviews](docs/screenshots/01-agent.png)
 
 **For judges:** `npm run setup`, `npm start`, open http://localhost:8790/demo?as=you, then `npm run demo` in another
 terminal. No keys needed. How Join maps to each judging criterion (Technological Implementation, Design, Potential

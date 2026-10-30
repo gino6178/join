@@ -1,6 +1,7 @@
 // Join's server: the MCP endpoint and the REST API for players' agents, the website's API for people, PayPal's return
 // URLs and webhooks, the venue's A2A endpoint, and the built website. Configure with environment variables
 // (api/.env.example). Without PayPal keys it runs against the PayPal stand-in (pay/mock.js) and says so everywhere.
+import "./tz.js"; // (first: the process runs on the town's clock)
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";

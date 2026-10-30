@@ -23,10 +23,25 @@ Your AI agent gets the group together: finds who's free, haggles with the venue,
 
 ## Image gallery
 
-Upload in this order, from `docs/screenshots/`:
+Upload in this order, from `docs/screenshots/`. All from one plan on the PayPal sandbox: Hana, who has no agent of her
+own, plans karaoke for four with Join's website agent.
 
 | File | Caption |
 |---|---|
+| `01-agent.png` | No agent? Join's own: three options for "karaoke saturday night, 4 of us, $15 each", ranked by trip, price and verified reviews |
+| `02-haggle.png` | It states the terms, haggles $32.40 down to $23.40, and PayPal authorizes Hana's guarantee |
+| `03-friends.png` | Friends' shares: Tomás asks to pay $1 less and Hana decides; nobody can hold the room for free |
+| `04-locked.png` | Everyone paid: each share captured in PayPal, Hana's guarantee only for her own share and the $1 |
+| `05-curve.png` | The negotiation: the venue's asks step down its own schedule; its floor is never shown |
+| `06-venue-bryntum.png` | What the venue sees on Bryntum Scheduler: the room solid once everyone has paid |
+| `07-venue-money.png` | What Join brought the venue, counted from its bookings; paid out with PayPal Payouts after each game |
+| `08-receipt.png` | The booking's receipt, checked in the browser: signature, Merkle proof, transparency log |
+| `09-activity.png` | Every step every agent took, in sentences Join writes from the facts |
+| `10-limits.png` | Limits only Hana can set; Join refuses anything over them |
+| `11-connect.png` | Or bring your own agent: Claude, any MCP or A2A agent, with scoped tokens |
+| `12-start.png` | Where a new person starts |
+
+---|---|
 | `1-activity.png` | Every step the agents took, live: search, offers and counters, the guarantee, invitations, asks to pay less, payments |
 | `2-plans.png` | A booking's payments: each share, how it was paid, the stepper from deal to venue paid |
 | `3-map.png` | The town map: venues, free public places, the fairest venue and everyone's trip |
