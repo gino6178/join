@@ -34,7 +34,7 @@ keys needed; PayPal is simulated and says so). In another terminal, `npm run dem
 - **A settlement state machine** (`awaiting_organizer → held → locked → played → venue_paid`, or released / cancelled /
   refunded), driven by return URLs, polling and webhooks, any of which is enough, with a per-booking lock so two
   signals never race (`settle.js`).
-- **Agents use the same 17 tools three ways:** MCP (Streamable HTTP), REST and A2A with an Agent Card
+- **Agents use the same 18 tools three ways:** MCP (Streamable HTTP), REST and A2A with an Agent Card
   (`api/src/mcp.js`, `api/src/a2a.js`). Tool descriptions are written for the model that reads them.
 - **Limits enforced in code before a venue sees an offer** (`api/src/mandate.js`, `negotiate/engine.js`): spending
   (your share per booking and per week, counting what you covered for friends) and guaranteeing (how much your agent

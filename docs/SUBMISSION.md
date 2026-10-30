@@ -42,124 +42,85 @@ Upload in this order, from `docs/screenshots/`:
 ### Inspiration
 
 AI agents can already find a free time and a few friends. Then they stop. Someone still has to call the venue, agree a
-price, front the money and chase three people for their share. That last mile, the money, is where group plans die:
-the badminton game, the karaoke night, the escape room, the barbecue. It's also the part nobody should hand to an agent
-without limits and a way to check what it did.
+price, front the money and chase three people for their share. The money is where group plans die, and it's the part
+nobody should hand to an agent without limits and a way to check what it did.
 
 ### What it does
 
-Join is an agent-ready marketplace for getting a group together: sports courts, karaoke rooms, escape rooms, board game
-tables, barbecue pits, dinner tables. People bring their own agents (Claude, or any MCP or A2A agent), and Join
-supplies the rules and the money. Someone without an agent uses Join's own, on the website.
+Join is a marketplace where agents get a group together and PayPal settles it. One plan, start to finish:
 
-- **Find a plan.** Who's free, and the fairest venue for each time: the one where the longest trip in the group is
-  shortest.
-- **Negotiate with the venue.** Each venue sets its own rules on Join: list price, off-peak, group and last-minute
-  discounts, how far it comes down, and a floor that's never revealed. Agents offer and counter; a lowball doesn't move
-  the venue, and its last counter is best and final.
-- **Over budget? Alternatives from the map.** When a price is over a person's limit or the venue says no, the answer
-  comes with other venues and free public places nearby, ranked by budget, time and trip.
-- **Split it, negotiate it, pay it with PayPal.**
-  - The organizer guarantees the whole booking with a PayPal authorization, so nobody can hold a room for free.
-  - Friends' agents are invited; they join, decline, or ask to pay less, and the organizer's agent answers.
-  - Each person pays their own share with PayPal, in a popup on the page or from saved PayPal within their limits.
-  - When everyone has paid, the booking is locked and the venue is paid afterwards with Payouts.
-- **Loose ends, settled with PayPal.** Someone who said yes but never paid gets a PayPal invoice, and the organizer is
-  paid back with Payouts. A venue bills extras like overtime with an invoice, reconciles against PayPal's records, and
-  sees what Join brought in, counted from its bookings. When a payment is disputed, Join answers PayPal by itself at
-  once, with the signed receipt and how that payer approved the payment.
-- **No agent? Use Join's.** A drawer on the website asks what you want ("karaoke Friday night, 4 of us, $15 each",
-  or the same in Chinese), shows three options with reasons, haggles and accepts as you under your limits, then hands
-  you the PayPal button. It understands people on Join's own server: rules, plus Qwen2.5 0.5B (Ollama) for
-  free-form sentences like "好冷 想吃熱呼呼的鍋". Nothing to download, no AI key, no AI service.
-- **Recommends with verified reviews.** Only people who booked and paid can review; the agent weighs a
-  recency-weighted Bayesian score and counted praise and complaints, learns what each person cares about from their own
-  past reviews, and steers away from a venue anyone in the group rated badly. Agents read reviews, never write them.
-- **Shops for you.** The website agent haggles with the venue you picked and up to two others free at the same time,
-  then lets you book the cheapest.
-- **Balances with friends.** Across plans, what friends owe each other is netted, and one PayPal invoice settles it.
-- **See every step.** The website shows each person what the agents did, in words Join writes from the facts: every
-  search, offer, counter, invitation and payment.
-- **Limits only people can set.** What you spend (your share per booking, per week) and what your agent may
-  guarantee for a group on its own are separate limits, set on the website; agent tokens can read them, never change
-  them. Before an organizer's agent accepts, it is told (and tells them) what the guarantee means: the whole price
-  until friends pay, their own share unless someone doesn't, and at most the whole price.
+1. **Hana asks.** "Karaoke Saturday night, 4 of us, $15 each": to her own agent (Claude, or any MCP or A2A agent), or
+   to Join's agent on the website if she has none. Join finds who's free, the fairest venue (shortest longest trip),
+   and ranks options with verified reviews from people who paid, steering away from places someone in the group
+   rated badly.
+2. **The agent haggles.** Each venue sets its own rules: discounts, how far it comes down, a floor it never reveals.
+   Lowballs don't move it; the last counter is best and final.
+3. **PayPal makes it binding.** Hana guarantees the whole booking with a PayPal authorization, so nobody holds a room
+   for free. Each friend pays their own share in PayPal (a popup, or saved PayPal within their limits). When the last
+   share is in, the booking locks; anyone who didn't pay is covered by Hana's guarantee and gets a PayPal invoice.
+4. **The venue gets paid after the game,** with PayPal Payouts. If a payer disputes, Join answers PayPal at once with
+   a signed receipt and how that payer approved.
+5. **Hana can check every step.** The Activity page shows what every agent did, in sentences Join writes from the facts
+   (no model writes them). Each booking's receipt is signed and logged in a witnessed transparency log, and checks in
+   the browser.
+
+Throughout, **limits only people can set** (per booking, per week, how much their agent may guarantee for a group) are
+enforced on Join's server. Agents carry a signed mandate saying what they may pay, and Join refuses anything outside it.
+
+**Why not just Venmo?** Venmo moves money after a plan exists. Join makes the plan binding: the venue isn't held for
+free, no-shows are billed automatically, and an agent can do the haggling and paying inside limits you set.
 
 ### How we built it
 
-- **PayPal**, run on the sandbox unless noted:
-  - JS SDK v6 (a browser-safe client token, PayPal button in a popup; Pay Later and Venmo where PayPal says the payer is
-    eligible).
-  - Orders v2 with intent `AUTHORIZE`, one order per payer.
-  - Authorizations captured with `final_capture` (partial for the organizer); voids; refunds.
-  - Payouts to the venue after the booking, and to an organizer who was paid back.
-  - Vault v3: a person saves PayPal once and their agent pays within their limits.
-  - Invoicing v2: paying the organizer back, and venues' extras.
-  - The **PayPal Agent Toolkit** as Join's back office for venues: `list_transactions` (reconciliation, with the Captures
-    API when reporting lags), `create_invoice` / `send_invoice` / `get_invoice`, `list_disputes`.
-  - Disputes `provide-evidence` with the signed receipt (built and tested against a stand-in).
-  - Webhooks: Join subscribes itself to 14 events when it has a public HTTPS address (built and tested against a
-    stand-in); every event is verified with `verify-webhook-signature`.
-  - Every PayPal POST is journaled first and carries a `PayPal-Request-Id`, so a step retried after a crash is the same
-    call.
-- **Agents:** an MCP server (Streamable HTTP) with 17 tools, the same tools over REST, and an A2A endpoint with an Agent Card. Tool
-  descriptions are written for the model that reads them. The person's mandate follows the shape of the Agent Payments
-  Protocol's Intent Mandate.
-- **AI:**
-  - Claude is the person's agent: Claude Code over MCP, and a Claude API agent that bridges Join's MCP tools into tool
-    use.
-  - A venue's Claude agent loads the PayPal Agent Toolkit as an in-process MCP server.
-  - We tested Join with Claude Sonnet agents playing four friends and a venue operator on the PayPal sandbox. They chose
-    karaoke, haggled, split, paid and reconciled on their own. They also tried a dozen ways to misuse the tools, and Join
-    refused every one. Their criticism became fixes: lowballs no longer move the venue, extras can't be billed twice, and
-    replies say plainly what happened.
-- **Bryntum Scheduler** shows a venue its courts and rooms, with payments driving the schedule.
-- **Receipts:** Ed25519-signed and batched in SHA-256 Merkle trees; anyone can check one in the browser or with a
-  script that shares no code with Join.
-- **Join's website agent:** a rules reader for days, times, group size and budget (English and Chinese), and
-  Qwen2.5 0.5B on Join's own server through Ollama for the one thing rules are bad at: which activity a free-form
-  sentence means. Its answer is held to a JSON schema and used only when the rules found none. It calls the same tools
-  as any agent.
-- **Receipts without a blockchain:** each batch of receipts is an entry in an RFC 6962 transparency log with signed
-  C2SP checkpoints that independent witnesses cosign after checking consistency; the browser checks a receipt, its
-  inclusion and the checkpoint.
-- **AP2:** Join signs the Agent Payments Protocol's open checkout and payment mandates for each agent, and the checkout
-  and payment mandates of every deal, in AP2's JSON schemas; they go into receipts and dispute evidence.
-- **Agents, safely:** scoped, expiring tokens, optionally tied to a key so every request is signed (RFC 9421, as in Web
-  Bot Auth); a published fingerprint of the MCP tool descriptions; and WebMCP tools for a browser's own agent.
-- **Negotiation, measured:** a benchmark of six buyer strategies against every venue's rules (docs/NEGOTIATION.md);
-  the website agent uses the best one and shops across venues.
-- Node, Express, React, Vite. 47 automated tests, including an end-to-end run of four agents over MCP.
+- **PayPal sandbox, end to end:** JS SDK v6; Orders v2 with `AUTHORIZE`, partial `final_capture`, voids and refunds;
+  Payouts to venues; Vault v3 for agents paying within limits; Invoicing v2; Disputes `provide-evidence`; the **PayPal
+  Agent Toolkit** as the venue's back office (reconciliation, invoices, disputes). Every POST is journaled with a
+  `PayPal-Request-Id`, so a retry after a crash is the same call.
+- **Agents:** an MCP server (18 tools), the same tools over REST, A2A with an Agent Card, and WebMCP for a browser's
+  own agent. Scoped, expiring tokens, optionally bound to a key (RFC 9421 signed requests).
+- **Tested with real LLM agents:** Claude Sonnet agents planned and paid for a game over MCP on the sandbox, and four
+  more bargained with different briefs, including a prompt-injected one that tried to ignore limits; nothing got
+  through ([agent-run.md](https://github.com/gino6178/join/blob/main/docs/agent-run.md)). What confused them became fixes.
+- **Join's website agent** for people without one: rules plus Qwen2.5 0.5B on Join's own server (Ollama), English and
+  Chinese. No AI key, no AI service.
+- **Bryntum Scheduler** shows the venue its courts and rooms; a booking turns from dashed to solid when everyone has paid.
+
+### Under the hood
+
+- **AP2 mandates:** Join signs the Agent Payments Protocol's open checkout and payment mandates for each agent and
+  checks them on every offer, accept and payment; the mandates of each deal go into its receipt and dispute evidence.
+- **Receipts without a blockchain:** Ed25519-signed, batched in Merkle trees, each batch an entry in an RFC 6962
+  transparency log with C2SP checkpoints that independent witnesses cosign.
+- **Negotiation, measured:** six buyer strategies benchmarked against every venue's rules
+  ([NEGOTIATION.md](https://github.com/gino6178/join/blob/main/docs/NEGOTIATION.md)); the website agent uses the best.
+- **Reviews:** verified only, Bayesian and recency-weighted, with each person's own tastes; agents read them, never
+  write them.
+- Node, Express, React, Vite; 47 automated tests, including an end-to-end run of four agents over MCP.
 
 ### Challenges we ran into
 
-- **A deal between agents is only binding if money backs it.** Without a saved payment method every payer approves in
-  PayPal, so "accept" alone could hold a room for free. The organizer authorizes the whole booking first and covers
-  anyone who doesn't pay.
-- **A floor price that answers yes or no can be found by binary search.** Venues answer with a concession schedule
-  instead, and a lowball doesn't move it. One of our own test agents found the first version rewarded three $1 offers.
-- **Marketplace settlement.** PayPal's multiparty model (the venue as `payee`, Join's fee as `platform_fees`) is the
-  production path, but partner onboarding is gated. A payout also can't be pulled back. So Join captures each share,
-  keeps cancellations refundable until 24 hours before, and pays the venue with Payouts afterwards.
+- **A deal between agents is only binding if money backs it.** Hence the organizer's authorization before anyone else
+  pays.
+- **A floor that answers yes or no can be found by binary search.** Venues answer with a concession schedule instead;
+  one of our own test agents broke the first version with three $1 offers.
+- **Marketplace settlement.** PayPal's multiparty flow needs partner onboarding, and a payout can't be pulled back, so
+  Join captures each share, keeps cancellations refundable until 24 hours before, and pays the venue afterwards.
 
 ### Accomplishments that we're proud of
 
-- **AI agents ran the whole flow on the real PayPal sandbox.** Four AI agents went from nothing but a sentence to a
-  locked booking: picking the activity, haggling, an invitee asking to pay less, the guarantee, four captured shares,
-  and a signed receipt.
-- **Nothing on the activity page is written by a model.** Every line comes from the facts.
+- LLM agents went from a sentence to a locked, paid booking on the PayPal sandbox, and its receipt verifies with a
+  script that shares no code with Join.
+- Nothing on the Activity page is written by a model.
 
 ### What we learned
 
 The hard part of agentic commerce isn't the agent. It's the rules around it: who can commit whom to what, when a
-promise becomes binding, and how a person can check afterwards what happened.
+promise becomes binding, and how a person checks afterwards what happened.
 
 ### What's next
 
-- Real venues' booking systems behind the venue adapter.
-- Venues bringing their own agents over A2A.
-- Multiparty settlement with Partner Referrals.
-- Payer approval through the Agent Payments Protocol once PayPal's support for it is available.
+Real venues' booking systems behind the venue adapter; venues bringing their own agents over A2A; multiparty settlement
+with Partner Referrals; payer approval through AP2 once PayPal supports it.
 
 ## Built with
 

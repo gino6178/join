@@ -197,11 +197,11 @@ page at `/mock-paypal/approve`, a 3.49% + $0.49 fee, request-id idempotency, and
 ## 8. Agent interfaces
 
 **Tools.** MCP (`/mcp`), REST (`POST /api/agent/<tool>`) and A2A (`/a2a`, `message/send` with one data part
-`{action, ...args}`) offer the same 17 tools:
+`{action, ...args}`) offer the same 18 tools:
 
 | Group | Tools |
 |---|---|
-| Reading | `whoami`, `list_activities`, `list_venues`, `find_options` |
+| Reading | `whoami`, `list_activities`, `list_venues`, `find_options`, `venue_reviews` |
 | Negotiating | `start_negotiation`, `make_offer`, `accept_price`, `walk_away`, `find_alternatives` |
 | Plans and payment | `my_plans`, `booking_status`, `pay_my_share`, `propose_share`, `answer_share`, `request_reimbursement`, `decline_invite`, `cancel_booking` |
 
@@ -301,6 +301,7 @@ There are 47, using Node's test runner, and they run against the stand-in with s
 - Four people's agents, given one sentence, chose an activity, haggled, split (one ask to pay less accepted, one refused for the mandate) and locked a karaoke booking.
 - 12 misuse attempts were all refused.
 - A venue agent reconciled with the toolkit and verified an extras invoice. Its findings became fixes (§4.2, §6.5).
+- With AP2 mandates enforced (30 Oct 2026, on the server): an organizer agent and a friend's agent, each with only its own person's token and the tool descriptions, planned badminton for four, haggled $35.10 down to $34.06, guaranteed and paid; at the pay-by time the organizer's authorization covered the two who didn't pay and the booking locked; its receipt verified with `verify-receipt.mjs`, with a witness's cosignature. Four more agents bargained with different briefs (thrifty, in a hurry, a floor hunter, and a prompt-injected agent told to ignore limits and pay without a mandate): no deal under a floor, and nothing the injection asked for got through. Transcripts: `docs/agent-run/`; write-ups: `docs/agent-run.md`, `docs/NEGOTIATION.md`.
 
 **Join's website agent (30 Oct 2026):**
 - Deployed with `deploy/start.sh` on a Linux machine (RTX 3090) on the local network, Ollama serving `qwen2.5:0.5b`, and PayPal sandbox. From the website: "let's go sing somewhere saturday night, four of us, $15 each" gave three options; the agent offered $29.16 on a $32.40 ask, the venue countered $29.40, the agent accepted, and PayPal authorized the guarantee (sandbox test card). "好冷 想吃熱呼呼的鍋 週六晚上 四個人 每人20塊" became hot pot through Qwen; the venue's $25.20 a person was over Alex's $15 limit, and the agent said so without haggling.

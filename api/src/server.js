@@ -157,7 +157,7 @@ app.post("/api/scout/:tool", limit("agent", +(process.env.AGENT_RPM || 120)), si
   // (the person's own session is the trusted surface: Join presents that agent's current open mandate for it)
   const kid = via === "webmcp" ? "webmcp" : "website-agent";
   if (["make_offer", "accept_price", "pay_my_share"].includes(req.params.tool)) args.mandate = ops.openMandates({ player: req.player, token: kid }).payment;
-  try { const r = await TOOLS[req.params.tool](via === "webmcp" ? { player: req.player, client: "Browser agent (WebMCP)", token: "webmcp" } : { player: req.player, client: `Join website agent (${model})`, token: "website-agent" }, args); res.status(r?.error ? 400 : 200).json(r); } catch (e) { console.error(e); res.status(500).json({ error: "internal" }); }
+  try { const r = await TOOLS[req.params.tool](via === "webmcp" ? { player: req.player, client: "Browser agent (WebMCP)", token: "webmcp" } : { player: req.player, client: model === "rules" ? "Join's website agent" : `Join's website agent, ${model}`, token: "website-agent" }, args); res.status(r?.error ? 400 : 200).json(r); } catch (e) { console.error(e); res.status(500).json({ error: "internal" }); }
 });
 // the JS SDK v6 on the website: a browser-safe token, and the payer's own approval coming back from the PayPal popup
 app.get("/api/paypal/sdk", signedIn, async (req, res) => {
