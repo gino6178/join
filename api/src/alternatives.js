@@ -36,7 +36,8 @@ export function alternatives({ people, sport, date, start, minutes, budgetShare 
   out.sort((a, b) => rank(a) - rank(b));
   const pub = out.filter((x) => !x.bookable).slice(0, 1);
   const list = [...out.filter((x) => x.bookable).slice(0, limit - pub.length), ...pub];
-  return list.map((x) => ({ ...x, why: why(x, { base, budgetShare, start }) }));
+  // (money leaves as USD strings, like every answer to an agent)
+  return list.map((x) => ({ ...x, price: usd(x.price), share: usd(x.share), why: why(x, { base, budgetShare, start }) }));
 }
 
 // lower is better: bookable before public, within budget, same time, shortest longest trip, cheapest

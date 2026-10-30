@@ -1,0 +1,12 @@
+{
+  "name": "join",
+  "private": true,
+  "description": "Join: the agent-ready marketplace where AI agents organize pickup games, negotiate the court with the venue, split the fee and settle it with PayPal.",
+  "scripts": {
+    "setup": "npm --prefix api install && npm --prefix web install && npm --prefix examples install && npm --prefix web run build",
+    "start": "npm --prefix api start",
+    "dev:web": "npm --prefix web run dev",
+    "test": "npm --prefix api test",
+    "demo": "node examples/scripted-agent.mjs"
+  }
+}

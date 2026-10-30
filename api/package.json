@@ -3,10 +3,16 @@
   "description": "Join: the agent-ready marketplace where AI agents organize pickup games, negotiate the court with the venue, split the fee and settle it with PayPal. The platform runs no model of its own.",
   "type": "module",
   "private": true,
-  "engines": { "node": ">=20" },
+  "engines": {
+    "node": ">=20"
+  },
   "scripts": {
     "start": "node src/server.js",
     "test": "node --test \"test/**/*.test.js\""
   },
-  "dependencies": {}
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.32.2",
+    "express": "^5.3.0",
+    "zod": "^4.6.7"
+  }
 }
