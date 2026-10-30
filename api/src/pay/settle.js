@@ -25,10 +25,10 @@ import { store, stateFile } from "../store.js";
 import { setTaken, venue, player, freeUnits, unitName } from "../world.js";
 // "room 3" (or "Room 3" to start a sentence)
 const place = (b, cap = false) => { const t = unitName(b.activity, b.unit); return cap ? t[0].toUpperCase() + t.slice(1) : t; };
-import { setOnAgreed, internal as negotiation } from "../negotiate/engine.js";
+import { setOnAgreed, setSpent, internal as negotiation } from "../negotiate/engine.js";
 import * as receipts from "../proof/receipts.js";
 import * as toolkit from "./toolkit.js";
-import { getMandate, fits } from "../mandate.js";
+import { getMandate, fits, coverFits } from "../mandate.js";
 import { record } from "../activity.js";
 import { startOf, toMin, hm } from "../time.js";
 import { usd } from "../negotiate/policy.js";
@@ -88,7 +88,9 @@ setOnAgreed((n) => {
 async function startPayment(b, playerId, amount, role) {
   if (b.payments[playerId]) return b.payments[playerId];
   const v = venue(b.venue), vault = db.data.vaults[playerId], m = getMandate(playerId);
-  const f = fits(playerId, { venue: b.venue, share: amount, spentThisWeek: spentAround(playerId, b) });
+  // the share is checked against what they spend; an organizer's guarantee of the whole price against what they cover
+  const f = fits(playerId, { venue: b.venue, share: b.shares[playerId], spentThisWeek: spentAround(playerId, b) });
+  if (role === "organizer") { const c = coverFits(playerId, amount); f.ok &&= c.ok; f.why.push(...c.why); }
   const auto = !!(vault && m.autopay && f.ok), card = !auto && !!pp.testCard;
   const p = { role, amount, status: "creating", via: auto ? "vault" : card ? "sandbox test card" : "approval", orderId: null, approveUrl: null, authorizationId: null, captureId: null, net: null, why: auto ? null : !vault || !m.autopay ? "approve in PayPal" : `needs your approval: ${f.why.join("; ")}` };
   b.payments[playerId] = p; db.save();
@@ -109,10 +111,29 @@ async function startPayment(b, playerId, amount, role) {
   return p;
 }
 
-// what this player's other games in the same week already commit them to
-function spentAround(playerId, b) {
-  const t = startOf(b.date, b.start).getTime();
-  return db.data.bookings.filter((x) => x.id !== b.id && LIVE.includes(x.state) && x.players.includes(playerId) && Math.abs(startOf(x.date, x.start).getTime() - t) < 3.5 * 864e5).reduce((a, x) => a + (x.shares[playerId] || 0), 0);
+// what a player pays for a booking: their share; for an organizer who covered someone, what was captured from them,
+// less what they were paid back
+function paysFor(x, playerId) {
+  const p = x.payments[playerId];
+  if (playerId !== x.organizer || p?.captured == null) return x.shares[playerId] || 0;
+  return p.captured - Object.values(x.reimbursements || {}).filter((r) => r.status === "repaid").reduce((a, r) => a + r.amount, 0);
+}
+// what this player's other bookings in the same week already cost them
+export function spentInWeek(playerId, date, start, except = null) {
+  const t = startOf(date, start).getTime();
+  return db.data.bookings.filter((x) => x.id !== except && LIVE.includes(x.state) && x.players.includes(playerId) && !x.declined.includes(playerId) && Math.abs(startOf(x.date, x.start).getTime() - t) < 3.5 * 864e5).reduce((a, x) => a + paysFor(x, playerId), 0);
+}
+const spentAround = (playerId, b) => spentInWeek(playerId, b.date, b.start, b.id);
+setSpent(spentInWeek);
+
+// What an organizer takes on by accepting a price: the guarantee, their own share, the worst case, and whether their
+// agent can authorize it from saved PayPal or they approve it themselves.
+export function guaranteeTerms(playerId, { total, players, venue: venueId, date, start }) {
+  const shares = split(total, players, playerId), m = getMandate(playerId);
+  const f = fits(playerId, { venue: venueId, share: shares[playerId], spentThisWeek: spentInWeek(playerId, date, start) }), c = coverFits(playerId, total);
+  const auto = !!(db.data.vaults[playerId] && m.autopay && f.ok && c.ok);
+  return { guarantee: usd(total), yourShare: usd(shares[playerId]), worstCase: usd(total), approval: auto ? "saved PayPal, within your limits" : pp?.testCard ? "sandbox test card (stands in for your approval)" : "you approve it in PayPal",
+    note: `As the organizer you guarantee the whole $${usd(total)} with a PayPal authorization until the others pay. You pay your own $${usd(shares[playerId])} unless someone doesn't pay; then you cover them, at most $${usd(total)} in all.` };
 }
 
 // ---- a payer approved: authorize ---------------------------------------------------------------------------------
@@ -283,7 +304,7 @@ export function answerShare(bookingId, organizerId, playerId, accept) {
   const ask = (b.shareAsks || []).find((x) => x.player === playerId && x.status === "pending");
   if (!ask) return { error: "no_ask", message: "No open ask from that player." };
   if (b.state !== "held" || b.payments[playerId]) { ask.status = "expired"; db.save(); return { error: "too_late", message: "That ask is no longer open." }; }
-  const diff = b.shares[playerId] - ask.amount, f = fits(organizerId, { venue: b.venue, share: b.shares[organizerId] + diff });
+  const diff = b.shares[playerId] - ask.amount, f = fits(organizerId, { venue: b.venue, share: b.shares[organizerId] + diff, spentThisWeek: spentAround(organizerId, b) });
   if (accept && !f.ok) {
     ask.status = "refused"; db.save();
     record({ actor: { kind: "platform" }, who: [playerId, organizerId], action: "share_refused", ref: b.id, summary: `${name(organizerId)}'s agent can't take on $${usd(diff)} more: ${f.why.join("; ")}.` });

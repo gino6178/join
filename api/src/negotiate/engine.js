@@ -32,6 +32,9 @@ export const setClock = (fn) => { clock = fn; };
 // bookings.js hears about a deal the moment it is agreed
 let onAgreed = null;
 export const setOnAgreed = (fn) => { onAgreed = fn; };
+// and tells it what a player's other bookings that week already cost them
+let spent = () => 0;
+export const setSpent = (fn) => { spent = fn; };
 
 const get = (id) => db.data.negotiations.find((n) => n.id === id);
 const people = (ids) => ids.map(player).filter(Boolean);
@@ -103,7 +106,7 @@ function agree(n, amount, who) {
 
 // the organizer's own limit, checked before the venue sees the offer
 function overMandate(n, amount) {
-  const share = shareOf(amount, n.players.length), f = fits(n.by, { venue: n.venue, share });
+  const share = shareOf(amount, n.players.length), f = fits(n.by, { venue: n.venue, share, spentThisWeek: spent(n.by, n.date, n.start) });
   return f.ok ? null : err("over_mandate", `Your agent can't commit you to that: ${f.why.join("; ")}.`, { negotiation: view(n), alternatives: alts(n, f.mandate.perGame) });
 }
 

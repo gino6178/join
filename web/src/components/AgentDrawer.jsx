@@ -19,7 +19,7 @@ export default function AgentDrawer({ me, info, open, onClose }) {
   const [msgs, setMsgs] = useState([{ from: "agent", text: WORDS.en.hello(me.player.name.split(" ")[0]) }]);
   const [brief, setBrief] = useState({});
   const [text, setText] = useState(""), [busy, setBusy] = useState(false);
-  const [cards, setCards] = useState(null), [deal, setDeal] = useState(null), [pending, setPending] = useState(null), [booking, setBooking] = useState(null);
+  const [cards, setCards] = useState(null), [deal, setDeal] = useState(null), [pending, setPending] = useState(null), [booking, setBooking] = useState(null), [confirm, setConfirm] = useState(null);
   const [model, setModel] = useState(info?.scout || "rules");
   const end = useRef(null);
   useEffect(() => { end.current?.scrollIntoView({ block: "end" }); }, [msgs, cards, deal, booking]);
@@ -46,8 +46,14 @@ export default function AgentDrawer({ me, info, open, onClose }) {
     } catch (e) { say(W.wrong(e.message)); } finally { setBusy(false); }
   };
 
+  // before negotiating, the person hears what a deal would commit them to, and says yes
+  const ask = (o) => {
+    const people = o.players.length, cap = each(brief, o.limit);
+    setCards(null); setPending(null); setConfirm(o);
+    say(w.confirm(o.venueName, cap * people, cap, people));
+  };
   const choose = async (o) => {
-    setCards(null); setBusy(true); setPending(null);
+    setConfirm(null); setBusy(true);
     try {
       say(w.talking(o.venueName, o.date, o.start));
       await finish(await negotiate(o, brief, model, say, w), o);
@@ -56,7 +62,8 @@ export default function AgentDrawer({ me, info, open, onClose }) {
   const finish = async (r, o) => {
     if (r.deal) {
       setDeal(r.deal);
-      say(w.deal(r.deal.agreed.amount, r.deal.agreed.share, r.deal.venueName));
+      const k = r.deal.players.length, t = Math.round(+r.deal.agreed.amount * 100);
+      say(w.deal(r.deal.agreed.amount, (t - Math.floor(t / k) * (k - 1)) / 100, r.deal.venueName));
       for (let i = 0; i < 10; i++) {
         const g = await api("/api/games").catch(() => null), b = g?.bookings.find((x) => x.negotiation === r.deal.id);
         if (b && (b.you?.approveUrl || b.you?.status === "authorized" || b.state !== "awaiting_organizer")) { setBooking(b); return; }
@@ -71,7 +78,7 @@ export default function AgentDrawer({ me, info, open, onClose }) {
     say(alts.length ? w.others(alts.slice(0, 3).map(w.other)) : w.noOthers(brief.activity, each(brief, o?.limit ?? brief.budget ?? 0)));
   };
 
-  const reset = () => { setBrief({}); setCards(null); setDeal(null); setPending(null); setBooking(null); say(w.reset); };
+  const reset = () => { setBrief({}); setCards(null); setDeal(null); setPending(null); setBooking(null); setConfirm(null); say(w.reset); };
   if (!open) return null;
   return (
     <aside className="drawer" role="dialog" aria-label="Join's website agent">
@@ -88,8 +95,12 @@ export default function AgentDrawer({ me, info, open, onClose }) {
           {o.missing.length > 0 && <small className="warn-text">{w.notFree(o.missing.map(firstName))}</small>}
           <span><b>{money(o.askPrice)}</b> {w.card.asked} · {money(o.share)} {w.card.each}{o.fit !== "ok" ? ` · ${w.card[o.fit]}` : ""}</span>
           <small className="muted">{o.why.join(" · ")}</small>
-          <button className="btn primary small" disabled={busy || o.fit === "tooFar"} onClick={() => choose(o)}>{w.card.negotiate}</button>
+          <button className="btn primary small" disabled={busy || o.fit === "tooFar"} onClick={() => ask(o)}>{w.card.negotiate}</button>
         </div>)}
+        {confirm && <div className="drawer-actions">
+          <button className="btn primary small" disabled={busy} onClick={() => choose(confirm)}>{w.go}</button>
+          <button className="btn small" disabled={busy} onClick={() => { setConfirm(null); say(w.stopped); }}>{w.notThis}</button>
+        </div>}
         {pending && <div className="drawer-actions">
           <button className="btn primary small" disabled={busy} onClick={async () => { setBusy(true); const p = pending; setPending(null); await finish(await acceptDeal(p.n, model), p.o); setBusy(false); }}>{w.accept(pending.n.ask)}</button>
           <button className="btn small" disabled={busy} onClick={async () => { setBusy(true); const p = pending; setPending(null); await walkAway(p.n, model); await finish({ error: w.walked }, p.o); setBusy(false); }}>{w.elsewhere}</button>

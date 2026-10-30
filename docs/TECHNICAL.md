@@ -58,7 +58,7 @@ same operations with the person's session.
 | Website | `web/src/**` (about 1,000 lines) |
 | Examples | `examples/scripted-agent.mjs`, `claude-agent.mjs`, `venue-agent.mjs`, `toolkit-cli.mjs`, `verify-receipt.mjs` |
 | Website agent | `web/src/scout/understand.js`, `web/src/scout/agent.js`, `web/src/components/AgentDrawer.jsx` |
-| Tests | `api/test/*.test.js`: 32 tests |
+| Tests | `api/test/*.test.js`: 34 tests |
 
 **Money is integer cents inside, USD strings outward.** Times are the town's local time: the process sets `TZ` from
 `world.json` (`America/Los_Angeles`), and the website renders in that zone (`world.js`, `web/src/api.js`).
@@ -105,12 +105,16 @@ old one (`store.js`). Tests keep all state in memory.
 
 ## 5. Mandates (api/src/mandate.js)
 
-- **Fields:** `{ perGame (per booking), perWeek, venues | null, autopay }`, in cents. The shape follows the AP2 Intent Mandate.
-- **Who can set it:** only the person's web session (`PUT /api/mandate`). Agent tokens can read it, never write it.
+- **Fields:** `{ perGame, perWeek, cover, venues | null, autopay }`, in cents. The shape follows the AP2 Intent Mandate.
+- **Two different numbers: what you spend and what you guarantee.**
+  - Spending: `perGame` is the most your own share of one booking may be; `perWeek` the most you pay in the 7 days around it. The week counts your shares, plus what you actually paid for others as an organizer (a capture larger than your share because someone didn't pay), less what they paid you back (`settle.spentInWeek`).
+  - Guaranteeing: an organizer authorizes the whole price until the others pay. They pay their own share unless someone doesn't, and at most the whole price. `cover` (default $60) is the most their agent may guarantee from saved PayPal on its own; above it, the organizer approves the guarantee in PayPal themselves. A guarantee is not checked against `perGame`: that would make most group bookings impossible (four people at $8 is $32, over a $15 share limit).
+- **Who can set it:** only the person's web session (`PUT /api/mandate`, the Limits page). Agent tokens can read it (`whoami`), never write it.
 - **Where it is checked:**
-  - before an offer or accept reaches the venue (engine)
-  - before an agent pays from Vault (settle `startPayment`, using `spentAround`, which sums shares within ±3.5 days)
-  - before an organizer accepts covering a bigger share (`answerShare`)
+  - before an offer or accept reaches the venue: the organizer's share against `perGame` and `perWeek` (engine, through `settle.spentInWeek`)
+  - before an agent pays from Vault: a share against `perGame` and `perWeek`; an organizer's guarantee also against `cover` (settle `startPayment`)
+  - before an organizer accepts covering a bigger share (`answerShare`), including the week
+- **Said before accepting:** every negotiation reply to the organizer carries `ifYouAccept` (or `youGuarantee` once agreed): the guarantee, their own share, the worst case, and whether saved PayPal or their own approval will authorize it. The `accept_price` description tells agents to tell their user first; the activity log says it on the deal; Join's website agent asks for a yes before it negotiates.
 
 ## 6. Settlement (api/src/pay/settle.js)
 
@@ -234,11 +238,11 @@ For people who don't bring an agent. A drawer ("No agent? Ask Join's") asks what
 
 ## 11. Tests (api/test/, `npm test`)
 
-There are 32, using Node's test runner, and they run against the stand-in with state in memory.
+There are 34, using Node's test runner, and they run against the stand-in with state in memory.
 - **Negotiation (12):** pricing, the floor never leaking, the serious-offer schedule, lowballs, agreeing at an offer, the mandate before the venue, organizer-only actions, expiry and quota, walking away, alternatives' ordering, bad input, venue policy edits.
 - **Receipts (3):** Merkle proofs for 1 to 13 leaves; signature, tamper detection and hashed players; a seal over several batches.
 - **Website agent (6):** the sentences our test agents found the rules got wrong, and the checks on a brief from the browser; also the rules reader in English and Chinese, weekends and named friends, a brief built over several messages; and against a stand-in Ollama, that Qwen fills in only the activity, only when the rules found none, and that an answer outside the list is ignored.
-- **Settlement (10):**
+- **Settlement (12):** also the guarantee limit (`cover`) for saved PayPal, the terms said up front, and the week counting what an organizer covered;
   - guarantee first, invitations before any charge, the full lock and payout
   - timeout with the organizer covering, release, void and refund cancellation
   - Vault autopay within the mandate and approval above it
@@ -309,7 +313,7 @@ There are 32, using Node's test runner, and they run against the stand-in with s
 npm run setup          # api, web, examples; builds the website
 npm start              # http://localhost:8790 (the stand-in without keys)
 npm run demo           # four agents over MCP; JOIN_ACTIVITY=karaoke for another plan
-npm test               # 32 tests
+npm test               # 34 tests
 npm run chain          # optional: a local Hardhat node for receipt anchoring
 ```
 

@@ -200,3 +200,38 @@ test("the venue's side on the PayPal Agent Toolkit: extras invoice, reconciliati
   const ans = await settle.answerDispute("north", d.dispute_id);
   assert.equal(ans.status, "evidence_sent");
 });
+
+test("an organizer's guarantee: on its own from saved PayPal only up to their cover; above it they approve it", async () => {
+  const s = await settle.vaultStart("you"); pp.approve({ setup: s.setup }); await settle.vaultFinish(s.setup);
+  setMandate("you", { autopay: true, perGame: 5000, cover: 1 }); // a share fits, but they let their agent guarantee almost nothing
+  const id = await deal();
+  await settle.pay(id, "you");
+  const p = settle.internal(id).payments.you;
+  assert.equal(p.status, "awaiting_approval");
+  assert.match(p.why, /over what they let their agent guarantee/);
+  // with room to cover the group, the same booking's guarantee is authorized at once
+  setMandate("you", { cover: 100000 });
+  const id2 = await deal(["leo"]);
+  await settle.pay(id2, "you");
+  assert.equal(settle.internal(id2).payments.you.via, "vault");
+  // and what accepting means is said up front: the whole price, their share, the worst case
+  const b = settle.internal(id2), t = settle.guaranteeTerms("you", { total: b.total, players: b.players, venue: b.venue, date: b.date, start: b.start });
+  assert.equal(t.guarantee, t.worstCase);
+  assert.equal(+t.yourShare * 100, b.shares.you);
+});
+
+test("the weekly limit counts what an organizer actually paid for others, and the agent can't commit past it", async () => {
+  const id = await deal();
+  await settle.pay(id, "you"); await approve(id, "you");
+  now = new Date(now.getTime() + settle.SHARES_MS + 60e3);
+  await settle.tick(); // nobody else paid: the organizer covered the whole court
+  const b = settle.internal(id);
+  assert.equal(b.payments.you.captured, b.total);
+  assert.equal(settle.spentInWeek("you", DATE, "21:00"), b.total);
+  // a weekly limit just above that leaves no room for another share that week
+  setMandate("you", { perWeek: b.total + 100 });
+  const n = open({ by: "you", players: ["leo", "hana", "tomas"], venue: "north", activity: "badminton", date: DATE, start: "21:00", minutes: 90 });
+  const r = n.error ? n : accept({ id: n.id, by: "you" });
+  assert.equal(r.error, "over_mandate");
+  assert.match(r.message, /weekly limit/);
+});

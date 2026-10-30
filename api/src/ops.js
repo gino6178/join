@@ -22,7 +22,7 @@ const said = (a) => `${first(a.player)}'s agent${a.client ? ` (${a.client})` : "
 export function whoami(a) {
   const p = player(a.player), m = getMandate(a.player);
   return { player: { id: p.id, name: p.name, interests: p.interests, ...(p.level ? { sportsLevel: p.level } : {}), usuallyFree: p.free, area: p.area?.name },
-    mandate: { perGame: usd(m.perGame), perWeek: usd(m.perWeek), venues: m.venues, autopay: m.autopay && settle.hasVault(a.player), note: "Set by the player on the website. Agents can read it, not change it." },
+    mandate: { perGame: usd(m.perGame), perWeek: usd(m.perWeek), guaranteeOnItsOwn: usd(m.cover), venues: m.venues, autopay: m.autopay && settle.hasVault(a.player), note: "Set by the player on the website. Agents can read it, not change it." },
     paypal: { savedForAgent: settle.hasVault(a.player), mode: settle.paypalMode() }, client: a.client };
 }
 
@@ -82,6 +82,17 @@ export function findOptions(a, { activity = "badminton", dates = [], from = null
   return { options: out.map(({ score, ...o }) => o), mandate: { perGame: usd(getMandate(a.player).perGame) }, note: out.length ? "Prices are the venue's opening ask; negotiate with start_negotiation." : "Nothing fits. Try other days, a wider window or fewer players." };
 }
 
+// What accepting means for the organizer, on every reply they get about an open or agreed negotiation: they guarantee
+// the whole price until the others pay, pay their own share unless someone doesn't, and at most the whole price.
+function withTerms(a, r) {
+  const n = r?.error ? r.negotiation : r;
+  if (!n || n.organizer !== a.player || !["open", "agreed"].includes(n.status)) return r;
+  const terms = settle.guaranteeTerms(a.player, { total: cents(n.agreed?.amount ?? n.ask), players: n.players, venue: n.venue, date: n.date, start: n.start });
+  return { ...r, [n.status === "agreed" ? "youGuarantee" : "ifYouAccept"]: terms };
+}
+// the organizer's share of the agreed price (the remainder of an even split)
+const organizerShare = (n) => { const t = cents(n.agreed.amount), k = n.players.length; return usd(t - Math.floor(t / k) * (k - 1)); };
+
 export function startNegotiation(a, { venue: venueId, activity, date, start, minutes = 90, players = [] }) {
   const r = neg.open({ by: a.player, players, venue: venueId, activity, date, start, minutes });
   const v = venue(venueId);
@@ -90,7 +101,7 @@ export function startNegotiation(a, { venue: venueId, activity, date, start, min
     return r;
   }
   record({ actor: by(a), who: r.players, action: "negotiation_opened", ref: r.id, summary: `${said(a)} asked ${r.venueName} for a ${getActivity(r.activity).unit} for ${r.activity} on ${r.date} ${r.start} for ${r.players.map(first).join(", ")}. Venue asks $${r.ask} ($${r.share} each)${r.discounts.length ? `, with ${r.discounts.map((d) => d.kind).join(" + ")} discount` : ""}.`, data: { ask: r.ask, list: r.list, ...(r.overBudget ? { overBudget: true, alternatives: r.alternatives } : {}) } });
-  return r;
+  return withTerms(a, r);
 }
 
 export function makeOffer(a, { negotiation, amount }) {
@@ -99,16 +110,16 @@ export function makeOffer(a, { negotiation, amount }) {
   const r = neg.offer({ id: negotiation, by: a.player, amount: c });
   const n = r.error ? r.negotiation : r;
   if (n) record({ actor: by(a), who: n.players, action: r.error ? "offer_refused" : r.status === "agreed" ? "deal" : r.status === "rejected" ? "venue_rejected" : "venue_countered", ref: n.id,
-    summary: r.error ? `${said(a)} offered $${usd(c)}: ${r.message}` : r.status === "agreed" ? `${said(a)} offered $${usd(c)}. ${n.venueName} agreed: $${n.agreed.amount}.` : r.status === "rejected" ? `${said(a)} offered $${usd(c)}. ${n.venueName} stood at $${n.ask}: no deal.` : `${said(a)} offered $${usd(c)}. ${n.venueName} countered $${n.ask}${n.final ? " (best and final)" : ""}.`,
+    summary: r.error ? `${said(a)} offered $${usd(c)}: ${r.message}` : r.status === "agreed" ? `${said(a)} offered $${usd(c)}. ${n.venueName} agreed: $${n.agreed.amount}. ${first(a.player)} guarantees it in PayPal until the others pay; own share $${organizerShare(n)}, at most $${n.agreed.amount}.` : r.status === "rejected" ? `${said(a)} offered $${usd(c)}. ${n.venueName} stood at $${n.ask}: no deal.` : `${said(a)} offered $${usd(c)}. ${n.venueName} countered $${n.ask}${n.final ? " (best and final)" : ""}.`,
     data: { offer: usd(c), ask: n.ask, ...(r.alternatives ? { alternatives: r.alternatives } : {}), ...(r.overBudget ? { overBudget: true } : {}) } });
-  return r;
+  return withTerms(a, r);
 }
 
 export function acceptPrice(a, { negotiation }) {
   const r = neg.accept({ id: negotiation, by: a.player });
   const n = r.error ? r.negotiation : r;
-  if (n) record({ actor: by(a), who: n.players, action: r.error ? "accept_refused" : "deal", ref: n.id, summary: r.error ? `${said(a)} tried to accept $${n.ask}: ${r.message}` : `${said(a)} accepted ${n.venueName}'s $${n.agreed.amount}. Next: ${first(a.player)} guarantees the booking in PayPal.`, data: r.alternatives ? { alternatives: r.alternatives } : null });
-  return r;
+  if (n) record({ actor: by(a), who: n.players, action: r.error ? "accept_refused" : "deal", ref: n.id, summary: r.error ? `${said(a)} tried to accept $${n.ask}: ${r.message}` : `${said(a)} accepted ${n.venueName}'s $${n.agreed.amount}. Next: ${first(a.player)} guarantees the whole $${n.agreed.amount} in PayPal until the others pay; ${first(a.player)}'s own share is $${organizerShare(n)}, and at most $${n.agreed.amount} if nobody else pays.`, data: r.alternatives ? { alternatives: r.alternatives } : null });
+  return withTerms(a, r);
 }
 
 export function walkAway(a, { negotiation }) {
