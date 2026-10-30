@@ -68,8 +68,8 @@ supplies the rules and the money. Someone without an agent uses Join's own, on t
   answers a chargeback with Join's signed receipt.
 - **No agent? Use Join's.** A drawer on the website asks what you want ("karaoke Friday night, 4 of us, $15 each",
   or the same in Chinese), shows three options with reasons, haggles and accepts as you under your limits, then hands
-  you the PayPal button. It runs in your browser: Qwen through WebLLM if you choose to download it, plain rules
-  otherwise. Join holds no AI key.
+  you the PayPal button. It understands people on Join's own server: rules, plus Qwen2.5 0.5B (Ollama) for
+  free-form sentences like "好冷 想吃熱呼呼的鍋". Nothing to download, no AI key, no AI service.
 - **See every step.** The website shows each person what the agents did, in words Join writes from the facts: every
   search, offer, counter, invitation and payment.
 - **Limits only people can set.** Per-booking and per-week limits and allowed venues are set on the website. Agent
@@ -106,11 +106,13 @@ supplies the rules and the money. Someone without an agent uses Join's own, on t
 - **Bryntum Scheduler** shows a venue its courts and rooms, with payments driving the schedule.
 - **Receipts:** Ed25519-signed and batched in SHA-256 Merkle trees; anyone can check one in the browser or with a
   script that shares no code with Join.
-- **Join's website agent:** Qwen2.5-1.5B-Instruct in the browser with WebLLM (WebGPU), its output held to a JSON
-  schema and checked by code; a rules reader as the fallback. It calls the same tools as any agent.
+- **Join's website agent:** a rules reader for days, times, group size and budget (English and Chinese), and
+  Qwen2.5 0.5B on Join's own server through Ollama for the one thing rules are bad at: which activity a free-form
+  sentence means. Its answer is held to a JSON schema and used only when the rules found none. It calls the same tools
+  as any agent.
 - **Receipts on chain, no tokens:** batch roots in a zero-value transaction ("JOIN" + root) on a local Hardhat node for
   testing, and one public seal transaction for production.
-- Node, Express, React, Vite. 29 automated tests, including an end-to-end run of four agents over MCP.
+- Node, Express, React, Vite. 30 automated tests, including an end-to-end run of four agents over MCP.
 
 ### Challenges we ran into
 
@@ -160,9 +162,10 @@ bryntum-scheduler, node.js, express, react, vite
   their own decisions and reporting what confused them; we fixed what they found.
 - **The PayPal Agent Toolkit** (`@paypal/agent-toolkit`): its tools run Join's venue back office (reconciliation,
   invoices, disputes) and the venue agent.
-- **Qwen, for people without an agent.** Join's website agent runs Qwen2.5-1.5B-Instruct in the person's browser
-  (WebLLM), only to understand what they ask for; searching, haggling and accepting are fixed code. Join's server runs
-  no model and holds no AI key.
+- **Qwen, for people without an agent.** Join's website agent asks Qwen2.5 0.5B, served by Ollama on Join's own
+  machine, which activity a person means; searching, haggling and accepting are fixed code. Join holds no AI key and
+  calls no AI service. We first tried Qwen in the browser (WebLLM); it needed a 1 GB download per person and failed on
+  some GPUs, so it moved to the server.
 - **Join's server is the market and the rules:** negotiation policy, mandates, settlement. Everything an
   agent does is shown to the people involved in code-written sentences.
 - **Development:** built with Claude Code as a coding assistant.
@@ -179,8 +182,9 @@ bryntum-scheduler, node.js, express, react, vite
    to pay less, the guarantee, four shares, and the lock. Then refresh the website. Other plans:
    `JOIN_ACTIVITY=karaoke npm run demo` (or `"escape room"`, `"board games"`, `bbq`, `"hot pot"`).
 5. No agent? Click **No agent? Ask Join's** on the website and type a plan, e.g. "karaoke Friday night, 4 of us,
-   $15 each". "Use Qwen in your browser" downloads the model (about 1 GB, WebGPU); otherwise it uses rules.
-6. `npm test` runs 29 tests, including the end-to-end MCP run.
+   $15 each" or "好冷 想吃熱呼呼的鍋". Without a model it uses rules; with Ollama (`ollama pull qwen2.5:0.5b`, then
+   `SCOUT_LLM_URL=http://127.0.0.1:11434 npm start`) Qwen reads free-form sentences too.
+6. `npm test` runs 30 tests, including the end-to-end MCP run.
 
 Without keys, Join runs on a PayPal stand-in that moves no money and says so on every page.
 

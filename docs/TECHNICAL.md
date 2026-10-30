@@ -17,7 +17,8 @@ split the cost and settle it with PayPal.
 - an activity log of everything the agents did
 
 Agents reach it over MCP, REST or A2A, with a per-person token. For people without an agent, the website has its own
-(§10.1): it runs in the person's browser and calls the same operations with their session.
+(§10.1): Join's server understands the request (rules, plus Qwen2.5 0.5B through its own Ollama) and the page calls the
+same operations with the person's session.
 
 ## 2. Architecture
 
@@ -41,7 +42,7 @@ Agents reach it over MCP, REST or A2A, with a per-person token. For people witho
         ^                                                   ^
         | session cookie                                     | PayPal webhooks, return URLs
  web/ (React, Vite): Activity, Plans, Map, Limits, Connect, Venue view (Bryntum), Receipt,
-      Join's website agent (Qwen via WebLLM or rules, in the browser) --> /api/scout/<tool>
+      Join's website agent --> /api/scout/understand (rules + Qwen2.5 0.5B on Ollama), /api/scout/<tool>
 ```
 
 | Area | Files (lines) |
@@ -57,7 +58,7 @@ Agents reach it over MCP, REST or A2A, with a per-person token. For people witho
 | Website | `web/src/**` (about 1,000 lines) |
 | Examples | `examples/scripted-agent.mjs`, `claude-agent.mjs`, `venue-agent.mjs`, `toolkit-cli.mjs`, `verify-receipt.mjs` |
 | Website agent | `web/src/scout/understand.js`, `web/src/scout/agent.js`, `web/src/components/AgentDrawer.jsx` |
-| Tests | `api/test/*.test.js`: 29 tests |
+| Tests | `api/test/*.test.js`: 30 tests |
 
 **Money is integer cents inside, USD strings outward.** Times are the town's local time: the process sets `TZ` from
 `world.json` (`America/Los_Angeles`), and the website renders in that zone (`world.js`, `web/src/api.js`).
@@ -219,23 +220,24 @@ page at `/mock-paypal/approve`, a 3.49% + $0.49 fee, request-id idempotency, and
 | Venue view | Bryntum Scheduler (`PlaceScheduler.jsx`: one row per unit, dashed bars while held, solid when locked, refreshed every 3 s); policy editor; reconciliation, extras and disputes (`VenueMoney.jsx`) |
 | Receipt | Checks a receipt in the browser |
 
-### 10.1 Join's website agent (web/src/scout/, components/AgentDrawer.jsx)
+### 10.1 Join's website agent (api/src/scout/, web/src/scout/agent.js, components/AgentDrawer.jsx)
 
 For people who don't bring an agent. A drawer ("No agent? Ask Join's") asks what they want, then acts as them.
-- **Understanding, in the browser.** `understand.js` turns messages into a brief `{activity, dates, from, to, players, with, budget}` and asks for what's missing (activity, day, group size).
-  - Qwen2.5-1.5B-Instruct through WebLLM on WebGPU, downloaded only when the person clicks and cached by the browser: the `q4f16_1` build (about 1 GB) on GPUs with `shader-f16`, the `q4f32_1` build otherwise. Its output is held to a JSON schema, then checked by code (known activities, group size 2-12, budget range, known friends).
-  - Without WebGPU, or before the download: a rules reader (English and Chinese keywords, weekdays, numbers, "$").
-  - WebLLM is a separate 6 MB chunk loaded on demand; the page's own script stays about 300 kB.
-- **Acting, in code.** `agent.js` runs fixed steps through `POST /api/scout/<tool>` (session cookie): `find_options` (three cards with reasons), then `start_negotiation`, offers never under 72% of the ask (a lowball doesn't move venues), halfway on counters, accepting when the price is within the budget and asking the person when it isn't, and `find_alternatives` when the venue says no.
-- **Same rules as any agent.** The route allows 10 read and negotiation tools only (no paying, cancelling or inviting), applies the person's mandate, and is rate-limited like `/api/agent`. Activity entries carry the client "Join website agent, Qwen in the browser" or "..., rules in the browser".
+- **Understanding, on Join's server.** `POST /api/scout/understand` (`api/src/scout/understand.js`) turns each message into a brief `{activity, dates, from, to, players, with, budget}` and asks for what's missing (activity, day, group size), in Chinese when the person writes Chinese.
+  - Rules decide days (weekdays, 今天/明天/後天, weekends), times of day, group size (digits, English number words, Chinese numerals), budget and named friends.
+  - Qwen2.5 0.5B (`qwen2.5:0.5b`, Q4_K_M, about 400 MB) through Ollama (`SCOUT_LLM_URL`) is asked one thing: which activity the message means, or "none" (a JSON-schema enum, few-shot, temperature 0). It is called only when the rules found no activity. Asked for days and group sizes too, a model this small made them up in our tests, so it isn't.
+  - Without `SCOUT_LLM_URL`, or if the model fails, rules alone. No model runs in the browser and nothing is downloaded by the person.
+  - Deployment: `deploy/start.sh` runs Join's own Ollama on 127.0.0.1:11437 with its own model folder, the local chain and the server.
+- **Acting, in code.** `agent.js` runs fixed steps through `POST /api/scout/<tool>` (session cookie): `find_options` (three cards with reasons), then `start_negotiation`, offers never under 72% of the ask (a lowball doesn't move venues), halfway on counters, accepting when the price is within the budget and asking the person when it isn't, and `find_alternatives` when the venue says no. It aims at the lower of the stated budget and the person's limit; if even the lowest serious offer is over that, it doesn't haggle and says why, and it never offers to accept a price Join would refuse.
+- **Same rules as any agent.** The route allows 10 read and negotiation tools only (no paying, cancelling or inviting), applies the person's mandate, and is rate-limited like `/api/agent`. Activity entries carry the client "Join website agent (qwen2.5:0.5b)" or "(rules)".
 - **Paying stays with the person:** after the deal the drawer shows the PayPal SDK v6 button for the guarantee (or, with the sandbox test card, the authorization result).
 
 ## 11. Tests (api/test/, `npm test`)
 
-There are 29, using Node's test runner, and they run against the stand-in with state in memory.
+There are 30, using Node's test runner, and they run against the stand-in with state in memory.
 - **Negotiation (12):** pricing, the floor never leaking, the serious-offer schedule, lowballs, agreeing at an offer, the mandate before the venue, organizer-only actions, expiry and quota, walking away, alternatives' ordering, bad input, venue policy edits.
 - **Receipts (3):** Merkle proofs for 1 to 13 leaves; signature, tamper detection and hashed players; a seal over several batches.
-- **Website agent (3):** the rules reader in English and Chinese, weekends and named friends, a brief built over several messages.
+- **Website agent (4):** the rules reader in English and Chinese, weekends and named friends, a brief built over several messages; and against a stand-in Ollama, that Qwen fills in only the activity, only when the rules found none, and that an answer outside the list is ignored.
 - **Settlement (10):**
   - guarantee first, invitations before any charge, the full lock and payout
   - timeout with the organizer covering, release, void and refund cancellation
@@ -262,8 +264,9 @@ There are 29, using Node's test runner, and they run against the stand-in with s
 - A venue agent reconciled with the toolkit and verified an extras invoice. Its findings became fixes (§4.2, §6.5).
 
 **Join's website agent (30 Oct 2026):**
-- With the rules reader, against the PayPal sandbox: "Karaoke Friday night, 4 of us, $15 each" gave three options; the agent offered $29.16 on a $32.40 ask, the venue countered $29.40, the agent accepted, and PayPal authorized the guarantee (sandbox test card). Every step appeared on the Activity page as "Join website agent, rules in the browser".
-- Qwen: the model downloaded, but WebLLM's kernels failed to compile in the Claude desktop app's built-in browser (Chrome 152) on an NVIDIA Pascal GPU, with both the `q4f16_1` and `q4f32_1` builds. The drawer fell back to rules each time. The Qwen path has not yet run end to end on a machine where WebLLM works.
+- Deployed with `deploy/start.sh` on a Linux machine (RTX 3090) on the local network, Ollama serving `qwen2.5:0.5b`, PayPal sandbox and the local chain. From the website: "let's go sing somewhere saturday night, four of us, $15 each" gave three options; the agent offered $29.16 on a $32.40 ask, the venue countered $29.40, the agent accepted, and PayPal authorized the guarantee (sandbox test card). "好冷 想吃熱呼呼的鍋 週六晚上 四個人 每人20塊" became hot pot through Qwen; the venue's $25.20 a person was over Alex's $15 limit, and the agent said so without haggling.
+- Qwen's answers, warm: about 40-350 ms each. In 15 test messages it found karaoke, BBQ ("grilling meat outdoors"), board games ("cards and dice at a cafe") and hot pot, and answered "none" for "我想跟朋友出去玩". It missed "想找人玩解謎 把我們關在房間裡那種" (escape room), which the rules now catch.
+- An earlier version ran Qwen2.5 1.5B in the browser with WebLLM; its kernels failed to compile on an NVIDIA Pascal GPU in Chrome 152, which is one reason it moved to the server.
 
 **Built and tested only against the stand-in:**
 - Dispute evidence.
@@ -305,7 +308,7 @@ There are 29, using Node's test runner, and they run against the stand-in with s
 npm run setup          # api, web, examples; builds the website
 npm start              # http://localhost:8790 (the stand-in without keys)
 npm run demo           # four agents over MCP; JOIN_ACTIVITY=karaoke for another plan
-npm test               # 29 tests
+npm test               # 30 tests
 npm run chain          # optional: a local Hardhat node for receipt anchoring
 ```
 

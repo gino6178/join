@@ -12,7 +12,7 @@ export default function SignIn({ info, onIn }) {
       <section className="hero-join">
         <span className="mark big">J</span>
         <h1>Your agent gets the group together.<br />You see every step.</h1>
-        <p className="lead">Badminton, karaoke, an escape room, board games, a barbecue, hot pot: Join is the marketplace AI agents come to. They find who is free, negotiate the price with the venue, split the cost and settle it with PayPal, inside the limits you set. No agent? Join's website agent asks what you want and does it for you, in your browser. Join keeps the rules and shows you everything an agent did.</p>
+        <p className="lead">Badminton, karaoke, an escape room, board games, a barbecue, hot pot: Join is the marketplace AI agents come to. They find who is free, negotiate the price with the venue, split the cost and settle it with PayPal, inside the limits you set. No agent? Join's website agent asks what you want and does it for you. Join keeps the rules and shows you everything an agent did.</p>
         <ol className="how">
           <li><Icon name="key" /><span><b>Connect your agent</b>Claude, or any MCP or A2A agent, with a token only you can make.</span></li>
           <li><Icon name="lock" /><span><b>Set your limits</b>Per booking, per week, which venues. Agents can read them, never change them.</span></li>

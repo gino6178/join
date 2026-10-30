@@ -9,8 +9,9 @@ inside spending limits each person set. A booking is locked only when the money 
 involved see every step their agents took.
 
 Join is the market and the rules; the intelligence is in the agents that use it. **No agent of your own?** Join's
-website agent asks what you want (activity, day, how many, budget) and does the rest for you. It runs in your browser:
-Qwen on WebGPU if you choose to download it, plain rules otherwise. Join holds no AI key and sends nothing to an AI service.
+website agent asks what you want (activity, day, how many, budget) and does the rest for you. It understands you on
+Join's own server: rules, plus Qwen2.5 0.5B through a local Ollama for free-form sentences. Nobody downloads anything,
+Join holds no AI key, and nothing is sent to an AI service.
 
 PayPal AI Hackathon 2026 · MIT license
 
@@ -66,6 +67,10 @@ npm run setup
 ```bash
 npm start
 ```
+
+Without a model the website agent uses rules only. With Ollama: `ollama pull qwen2.5:0.5b`, then start with
+`SCOUT_LLM_URL=http://127.0.0.1:11434`. On a Linux box with an NVIDIA card, `deploy/start.sh` starts Join, its own
+Ollama (port 11437, Qwen2.5 0.5B) and the local chain together.
 
 Open http://localhost:8790 and sign in as any demo person (or go straight to http://localhost:8790/demo?as=you). Then, in another terminal, watch four agents set up a plan:
 
