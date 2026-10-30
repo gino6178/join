@@ -7,11 +7,11 @@ import Icon from "../components/Icon.jsx";
 // account with just a name, or as one of the demo town's residents. And, for AI agents, the way in.
 const BRAND = { google: "#4285F4", facebook: "#1877F2", line: "#06C755", paypal: "#003087" };
 export default function SignIn({ info, onIn }) {
-  const [world, setWorld] = useState(null), [err, setErr] = useState(null), [auth, setAuth] = useState(null), [name, setName] = useState("");
+  const [world, setWorld] = useState(null), [err, setErr] = useState(null), [auth, setAuth] = useState(null), [name, setName] = useState(""), [area, setArea] = useState(""), [crew, setCrew] = useState(() => new URLSearchParams(location.hash.split("?")[1] || "").get("crew") || "");
   useEffect(() => { api("/api/world").then(setWorld).catch(setErr); api("/api/auth/providers").then(setAuth).catch(() => {}); }, []);
   useEffect(() => { const m = /signin=([^&]+)/.exec(location.hash); if (m && m[1] !== "off") setErr(new Error(decodeURIComponent(m[1]))); }, []);
   const pick = async (id) => { try { await api("/api/session", { method: "POST", body: { player: id } }); location.hash = "/"; onIn(); } catch (e) { setErr(e); } };
-  const fresh = async (e) => { e.preventDefault(); try { await api("/api/auth/demo", { method: "POST", body: { name } }); location.hash = "/"; onIn(); } catch (x) { setErr(x); } };
+  const fresh = async (e) => { e.preventDefault(); try { await api("/api/auth/demo", { method: "POST", body: { name, area, crew } }); location.hash = "/"; onIn(); } catch (x) { setErr(x); } };
   const on = (auth?.providers || []).filter((p) => p.on), off = (auth?.providers || []).filter((p) => !p.on);
   return (
     <div className="signin">
@@ -43,6 +43,9 @@ export default function SignIn({ info, onIn }) {
         </div>
         {auth?.demo && <form className="fresh" onSubmit={fresh}>
           <label><span>{tr("New here? Make a demo account")}</span><input value={name} onChange={(e) => setName(e.target.value)} placeholder={tr("Your first name")} maxLength={40} required /></label>
+          <label><span>{tr("Where you live")}</span><select value={area} onChange={(e) => setArea(e.target.value)}><option value="">{tr("Any district")}</option>{(auth?.areas || []).map((d) => <option key={d}>{d}</option>)}</select></label>
+          <label><span>{tr("Friends' crew code (optional)")}</span><input value={crew} onChange={(e) => setCrew(e.target.value)} placeholder="e.g. badminton-fri" maxLength={32} /></label>
+          <small className="muted">{tr("Friends who type the same crew code are invited to each other's plans first.")}</small>
           <button className="btn primary">{tr("Start")}</button>
         </form>}
         <h3>{tr("Or be one of the demo town's residents")}</h3>

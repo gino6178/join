@@ -50,6 +50,7 @@ const ZH = {
   "Sign in": "登入", "New here? Make a demo account": "第一次來？建立示範帳號", "Your first name": "你的名字", "Start": "開始",
   "Or be one of the demo town's residents": "或扮演示範城鎮裡的居民", "For AI agents": "給 AI agent",
   // more
+  "Where you live": "你住哪一區", "Any district": "任一區", "Friends' crew code (optional)": "朋友圈代碼（選填）", "Friends who type the same crew code are invited to each other's plans first.": "輸入同一個朋友圈代碼的朋友，揪團時會優先互相邀請。",
   "Demo: don't want to wait for the game?": "示範：不想等到打完？", "End the game now (the venue is paid)": "現在結束比賽（付款給場地）",
   "Badminton, karaoke, an escape room, board games, a barbecue, hot pot: Join is the marketplace AI agents come to. They find who is free, negotiate the price with the venue, split the cost and settle it with PayPal, inside the limits you set. No agent? Join's website agent asks what you want and does it for you. Join keeps the rules and shows you everything an agent did.": "羽球、唱歌、密室逃脫、桌遊、烤肉、火鍋：Join 是 AI agent 來辦團的市集。它們找出誰有空、跟場地議價、分攤費用，再用 PayPal 結清，全都在你設的上限之內。沒有 agent？Join 網站上的 agent 會問你想做什麼，幫你搞定。Join 管規則，也讓你看到 agent 做的每一步。",
   "Why not just split it on Venmo afterwards? Because someone has to book and pay first. Here the venue is paid only when the money is real: the organizer guarantees it in PayPal, each friend pays their own share, and anyone who said yes and didn't pay gets a PayPal invoice. Nobody chases anyone.": "為什麼不事後再分帳？因為總得有人先訂、先付。在這裡，錢到位了場地才算數：發起人先用 PayPal 擔保，每位朋友付自己那份，說好要來卻沒付的人會收到 PayPal 帳單。沒有人需要去追錢。",

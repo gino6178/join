@@ -7,7 +7,7 @@ needs to be taken on trust.
 
 **See it fast:** `npm run setup`, `npm start`, then open http://localhost:8790/demo?as=hana (no
 keys needed; PayPal is simulated and says so). In another terminal, `npm run demo` runs four agents over MCP.
-`npm test` runs 49 tests; `npm --prefix api run bench` runs the negotiation benchmark. Details: [TECHNICAL.md](TECHNICAL.md).
+`npm test` runs 50 tests; `npm --prefix api run bench` runs the negotiation benchmark. Details: [TECHNICAL.md](TECHNICAL.md).
 
 ---
 

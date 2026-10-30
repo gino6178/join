@@ -314,3 +314,4 @@ legend { font-size: var(--fs-14); color: var(--ink-2); padding: 0 6px; }
 .lg.booked { background: #7c3aed; border-radius: 50%; }
 .lg.venue { background: #fff; border: 2px solid var(--ink); }
 .pp-ids { display: block; font-family: ui-monospace, monospace; font-size: 11px; opacity: .7; }
+.fresh select { padding: 8px 10px; border-radius: 10px; border: 1px solid var(--line, #ccc); font: inherit; background: transparent; color: inherit; } .fresh > small { flex-basis: 100%; }

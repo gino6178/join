@@ -16,7 +16,10 @@ export function agentGuide(u) {
 
 Your person makes a token for you on the website: ${u}/#/connect (they choose its scopes: read, negotiate, pay).
 Testing on your own, with no person to ask? Demo accounts are on here:
-1. POST ${u}/api/auth/demo  {"name": "<a first name>"}  -> a session cookie (join_session) for a new demo person.
+1. POST ${u}/api/auth/demo  {"name": "<a first name>", "area": "<district>", "crew": "<code>"}  -> a session cookie
+   (join_session) for a new demo person. area and crew are optional: area is the district they live in (GET
+   ${u}/api/auth/providers lists them), and everyone who joins with the same crew code is in one group of friends,
+   whom find_options invites first and who each answer invitations through their own agent.
 2. POST ${u}/api/tokens  {"label": "my agent", "scopes": ["read", "negotiate"]}  with that cookie -> {"token": "join_..."}.
    Add "pay" to scopes only if your person agreed that you may pay (sandbox).
 3. Use the token as Authorization: Bearer join_...
@@ -36,8 +39,10 @@ ${tools}
 
 - Every date and time is the town's local time (whoami: town.timeZone, and town.now); every price is in US dollars.
   If your person lives elsewhere, convert both for them.
-- Friends: the demo town's residents are who find_options invites. People who joined Join themselves are invited
-  only when you name them in with (by their id, which whoami shows them).
+- Friends: your person's crew (whoami: crew.members) first, then the demo town's residents, whose agents are
+  simulated and answer an invitation by themselves after a minute or two. Other people who joined Join are invited
+  only when you name them in with (by id). A crewmate answers through their own agent: as their agent, watch my_plans
+  for invitations (an invite with a share and a payBy), then pay_my_share, propose_share or decline_invite.
 - Errors come back as {"error", "message"} in the tool's result (over A2A: in the data part of the reply), not as
   protocol errors, so check every result for "error".
 

@@ -2,6 +2,7 @@
 // takes the acting agent ({ player, client }) and plain arguments, checks them, does it, and writes what it did to the
 // activity log in code-made words, so the people involved can see every step on the website.
 // Money crosses as USD strings ("31.50") outward and integer cents inward.
+import * as people from "./people.js";
 import { getWorld, venue, player, freeUnits, forActivity, ACTIVITIES, activity as getActivity, unitName } from "./world.js";
 import * as neg from "./negotiate/engine.js";
 import { price, cents, usd } from "./negotiate/policy.js";
@@ -35,6 +36,7 @@ export function whoami(a) {
   const p = player(a.player), m = getMandate(a.player);
   const w = getWorld();
   return { town: { name: w.town.name, timeZone: w.town.timeZone, currency: w.currency || "USD", now: new Date().toLocaleString("sv-SE", { timeZone: w.town.timeZone }).slice(0, 16), note: "Every date and time on Join is the town's local time; every price is in USD." },
+    ...(p.crew ? { crew: { code: p.crew, members: people.crewmates(p).map((x) => ({ id: x.id, name: x.name, area: x.area?.name })), note: "Your person's friends who joined Join with the same crew code. find_options invites them first; each answers an invitation through their own agent." } } : {}),
     player: { id: p.id, name: p.name, interests: p.interests, ...(p.level ? { sportsLevel: p.level } : {}), usuallyFree: p.free, area: p.area?.name },
     mandate: { perGame: usd(m.perGame), perWeek: usd(m.perWeek), guaranteeOnItsOwn: usd(m.cover), venues: m.venues, autopay: m.autopay && settle.hasVault(a.player), note: "Set by the player on the website. Agents can read it, not change it." },
     paypal: { savedForAgent: settle.hasVault(a.player), mode: settle.paypalMode() }, client: a.client,
@@ -67,7 +69,7 @@ export function findOptions(a, { activity = "badminton", date = null, dates = []
   if ((from && !isTime(from)) || (to && !isTime(to)) || dates.some((d) => !isDate(d))) return { error: "bad_time", message: "dates are YYYY-MM-DD, from and to HH:MM." };
   const need = Math.max(1, Math.min(11, players | 0));
   const days = dates.length ? dates.slice(0, 7) : Array.from({ length: 7 }, (_, i) => addDays(ymd(now), i));
-  const mine = windows(me.free), others = getWorld().players.filter((p) => p.id !== me.id && (want.includes(p.id) || (!p.joined && (p.interests || []).includes(activity)))); // (people who joined Join themselves are invited only when asked for by name)
+  const mine = windows(me.free), crew = me.crew ? me.crew : null, others = getWorld().players.filter((p) => p.id !== me.id && (want.includes(p.id) || (crew && p.crew === crew) || (!p.joined && (p.interests || []).includes(activity)))); // (people who joined Join themselves: your crewmates, or anyone you name)
   const opts = [];
   for (const d of days) {
     const date = dateOf(d);
@@ -76,7 +78,7 @@ export function findOptions(a, { activity = "badminton", date = null, dates = []
       if (!from && !freeAt(mine, date, s, minutes)) continue;
       const free = others.filter((p) => freeAt(windows(p.free), date, s, minutes))
         // (for a sport, players close to your level first; for anything else, everyone interested is as good)
-        .map((p) => ({ p, score: (want.includes(p.id) ? 10 : 0) - (act.kind === "sport" ? Math.abs("CBA".indexOf(p.level) - "CBA".indexOf(me.level)) + (p.prefers && p.prefers !== "any" && p.prefers !== (need === 1 ? "singles" : "doubles") ? 1 : 0) : 0) }))
+        .map((p) => ({ p, score: (want.includes(p.id) ? 10 : 0) + (crew && p.crew === crew ? 6 : 0) - (act.kind === "sport" ? Math.abs("CBA".indexOf(p.level) - "CBA".indexOf(me.level)) + (p.prefers && p.prefers !== "any" && p.prefers !== (need === 1 ? "singles" : "doubles") ? 1 : 0) : 0) }))
         .sort((x, y) => y.score - x.score);
       if (free.length < need) continue;
       const group = [me, ...free.slice(0, need).map((x) => x.p)];

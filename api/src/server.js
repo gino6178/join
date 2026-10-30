@@ -117,13 +117,13 @@ app.post("/api/session", (req, res) => {
 });
 // Sign-in with an account people have (Google, Facebook, LINE, PayPal: whichever has keys here, oauth.js), or a new
 // demo account with just a name. Either way the person joins the town (people.js) and gets the usual session cookie.
-app.get("/api/auth/providers", (req, res) => res.json({ providers: oauth.providers(), demo: DEMO }));
+app.get("/api/auth/providers", (req, res) => res.json({ providers: oauth.providers(), demo: DEMO, areas: people.districts() }));
 app.post("/api/auth/demo", limit("signin", 30), (req, res) => {
   if (!DEMO) return res.status(403).json({ error: "demo accounts are off" });
   const name = String(req.body?.name || "").trim();
   if (!name) return res.status(400).json({ error: "name", message: "Give a first name for the demo account." });
-  const p = people.demoPerson(name), sid = createSession(p.id);
-  res.set("Set-Cookie", `${COOKIE}=${sid}; HttpOnly; SameSite=Lax; Path=/`).json({ ok: true, player: { id: p.id, name: p.name, area: p.area.name } });
+  const p = people.demoPerson(name, { area: req.body?.area, crew: req.body?.crew }), sid = createSession(p.id);
+  res.set("Set-Cookie", `${COOKIE}=${sid}; HttpOnly; SameSite=Lax; Path=/`).json({ ok: true, player: { id: p.id, name: p.name, area: p.area.name, ...(p.crew ? { crew: p.crew, crewmates: people.crewmates(p).map((x) => ({ id: x.id, name: x.name })) } : {}) } });
 });
 app.get("/auth/:provider/start", (req, res) => {
   const r = oauth.start(req.params.provider, PUBLIC_URL);
