@@ -87,7 +87,7 @@ export function summary(venueId, { activity = null, group = [], viewer = null } 
   let s = 0, w = 0;
   for (const r of list) { const k = weight(r); s += k * r.stars; w += k; }
   const m = townMean(), score = (C * m + s) / (C + w);
-  const count = (key, labels) => { const c = {}; for (const r of list) for (const a of r[key] || []) c[a] = (c[a] || 0) + 1; return Object.entries(c).filter(([, n]) => n >= 2 && n / list.length >= 0.25).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([a, n]) => ({ aspect: a, label: labels[a], count: n })); };
+  const count = (key, labels) => { const c = {}; for (const r of list) for (const a of r[key] || []) c[a] = (c[a] || 0) + 1; return Object.entries(c).filter(([, n]) => n >= 2 && n / list.length >= 0.25).sort((a, b) => b[1] - a[1]).slice(0, 2).map(([a, n]) => (labels === COMPLAINTS ? { label: labels[a], about: a, count: n } : { aspect: a, label: labels[a], count: n })); }; // (a complaint reads as itself, "noisy", with the aspect it is about)
   // (the viewer's own low rating is theirs to see; a friend's is "someone in your group")
   const groupLow = list.filter((r) => group.includes(r.player) && r.stars <= 2).map((r) => ({ you: r.player === viewer, stars: r.stars, at: r.at.slice(0, 7) }));
   const taste = groupFit(list, group, viewer);

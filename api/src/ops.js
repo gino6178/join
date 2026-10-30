@@ -54,8 +54,9 @@ export function listVenues({ activity } = {}) {
 
 // Who is free and when, and the fair venue for each: the organizer's usual free times (or the window they give), the
 // people interested in the activity who are free then, and the venue with a free unit whose longest trip is shortest.
-export function findOptions(a, { activity = "badminton", date = null, dates = date ? [date] : [], from = null, to = null, minutes = null, players = 3, people = null, with: want = [] } = {}) {
+export function findOptions(a, { activity = "badminton", date = null, dates = [], from = null, to = null, minutes = null, players = 3, people = null, with: want = [] } = {}) {
   if (Number.isInteger(people) && people >= 1) players = people - 1; // ("people" is the whole group, your user included)
+  if (date && !dates.length) dates = [date];
   const now = clock(), me = player(a.player), act = getActivity(activity);
   if (!act) return { error: "unknown_activity", message: `activity is one of ${ACTIVITIES().join(", ")}.` };
   minutes ??= act.minutes.includes(90) ? 90 : act.minutes[0];
@@ -90,7 +91,7 @@ export function findOptions(a, { activity = "badminton", date = null, dates = da
       const asked = want.filter((id) => group.some((g) => g.id === id)).length;
       opts.push({ date: d, day: DAYS[date.getDay()], start: hm(s), minutes, players: group.map((g) => g.id), names: group.map((g) => g.name), alsoFree: free.slice(need, need + 3).map((x) => x.p.id),
         venue: best.venue, venueName: best.venueName, longestTrip: best.longestTrip, askPrice: usd(best.ask), share: usd(shareOf(best.ask, group.length)), discounts: best.discounts,
-        reviews: { score: best.reviews.score, count: best.reviews.count, praise: best.reviews.praise.map((p) => p.aspect), complaints: best.reviews.complaints.map((p) => p.aspect), groupLow: best.reviews.groupLow, tasteNotes: best.reviews.tasteNotes, demoData: best.reviews.demoData > 0, reason: reviews.reason(best.reviews) },
+        reviews: { score: best.reviews.score, count: best.reviews.count, praise: best.reviews.praise.map((p) => p.aspect), complaints: best.reviews.complaints.map((p) => p.about), groupLow: best.reviews.groupLow, tasteNotes: best.reviews.tasteNotes, demoData: best.reviews.demoData > 0, reason: reviews.reason(best.reviews) },
         score: asked * 5 - best.longestTrip * 0.2 - best.ask / 1000 - days.indexOf(d) * 0.3 });
     }
   }
@@ -108,7 +109,7 @@ export function findOptions(a, { activity = "badminton", date = null, dates = da
 function withTerms(a, r) {
   const n = r?.error ? r.negotiation : r;
   if (!n || n.organizer !== a.player || !["open", "agreed"].includes(n.status)) return r;
-  const terms = settle.guaranteeTerms(a.player, { total: cents(n.agreed?.amount ?? n.ask), players: n.players, venue: n.venue, date: n.date, start: n.start });
+  const terms = settle.guaranteeTerms(a.player, { total: cents(n.agreed?.amount ?? n.ask), players: n.players, venue: n.venue, date: n.date, start: n.start }, { mayPay: mayPay(a) });
   return { ...r, [n.status === "agreed" ? "youGuarantee" : "ifYouAccept"]: terms };
 }
 // AP2: when Join refuses an action under the person's limits, the agent gets Join's signed Mandate Receipt saying so

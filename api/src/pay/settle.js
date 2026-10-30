@@ -146,11 +146,11 @@ setSpent(spentInWeek);
 
 // What an organizer takes on by accepting a price: the guarantee, their own share, the worst case, and whether their
 // agent can authorize it from saved PayPal or they approve it themselves.
-export function guaranteeTerms(playerId, { total, players, venue: venueId, date, start }) {
+export function guaranteeTerms(playerId, { total, players, venue: venueId, date, start }, { mayPay = true } = {}) {
   const shares = split(total, players, playerId), m = getMandate(playerId);
   const f = fits(playerId, { venue: venueId, share: shares[playerId], spentThisWeek: spentInWeek(playerId, date, start) }), c = coverFits(playerId, total);
   const auto = !!(db.data.vaults[playerId] && m.autopay && f.ok && c.ok);
-  return { guarantee: usd(total), yourShare: usd(shares[playerId]), worstCase: usd(total), approval: auto ? "saved PayPal, within your limits" : pp?.testCard ? "sandbox test card (stands in for your approval)" : "you approve it in PayPal",
+  return { guarantee: usd(total), yourShare: usd(shares[playerId]), worstCase: usd(total), approval: !mayPay ? "your person guarantees it on Join (this agent may not pay)" : auto ? "saved PayPal, within your limits" : pp?.testCard ? "sandbox test card (stands in for your approval)" : "you approve it in PayPal",
     note: `As the organizer you guarantee the whole $${usd(total)} with a PayPal authorization until the others pay. You pay your own $${usd(shares[playerId])} unless someone doesn't pay; then you cover them, at most $${usd(total)} in all.` };
 }
 
