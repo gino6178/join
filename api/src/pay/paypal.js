@@ -16,7 +16,7 @@ export function paypal({ clientId, secret, brand = "Join", testCard = false }) {
   let token = null, until = 0;
   async function auth() {
     if (token && Date.now() < until - 60e3) return token;
-    const r = await fetch(`${BASE}/v1/oauth2/token`, { method: "POST", headers: { Authorization: `Basic ${Buffer.from(`${clientId}:${secret}`).toString("base64")}`, "Content-Type": "application/x-www-form-urlencoded" }, body: "grant_type=client_credentials" });
+    const r = await fetch(`${BASE}/v1/oauth2/token`, { method: "POST", headers: { Authorization: `Basic ${Buffer.from(`${clientId}:${secret}`).toString("base64")}`, "Content-Type": "application/x-www-form-urlencoded" }, body: "grant_type=client_credentials" , signal: AbortSignal.timeout(20e3) });
     if (!r.ok) throw new Error(`PayPal auth failed: ${r.status}`);
     const j = await r.json();
     token = j.access_token; until = Date.now() + j.expires_in * 1000;
@@ -25,7 +25,7 @@ export function paypal({ clientId, secret, brand = "Join", testCard = false }) {
   async function call(method, path, body, requestId) {
     const headers = { Authorization: `Bearer ${await auth()}`, "Content-Type": "application/json", Prefer: "return=representation" };
     if (requestId) headers["PayPal-Request-Id"] = requestId;
-    const r = await fetch(`${BASE}${path}`, { method, headers, body: body === undefined ? undefined : typeof body === "string" ? body : JSON.stringify(body) });
+    const r = await fetch(`${BASE}${path}`, { method, headers, body: body === undefined ? undefined : typeof body === "string" ? body : JSON.stringify(body) , signal: AbortSignal.timeout(20e3) });
     const text = await r.text(), j = text ? JSON.parse(text) : {};
     if (!r.ok) { const e = new Error(`PayPal ${method} ${path}: ${r.status} ${j.name || ""} ${j.details?.[0]?.issue || j.message || ""}`.trim()); e.status = r.status; e.paypal = j; throw e; }
     return j;
@@ -102,7 +102,7 @@ export function paypal({ clientId, secret, brand = "Join", testCard = false }) {
     },
     // A browser-safe client token for the JS SDK v6 (short-lived; scoped to initializing the SDK)
     async clientToken() {
-      const r = await fetch(`${BASE}/v1/oauth2/token`, { method: "POST", headers: { Authorization: `Basic ${Buffer.from(`${clientId}:${secret}`).toString("base64")}`, "Content-Type": "application/x-www-form-urlencoded" }, body: "grant_type=client_credentials&response_type=client_token&intent=sdk_init" });
+      const r = await fetch(`${BASE}/v1/oauth2/token`, { method: "POST", headers: { Authorization: `Basic ${Buffer.from(`${clientId}:${secret}`).toString("base64")}`, "Content-Type": "application/x-www-form-urlencoded" }, body: "grant_type=client_credentials&response_type=client_token&intent=sdk_init" , signal: AbortSignal.timeout(20e3) });
       if (!r.ok) throw new Error(`PayPal client token: ${r.status}`);
       const j = await r.json();
       return { token: j.access_token, expiresIn: j.expires_in, sdk: "https://www.sandbox.paypal.com/web-sdk/v6/core" };
@@ -112,7 +112,7 @@ export function paypal({ clientId, secret, brand = "Join", testCard = false }) {
       const form = new FormData();
       form.append("input", new Blob([JSON.stringify({ evidences: [{ evidence_type: "PROOF_OF_FULFILLMENT", evidence_info: {}, notes: notes.slice(0, 2000) }] })], { type: "application/json" }), "input.json");
       form.append("file1", new Blob([file], { type: "application/json" }), fileName);
-      const r = await fetch(`${BASE}/v1/customer/disputes/${disputeId}/provide-evidence`, { method: "POST", headers: { Authorization: `Bearer ${await auth()}` }, body: form });
+      const r = await fetch(`${BASE}/v1/customer/disputes/${disputeId}/provide-evidence`, { method: "POST", headers: { Authorization: `Bearer ${await auth()}` }, body: form , signal: AbortSignal.timeout(20e3) });
       if (!r.ok) throw new Error(`PayPal provide-evidence: ${r.status} ${(await r.text()).slice(0, 200)}`);
       return { status: "UNDER_REVIEW" };
     },

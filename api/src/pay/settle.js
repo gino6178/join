@@ -276,7 +276,9 @@ export async function tick() {
   for (const b of db.data.bookings) {
     const owed = Object.values(b.reimbursements || {}).some((r) => r.status === "sent") || (b.bills || []).some((x) => x.status === "sent" || x.status === "paid");
     if (!owed && (!LIVE.includes(b.state) || b.state === "venue_paid" && b.payout?.status !== "PENDING")) continue;
-    await serial(b.id, async () => {
+    // (each booking waits at most 60 s here, so one stuck on a slow PayPal call can't hold up the others; its own queue
+    // carries on, and the next tick picks it up again)
+    await Promise.race([serial(b.id, async () => {
       // payers who approved but never came back to the return URL
       for (const [pid, p] of Object.entries(b.payments)) {
         if (p.status !== "awaiting_approval" || !p.orderId) continue;
@@ -292,7 +294,7 @@ export async function tick() {
       if (b.payout?.status === "PENDING") {
         try { const r = await pp.getPayout(b.payout.batchId); if (r.status !== "PENDING") { b.payout.status = r.status; b.payout.item = r.item; db.save(); note(b, { kind: "paypal" }, "payout_status", `PayPal Payouts: the venue's payment is ${String(r.item || r.status).toLowerCase()}.`); } } catch {}
       }
-    });
+    }), new Promise((ok) => setTimeout(ok, 60e3).unref?.())]);
   }
 }
 
