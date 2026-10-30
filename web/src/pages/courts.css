@@ -1,0 +1,39 @@
+/* Courts near you: what to look for, the agent's steps, then each place with its verdict and the reasons for it */
+.page.courts-page { max-width: 1240px; }
+.ct-ask { display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s3); margin-bottom: var(--s4); }
+.ct-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); }
+.ct-row .seg { margin: 0; max-width: 100%; min-width: 0; overflow-x: auto; flex: 0 1 auto; }
+.ct-l { width: 52px; font: 600 13px/1.3 var(--font); color: var(--ink-2); }
+.ct-row select, .ct-q input { font: 15px var(--font); padding: 7px 10px; border-radius: var(--r-sm); border: 1px solid var(--rule-strong); background: var(--bg); color: var(--ink); }
+.ct-near { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; }
+.ct-q { display: inline-flex; gap: 6px; flex: 1 1 220px; max-width: 360px; }
+.ct-q input { flex: 1; min-width: 0; }
+.ct-err { color: var(--bad); }
+.ct-run { margin-bottom: var(--s4); }
+.ct-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; max-width: 880px; }
+.ct-steps li { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: var(--s3); padding: 7px 0; border-bottom: 1px solid var(--rule); animation: land .35s var(--ease); }
+.ct-steps li > span:last-child { display: grid; gap: 2px; }
+.ct-steps .ap-now { display: flex !important; }
+.ct-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: var(--s3); margin-bottom: var(--s3); }
+.ct-head .sec-label { margin: 0; }
+.ct-list { list-style: none; margin: 0 0 var(--s3); padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: var(--s3); }
+.ct-place { display: grid; gap: var(--s2); align-content: start; }
+.ct-place.no { opacity: .78; }
+.ct-top { display: flex; justify-content: space-between; align-items: center; gap: var(--s2); }
+.ct-v { display: inline-flex; align-items: center; gap: 5px; font: 700 12px/1 var(--font); padding: 5px 9px; border-radius: var(--r-pill); }
+.ct-v.good { background: color-mix(in srgb, var(--good) 16%, transparent); color: var(--good); }
+.ct-v.maybe { background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn); }
+.ct-v.no { background: color-mix(in srgb, var(--bad) 14%, transparent); color: var(--bad); }
+.ct-place h3 { margin: 0; font-size: 18px; line-height: 1.25; text-wrap: balance; }
+
+.ct-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.ct-tags span { font: 600 12px/1 var(--font); padding: 5px 8px; border-radius: var(--r-pill); background: var(--control); color: var(--ink-2); text-transform: capitalize; }
+.ct-why { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; font-size: 14px; }
+.ct-why li { display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 8px; align-items: start; }
+.ct-cite { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; background: var(--control); color: var(--ink-2); }
+.ct-cite.google { background: color-mix(in srgb, var(--agent) 14%, transparent); color: var(--agent); }
+.ct-cite.weather { background: color-mix(in srgb, var(--near) 14%, transparent); color: var(--near); }
+.ct-quote { display: block; margin-top: 3px; font-style: italic; color: var(--ink-2); }
+.ct-foot { display: flex; justify-content: space-between; align-items: center; gap: var(--s2); padding-top: var(--s2); border-top: 1px solid var(--rule); }
+@media (max-width: 640px) { .ct-list { grid-template-columns: minmax(0, 1fr); } .ct-steps li { grid-template-columns: minmax(0, 1fr); gap: 4px; } .ct-l { width: 100%; } }
+@media (prefers-reduced-motion: reduce) { .ct-steps li { animation: none; } }

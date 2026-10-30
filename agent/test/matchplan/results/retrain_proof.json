@@ -1,0 +1,168 @@
+{
+ "at": "2026-10-28T05:26:31.432Z",
+ "startedWith": "likely-lr-20261028",
+ "simulated": {
+  "installed": true,
+  "version": "likely-lr-20261028-5a4cf4",
+  "members": 400,
+  "answered": 16540,
+  "rows": {
+   "train": 11578,
+   "calibration": 2481,
+   "held": 2481
+  },
+  "inUse": "likely-lr-20261028-5a4cf4",
+  "seconds": 0.4,
+  "gate": {
+   "pass": true,
+   "why": [],
+   "candidate": {
+    "brier": 0.15379,
+    "ece": 0.02207,
+    "auc": 0.7179,
+    "bands": [
+     {
+      "band": "unlikely",
+      "n": 828,
+      "observed": 0.095,
+      "inside": true
+     },
+     {
+      "band": "maybe",
+      "n": 1300,
+      "observed": 0.23,
+      "inside": true
+     },
+     {
+      "band": "likely",
+      "n": 302,
+      "observed": 0.46,
+      "inside": true
+     },
+     {
+      "band": "very likely",
+      "n": 51,
+      "observed": 0.627,
+      "inside": true
+     }
+    ]
+   },
+   "inUse": {
+    "version": "likely-lr-20261028",
+    "brier": 0.15456,
+    "ece": 0.03062,
+    "auc": 0.7161
+   }
+  }
+ },
+ "few": {
+  "installed": false,
+  "version": "likely-lr-20261028-c5618d",
+  "members": 25,
+  "answered": 1018,
+  "rows": {
+   "train": 712,
+   "calibration": 153,
+   "held": 153
+  },
+  "inUse": "likely-lr-20261028-5a4cf4",
+  "seconds": 0,
+  "gate": {
+   "pass": false,
+   "why": [
+    "Brier 0.18214 is worse than 0.17439",
+    "unlikely: 0.159 said yes, outside 0–0.15"
+   ],
+   "candidate": {
+    "brier": 0.18214,
+    "ece": 0.04624,
+    "auc": 0.6335,
+    "bands": [
+     {
+      "band": "unlikely",
+      "n": 63,
+      "observed": 0.159,
+      "inside": false
+     },
+     {
+      "band": "maybe",
+      "n": 74,
+      "observed": 0.297,
+      "inside": true
+     },
+     {
+      "band": "likely",
+      "n": 16,
+      "observed": 0.438,
+      "inside": true
+     },
+     {
+      "band": "very likely",
+      "n": 0,
+      "observed": null,
+      "inside": true
+     }
+    ]
+   },
+   "inUse": {
+    "version": "likely-lr-20261028-5a4cf4",
+    "brier": 0.17439,
+    "ece": 0.08707,
+    "auc": 0.6858
+   }
+  }
+ },
+ "consented": {
+  "installed": false,
+  "reason": "only 0 answered asks to learn from (300 needed)",
+  "members": 0,
+  "answered": 0,
+  "seconds": 0.001
+ },
+ "rollback": {
+  "ok": true,
+  "active": "likely-lr-20261028",
+  "from": "likely-lr-20261028-5a4cf4"
+ },
+ "registry": {
+  "active": "likely-lr-20261028",
+  "history": [
+   {
+    "version": "likely-lr-20261028-5a4cf4",
+    "at": 1793165191823,
+    "source": "simulated",
+    "replaced": "likely-lr-20261028",
+    "gate": {
+     "pass": true,
+     "brier": 0.15379,
+     "ece": 0.02207,
+     "inUse": {
+      "version": "likely-lr-20261028",
+      "brier": 0.15456,
+      "ece": 0.03062
+     }
+    }
+   },
+   {
+    "version": "likely-lr-20261028-c5618d",
+    "at": 1793165191873,
+    "source": "simulated",
+    "gate": {
+     "pass": false,
+     "why": [
+      "Brier 0.18214 is worse than 0.17439",
+      "unlikely: 0.159 said yes, outside 0–0.15"
+     ]
+    },
+    "installed": false
+   },
+   {
+    "version": "likely-lr-20261028",
+    "at": 1793165191874,
+    "rolledBackFrom": "likely-lr-20261028-5a4cf4"
+   }
+  ],
+  "inUse": "likely-lr-20261028"
+ },
+ "seconds": 4
+}

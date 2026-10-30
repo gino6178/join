@@ -1,0 +1,1251 @@
+{
+ "simulated": true,
+ "note": "Simulated people for Serve's user simulation (agent/test/sim_users). None is a real person; the names are invented. Made by personas.mjs from the seed below.",
+ "seed": 20261105,
+ "personas": [
+  {
+   "id": "u01",
+   "name": "Lo Yi-Hsuan",
+   "simulated": true,
+   "age": 35,
+   "job": "pharmacist, one toddler",
+   "hours": "office hours, kids in the evening",
+   "archetype": "parent",
+   "lang": "zh",
+   "voice": "很有禮貌的中文，句子完整",
+   "sports": [
+    "badminton",
+    "tennis"
+   ],
+   "level": "B",
+   "rating": 1433,
+   "prefers": "singles",
+   "hand": "R",
+   "home": {
+    "x": 6.9,
+    "y": 0.3,
+    "name": "North"
+   },
+   "venue": "north",
+   "free": [
+    "Thu 20-22",
+    "Sat 08-11"
+   ],
+   "sessions": [
+    "06:46",
+    "12:35",
+    "21:55"
+   ],
+   "rules": {
+    "endBy": "21:45"
+   },
+   "habits": [
+    "Yi has to be home for the kids, so nothing that ends after 21:45.",
+    "Yi prefers singles."
+   ],
+   "goal": {
+    "perWeek": 3,
+    "sport": "badminton"
+   },
+   "inertia": {
+    "laziness": 0.88,
+    "pOpen": 0.44,
+    "replyMin": 153,
+    "pNotThisWeek": 0.47,
+    "flaky": 0.17,
+    "pBusy": 0.34,
+    "patienceH": 3
+   },
+   "social": 0.71,
+   "civic": 0.08,
+   "choices": {
+    "improve": false,
+    "bands": true,
+    "beta": true
+   },
+   "idea": "seeing who else is in a game before saying yes",
+   "trashTalk": false,
+   "niggle": null
+  },
+  {
+   "id": "u02",
+   "name": "Kuo Chen-Hao",
+   "simulated": true,
+   "age": 38,
+   "job": "freelance illustrator",
+   "hours": "works from home, flexible",
+   "archetype": "freelancer",
+   "lang": "zh",
+   "voice": "中文夾一點英文運動用語",
+   "sports": [
+    "badminton"
+   ],
+   "level": "C",
+   "rating": 1384,
+   "prefers": "any",
+   "hand": "L",
+   "home": {
+    "x": 7.1,
+    "y": 6.8,
+    "name": "Lakeside"
+   },
+   "venue": "lakeside",
+   "free": [
+    "Tue 10-13",
+    "Wed 10-13",
+    "Fri 14-17"
+   ],
+   "sessions": [
+    "10:25",
+    "13:55",
+    "18:32",
+    "23:49"
+   ],
+   "rules": {},
+   "habits": [],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton"
+   },
+   "inertia": {
+    "laziness": 0.68,
+    "pOpen": 0.68,
+    "replyMin": 153,
+    "pNotThisWeek": 0.36,
+    "flaky": 0.09,
+    "pBusy": 0.13,
+    "patienceH": 7
+   },
+   "social": 0.67,
+   "civic": 0.17,
+   "choices": {
+    "improve": false,
+    "bands": true,
+    "beta": true
+   },
+   "idea": "splitting the court fee",
+   "trashTalk": true,
+   "niggle": null
+  },
+  {
+   "id": "u03",
+   "name": "Bao Tran",
+   "simulated": true,
+   "age": 36,
+   "job": "freelance translator",
+   "hours": "works from home, flexible",
+   "archetype": "freelancer",
+   "lang": "en",
+   "voice": "terse, gets to the point",
+   "sports": [
+    "badminton",
+    "table tennis"
+   ],
+   "level": "A",
+   "rating": 1668,
+   "prefers": "doubles",
+   "hand": "R",
+   "home": {
+    "x": 3.4,
+    "y": 4.5,
+    "name": "Riverside"
+   },
+   "venue": "riverside",
+   "free": [
+    "Mon 14-17",
+    "Wed 10-13",
+    "Thu 14-17",
+    "Sun 15-18"
+   ],
+   "sessions": [
+    "10:23",
+    "13:25",
+    "18:39",
+    "23:27"
+   ],
+   "rules": {
+    "maxTrip": 20
+   },
+   "habits": [
+    "Tran won't travel more than 20 minutes for a game.",
+    "Tran prefers doubles."
+   ],
+   "goal": {
+    "perWeek": 3,
+    "sport": "badminton"
+   },
+   "inertia": {
+    "laziness": 0.3,
+    "pOpen": 0.78,
+    "replyMin": 24,
+    "pNotThisWeek": 0.25,
+    "flaky": 0.03,
+    "pBusy": 0.14,
+    "patienceH": 9
+   },
+   "social": 0.69,
+   "civic": 0.37,
+   "choices": {
+    "improve": false,
+    "bands": true,
+    "beta": false
+   },
+   "idea": "being asked about games at a time that suits them",
+   "trashTalk": false,
+   "niggle": "left ankle"
+  },
+  {
+   "id": "u04",
+   "name": "Mateo Albarran",
+   "simulated": true,
+   "age": 25,
+   "job": "HR officer",
+   "hours": "office hours, 9 to 6",
+   "archetype": "office",
+   "lang": "en",
+   "voice": "short lowercase texts, no punctuation",
+   "sports": [
+    "badminton"
+   ],
+   "level": "B",
+   "rating": 1473,
+   "prefers": "any",
+   "hand": "R",
+   "home": {
+    "x": 0.3,
+    "y": 1.8,
+    "name": "Westgate"
+   },
+   "venue": "westgate",
+   "free": [
+    "Mon 19-22",
+    "Wed 19-22",
+    "Thu 19-22",
+    "Fri 19-22"
+   ],
+   "sessions": [
+    "08:22",
+    "12:45",
+    "18:36",
+    "22:35"
+   ],
+   "rules": {},
+   "habits": [],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton"
+   },
+   "inertia": {
+    "laziness": 0.32,
+    "pOpen": 0.79,
+    "replyMin": 17,
+    "pNotThisWeek": 0.17,
+    "flaky": 0.08,
+    "pBusy": 0.23,
+    "patienceH": 7
+   },
+   "social": 0.76,
+   "civic": 0.08,
+   "choices": {
+    "improve": false,
+    "bands": false,
+    "beta": false
+   },
+   "idea": "being asked about games at a time that suits them",
+   "trashTalk": false,
+   "niggle": null
+  },
+  {
+   "id": "u05",
+   "name": "Tsai Wan-Ju",
+   "simulated": true,
+   "age": 20,
+   "job": "master's student",
+   "hours": "classes most mornings",
+   "archetype": "student",
+   "lang": "mix",
+   "voice": "Chinese and English mixed in one message",
+   "sports": [
+    "badminton"
+   ],
+   "level": "A",
+   "rating": 1712,
+   "prefers": "singles",
+   "hand": "R",
+   "home": {
+    "x": 5,
+    "y": 2.7,
+    "name": "Midtown"
+   },
+   "venue": "midtown",
+   "free": [
+    "Mon 14-18",
+    "Fri 19-22",
+    "Sat 13-17",
+    "Sun 15-19"
+   ],
+   "sessions": [
+    "11:00",
+    "16:23",
+    "00:17"
+   ],
+   "rules": {},
+   "habits": [
+    "Wan prefers singles."
+   ],
+   "goal": {
+    "perWeek": 2,
+    "sport": "badminton"
+   },
+   "inertia": {
+    "laziness": 0.52,
+    "pOpen": 0.62,
+    "replyMin": 47,
+    "pNotThisWeek": 0.28,
+    "flaky": 0.07,
+    "pBusy": 0.19,
+    "patienceH": 4
+   },
+   "social": 0.16,
+   "civic": 0.46,
+   "choices": {
+    "improve": true,
+    "bands": true,
+    "beta": false
+   },
+   "idea": "fewer messages from the agent",
+   "trashTalk": false,
+   "niggle": null
+  },
+  {
+   "id": "u06",
+   "name": "Hsieh Bo-Wei",
+   "simulated": true,
+   "age": 19,
+   "job": "university student (engineering)",
+   "hours": "classes most mornings",
+   "archetype": "student",
+   "lang": "zh",
+   "voice": "中文夾一點英文運動用語",
+   "sports": [
+    "badminton",
+    "tennis"
+   ],
+   "level": "A",
+   "rating": 1599,
+   "prefers": "doubles",
+   "hand": "R",
+   "home": {
+    "x": 6.1,
+    "y": 4.2,
+    "name": "Midtown"
+   },
+   "venue": "midtown",
+   "free": [
+    "Tue 14-18",
+    "Wed 14-18",
+    "Thu 14-18",
+    "Sat 13-17"
+   ],
+   "sessions": [
+    "10:17",
+    "15:57",
+    "00:24"
+   ],
+   "rules": {},
+   "habits": [
+    "Bo prefers doubles."
+   ],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton"
+   },
+   "inertia": {
+    "laziness": 0.45,
+    "pOpen": 0.66,
+    "replyMin": 46,
+    "pNotThisWeek": 0.27,
+    "flaky": 0.08,
+    "pBusy": 0.2,
+    "patienceH": 7
+   },
+   "social": 0.58,
+   "civic": 0.17,
+   "choices": {
+    "improve": false,
+    "bands": false,
+    "beta": false
+   },
+   "idea": "choosing the court themselves",
+   "trashTalk": true,
+   "niggle": null
+  },
+  {
+   "id": "u07",
+   "name": "Freya Ashcombe",
+   "simulated": true,
+   "age": 67,
+   "job": "retired schoolteacher",
+   "hours": "retired",
+   "archetype": "retiree",
+   "lang": "en",
+   "voice": "friendly full sentences",
+   "sports": [
+    "badminton"
+   ],
+   "level": "D",
+   "rating": 1392,
+   "prefers": "singles",
+   "hand": "R",
+   "home": {
+    "x": 7.3,
+    "y": 6.6,
+    "name": "Lakeside"
+   },
+   "venue": "lakeside",
+   "free": [
+    "Tue 08-11",
+    "Wed 14-17",
+    "Thu 08-11"
+   ],
+   "sessions": [
+    "06:55",
+    "10:54",
+    "17:18",
+    "20:33"
+   ],
+   "rules": {
+    "maxTrip": 20
+   },
+   "habits": [
+    "Ashcombe won't travel more than 20 minutes for a game.",
+    "Ashcombe prefers singles."
+   ],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton"
+   },
+   "inertia": {
+    "laziness": 0.28,
+    "pOpen": 0.76,
+    "replyMin": 29,
+    "pNotThisWeek": 0.14,
+    "flaky": 0.07,
+    "pBusy": 0.13,
+    "patienceH": 10
+   },
+   "social": 0.6,
+   "civic": 0.76,
+   "choices": {
+    "improve": true,
+    "bands": true,
+    "beta": false
+   },
+   "idea": "being able to back out of a game their agent agreed",
+   "trashTalk": false,
+   "niggle": null
+  },
+  {
+   "id": "u08",
+   "name": "Chiang Yu-Ting",
+   "simulated": true,
+   "age": 27,
+   "job": "backend engineer",
+   "hours": "long days, often till 8",
+   "archetype": "engineer",
+   "lang": "mix",
+   "voice": "Chinese and English mixed in one message",
+   "sports": [
+    "badminton"
+   ],
+   "level": "D",
+   "rating": 1318,
+   "prefers": "any",
+   "hand": "R",
+   "home": {
+    "x": 3.7,
+    "y": 4.7,
+    "name": "Riverside"
+   },
+   "venue": "riverside",
+   "free": [
+    "Thu 20-22",
+    "Sat 14-18",
+    "Sun 09-13"
+   ],
+   "sessions": [
+    "08:35",
+    "12:41",
+    "23:10"
+   ],
+   "rules": {},
+   "habits": [],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton"
+   },
+   "inertia": {
+    "laziness": 0.8,
+    "pOpen": 0.43,
+    "replyMin": 172,
+    "pNotThisWeek": 0.36,
+    "flaky": 0.09,
+    "pBusy": 0.28,
+    "patienceH": 2
+   },
+   "social": 0.25,
+   "civic": 0.16,
+   "choices": {
+    "improve": false,
+    "bands": false,
+    "beta": false
+   },
+   "idea": "splitting the court fee",
+   "trashTalk": false,
+   "niggle": null
+  },
+  {
+   "id": "u09",
+   "name": "Daniel Achterberg",
+   "simulated": true,
+   "age": 24,
+   "job": "accountant",
+   "hours": "office hours, 9 to 6",
+   "archetype": "office",
+   "lang": "en",
+   "voice": "short lowercase texts, no punctuation",
+   "sports": [
+    "badminton"
+   ],
+   "level": "A",
+   "rating": 1632,
+   "prefers": "any",
+   "hand": "L",
+   "home": {
+    "x": 6.5,
+    "y": 1.3,
+    "name": "North"
+   },
+   "venue": "north",
+   "free": [
+    "Mon 19-22",
+    "Tue 19-22",
+    "Thu 19-22",
+    "Sat 14-18"
+   ],
+   "sessions": [
+    "07:57",
+    "12:55",
+    "18:31",
+    "22:00"
+   ],
+   "rules": {},
+   "habits": [],
+   "goal": {
+    "perWeek": 2,
+    "sport": "badminton"
+   },
+   "inertia": {
+    "laziness": 0.55,
+    "pOpen": 0.61,
+    "replyMin": 68,
+    "pNotThisWeek": 0.34,
+    "flaky": 0.11,
+    "pBusy": 0.25,
+    "patienceH": 7
+   },
+   "social": 0.37,
+   "civic": 0.18,
+   "choices": {
+    "improve": false,
+    "bands": true,
+    "beta": false
+   },
+   "idea": "being asked about games at a time that suits them",
+   "trashTalk": false,
+   "niggle": null
+  },
+  {
+   "id": "u10",
+   "name": "Tseng Pin-Jung",
+   "simulated": true,
+   "age": 24,
+   "job": "bank clerk",
+   "hours": "office hours, 9 to 6",
+   "archetype": "office",
+   "lang": "mix",
+   "voice": "Chinese and English mixed in one message",
+   "sports": [
+    "badminton",
+    "tennis"
+   ],
+   "level": "B",
+   "rating": 1577,
+   "prefers": "any",
+   "hand": "R",
+   "home": {
+    "x": 4.7,
+    "y": 5.6,
+    "name": "Midtown"
+   },
+   "venue": "midtown",
+   "free": [
+    "Mon 19-22",
+    "Tue 19-22",
+    "Wed 19-22",
+    "Sat 09-13"
+   ],
+   "sessions": [
+    "08:13",
+    "13:10",
+    "18:58",
+    "22:01"
+   ],
+   "rules": {},
+   "habits": [],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton"
+   },
+   "inertia": {
+    "laziness": 0.72,
+    "pOpen": 0.54,
+    "replyMin": 121,
+    "pNotThisWeek": 0.33,
+    "flaky": 0.09,
+    "pBusy": 0.25,
+    "patienceH": 5
+   },
+   "social": 0.43,
+   "civic": 0.36,
+   "choices": {
+    "improve": true,
+    "bands": true,
+    "beta": false
+   },
+   "idea": "a reminder the day before, not just an hour before",
+   "trashTalk": false,
+   "niggle": "lower back"
+  },
+  {
+   "id": "u11",
+   "name": "Hung Kuan-Lin",
+   "simulated": true,
+   "age": 31,
+   "job": "café shift lead",
+   "hours": "works weekends and some evenings",
+   "archetype": "retail",
+   "lang": "zh",
+   "voice": "短短的中文訊息，口語",
+   "sports": [
+    "badminton"
+   ],
+   "level": "C",
+   "rating": 1434,
+   "prefers": "singles",
+   "hand": "R",
+   "home": {
+    "x": 7,
+    "y": 6.7,
+    "name": "Lakeside"
+   },
+   "venue": "lakeside",
+   "free": [
+    "Mon 14-17",
+    "Tue 09-13",
+    "Thu 14-17"
+   ],
+   "sessions": [
+    "09:10",
+    "15:05",
+    "22:51"
+   ],
+   "rules": {},
+   "habits": [
+    "Kuan prefers singles."
+   ],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton"
+   },
+   "inertia": {
+    "laziness": 0.6,
+    "pOpen": 0.61,
+    "replyMin": 81,
+    "pNotThisWeek": 0.31,
+    "flaky": 0.09,
+    "pBusy": 0.16,
+    "patienceH": 6
+   },
+   "social": 0.56,
+   "civic": 0.59,
+   "choices": {
+    "improve": false,
+    "bands": false,
+    "beta": false
+   },
+   "idea": "doubles with people of their level",
+   "trashTalk": false,
+   "niggle": null
+  },
+  {
+   "id": "u12",
+   "name": "Siti Rahmawati",
+   "simulated": true,
+   "age": 30,
+   "job": "bank clerk",
+   "hours": "office hours, 9 to 6",
+   "archetype": "office",
+   "lang": "en",
+   "voice": "short lowercase texts, no punctuation",
+   "sports": [
+    "badminton",
+    "table tennis"
+   ],
+   "level": "B",
+   "rating": 1535,
+   "prefers": "singles",
+   "hand": "R",
+   "home": {
+    "x": 3.8,
+    "y": 4.8,
+    "name": "Riverside"
+   },
+   "venue": "riverside",
+   "free": [
+    "Thu 19-22",
+    "Fri 19-22",
+    "Sun 14-18"
+   ],
+   "sessions": [
+    "08:13",
+    "12:23",
+    "18:39",
+    "22:19"
+   ],
+   "rules": {},
+   "habits": [
+    "Rahmawati prefers singles."
+   ],
+   "goal": {
+    "perWeek": 2,
+    "sport": "badminton"
+   },
+   "inertia": {
+    "laziness": 0.42,
+    "pOpen": 0.78,
+    "replyMin": 32,
+    "pNotThisWeek": 0.27,
+    "flaky": 0.09,
+    "pBusy": 0.2,
+    "patienceH": 6
+   },
+   "social": 0.73,
+   "civic": 0.48,
+   "choices": {
+    "improve": true,
+    "bands": false,
+    "beta": false
+   },
+   "idea": "a reminder the day before, not just an hour before",
+   "trashTalk": true,
+   "niggle": null
+  },
+  {
+   "id": "u13",
+   "name": "Pan Hsin-Yi",
+   "simulated": true,
+   "age": 27,
+   "job": "backend engineer",
+   "hours": "long days, often till 8",
+   "archetype": "engineer",
+   "lang": "mix",
+   "voice": "casual Taiwanese-English texting",
+   "sports": [
+    "badminton"
+   ],
+   "level": "D",
+   "rating": 1339,
+   "prefers": "singles",
+   "hand": "R",
+   "home": {
+    "x": 3.7,
+    "y": 5.8,
+    "name": "Riverside"
+   },
+   "venue": "riverside",
+   "free": [
+    "Sat 14-18",
+    "Sun 09-13"
+   ],
+   "sessions": [
+    "08:42",
+    "13:13",
+    "23:29"
+   ],
+   "rules": {},
+   "habits": [
+    "Hsin prefers singles."
+   ],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton"
+   },
+   "inertia": {
+    "laziness": 0.25,
+    "pOpen": 0.8,
+    "replyMin": 13,
+    "pNotThisWeek": 0.22,
+    "flaky": 0.04,
+    "pBusy": 0.33,
+    "patienceH": 5
+   },
+   "social": 0.84,
+   "civic": 0.55,
+   "choices": {
+    "improve": true,
+    "bands": false,
+    "beta": true
+   },
+   "idea": "splitting the court fee",
+   "trashTalk": false,
+   "niggle": null
+  },
+  {
+   "id": "u14",
+   "name": "Arnav Kulkarni",
+   "simulated": true,
+   "age": 25,
+   "job": "HR officer",
+   "hours": "office hours, 9 to 6",
+   "archetype": "office",
+   "lang": "en",
+   "voice": "short lowercase texts, no punctuation",
+   "sports": [
+    "badminton",
+    "table tennis"
+   ],
+   "level": "C",
+   "rating": 1456,
+   "prefers": "doubles",
+   "hand": "R",
+   "home": {
+    "x": 3.6,
+    "y": 4.8,
+    "name": "Riverside"
+   },
+   "venue": "riverside",
+   "free": [
+    "Tue 19-22",
+    "Thu 19-22",
+    "Fri 19-22",
+    "Sat 09-13"
+   ],
+   "sessions": [
+    "08:21",
+    "12:49",
+    "18:47",
+    "21:38"
+   ],
+   "rules": {
+    "maxTrip": 20
+   },
+   "habits": [
+    "Kulkarni won't travel more than 20 minutes for a game.",
+    "Kulkarni prefers doubles."
+   ],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton"
+   },
+   "inertia": {
+    "laziness": 0.58,
+    "pOpen": 0.59,
+    "replyMin": 119,
+    "pNotThisWeek": 0.24,
+    "flaky": 0.11,
+    "pBusy": 0.19,
+    "patienceH": 3
+   },
+   "social": 0.53,
+   "civic": 0.3,
+   "choices": {
+    "improve": false,
+    "bands": true,
+    "beta": false
+   },
+   "idea": "being asked about games at a time that suits them",
+   "trashTalk": true,
+   "niggle": "right shoulder"
+  },
+  {
+   "id": "u15",
+   "name": "Liao Chih-Wei",
+   "simulated": true,
+   "age": 33,
+   "job": "ward nurse",
+   "hours": "rotating shifts at the hospital",
+   "archetype": "nurse",
+   "lang": "zh",
+   "voice": "短短的中文訊息，口語",
+   "sports": [
+    "badminton"
+   ],
+   "level": "D",
+   "rating": 1285,
+   "prefers": "doubles",
+   "hand": "R",
+   "home": {
+    "x": 6.6,
+    "y": 0.3,
+    "name": "North"
+   },
+   "venue": "north",
+   "free": [
+    "Wed 19-22",
+    "Thu 09-13",
+    "Sat 14-18"
+   ],
+   "sessions": [
+    "07:41",
+    "14:52",
+    "23:03"
+   ],
+   "rules": {},
+   "habits": [
+    "Chih prefers doubles."
+   ],
+   "goal": {
+    "perWeek": 2,
+    "sport": "badminton"
+   },
+   "inertia": {
+    "laziness": 0.48,
+    "pOpen": 0.8,
+    "replyMin": 53,
+    "pNotThisWeek": 0.25,
+    "flaky": 0.11,
+    "pBusy": 0.33,
+    "patienceH": 5
+   },
+   "social": 0.25,
+   "civic": 0.53,
+   "choices": {
+    "improve": false,
+    "bands": true,
+    "beta": true
+   },
+   "idea": "being able to back out of a game their agent agreed",
+   "trashTalk": false,
+   "niggle": null
+  },
+  {
+   "id": "u16",
+   "name": "Camille Roussel",
+   "simulated": true,
+   "age": 32,
+   "job": "café shift lead",
+   "hours": "works weekends and some evenings",
+   "archetype": "retail",
+   "lang": "en",
+   "voice": "chatty, uses an emoji now and then",
+   "sports": [
+    "badminton",
+    "tennis"
+   ],
+   "level": "D",
+   "rating": 1305,
+   "prefers": "doubles",
+   "hand": "L",
+   "home": {
+    "x": 0.9,
+    "y": 4.1,
+    "name": "Westgate"
+   },
+   "venue": "westgate",
+   "free": [
+    "Tue 14-17",
+    "Wed 14-17",
+    "Thu 14-17"
+   ],
+   "sessions": [
+    "09:07",
+    "15:17",
+    "22:52"
+   ],
+   "rules": {},
+   "habits": [
+    "Roussel prefers doubles."
+   ],
+   "goal": {
+    "perWeek": 3,
+    "sport": "badminton"
+   },
+   "inertia": {
+    "laziness": 0.5,
+    "pOpen": 0.71,
+    "replyMin": 54,
+    "pNotThisWeek": 0.25,
+    "flaky": 0.06,
+    "pBusy": 0.21,
+    "patienceH": 2
+   },
+   "social": 0.13,
+   "civic": 0.41,
+   "choices": {
+    "improve": false,
+    "bands": false,
+    "beta": false
+   },
+   "idea": "splitting the court fee",
+   "trashTalk": false,
+   "niggle": null
+  },
+  {
+   "id": "u17",
+   "name": "Yeh Shu-Fen",
+   "simulated": true,
+   "age": 21,
+   "job": "university student (design)",
+   "hours": "classes most mornings",
+   "archetype": "student",
+   "lang": "zh",
+   "voice": "簡短，常用表情符號",
+   "sports": [
+    "badminton"
+   ],
+   "level": "C",
+   "rating": 1414,
+   "prefers": "singles",
+   "hand": "R",
+   "home": {
+    "x": 3.8,
+    "y": 3.3,
+    "name": "Midtown"
+   },
+   "venue": "midtown",
+   "free": [
+    "Tue 14-18",
+    "Fri 19-22",
+    "Sat 13-17",
+    "Sun 15-19"
+   ],
+   "sessions": [
+    "11:29",
+    "15:32",
+    "23:16"
+   ],
+   "rules": {},
+   "habits": [
+    "Shu prefers singles."
+   ],
+   "goal": {
+    "perWeek": 2,
+    "sport": "badminton"
+   },
+   "inertia": {
+    "laziness": 0.15,
+    "pOpen": 0.88,
+    "replyMin": 14,
+    "pNotThisWeek": 0.12,
+    "flaky": 0.03,
+    "pBusy": 0.12,
+    "patienceH": 12
+   },
+   "social": 0.21,
+   "civic": 0.83,
+   "choices": {
+    "improve": true,
+    "bands": true,
+    "beta": false
+   },
+   "idea": "being able to back out of a game their agent agreed",
+   "trashTalk": false,
+   "niggle": null
+  },
+  {
+   "id": "u18",
+   "name": "Hwang Jae-won",
+   "simulated": true,
+   "age": 26,
+   "job": "ward nurse",
+   "hours": "rotating shifts at the hospital",
+   "archetype": "nurse",
+   "lang": "en",
+   "voice": "short lowercase texts, no punctuation",
+   "sports": [
+    "badminton",
+    "tennis"
+   ],
+   "level": "C",
+   "rating": 1429,
+   "prefers": "any",
+   "hand": "R",
+   "home": {
+    "x": 6.5,
+    "y": 5.7,
+    "name": "Lakeside"
+   },
+   "venue": "lakeside",
+   "free": [
+    "Tue 19-22",
+    "Sat 14-18",
+    "Sun 14-18"
+   ],
+   "sessions": [
+    "08:08",
+    "14:37",
+    "23:28"
+   ],
+   "rules": {},
+   "habits": [],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton"
+   },
+   "inertia": {
+    "laziness": 0.84,
+    "pOpen": 0.52,
+    "replyMin": 134,
+    "pNotThisWeek": 0.39,
+    "flaky": 0.14,
+    "pBusy": 0.33,
+    "patienceH": 3
+   },
+   "social": 0.57,
+   "civic": 0.47,
+   "choices": {
+    "improve": true,
+    "bands": false,
+    "beta": false
+   },
+   "idea": "choosing the court themselves",
+   "trashTalk": false,
+   "niggle": null
+  },
+  {
+   "id": "u19",
+   "name": "Fang Ting-Yu",
+   "simulated": true,
+   "age": 42,
+   "job": "pharmacist, one toddler",
+   "hours": "office hours, kids in the evening",
+   "archetype": "parent",
+   "lang": "mix",
+   "voice": "mostly English with some Chinese words",
+   "sports": [
+    "badminton"
+   ],
+   "level": "B",
+   "rating": 1603,
+   "prefers": "any",
+   "hand": "L",
+   "home": {
+    "x": 7.3,
+    "y": 6.5,
+    "name": "Lakeside"
+   },
+   "venue": "lakeside",
+   "free": [
+    "Wed 20-22",
+    "Sat 08-11"
+   ],
+   "sessions": [
+    "06:33",
+    "12:39",
+    "22:09"
+   ],
+   "rules": {
+    "endBy": "21:45"
+   },
+   "habits": [
+    "Ting has to be home for the kids, so nothing that ends after 21:45."
+   ],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton"
+   },
+   "inertia": {
+    "laziness": 0.2,
+    "pOpen": 0.87,
+    "replyMin": 13,
+    "pNotThisWeek": 0.24,
+    "flaky": 0.05,
+    "pBusy": 0.3,
+    "patienceH": 7
+   },
+   "social": 0.62,
+   "civic": 0.46,
+   "choices": {
+    "improve": false,
+    "bands": true,
+    "beta": true
+   },
+   "idea": "splitting the court fee",
+   "trashTalk": false,
+   "niggle": null
+  },
+  {
+   "id": "u20",
+   "name": "Marta Szymanek",
+   "simulated": true,
+   "age": 30,
+   "job": "high school PE teacher",
+   "hours": "school hours",
+   "archetype": "teacher",
+   "lang": "en",
+   "voice": "chatty, uses an emoji now and then",
+   "sports": [
+    "badminton",
+    "table tennis"
+   ],
+   "level": "A",
+   "rating": 1620,
+   "prefers": "doubles",
+   "hand": "R",
+   "home": {
+    "x": 2.2,
+    "y": 5.3,
+    "name": "Riverside"
+   },
+   "venue": "riverside",
+   "free": [
+    "Mon 17-20",
+    "Wed 17-20",
+    "Sat 09-12"
+   ],
+   "sessions": [
+    "07:03",
+    "12:12",
+    "20:30"
+   ],
+   "rules": {},
+   "habits": [
+    "Szymanek prefers doubles."
+   ],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton"
+   },
+   "inertia": {
+    "laziness": 0.76,
+    "pOpen": 0.61,
+    "replyMin": 85,
+    "pNotThisWeek": 0.46,
+    "flaky": 0.12,
+    "pBusy": 0.17,
+    "patienceH": 3
+   },
+   "social": 0.1,
+   "civic": 0.15,
+   "choices": {
+    "improve": false,
+    "bands": true,
+    "beta": false
+   },
+   "idea": "splitting the court fee",
+   "trashTalk": false,
+   "niggle": "right shoulder"
+  }
+ ]
+}

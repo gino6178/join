@@ -1,0 +1,633 @@
+{
+ "note": "Held-out Autopilot weeks, made once by test/sim/heldout_weeks.mjs from the simulated club; not used for tuning. Dates are relative to the day the eval runs.",
+ "made": "2026-10-28T12:16:24.142Z",
+ "seed": 20261028,
+ "club": {
+  "simMembers": 16,
+  "simSeed": 2611
+ },
+ "weeks": [
+  {
+   "name": "H01 3 badminton, doubles (knee)",
+   "goal": {
+    "perWeek": 3,
+    "sport": "badminton"
+   },
+   "you": {
+    "limit": "no jump landings"
+   },
+   "history": [
+    {
+     "weeksAgo": 2,
+     "day": "Tue",
+     "start": "19:00",
+     "sport": "badminton",
+     "format": "doubles",
+     "with": [
+      "s001",
+      "s015",
+      "s010"
+     ],
+     "booked": 90,
+     "played": 90
+    },
+    {
+     "weeksAgo": 4,
+     "day": "Tue",
+     "start": "19:00",
+     "sport": "badminton",
+     "format": "doubles",
+     "with": [
+      "s001",
+      "s015",
+      "s010"
+     ],
+     "booked": 90,
+     "played": 90
+    }
+   ],
+   "upcoming": [],
+   "notes": [
+    {
+     "text": "The parking at North is a pain on weekday evenings.",
+     "daysAgo": 3
+    },
+    {
+     "text": "I'd like to get my footwork faster this season.",
+     "daysAgo": 7
+    },
+    {
+     "text": "Sunday games before lunch suit me well.",
+     "daysAgo": 11
+    }
+   ],
+   "need": 3,
+   "oracle": [
+    {
+     "sport": "badminton"
+    },
+    {
+     "format": "doubles"
+    }
+   ]
+  },
+  {
+   "name": "H02 1 pickleball",
+   "goal": {
+    "perWeek": 1,
+    "sport": "pickleball"
+   },
+   "history": [
+    {
+     "weeksAgo": 2,
+     "day": "Sun",
+     "start": "09:00",
+     "sport": "pickleball",
+     "format": "singles",
+     "with": [
+      "s009"
+     ],
+     "booked": 90,
+     "played": 90
+    },
+    {
+     "weeksAgo": 4,
+     "day": "Sun",
+     "start": "09:00",
+     "sport": "pickleball",
+     "format": "singles",
+     "with": [
+      "s009"
+     ],
+     "booked": 90,
+     "played": 90
+    }
+   ],
+   "upcoming": [],
+   "notes": [
+    {
+     "text": "I sprained nothing, just a bit tired after the league.",
+     "daysAgo": 3
+    },
+    {
+     "text": "Saturday mornings are the best time for me.",
+     "daysAgo": 7
+    }
+   ],
+   "need": 1,
+   "oracle": [
+    {
+     "sport": "pickleball"
+    }
+   ]
+  },
+  {
+   "name": "H03 2 badminton",
+   "goal": {
+    "perWeek": 2,
+    "sport": "badminton"
+   },
+   "history": [
+    {
+     "weeksAgo": 2,
+     "day": "Mon",
+     "start": "20:00",
+     "sport": "badminton",
+     "format": "singles",
+     "with": [
+      "s005"
+     ],
+     "booked": 90,
+     "played": 90
+    },
+    {
+     "weeksAgo": 4,
+     "day": "Mon",
+     "start": "20:00",
+     "sport": "badminton",
+     "format": "singles",
+     "with": [
+      "s005"
+     ],
+     "booked": 90,
+     "played": 90
+    }
+   ],
+   "upcoming": [],
+   "notes": [
+    {
+     "text": "The parking at North is a pain on weekday evenings.",
+     "daysAgo": 3
+    },
+    {
+     "text": "My new shoes grip much better on the wooden courts.",
+     "daysAgo": 7
+    },
+    {
+     "text": "I'm away for a work trip in the middle of next month.",
+     "daysAgo": 11
+    },
+    {
+     "text": "Saturday mornings are the best time for me.",
+     "daysAgo": 15
+    }
+   ],
+   "need": 2,
+   "oracle": [
+    {
+     "sport": "badminton"
+    }
+   ]
+  },
+  {
+   "name": "H04 2 pickleball, Mon booked, Femi ran long",
+   "goal": {
+    "perWeek": 2,
+    "sport": "pickleball"
+   },
+   "history": [
+    {
+     "weeksAgo": 2,
+     "day": "Tue",
+     "start": "19:00",
+     "sport": "pickleball",
+     "format": "singles",
+     "with": [
+      "s007"
+     ],
+     "booked": 90,
+     "played": 125
+    },
+    {
+     "weeksAgo": 4,
+     "day": "Tue",
+     "start": "19:00",
+     "sport": "pickleball",
+     "format": "singles",
+     "with": [
+      "s007"
+     ],
+     "booked": 90,
+     "played": 90
+    }
+   ],
+   "upcoming": [
+    {
+     "day": "Mon",
+     "start": "19:30",
+     "with": [
+      "noor"
+     ]
+    }
+   ],
+   "notes": [
+    {
+     "text": "I sprained nothing, just a bit tired after the league.",
+     "daysAgo": 3
+    },
+    {
+     "text": "Sunday games before lunch suit me well.",
+     "daysAgo": 7
+    }
+   ],
+   "need": 1,
+   "oracle": [
+    {
+     "sport": "pickleball"
+    },
+    {
+     "withOneOf": "s007"
+    }
+   ]
+  },
+  {
+   "name": "H05 2 badminton, doubles (knee), Thu booked, Leo left out, Joel ran long",
+   "goal": {
+    "perWeek": 2,
+    "sport": "badminton"
+   },
+   "you": {
+    "limit": "no jump landings"
+   },
+   "history": [
+    {
+     "weeksAgo": 2,
+     "day": "Thu",
+     "start": "19:00",
+     "sport": "badminton",
+     "format": "doubles",
+     "with": [
+      "s008",
+      "s015",
+      "s002"
+     ],
+     "booked": 90,
+     "played": 125
+    },
+    {
+     "weeksAgo": 4,
+     "day": "Thu",
+     "start": "19:00",
+     "sport": "badminton",
+     "format": "doubles",
+     "with": [
+      "s008",
+      "s015",
+      "s002"
+     ],
+     "booked": 90,
+     "played": 90
+    }
+   ],
+   "upcoming": [
+    {
+     "day": "Thu",
+     "start": "19:00",
+     "with": [
+      "sam"
+     ]
+    }
+   ],
+   "notes": [
+    {
+     "text": "I sprained nothing, just a bit tired after the league.",
+     "daysAgo": 3
+    },
+    {
+     "text": "My new shoes grip much better on the wooden courts.",
+     "daysAgo": 7
+    },
+    {
+     "text": "Please leave Leo out of my games for a while, we need a break from each other.",
+     "daysAgo": 11
+    }
+   ],
+   "need": 1,
+   "oracle": [
+    {
+     "sport": "badminton"
+    },
+    {
+     "format": "doubles"
+    },
+    {
+     "notWith": "leo"
+    },
+    {
+     "withOneOf": "s008"
+    }
+   ]
+  },
+  {
+   "name": "H06 2 pickleball, Rina left out",
+   "goal": {
+    "perWeek": 2,
+    "sport": "pickleball"
+   },
+   "history": [
+    {
+     "weeksAgo": 2,
+     "day": "Sun",
+     "start": "10:00",
+     "sport": "pickleball",
+     "format": "singles",
+     "with": [
+      "s009"
+     ],
+     "booked": 90,
+     "played": 90
+    },
+    {
+     "weeksAgo": 4,
+     "day": "Sun",
+     "start": "10:00",
+     "sport": "pickleball",
+     "format": "singles",
+     "with": [
+      "s009"
+     ],
+     "booked": 90,
+     "played": 90
+    }
+   ],
+   "upcoming": [],
+   "notes": [
+    {
+     "text": "Saturday mornings are the best time for me.",
+     "daysAgo": 3
+    },
+    {
+     "text": "Sunday games before lunch suit me well.",
+     "daysAgo": 7
+    },
+    {
+     "text": "My new shoes grip much better on the wooden courts.",
+     "daysAgo": 11
+    },
+    {
+     "text": "Please leave Rina out of my games for a while, we need a break from each other.",
+     "daysAgo": 15
+    }
+   ],
+   "need": 2,
+   "oracle": [
+    {
+     "sport": "pickleball"
+    },
+    {
+     "notWith": "s009"
+    }
+   ]
+  },
+  {
+   "name": "H07 2 badminton, doubles (knee), Thu booked, Dev ran long",
+   "goal": {
+    "perWeek": 2,
+    "sport": "badminton"
+   },
+   "you": {
+    "limit": "no jump landings"
+   },
+   "history": [
+    {
+     "weeksAgo": 2,
+     "day": "Sun",
+     "start": "09:00",
+     "sport": "badminton",
+     "format": "doubles",
+     "with": [
+      "s015",
+      "s012",
+      "s014"
+     ],
+     "booked": 90,
+     "played": 125
+    },
+    {
+     "weeksAgo": 4,
+     "day": "Sun",
+     "start": "09:00",
+     "sport": "badminton",
+     "format": "doubles",
+     "with": [
+      "s015",
+      "s012",
+      "s014"
+     ],
+     "booked": 90,
+     "played": 90
+    }
+   ],
+   "upcoming": [
+    {
+     "day": "Thu",
+     "start": "19:00",
+     "with": [
+      "aisha"
+     ]
+    }
+   ],
+   "notes": [
+    {
+     "text": "My new shoes grip much better on the wooden courts.",
+     "daysAgo": 3
+    },
+    {
+     "text": "Sunday games before lunch suit me well.",
+     "daysAgo": 7
+    },
+    {
+     "text": "Saturday mornings are the best time for me.",
+     "daysAgo": 11
+    },
+    {
+     "text": "I sprained nothing, just a bit tired after the league.",
+     "daysAgo": 15
+    }
+   ],
+   "need": 1,
+   "oracle": [
+    {
+     "sport": "badminton"
+    },
+    {
+     "format": "doubles"
+    },
+    {
+     "withOneOf": "s015"
+    }
+   ]
+  },
+  {
+   "name": "H08 1 badminton, Kenji left out",
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton"
+   },
+   "history": [
+    {
+     "weeksAgo": 2,
+     "day": "Mon",
+     "start": "19:00",
+     "sport": "badminton",
+     "format": "singles",
+     "with": [
+      "s002"
+     ],
+     "booked": 90,
+     "played": 90
+    },
+    {
+     "weeksAgo": 4,
+     "day": "Mon",
+     "start": "19:00",
+     "sport": "badminton",
+     "format": "singles",
+     "with": [
+      "s002"
+     ],
+     "booked": 90,
+     "played": 90
+    }
+   ],
+   "upcoming": [],
+   "notes": [
+    {
+     "text": "I'd like to get my footwork faster this season.",
+     "daysAgo": 3
+    },
+    {
+     "text": "My new shoes grip much better on the wooden courts.",
+     "daysAgo": 7
+    },
+    {
+     "text": "Please leave Kenji out of my games for a while, we need a break from each other.",
+     "daysAgo": 11
+    }
+   ],
+   "need": 1,
+   "oracle": [
+    {
+     "sport": "badminton"
+    },
+    {
+     "notWith": "kenji"
+    }
+   ]
+  },
+  {
+   "name": "H09 1 pickleball, Rina ran long",
+   "goal": {
+    "perWeek": 1,
+    "sport": "pickleball"
+   },
+   "history": [
+    {
+     "weeksAgo": 2,
+     "day": "Sun",
+     "start": "10:00",
+     "sport": "pickleball",
+     "format": "singles",
+     "with": [
+      "s009"
+     ],
+     "booked": 90,
+     "played": 125
+    },
+    {
+     "weeksAgo": 4,
+     "day": "Sun",
+     "start": "10:00",
+     "sport": "pickleball",
+     "format": "singles",
+     "with": [
+      "s009"
+     ],
+     "booked": 90,
+     "played": 90
+    }
+   ],
+   "upcoming": [],
+   "notes": [
+    {
+     "text": "I'd like to get my footwork faster this season.",
+     "daysAgo": 3
+    },
+    {
+     "text": "Saturday mornings are the best time for me.",
+     "daysAgo": 7
+    }
+   ],
+   "need": 1,
+   "oracle": [
+    {
+     "sport": "pickleball"
+    },
+    {
+     "withOneOf": "s009"
+    }
+   ]
+  },
+  {
+   "name": "H10 2 badminton, Femi left out",
+   "goal": {
+    "perWeek": 2,
+    "sport": "badminton"
+   },
+   "history": [
+    {
+     "weeksAgo": 2,
+     "day": "Sun",
+     "start": "10:00",
+     "sport": "badminton",
+     "format": "singles",
+     "with": [
+      "s007"
+     ],
+     "booked": 90,
+     "played": 90
+    },
+    {
+     "weeksAgo": 4,
+     "day": "Sun",
+     "start": "10:00",
+     "sport": "badminton",
+     "format": "singles",
+     "with": [
+      "s007"
+     ],
+     "booked": 90,
+     "played": 90
+    }
+   ],
+   "upcoming": [],
+   "notes": [
+    {
+     "text": "Sunday games before lunch suit me well.",
+     "daysAgo": 3
+    },
+    {
+     "text": "My new shoes grip much better on the wooden courts.",
+     "daysAgo": 7
+    },
+    {
+     "text": "I'd like to get my footwork faster this season.",
+     "daysAgo": 11
+    },
+    {
+     "text": "Please leave Femi out of my games for a while, we need a break from each other.",
+     "daysAgo": 15
+    }
+   ],
+   "need": 2,
+   "oracle": [
+    {
+     "sport": "badminton"
+    },
+    {
+     "notWith": "s007"
+    }
+   ]
+  }
+ ]
+}

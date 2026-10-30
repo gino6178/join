@@ -1,0 +1,58 @@
+/* ---------- goals: this week, the weeks in a row, the club challenge, bringing someone new ---------- */
+.page.goals-page { max-width: 1240px; }
+.gl-readout { margin-bottom: var(--s5); }
+.gl-grid { display: grid; grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr); gap: var(--s4); align-items: start; }
+.gl-main, .gl-side { display: grid; gap: var(--s4); min-width: 0; }
+.gl-grid .panel > p { margin: 0 0 var(--s3); }
+.gl-grid .panel > p:last-child { margin-bottom: 0; }
+
+/* the week's games, one slot per game of the goal */
+.gl-slots { list-style: none; margin: 0 0 var(--s4); padding: 0; display: flex; flex-wrap: wrap; gap: var(--s3); }
+.gl-slots li { display: grid; justify-items: center; gap: 6px; min-width: 64px; color: var(--ink-3); }
+.gl-dot { width: 48px; height: 48px; border-radius: 50%; display: grid; place-items: center; border: 2px dashed var(--rule-strong); }
+.gl-slots .played .gl-dot { border: 0; background: var(--accent); color: var(--accent-ink); }
+.gl-slots .booked .gl-dot { border: 2px solid var(--agent); color: var(--agent); background: color-mix(in srgb, var(--agent) 10%, transparent); }
+.gl-slots .played, .gl-slots .booked { color: var(--ink-2); }
+.gl-games { list-style: none; margin: 0 0 var(--s3); padding: 0; display: grid; gap: var(--s2); }
+.gl-games a { display: grid; grid-template-columns: minmax(0, auto) minmax(0, 1fr) auto; align-items: center; gap: 4px var(--s3); padding: var(--s3); border-radius: var(--r-md); background: var(--surface-2); color: inherit; text-decoration: none; }
+.gl-games a:hover { background: var(--control-hover); }
+.gl-left { color: var(--ink-2); }
+.gl-cta { margin-top: 0; gap: var(--s2); }
+
+/* the last eight weeks, and this one */
+.gl-bars { --goal: .5; position: relative; list-style: none; margin: 0 0 var(--s3); padding: 0; display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: var(--s2); }
+.gl-bars li { display: grid; justify-items: center; gap: 4px; min-width: 0; }
+.gl-bar { position: relative; display: block; width: 100%; max-width: 40px; height: 96px; border-radius: var(--r-sm); background: var(--surface-2); overflow: hidden; }
+.gl-bar::after { content: ""; position: absolute; left: 0; right: 0; bottom: calc(var(--goal) * 100%); border-top: 2px dashed var(--ink-3); opacity: .6; }
+.gl-bar i { position: absolute; inset: 0; transform-origin: bottom; background: color-mix(in srgb, var(--accent) 45%, var(--surface-3)); transition: transform var(--dur-2) var(--ease); }
+.gl-bars li.met .gl-bar i { background: var(--accent); }
+.gl-bars li.now .gl-bar { outline: 2px solid var(--agent); outline-offset: 2px; }
+.gl-bars b { font-size: 14px; }
+.gl-bars .tiny { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+
+/* the club challenge */
+.gl-ch-title { font: 700 18px/1.3 var(--font); color: var(--ink); margin: 0 0 4px !important; }
+.gl-meter { position: relative; display: block; height: 12px; border-radius: var(--r-pill); background: var(--control-hover); overflow: hidden; margin: var(--s3) 0 var(--s2); }
+.gl-meter i, .gl-meter em { position: absolute; inset: 0; transform-origin: left; transition: transform var(--dur-2) var(--ease); }
+.gl-meter i { background: var(--agent); }
+.gl-meter em { background: var(--accent); }
+.gl-you { color: var(--accent); font-weight: 650; }
+.gl-rows { list-style: none; margin: var(--s3) 0 0; padding: 0; display: grid; gap: 6px; }
+.gl-rows li { display: grid; grid-template-columns: 20px 28px minmax(0, 1fr) auto; align-items: center; gap: var(--s2); font-size: 15px; }
+.gl-rows li.me { font-weight: 650; }
+.gl-rows .rk { color: var(--ink-3); font-size: 13px; }
+
+/* bringing someone new */
+.gl-share { display: flex; flex-wrap: wrap; gap: var(--s2); margin-bottom: var(--s3); }
+.gl-share .chip { text-decoration: none; gap: 6px; }
+.gl-recruits { list-style: none; margin: var(--s2) 0 0; padding: 0; display: grid; gap: var(--s2); }
+.gl-recruits li { display: flex; align-items: center; gap: var(--s2); font-size: 15px; }
+
+@media (max-width: 1100px) { .gl-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 640px) {
+  .gl-games a { grid-template-columns: minmax(0, 1fr) auto; }
+  .gl-games a .tiny { grid-column: 1 / -1; grid-row: 2; }
+  .gl-bar { height: 72px; }
+  .gl-bars { gap: 4px; }
+  .gl-bars .tiny { font-size: 10px; }
+}

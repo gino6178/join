@@ -1,0 +1,342 @@
+{
+ "at": "2026-10-28T05:52:28.813Z",
+ "heldOut": 3136,
+ "scored": {
+  "first": {
+   "version": "likely-lr-20261028",
+   "features": 24,
+   "brier": 0.15196,
+   "ece": 0.02357,
+   "auc": 0.7169,
+   "bandsInside": true,
+   "bands": [
+    {
+     "band": "unlikely",
+     "n": 935,
+     "observed": 0.096,
+     "range": [
+      0,
+      0.15
+     ],
+     "checked": true,
+     "inside": true
+    },
+    {
+     "band": "maybe",
+     "n": 1760,
+     "observed": 0.211,
+     "range": [
+      0.15,
+      0.35
+     ],
+     "checked": true,
+     "inside": true
+    },
+    {
+     "band": "likely",
+     "n": 392,
+     "observed": 0.485,
+     "range": [
+      0.35,
+      0.6
+     ],
+     "checked": true,
+     "inside": true
+    },
+    {
+     "band": "very likely",
+     "n": 49,
+     "observed": 0.633,
+     "range": [
+      0.6,
+      1
+     ],
+     "checked": true,
+     "inside": true
+    }
+   ]
+  },
+  "retrainedWithout": {
+   "version": "likely-lr-20261028-2a3b44",
+   "features": 24,
+   "brier": 0.15227,
+   "ece": 0.02561,
+   "auc": 0.7171,
+   "bandsInside": true,
+   "bands": [
+    {
+     "band": "unlikely",
+     "n": 984,
+     "observed": 0.097,
+     "range": [
+      0,
+      0.15
+     ],
+     "checked": true,
+     "inside": true
+    },
+    {
+     "band": "maybe",
+     "n": 1700,
+     "observed": 0.216,
+     "range": [
+      0.15,
+      0.35
+     ],
+     "checked": true,
+     "inside": true
+    },
+    {
+     "band": "likely",
+     "n": 402,
+     "observed": 0.468,
+     "range": [
+      0.35,
+      0.6
+     ],
+     "checked": true,
+     "inside": true
+    },
+    {
+     "band": "very likely",
+     "n": 50,
+     "observed": 0.66,
+     "range": [
+      0.6,
+      1
+     ],
+     "checked": true,
+     "inside": true
+    }
+   ]
+  },
+  "withReliability": {
+   "version": "likely-lr-20261028-20508c",
+   "features": 26,
+   "brier": 0.15158,
+   "ece": 0.02179,
+   "auc": 0.7169,
+   "bandsInside": true,
+   "bands": [
+    {
+     "band": "unlikely",
+     "n": 844,
+     "observed": 0.094,
+     "range": [
+      0,
+      0.15
+     ],
+     "checked": true,
+     "inside": true
+    },
+    {
+     "band": "maybe",
+     "n": 1785,
+     "observed": 0.203,
+     "range": [
+      0.15,
+      0.35
+     ],
+     "checked": true,
+     "inside": true
+    },
+    {
+     "band": "likely",
+     "n": 465,
+     "observed": 0.462,
+     "range": [
+      0.35,
+      0.6
+     ],
+     "checked": true,
+     "inside": true
+    },
+    {
+     "band": "very likely",
+     "n": 42,
+     "observed": 0.643,
+     "range": [
+      0.6,
+      1
+     ],
+     "checked": true,
+     "inside": true
+    }
+   ]
+  }
+ },
+ "pick": "first",
+ "gateAgainstOther": {
+  "pass": true,
+  "why": [],
+  "candidate": {
+   "n": 3136,
+   "brier": 0.15196,
+   "ece": 0.02357,
+   "auc": 0.7169,
+   "bands": [
+    {
+     "band": "unlikely",
+     "n": 935,
+     "observed": 0.096,
+     "range": [
+      0,
+      0.15
+     ],
+     "checked": true,
+     "inside": true
+    },
+    {
+     "band": "maybe",
+     "n": 1760,
+     "observed": 0.211,
+     "range": [
+      0.15,
+      0.35
+     ],
+     "checked": true,
+     "inside": true
+    },
+    {
+     "band": "likely",
+     "n": 392,
+     "observed": 0.485,
+     "range": [
+      0.35,
+      0.6
+     ],
+     "checked": true,
+     "inside": true
+    },
+    {
+     "band": "very likely",
+     "n": 49,
+     "observed": 0.633,
+     "range": [
+      0.6,
+      1
+     ],
+     "checked": true,
+     "inside": true
+    }
+   ]
+  },
+  "inUse": {
+   "version": "likely-lr-20261028-2a3b44",
+   "n": 3136,
+   "brier": 0.15227,
+   "ece": 0.02561,
+   "auc": 0.7171,
+   "bands": [
+    {
+     "band": "unlikely",
+     "n": 984,
+     "observed": 0.097
+    },
+    {
+     "band": "maybe",
+     "n": 1700,
+     "observed": 0.216
+    },
+    {
+     "band": "likely",
+     "n": 402,
+     "observed": 0.468
+    },
+    {
+     "band": "very likely",
+     "n": 50,
+     "observed": 0.66
+    }
+   ]
+  }
+ },
+ "gateAgainstWithReliability": {
+  "pass": false,
+  "why": [
+   "Brier 0.15196 is worse than 0.15158",
+   "ECE 0.02357 is worse than 0.02179"
+  ],
+  "candidate": {
+   "n": 3136,
+   "brier": 0.15196,
+   "ece": 0.02357,
+   "auc": 0.7169,
+   "bands": [
+    {
+     "band": "unlikely",
+     "n": 935,
+     "observed": 0.096,
+     "range": [
+      0,
+      0.15
+     ],
+     "checked": true,
+     "inside": true
+    },
+    {
+     "band": "maybe",
+     "n": 1760,
+     "observed": 0.211,
+     "range": [
+      0.15,
+      0.35
+     ],
+     "checked": true,
+     "inside": true
+    },
+    {
+     "band": "likely",
+     "n": 392,
+     "observed": 0.485,
+     "range": [
+      0.35,
+      0.6
+     ],
+     "checked": true,
+     "inside": true
+    },
+    {
+     "band": "very likely",
+     "n": 49,
+     "observed": 0.633,
+     "range": [
+      0.6,
+      1
+     ],
+     "checked": true,
+     "inside": true
+    }
+   ]
+  },
+  "inUse": {
+   "version": "likely-lr-20261028-20508c",
+   "n": 3136,
+   "brier": 0.15158,
+   "ece": 0.02179,
+   "auc": 0.7169,
+   "bands": [
+    {
+     "band": "unlikely",
+     "n": 844,
+     "observed": 0.094
+    },
+    {
+     "band": "maybe",
+     "n": 1785,
+     "observed": 0.203
+    },
+    {
+     "band": "likely",
+     "n": 465,
+     "observed": 0.462
+    },
+    {
+     "band": "very likely",
+     "n": 42,
+     "observed": 0.643
+    }
+   ]
+  }
+ }
+}

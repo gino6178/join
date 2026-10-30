@@ -1,0 +1,125 @@
+{
+ "simulated": true,
+ "note": "Simulated: made by Serve's user simulation (agent/test/sim_users), by simulated people. None of it is a real person's.",
+ "trial": {
+  "first": "2026-11-05",
+  "last": "2026-11-07"
+ },
+ "games": [
+  {
+   "simulated": true,
+   "key": "MI-3PH1",
+   "date": "2026-11-07",
+   "start": "15:00",
+   "format": "singles",
+   "by": "u17",
+   "with": [
+    "u18"
+   ],
+   "venue": "Midtown Community Gym",
+   "played": false,
+   "turnout": [
+    {
+     "id": "u17",
+     "shows": true,
+     "why": null
+    },
+    {
+     "id": "u18",
+     "shows": false,
+     "why": "kept away from a game their agent agreed for them"
+    }
+   ],
+   "names": [
+    "Yeh Shu-Fen",
+    "Hwang Jae-won"
+   ]
+  }
+ ],
+ "bookings": [
+  {
+   "simulated": true,
+   "id": "SIM-MI-3PH1",
+   "created": 1794022155851,
+   "option": {
+    "id": "midtown-2026-11-07-15:00",
+    "date": "2026-11-07",
+    "day": "Sat",
+    "start": "15:00",
+    "end": "16:30",
+    "minutes": 90,
+    "sport": "badminton",
+    "venue": {
+     "id": "midtown",
+     "name": "Midtown Community Gym",
+     "area": "Midtown",
+     "km": 1.8,
+     "x": 5.1,
+     "y": 3.9
+    },
+    "court": 1,
+    "courtsFree": 3,
+    "travel": [
+     {
+      "id": "you",
+      "name": "You",
+      "min": 10,
+      "km": 1.8
+     },
+     {
+      "id": "u18",
+      "name": "Hwang Jae-won",
+      "min": 14,
+      "km": 2.9
+     }
+    ],
+    "longest": 14,
+    "format": "singles",
+    "players": 2,
+    "price": 280,
+    "total": 420,
+    "each": 210,
+    "partners": [
+     {
+      "id": "u18",
+      "name": "Hwang Jae-won",
+      "level": "C",
+      "why": [
+       "your agents agreed the time"
+      ],
+      "likely": null
+     }
+    ],
+    "spare": [],
+    "asked": [
+     "u18"
+    ],
+    "agreed": [
+     "u18"
+    ],
+    "talk": "neg-009fa7ca-82b7",
+    "hold": "neg-009fa7ca-82b7",
+    "by": "u17"
+   },
+   "invites": [
+    {
+     "id": "u18",
+     "name": "Hwang Jae-won",
+     "text": "Hi Hwang, singles on Sat 15:00 at Midtown Community Gym? NT$210 each.",
+     "asked": true,
+     "sentAt": 1794022155851,
+     "answerAt": 1794022159359,
+     "accept": true
+    }
+   ],
+   "need": 1,
+   "log": [
+    {
+     "at": 1794022155851,
+     "text": "Held court 1 at Midtown Community Gym, Sat 15:00–16:30 (ref MI-3PH1). Pay at the venue."
+    }
+   ],
+   "cancelled": false
+  }
+ ]
+}

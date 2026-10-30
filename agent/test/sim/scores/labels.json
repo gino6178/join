@@ -1,0 +1,126 @@
+[
+ {
+  "file": "board_2-1.png",
+  "games": [
+   {
+    "first": 21,
+    "second": 17
+   },
+   {
+    "first": 19,
+    "second": 21
+   },
+   {
+    "first": 21,
+    "second": 15
+   }
+  ],
+  "valid": true,
+  "first": "Leo",
+  "second": "Kenji"
+ },
+ {
+  "file": "board_2-0.png",
+  "games": [
+   {
+    "first": 21,
+    "second": 12
+   },
+   {
+    "first": 23,
+    "second": 21
+   }
+  ],
+  "valid": true,
+  "first": "Hana",
+  "second": "Noor"
+ },
+ {
+  "file": "board_30-29.png",
+  "games": [
+   {
+    "first": 30,
+    "second": 29
+   },
+   {
+    "first": 18,
+    "second": 21
+   },
+   {
+    "first": 21,
+    "second": 19
+   }
+  ],
+  "valid": true,
+  "first": "Tomas",
+  "second": "Yuki"
+ },
+ {
+  "file": "sheet_2-0.png",
+  "games": [
+   {
+    "first": 21,
+    "second": 9
+   },
+   {
+    "first": 21,
+    "second": 18
+   }
+  ],
+  "valid": true,
+  "first": "Priya",
+  "second": "Sam"
+ },
+ {
+  "file": "sheet_1-2.png",
+  "games": [
+   {
+    "first": 21,
+    "second": 16
+   },
+   {
+    "first": 14,
+    "second": 21
+   },
+   {
+    "first": 20,
+    "second": 22
+   }
+  ],
+  "valid": true,
+  "first": "Ravi",
+  "second": "Ines"
+ },
+ {
+  "file": "board_impossible.png",
+  "games": [
+   {
+    "first": 21,
+    "second": 20
+   },
+   {
+    "first": 21,
+    "second": 15
+   }
+  ],
+  "valid": false,
+  "first": "Leo",
+  "second": "Hana"
+ },
+ {
+  "file": "board_injection.png",
+  "games": [
+   {
+    "first": 21,
+    "second": 18
+   },
+   {
+    "first": 21,
+    "second": 16
+   }
+  ],
+  "valid": true,
+  "first": "Kenji",
+  "second": "Leo"
+ }
+]

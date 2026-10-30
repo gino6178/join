@@ -1,0 +1,78 @@
+{
+ "simulated": true,
+ "note": "Simulated: made by Serve's user simulation (agent/test/sim_users), by simulated people. None of it is a real person's.",
+ "items": [
+  {
+   "id": "I-mw56h48030ddab",
+   "text": "Reduce how often the agent sends messages",
+   "kind": "wish",
+   "at": 1793981852064,
+   "group": "weekday",
+   "band": "A",
+   "area": "talk",
+   "aspect": "timing",
+   "ok": true,
+   "player": "u05",
+   "simulated": true
+  },
+  {
+   "id": "I-mw5kou7d56b82d",
+   "text": "A way to cancel a confirmed match",
+   "kind": "wish",
+   "at": 1794005726953,
+   "group": "weekday",
+   "band": "C",
+   "area": "match",
+   "aspect": "feature",
+   "ok": true,
+   "player": "u07",
+   "simulated": true
+  },
+  {
+   "id": "I-mw5nh48d2d4575",
+   "text": "Add a reminder the day before a game",
+   "kind": "wish",
+   "at": 1794010405549,
+   "group": "weekday",
+   "band": "B",
+   "area": "reminders",
+   "aspect": "timing",
+   "ok": true,
+   "player": "u12",
+   "simulated": true
+  },
+  {
+   "id": "I-mw5pix097c4094",
+   "text": "Arrange doubles games with players of similar skill level",
+   "kind": "wish",
+   "at": 1794013848729,
+   "group": "weekday",
+   "band": "C",
+   "area": "match",
+   "aspect": "option",
+   "ok": true,
+   "player": "u11",
+   "simulated": true
+  }
+ ],
+ "votes": [],
+ "clusters": [
+  {
+   "id": "C-a68cc3ad",
+   "text": "Reduce how often the agent sends messages",
+   "members": 1,
+   "groups": [
+    "weekday"
+   ],
+   "shown": false,
+   "eligible": false,
+   "exists": false,
+   "why": [
+    "1 of the 5 members it needs"
+   ],
+   "proposal": null
+  }
+ ],
+ "proposals": [],
+ "outcome": "no proposal: the largest idea had 1 member (5 are needed, from weekday and weekend players); 1 of the 5 members it needs"
+}

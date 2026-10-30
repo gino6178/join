@@ -1,0 +1,2009 @@
+{
+ "summary": {
+  "started": "2026-10-28T11:38:53.686Z",
+  "minutes": 10,
+  "model": "muse-glimmer",
+  "endpoint": "http://127.0.0.1:11448/v1",
+  "parallel": 3,
+  "runs": 3,
+  "pass": "3/3",
+  "C1": "0/0",
+  "C2": "3/3",
+  "firstAttempt": "1/3",
+  "infraStopped": 0,
+  "firstAttemptBySpec": {
+   "P-B04": "1/3"
+  },
+  "perSpec": {
+   "P-B04": "3/3"
+  },
+  "steps": 84,
+  "tokens": 825777,
+  "buildMinutes": 25.4,
+  "medianPerBuild": {
+   "steps": 32,
+   "tokens": 318537,
+   "minutes": 9.5
+  },
+  "refusedWrites": 0,
+  "refusedKinds": {},
+  "triedTestsOrNever": [],
+  "cannots": 0,
+  "falseCannots": [],
+  "cannotsRefused": 0,
+  "planFirstRefusals": 0
+ },
+ "rows": [
+  {
+   "run": 1,
+   "id": "P-B04",
+   "class": "C2",
+   "files": [
+    "agent/src/places.js",
+    "agent/src/autopilot.js"
+   ],
+   "ok": true,
+   "built": true,
+   "infra": false,
+   "cannot": null,
+   "falseCannot": false,
+   "planned": [
+    2,
+    3
+   ],
+   "reviews": 2,
+   "planFirst": 0,
+   "cannotRefused": 0,
+   "oracle": {
+    "ok": true,
+    "pass": 4,
+    "fail": 0,
+    "output": "passed"
+   },
+   "attemptsUsed": 2,
+   "wonAt": 2,
+   "steps": 32,
+   "toolCalls": 38,
+   "tokens": {
+    "prompt": 311693,
+    "cached": 205330,
+    "output": 6844,
+    "reasoning": 955,
+    "calls": 32
+   },
+   "seconds": 583.2,
+   "lockWaitS": 0,
+   "lock": null,
+   "endpoint": "http://127.0.0.1:11448/v1",
+   "lane": 0,
+   "buildSeconds": 572.3,
+   "refused": [],
+   "attempts": [
+    {
+     "n": 1,
+     "ok": false,
+     "end": "verify",
+     "steps": 16,
+     "toolCalls": 19,
+     "refused": [],
+     "compactions": 9,
+     "modelErrors": 0,
+     "planFirst": 0,
+     "cannotRefused": 0,
+     "plan": [
+      {
+       "file": "agent/src/places.js",
+       "where": "export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {} } = {})",
+       "change": "Add optional indoorOnly parameter default false to search signature, and filter judged places to only those where outdoor(p) is false when indoorOnly is true, before returning. This implements R2 and R3."
+      },
+      {
+       "file": "agent/src/autopilot.js",
+       "where": "TOOLS array entry for find_places, lines 86 and tools.find_places function lines 147-162",
+       "change": "Declare optional boolean parameter indoorOnly in find_places tool schema (not required) and pass it through to places.search call in tools.find_places. This implements R1 and R4, and keeps default behaviour for R5."
+      }
+     ],
+     "cannot": null,
+     "reviews": 1,
+     "checks": [
+      {
+       "id": "R1",
+       "met": true,
+       "where": "agent/src/autopilot.js line 86 parameters indoorOnly boolean, and line 147 function signature"
+      },
+      {
+       "id": "R2",
+       "met": true,
+       "where": "agent/src/places.js line 176 search signature indoorOnly = false"
+      },
+      {
+       "id": "R3",
+       "met": true,
+       "where": "agent/src/places.js line 220 filtered = indoorOnly ? judged.filter(p => !outdoor(p)) : judged"
+      },
+      {
+       "id": "R4",
+       "met": true,
+       "where": "agent/src/autopilot.js line 86 TOOLS declares indoorOnly boolean not required, line 152 passes indoorOnly to places.search"
+      },
+      {
+       "id": "R5",
+       "met": true,
+       "where": "agent/src/places.js line 176 default false and agent/src/autopilot.js line 147 default false keep existing behaviour"
+      }
+     ],
+     "verify": {
+      "ok": false,
+      "output": "failed: indoorOnly: only those places are judged (no model call for an outdoor one)\nerror: |-"
+     },
+     "changed": [
+      "agent/src/autopilot.js",
+      "agent/src/places.js"
+     ],
+     "unit": {
+      "ok": true,
+      "pass": 22,
+      "fail": 0
+     },
+     "tokens": {
+      "calls": 16,
+      "prompt": 153874,
+      "cached": 97001,
+      "fresh": 56873,
+      "cachedShare": 0.63,
+      "output": 3262,
+      "reasoning": 69,
+      "seconds": 299.4,
+      "empty": 0,
+      "invalid": 0
+     },
+     "seconds": 307.7,
+     "summary": null,
+     "diffChars": 8688
+    },
+    {
+     "n": 2,
+     "ok": true,
+     "end": "done",
+     "steps": 16,
+     "toolCalls": 19,
+     "refused": [],
+     "compactions": 10,
+     "modelErrors": 0,
+     "planFirst": 0,
+     "cannotRefused": 0,
+     "plan": [
+      {
+       "file": "agent/src/places.js",
+       "where": "export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {} } = {})",
+       "change": "Add optional indoorOnly parameter default false to search signature, and when true filter pick to only places where outdoor(p) is false before judging, so only indoor places are judged and returned. This satisfies R2 and R3."
+      },
+      {
+       "file": "agent/src/autopilot.js",
+       "where": "const TOOLS = [...] find_places entry lines 86",
+       "change": "Add optional boolean parameter indoorOnly to find_places tool definition in TOOLS, not required. This satisfies R1 and R4."
+      },
+      {
+       "file": "agent/src/autopilot.js",
+       "where": "async find_places({ day, start = \"19:00\" }) { ... } lines 147-162",
+       "change": "Accept indoorOnly in find_places arguments and pass it to places.search call. This satisfies R4 and R5."
+      }
+     ],
+     "cannot": null,
+     "reviews": 1,
+     "checks": [
+      {
+       "id": "R1",
+       "met": true,
+       "where": "agent/src/autopilot.js line 86: indoorOnly boolean property added to find_places parameters"
+      },
+      {
+       "id": "R2",
+       "met": true,
+       "where": "agent/src/places.js line 176: search signature includes indoorOnly = false"
+      },
+      {
+       "id": "R3",
+       "met": true,
+       "where": "agent/src/places.js lines 215-217: pick filtered with !outdoor(p) when indoorOnly true before judging"
+      },
+      {
+       "id": "R4",
+       "met": true,
+       "where": "agent/src/autopilot.js line 86 declares indoorOnly boolean optional and line 152 passes indoorOnly to places.search"
+      },
+      {
+       "id": "R5",
+       "met": true,
+       "where": "agent/src/places.js line 176 default false and filter only applied when indoorOnly true; autopilot default false"
+      }
+     ],
+     "verify": {
+      "ok": true,
+      "output": "passed"
+     },
+     "changed": [
+      "agent/src/autopilot.js",
+      "agent/src/places.js"
+     ],
+     "unit": {
+      "ok": true,
+      "pass": 22,
+      "fail": 0
+     },
+     "tokens": {
+      "calls": 16,
+      "prompt": 157819,
+      "cached": 108329,
+      "fresh": 49490,
+      "cachedShare": 0.686,
+      "output": 3582,
+      "reasoning": 886,
+      "seconds": 256.2,
+      "empty": 0,
+      "invalid": 0
+     },
+     "seconds": 264.6,
+     "summary": "Added optional indoorOnly parameter to Autopilot find_places tool and places.search, filtering out outdoor places when true.",
+     "diffChars": 7146
+    }
+   ],
+   "diff": "diff --git a/agent/src/autopilot.js b/agent/src/autopilot.js\nindex 67f8e60..12f4c4c 100644\n--- a/agent/src/autopilot.js\n+++ b/agent/src/autopilot.js\n@@ -83,7 +83,7 @@ const freeAt = (free, day, start, minutes) => windows(free).some((w) => DAYS[w.d\n const TOOLS = [\n   { name: \"get_week\", description: \"This week so far: the goal, games already booked, how many are still needed, your habitual play times and the partners you play best with.\", parameters: { type: \"object\", properties: {} } },\n   { name: \"check_body\", description: \"What the player's body log and health app say: anything sore, this week's training load against their usual week, and the limits that follow (format, game length, sports to skip, one game fewer).\", parameters: { type: \"object\", properties: {} } },\n-  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each judged playable or not from the map, Google Maps reviews and the forecast. Use for basketball, soccer or volleyball, or when club courts are full or far. Pass a place id to negotiate.\", parameters: { type: \"object\", properties: { day: { type: \"string\" }, start: { type: \"string\", description: \"HH:MM\" }, reason: { type: \"string\" } }, required: [\"day\", \"start\", \"reason\"] } },\n+  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each judged playable or not from the map, Google Maps reviews and the forecast. Use for basketball, soccer or volleyball, or when club courts are full or far. Pass a place id to negotiate.\", parameters: { type: \"object\", properties: { day: { type: \"string\" }, start: { type: \"string\", description: \"HH:MM\" }, reason: { type: \"string\" }, indoorOnly: { type: \"boolean\" } }, required: [\"day\", \"start\", \"reason\"] } },\n   { name: \"find_partners\", description: \"Rank the club members who are free at one of your times this week, for singles (one opponent) or doubles (three players).\", parameters: { type: \"object\", properties: { day: { type: \"string\", description: \"Mon..Sun\" }, start: { type: \"string\", description: \"HH:MM\" }, format: { type: \"string\", enum: [\"singles\", \"doubles\"] }, leaveOut: { type: \"array\", items: { type: \"string\" }, description: \"ids of members the player asked you to leave out (fromMemory, recall); they stay out for the rest of the run\" }, reason: { type: \"string\", description: \"one sentence: why this time\" } }, required: [\"day\", \"start\", \"format\", \"reason\"] } },\n   { name: \"negotiate\", description: \"Your agent agrees the game with these members' agents (in parallel). Returns the agreed time, court and trips, or why it failed.\", parameters: { type: \"object\", properties: { members: { type: \"array\", items: { type: \"string\" }, description: \"member ids: 1 for singles, 3 for doubles\" }, day: { type: \"string\" }, start: { type: \"string\" }, format: { type: \"string\", enum: [\"singles\", \"doubles\"] }, place: { type: \"string\", description: \"optional: a place id from find_places, for a public court instead of a club venue\" }, reason: { type: \"string\", description: \"one sentence: why these people\" } }, required: [\"members\", \"day\", \"start\", \"format\", \"reason\"] } },\n   { name: \"recall\", description: \"Search what the player told you before, and what happened in past talks, by meaning (the closest notes, with the day each was said). Use it when choosing people, times or places, if get_week's fromMemory does not cover the question.\", parameters: { type: \"object\", properties: { question: { type: \"string\", description: \"what you want to know, in a sentence\" }, reason: { type: \"string\", description: \"one sentence: why you ask\" } }, required: [\"question\", \"reason\"] } },\n@@ -144,12 +144,12 @@ async function runWeek({ you = {}, history = [], goal = {}, ratings = {}, upcomi\n         limits: { format: bp.format || \"any\", gameMinutes: minutes, skipSports: [...new Set([...bp.avoid, ...bp.pause])], gamesThisWeek: perWeek !== g.perWeek ? `${perWeek} instead of ${g.perWeek}` : g.perWeek },\n         agentActions: org.actions.filter((a) => a.kind !== \"follow\").map((a) => a.text), fromHealthApp: org.linked.length ? org.linked.map((l) => `${l.date} game ran ${l.minutes} min (booked ${l.booked || \"?\"})`) : undefined };\n     },\n-    async find_places({ day, start = \"19:00\" }) {\n+    async find_places({ day, start = \"19:00\", indoorOnly = false }) {\n       const d = days.find((x) => x.day === day);\n       if (!d) return { error: `${day} is not in the next seven days` };\n       if (!geo) return { error: \"the club map has no real-world location (venues.json map.geo)\" };\n       const here = places.toGeo(geo, club.you.area);\n-      const res = await places.search({ ...here, sport: g.sport, date: d.date, start, limit: 4, radius: flags.get(\"places.radius\", player || messenger), onStep: (e) => e.type === \"working\" && work(e.step) });\n+      const res = await places.search({ ...here, sport: g.sport, date: d.date, start, limit: 4, radius: flags.get(\"places.radius\", player || messenger), onStep: (e) => e.type === \"working\" && work(e.step), indoorOnly });\n       const ok = res.places.filter((p) => p.verdict !== \"no\").slice(0, 3);\n       ok.forEach((p) => { found[p.id] = p; places.note(p); });\n       const club0 = venues.venues.map((v) => v.sports?.[g.sport]).filter(Boolean).sort((a, b) => a.price - b.price)[0];\ndiff --git a/agent/src/places.js b/agent/src/places.js\nindex 7e9b708..89af5a3 100644\n--- a/agent/src/places.js\n+++ b/agent/src/places.js\n@@ -173,7 +173,7 @@ async function english(list) {\n }\n \n // near a point, for a sport, at a time: the places, nearest first, each judged\n-export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {} } = {}) {\n+export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {}, indoorOnly = false } = {}) {\n   const tell = (s) => onStep({ type: \"step\", ...s }), work = (step) => onStep({ type: \"working\", step });\n   const here = { lat: +lat, lon: +lon };\n   if (!isFinite(here.lat) || !isFinite(here.lon)) throw new Error(\"No location to search around.\");\n@@ -212,6 +212,9 @@ export async function search({ lat, lon, sport = \"basketball\", date, start = \"19\n     tell({ step: err ? \"Google Maps did not answer\" : \"Read Google Maps\", tool: \"reviews\", detail: err || `${found} places with a Google rating${nrev ? `, ${nrev} reviews read` : \" (this key's plan has no review text)\"}` });\n   } else tell({ step: \"No Google Maps\", tool: \"reviews\", detail: KEY ? \"today's Google Maps quota is used up: judging from the map tags and the weather\" : \"GOOGLE_MAPS_API_KEY is not set on the server: judging from the map tags and the weather\" });\n   await english(pick);\n+  if (indoorOnly) {\n+    pick = pick.filter((p) => !outdoor(p));\n+  }\n   work(\"Checking the weather at that hour\");\n   const w = await forecast(here.lat, here.lon, date, start);\n   if (w) tell({ step: \"Checked the forecast\", tool: \"weather\", detail: `${date} ${start}: rain ${w.rain}%, ${w.temp} °C, wind ${w.wind} km/h (Open-Meteo)` });\n",
+   "attemptDiffs": [
+    "diff --git a/agent/src/autopilot.js b/agent/src/autopilot.js\nindex 67f8e60..12f4c4c 100644\n--- a/agent/src/autopilot.js\n+++ b/agent/src/autopilot.js\n@@ -83,7 +83,7 @@ const freeAt = (free, day, start, minutes) => windows(free).some((w) => DAYS[w.d\n const TOOLS = [\n   { name: \"get_week\", description: \"This week so far: the goal, games already booked, how many are still needed, your habitual play times and the partners you play best with.\", parameters: { type: \"object\", properties: {} } },\n   { name: \"check_body\", description: \"What the player's body log and health app say: anything sore, this week's training load against their usual week, and the limits that follow (format, game length, sports to skip, one game fewer).\", parameters: { type: \"object\", properties: {} } },\n-  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each judged playable or not from the map, Google Maps reviews and the forecast. Use for basketball, soccer or volleyball, or when club courts are full or far. Pass a place id to negotiate.\", parameters: { type: \"object\", properties: { day: { type: \"string\" }, start: { type: \"string\", description: \"HH:MM\" }, reason: { type: \"string\" } }, required: [\"day\", \"start\", \"reason\"] } },\n+  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each judged playable or not from the map, Google Maps reviews and the forecast. Use for basketball, soccer or volleyball, or when club courts are full or far. Pass a place id to negotiate.\", parameters: { type: \"object\", properties: { day: { type: \"string\" }, start: { type: \"string\", description: \"HH:MM\" }, reason: { type: \"string\" }, indoorOnly: { type: \"boolean\" } }, required: [\"day\", \"start\", \"reason\"] } },\n   { name: \"find_partners\", description: \"Rank the club members who are free at one of your times this week, for singles (one opponent) or doubles (three players).\", parameters: { type: \"object\", properties: { day: { type: \"string\", description: \"Mon..Sun\" }, start: { type: \"string\", description: \"HH:MM\" }, format: { type: \"string\", enum: [\"singles\", \"doubles\"] }, leaveOut: { type: \"array\", items: { type: \"string\" }, description: \"ids of members the player asked you to leave out (fromMemory, recall); they stay out for the rest of the run\" }, reason: { type: \"string\", description: \"one sentence: why this time\" } }, required: [\"day\", \"start\", \"format\", \"reason\"] } },\n   { name: \"negotiate\", description: \"Your agent agrees the game with these members' agents (in parallel). Returns the agreed time, court and trips, or why it failed.\", parameters: { type: \"object\", properties: { members: { type: \"array\", items: { type: \"string\" }, description: \"member ids: 1 for singles, 3 for doubles\" }, day: { type: \"string\" }, start: { type: \"string\" }, format: { type: \"string\", enum: [\"singles\", \"doubles\"] }, place: { type: \"string\", description: \"optional: a place id from find_places, for a public court instead of a club venue\" }, reason: { type: \"string\", description: \"one sentence: why these people\" } }, required: [\"members\", \"day\", \"start\", \"format\", \"reason\"] } },\n   { name: \"recall\", description: \"Search what the player told you before, and what happened in past talks, by meaning (the closest notes, with the day each was said). Use it when choosing people, times or places, if get_week's fromMemory does not cover the question.\", parameters: { type: \"object\", properties: { question: { type: \"string\", description: \"what you want to know, in a sentence\" }, reason: { type: \"string\", description: \"one sentence: why you ask\" } }, required: [\"question\", \"reason\"] } },\n@@ -144,12 +144,12 @@ async function runWeek({ you = {}, history = [], goal = {}, ratings = {}, upcomi\n         limits: { format: bp.format || \"any\", gameMinutes: minutes, skipSports: [...new Set([...bp.avoid, ...bp.pause])], gamesThisWeek: perWeek !== g.perWeek ? `${perWeek} instead of ${g.perWeek}` : g.perWeek },\n         agentActions: org.actions.filter((a) => a.kind !== \"follow\").map((a) => a.text), fromHealthApp: org.linked.length ? org.linked.map((l) => `${l.date} game ran ${l.minutes} min (booked ${l.booked || \"?\"})`) : undefined };\n     },\n-    async find_places({ day, start = \"19:00\" }) {\n+    async find_places({ day, start = \"19:00\", indoorOnly = false }) {\n       const d = days.find((x) => x.day === day);\n       if (!d) return { error: `${day} is not in the next seven days` };\n       if (!geo) return { error: \"the club map has no real-world location (venues.json map.geo)\" };\n       const here = places.toGeo(geo, club.you.area);\n-      const res = await places.search({ ...here, sport: g.sport, date: d.date, start, limit: 4, radius: flags.get(\"places.radius\", player || messenger), onStep: (e) => e.type === \"working\" && work(e.step) });\n+      const res = await places.search({ ...here, sport: g.sport, date: d.date, start, limit: 4, radius: flags.get(\"places.radius\", player || messenger), onStep: (e) => e.type === \"working\" && work(e.step), indoorOnly });\n       const ok = res.places.filter((p) => p.verdict !== \"no\").slice(0, 3);\n       ok.forEach((p) => { found[p.id] = p; places.note(p); });\n       const club0 = venues.venues.map((v) => v.sports?.[g.sport]).filter(Boolean).sort((a, b) => a.price - b.price)[0];\ndiff --git a/agent/src/places.js b/agent/src/places.js\nindex 7e9b708..af7c7f9 100644\n--- a/agent/src/places.js\n+++ b/agent/src/places.js\n@@ -173,7 +173,7 @@ async function english(list) {\n }\n \n // near a point, for a sport, at a time: the places, nearest first, each judged\n-export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {} } = {}) {\n+export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {}, indoorOnly = false } = {}) {\n   const tell = (s) => onStep({ type: \"step\", ...s }), work = (step) => onStep({ type: \"working\", step });\n   const here = { lat: +lat, lon: +lon };\n   if (!isFinite(here.lat) || !isFinite(here.lon)) throw new Error(\"No location to search around.\");\n@@ -217,12 +217,13 @@ export async function search({ lat, lon, sport = \"basketball\", date, start = \"19\n   if (w) tell({ step: \"Checked the forecast\", tool: \"weather\", detail: `${date} ${start}: rain ${w.rain}%, ${w.temp} °C, wind ${w.wind} km/h (Open-Meteo)` });\n   work(`Muse Glimmer is judging ${pick.length} places`);\n   const judged = await Promise.all(pick.map(async (p) => ({ ...p, outdoor: outdoor(p), weather: outdoor(p) ? w : null, ...(await judge(p, sport, date, start, w)) })));\n+  const filtered = indoorOnly ? judged.filter((p) => !outdoor(p)) : judged;\n   const order = { good: 0, maybe: 1, no: 2 };\n-  judged.sort((a, b) => order[a.verdict] - order[b.verdict] || a.dist - b.dist);\n-  const g = judged.filter((p) => p.verdict === \"good\").length;\n-  tell({ step: \"Judged every place\", tool: \"verify\", detail: `${g} good, ${judged.filter((p) => p.verdict === \"maybe\").length} maybe, ${judged.filter((p) => p.verdict === \"no\").length} no · ${judged.filter((p) => p.by === \"model\").length} by Muse Glimmer, every reason checked against its source` });\n+  filtered.sort((a, b) => order[a.verdict] - order[b.verdict] || a.dist - b.dist);\n+  const g = filtered.filter((p) => p.verdict === \"good\").length;\n+  tell({ step: \"Judged every place\", tool: \"verify\", detail: `${g} good, ${filtered.filter((p) => p.verdict === \"maybe\").length} maybe, ${filtered.filter((p) => p.verdict === \"no\").length} no · ${filtered.filter((p) => p.by === \"model\").length} by Muse Glimmer, every reason checked against its source` });\n   // reviews go back with their author and the link to Google Maps; only the ones a reason quotes\n-  return { here, sport, date, start, weather: w, google: judged.some((p) => p.rating != null), reviews: judged.some((p) => p.reviews?.length), places: judged.map((p) => ({ ...p, reviews: (p.reviews || []).filter((r) => p.reasons.some((x) => x.review === r.n)).map(({ n, stars, when, text, author, authorUrl }) => ({ n, stars, when, text, author, authorUrl })) })) };\n+  return { here, sport, date, start, weather: w, google: filtered.some((p) => p.rating != null), reviews: filtered.some((p) => p.reviews?.length), places: filtered.map((p) => ({ ...p, reviews: (p.reviews || []).filter((r) => p.reasons.some((x) => x.review === r.n)).map(({ n, stars, when, text, author, authorUrl }) => ({ n, stars, when, text, author, authorUrl })) })) };\n }\n \n // the map under a route, drawn by the app in its own style: roads, rivers and parks from OpenStreetMap, no labels\n",
+    "diff --git a/agent/src/autopilot.js b/agent/src/autopilot.js\nindex 67f8e60..12f4c4c 100644\n--- a/agent/src/autopilot.js\n+++ b/agent/src/autopilot.js\n@@ -83,7 +83,7 @@ const freeAt = (free, day, start, minutes) => windows(free).some((w) => DAYS[w.d\n const TOOLS = [\n   { name: \"get_week\", description: \"This week so far: the goal, games already booked, how many are still needed, your habitual play times and the partners you play best with.\", parameters: { type: \"object\", properties: {} } },\n   { name: \"check_body\", description: \"What the player's body log and health app say: anything sore, this week's training load against their usual week, and the limits that follow (format, game length, sports to skip, one game fewer).\", parameters: { type: \"object\", properties: {} } },\n-  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each judged playable or not from the map, Google Maps reviews and the forecast. Use for basketball, soccer or volleyball, or when club courts are full or far. Pass a place id to negotiate.\", parameters: { type: \"object\", properties: { day: { type: \"string\" }, start: { type: \"string\", description: \"HH:MM\" }, reason: { type: \"string\" } }, required: [\"day\", \"start\", \"reason\"] } },\n+  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each judged playable or not from the map, Google Maps reviews and the forecast. Use for basketball, soccer or volleyball, or when club courts are full or far. Pass a place id to negotiate.\", parameters: { type: \"object\", properties: { day: { type: \"string\" }, start: { type: \"string\", description: \"HH:MM\" }, reason: { type: \"string\" }, indoorOnly: { type: \"boolean\" } }, required: [\"day\", \"start\", \"reason\"] } },\n   { name: \"find_partners\", description: \"Rank the club members who are free at one of your times this week, for singles (one opponent) or doubles (three players).\", parameters: { type: \"object\", properties: { day: { type: \"string\", description: \"Mon..Sun\" }, start: { type: \"string\", description: \"HH:MM\" }, format: { type: \"string\", enum: [\"singles\", \"doubles\"] }, leaveOut: { type: \"array\", items: { type: \"string\" }, description: \"ids of members the player asked you to leave out (fromMemory, recall); they stay out for the rest of the run\" }, reason: { type: \"string\", description: \"one sentence: why this time\" } }, required: [\"day\", \"start\", \"format\", \"reason\"] } },\n   { name: \"negotiate\", description: \"Your agent agrees the game with these members' agents (in parallel). Returns the agreed time, court and trips, or why it failed.\", parameters: { type: \"object\", properties: { members: { type: \"array\", items: { type: \"string\" }, description: \"member ids: 1 for singles, 3 for doubles\" }, day: { type: \"string\" }, start: { type: \"string\" }, format: { type: \"string\", enum: [\"singles\", \"doubles\"] }, place: { type: \"string\", description: \"optional: a place id from find_places, for a public court instead of a club venue\" }, reason: { type: \"string\", description: \"one sentence: why these people\" } }, required: [\"members\", \"day\", \"start\", \"format\", \"reason\"] } },\n   { name: \"recall\", description: \"Search what the player told you before, and what happened in past talks, by meaning (the closest notes, with the day each was said). Use it when choosing people, times or places, if get_week's fromMemory does not cover the question.\", parameters: { type: \"object\", properties: { question: { type: \"string\", description: \"what you want to know, in a sentence\" }, reason: { type: \"string\", description: \"one sentence: why you ask\" } }, required: [\"question\", \"reason\"] } },\n@@ -144,12 +144,12 @@ async function runWeek({ you = {}, history = [], goal = {}, ratings = {}, upcomi\n         limits: { format: bp.format || \"any\", gameMinutes: minutes, skipSports: [...new Set([...bp.avoid, ...bp.pause])], gamesThisWeek: perWeek !== g.perWeek ? `${perWeek} instead of ${g.perWeek}` : g.perWeek },\n         agentActions: org.actions.filter((a) => a.kind !== \"follow\").map((a) => a.text), fromHealthApp: org.linked.length ? org.linked.map((l) => `${l.date} game ran ${l.minutes} min (booked ${l.booked || \"?\"})`) : undefined };\n     },\n-    async find_places({ day, start = \"19:00\" }) {\n+    async find_places({ day, start = \"19:00\", indoorOnly = false }) {\n       const d = days.find((x) => x.day === day);\n       if (!d) return { error: `${day} is not in the next seven days` };\n       if (!geo) return { error: \"the club map has no real-world location (venues.json map.geo)\" };\n       const here = places.toGeo(geo, club.you.area);\n-      const res = await places.search({ ...here, sport: g.sport, date: d.date, start, limit: 4, radius: flags.get(\"places.radius\", player || messenger), onStep: (e) => e.type === \"working\" && work(e.step) });\n+      const res = await places.search({ ...here, sport: g.sport, date: d.date, start, limit: 4, radius: flags.get(\"places.radius\", player || messenger), onStep: (e) => e.type === \"working\" && work(e.step), indoorOnly });\n       const ok = res.places.filter((p) => p.verdict !== \"no\").slice(0, 3);\n       ok.forEach((p) => { found[p.id] = p; places.note(p); });\n       const club0 = venues.venues.map((v) => v.sports?.[g.sport]).filter(Boolean).sort((a, b) => a.price - b.price)[0];\ndiff --git a/agent/src/places.js b/agent/src/places.js\nindex 7e9b708..89af5a3 100644\n--- a/agent/src/places.js\n+++ b/agent/src/places.js\n@@ -173,7 +173,7 @@ async function english(list) {\n }\n \n // near a point, for a sport, at a time: the places, nearest first, each judged\n-export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {} } = {}) {\n+export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {}, indoorOnly = false } = {}) {\n   const tell = (s) => onStep({ type: \"step\", ...s }), work = (step) => onStep({ type: \"working\", step });\n   const here = { lat: +lat, lon: +lon };\n   if (!isFinite(here.lat) || !isFinite(here.lon)) throw new Error(\"No location to search around.\");\n@@ -212,6 +212,9 @@ export async function search({ lat, lon, sport = \"basketball\", date, start = \"19\n     tell({ step: err ? \"Google Maps did not answer\" : \"Read Google Maps\", tool: \"reviews\", detail: err || `${found} places with a Google rating${nrev ? `, ${nrev} reviews read` : \" (this key's plan has no review text)\"}` });\n   } else tell({ step: \"No Google Maps\", tool: \"reviews\", detail: KEY ? \"today's Google Maps quota is used up: judging from the map tags and the weather\" : \"GOOGLE_MAPS_API_KEY is not set on the server: judging from the map tags and the weather\" });\n   await english(pick);\n+  if (indoorOnly) {\n+    pick = pick.filter((p) => !outdoor(p));\n+  }\n   work(\"Checking the weather at that hour\");\n   const w = await forecast(here.lat, here.lon, date, start);\n   if (w) tell({ step: \"Checked the forecast\", tool: \"weather\", detail: `${date} ${start}: rain ${w.rain}%, ${w.temp} °C, wind ${w.wind} km/h (Open-Meteo)` });\n"
+   ],
+   "reasons": [],
+   "branch": "loop/P-B04",
+   "commit": "153b57d136d075d2cd3dca26f83978c7b52f91d0",
+   "stat": "2 files changed, 7 insertions(+), 4 deletions(-)",
+   "baseUnit": {
+    "ok": true,
+    "pass": 22,
+    "fail": 0,
+    "seconds": 4.4
+   },
+   "reviewStub": false,
+   "log": [
+    {
+     "attempt": 1,
+     "step": 1,
+     "tool": "list_files",
+     "args": {
+      "dir": "."
+     },
+     "ok": true,
+     "result": ".gitattributes (2 lines)\n.gitignore (31 lines)\nagent/\nCREDITS.md (83 lines)\ndocs/\nLICENSE (22 lines)\nREADME.md (468 lines)\nserver/\nsubmission/\nvideo/\nweb/",
+     "ms": 7
+    },
+    {
+     "attempt": 1,
+     "step": 2,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js"
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 1-86 of 273:\n1\t// Courts near you: public courts, school fields, sports centres and parks where a game can happen, in any ball sport.\n2\t//   1. OpenStreetMap (Overpass) finds them around a point, with what the map…[6817 more chars]",
+     "ms": 9
+    },
+    {
+     "attempt": 1,
+     "step": 2,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js"
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 1-78 of 408:\n1\t// Autopilot: your agent keeps you playing, without being asked.\n2\t//   It learns your habits from your games (the days and times you keep coming back to, and how long you play) and who\n3\t//   yo…[6660 more chars]",
+     "ms": 5
+    },
+    {
+     "attempt": 1,
+     "step": 3,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js",
+      "from": 110,
+      "to": 180
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 110-168 of 273:\n110\t\n111\tconst outdoor = (p) => !(p.kind === \"sports_centre\" || p.kind === \"sports_hall\" || p.tags.indoor === \"yes\" || p.tags.covered === \"yes\" || p.tags.building);\n112\tconst tagWords = (p) => p.id…[6784 more chars]",
+     "ms": 3
+    },
+    {
+     "attempt": 1,
+     "step": 3,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "from": 80,
+      "to": 160
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 80-120 of 408:\n80\tconst freeAt = (free, day, start, minutes) => windows(free).some((w) => DAYS[w.day] === day && w.from <= start && start + minutes <= w.to);\n81\t\n82\t// ---- the tools Muse Glimmer can call -----…[6805 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 1,
+     "step": 4,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js",
+      "from": 176,
+      "to": 230
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 176-230 of 273:\n176\texport async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {} } = {}) {\n177\t  const tell = (s) => onSte…[5306 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 1,
+     "step": 4,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "from": 140,
+      "to": 165
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 140-165 of 408:\n140\t    check_body() {\n141\t      const sore = org.parts.filter((p) => p.active);\n142\t      return { sore: sore.map((p) => `${p.name} ${p.latest.level}/5, ${p.trend === \"new\" ? \"first logged\" : p…[2906 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 1,
+     "step": 5,
+     "tool": "plan",
+     "args": {
+      "steps": [
+       {
+        "change": "Add optional indoorOnly parameter default false to search signature, and filter judged places to only those where outdoor(p) is false when indoorOnly is true, before returning. This implements R2 and R3.",
+        "file": "agent/src/places.js",
+        "where": "export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {} } = {})"
+       },
+       {
+        "change": "Declare optional boolean parameter indoorOnly in find_places tool schema (not required) and pass it through to places.search call in tools.find_places. This implements R1 and R4, and keeps default behaviour for R5.",
+        "file": "agent/src/autopilot.js",
+        "where": "TOOLS array entry for find_places, lines 86 and tools.find_places function lines 147-162"
+       }
+      ]
+     },
+     "ok": true,
+     "result": "Plan accepted. Your checklist (it stays in view):\n1. agent/src/places.js, export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"…[39 more chars]: Add optional indoorOnly para…[548 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 1,
+     "step": 6,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js",
+      "from": 176,
+      "to": 226
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 176-226 of 273:\n176\texport async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {} } = {}) {\n177\t  const tell = (s) => onSte…[5051 more chars]",
+     "ms": 2
+    },
+    {
+     "attempt": 1,
+     "step": 7,
+     "tool": "write_patch",
+     "args": {
+      "path": "agent/src/places.js",
+      "old": "export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"…[41 more chars]",
+      "new": "export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"…[61 more chars]",
+      "oldChars": 161,
+      "newChars": 181
+     },
+     "ok": true,
+     "result": "Changed agent/src/places.js. Lines 174-178 now:\n174\t\n175\t// near a point, for a sport, at a time: the places, nearest first, each judged\n176\texport async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flag…[254 more chars]",
+     "ms": 269
+    },
+    {
+     "attempt": 1,
+     "step": 8,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js",
+      "from": 218,
+      "to": 226
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 218-226 of 273:\n218\t  work(`Muse Glimmer is judging ${pick.length} places`);\n219\t  const judged = await Promise.all(pick.map(async (p) => ({ ...p, outdoor: outdoor(p), weather: outdoor(p) ? w : null, ...(await jud…[1051 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 1,
+     "step": 9,
+     "tool": "write_patch",
+     "args": {
+      "path": "agent/src/places.js",
+      "old": "  work(`Muse Glimmer is judging ${pick.length} places`);\n  const judged = await Promise.all(pick.map(async (p) => ({ ...…[1060 more chars]",
+      "new": "  work(`Muse Glimmer is judging ${pick.length} places`);\n  const judged = await Promise.all(pick.map(async (p) => ({ ...…[1152 more chars]",
+      "oldChars": 1180,
+      "newChars": 1272
+     },
+     "ok": true,
+     "result": "Changed agent/src/places.js. Lines 218-230 now:\n218\t  work(`Muse Glimmer is judging ${pick.length} places`);\n219\t  const judged = await Promise.all(pick.map(async (p) => ({ ...p, outdoor: outdoor(p), weather: outdoor(p) ? w : null, ...(awai…[1295 more chars]",
+     "ms": 162
+    },
+    {
+     "attempt": 1,
+     "step": 10,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "from": 84,
+      "to": 93
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 84-93 of 408:\n84\t  { name: \"get_week\", description: \"This week so far: the goal, games already booked, how many are still needed, your habitual play times and the partners you play best with.\", parameters: { ty…[3465 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 1,
+     "step": 11,
+     "tool": "write_patch",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "old": "  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each…[376 more chars]",
+      "new": "  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each…[409 more chars]",
+      "oldChars": 496,
+      "newChars": 529
+     },
+     "ok": true,
+     "result": "Changed agent/src/autopilot.js. Lines 84-88 now:\n84\t  { name: \"get_week\", description: \"This week so far: the goal, games already booked, how many are still needed, your habitual play times and the partners you play best with.\", parameters:…[1307 more chars]",
+     "ms": 125
+    },
+    {
+     "attempt": 1,
+     "step": 12,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "from": 147,
+      "to": 155
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 147-155 of 408:\n147\t    async find_places({ day, start = \"19:00\" }) {\n148\t      const d = days.find((x) => x.day === day);\n149\t      if (!d) return { error: `${day} is not in the next seven days` };\n150\t      i…[661 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 1,
+     "step": 13,
+     "tool": "write_patch",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "old": "    async find_places({ day, start = \"19:00\" }) {\n      const d = days.find((x) => x.day === day);\n      if (!d) return …[411 more chars]",
+      "new": "    async find_places({ day, start = \"19:00\", indoorOnly = false }) {\n      const d = days.find((x) => x.day === day);\n …[443 more chars]",
+      "oldChars": 531,
+      "newChars": 563
+     },
+     "ok": true,
+     "result": "Changed agent/src/autopilot.js. Lines 145-154 now:\n145\t        agentActions: org.actions.filter((a) => a.kind !== \"follow\").map((a) => a.text), fromHealthApp: org.linked.length ? org.linked.map((l) => `${l.date} game ran ${l.minutes} min (b…[804 more chars]",
+     "ms": 242
+    },
+    {
+     "attempt": 1,
+     "step": 14,
+     "tool": "run_unit",
+     "args": {},
+     "ok": true,
+     "result": "unit tests: 22 pass, 0 fail (4.6 s)",
+     "ms": 4622
+    },
+    {
+     "attempt": 1,
+     "step": 15,
+     "tool": "done",
+     "args": {
+      "summary": "Added optional indoorOnly parameter to places.search and autopilot find_places, filtering results to non-outdoor places when true.",
+      "checks": [
+       "R1:met: agent/src/autopilot.js lines 86 and 147",
+       "R2:met: agent/src/places.js line 176",
+       "R3:met: agent/src/places.js line 220",
+       "R4:met: agent/src/autopilot.js lines 86 and 152",
+       "R5:met: agent/src/places.js line 176 default false and autopilot.js line 147 default fal…[2 more chars]"
+      ]
+     },
+     "ok": true,
+     "result": "Not yet: check your change against the spec first.\nYour diff:\ndiff --git a/agent/src/autopilot.js b/agent/src/autopilot.js\nindex 67f8e60..12f4c4c 100644\n--- a/agent/src/autopilot.js\n+++ b/agent/src/autopilot.js\n@@ -83,7 +83,7 @@ const freeA…[4134 more chars]",
+     "ms": 163
+    },
+    {
+     "attempt": 1,
+     "step": 16,
+     "tool": "done",
+     "args": {
+      "summary": "Added optional indoorOnly parameter to places.search and autopilot find_places, filtering results to non-outdoor places when true.",
+      "checks": [
+       "R1:met: agent/src/autopilot.js line 86 parameters indoorOnly boolean, and line 147 funct…[13 more chars]",
+       "R2:met: agent/src/places.js line 176 search signature indoorOnly = false",
+       "R3:met: agent/src/places.js line 220 filtered = indoorOnly ? judged.filter(p => !outdoor…[13 more chars]",
+       "R4:met: agent/src/autopilot.js line 86 TOOLS declares indoorOnly boolean not required, l…[42 more chars]",
+       "R5:met: agent/src/places.js line 176 default false and agent/src/autopilot.js line 147 d…[36 more chars]"
+      ]
+     },
+     "ok": true,
+     "result": "accepted",
+     "ms": 133
+    },
+    {
+     "attempt": 2,
+     "step": 1,
+     "tool": "list_files",
+     "args": {
+      "dir": "."
+     },
+     "ok": true,
+     "result": ".gitattributes (2 lines)\n.gitignore (31 lines)\nagent/\nCREDITS.md (83 lines)\ndocs/\nLICENSE (22 lines)\nREADME.md (468 lines)\nserver/\nsubmission/\nvideo/\nweb/",
+     "ms": 3
+    },
+    {
+     "attempt": 2,
+     "step": 2,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js"
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 1-86 of 273:\n1\t// Courts near you: public courts, school fields, sports centres and parks where a game can happen, in any ball sport.\n2\t//   1. OpenStreetMap (Overpass) finds them around a point, with what the map…[6817 more chars]",
+     "ms": 3
+    },
+    {
+     "attempt": 2,
+     "step": 2,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js"
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 1-78 of 408:\n1\t// Autopilot: your agent keeps you playing, without being asked.\n2\t//   It learns your habits from your games (the days and times you keep coming back to, and how long you play) and who\n3\t//   yo…[6660 more chars]",
+     "ms": 0
+    },
+    {
+     "attempt": 2,
+     "step": 3,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js",
+      "from": 110,
+      "to": 180
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 110-168 of 273:\n110\t\n111\tconst outdoor = (p) => !(p.kind === \"sports_centre\" || p.kind === \"sports_hall\" || p.tags.indoor === \"yes\" || p.tags.covered === \"yes\" || p.tags.building);\n112\tconst tagWords = (p) => p.id…[6784 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 2,
+     "step": 3,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "from": 80,
+      "to": 160
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 80-120 of 408:\n80\tconst freeAt = (free, day, start, minutes) => windows(free).some((w) => DAYS[w.day] === day && w.from <= start && start + minutes <= w.to);\n81\t\n82\t// ---- the tools Muse Glimmer can call -----…[6805 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 2,
+     "step": 4,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js",
+      "from": 176,
+      "to": 230
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 176-230 of 273:\n176\texport async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {} } = {}) {\n177\t  const tell = (s) => onSte…[5306 more chars]",
+     "ms": 3
+    },
+    {
+     "attempt": 2,
+     "step": 4,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "from": 147,
+      "to": 165
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 147-165 of 408:\n147\t    async find_places({ day, start = \"19:00\" }) {\n148\t      const d = days.find((x) => x.day === day);\n149\t      if (!d) return { error: `${day} is not in the next seven days` };\n150\t      i…[2029 more chars]",
+     "ms": 3
+    },
+    {
+     "attempt": 2,
+     "step": 5,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js",
+      "from": 176,
+      "to": 226
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 176-226 of 273:\n176\texport async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {} } = {}) {\n177\t  const tell = (s) => onSte…[5051 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 2,
+     "step": 6,
+     "tool": "plan",
+     "args": {
+      "steps": [
+       {
+        "change": "Add optional indoorOnly parameter default false to search signature, and when true filter pick to only places where outdoor(p) is false before judging, so only indoor places are judged and returned. This satisfies R2 and R3.",
+        "file": "agent/src/places.js",
+        "where": "export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {} } = {})"
+       },
+       {
+        "change": "Add optional boolean parameter indoorOnly to find_places tool definition in TOOLS, not required. This satisfies R1 and R4.",
+        "file": "agent/src/autopilot.js",
+        "where": "const TOOLS = [...] find_places entry lines 86"
+       },
+       {
+        "change": "Accept indoorOnly in find_places arguments and pass it to places.search call. This satisfies R4 and R5.",
+        "file": "agent/src/autopilot.js",
+        "where": "async find_places({ day, start = \"19:00\" }) { ... } lines 147-162"
+       }
+      ]
+     },
+     "ok": true,
+     "result": "Plan accepted. Your checklist (it stays in view):\n1. agent/src/places.js, export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"…[39 more chars]: Add optional indoorOnly para…[633 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 2,
+     "step": 7,
+     "tool": "write_patch",
+     "args": {
+      "path": "agent/src/places.js",
+      "old": "export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"…[41 more chars]",
+      "new": "export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"…[61 more chars]",
+      "oldChars": 161,
+      "newChars": 181
+     },
+     "ok": true,
+     "result": "Changed agent/src/places.js. Lines 174-178 now:\n174\t\n175\t// near a point, for a sport, at a time: the places, nearest first, each judged\n176\texport async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flag…[254 more chars]",
+     "ms": 142
+    },
+    {
+     "attempt": 2,
+     "step": 8,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js",
+      "from": 214,
+      "to": 226
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 214-226 of 273:\n214\t  await english(pick);\n215\t  work(\"Checking the weather at that hour\");\n216\t  const w = await forecast(here.lat, here.lon, date, start);\n217\t  if (w) tell({ step: \"Checked the forecast\", tool: …[1355 more chars]",
+     "ms": 5
+    },
+    {
+     "attempt": 2,
+     "step": 9,
+     "tool": "write_patch",
+     "args": {
+      "path": "agent/src/places.js",
+      "old": "  await english(pick);\n  work(\"Checking the weather at that hour\");\n  const w = await forecast(here.lat, here.lon, date,…[392 more chars]",
+      "new": "  await english(pick);\n  if (indoorOnly) {\n    pick = pick.filter((p) => !outdoor(p));\n  }\n  work(\"Checking the weather …[460 more chars]",
+      "oldChars": 512,
+      "newChars": 580
+     },
+     "ok": true,
+     "result": "Changed agent/src/places.js. Lines 213-225 now:\n213\t  } else tell({ step: \"No Google Maps\", tool: \"reviews\", detail: KEY ? \"today's Google Maps quota is used up: judging from the map tags and the weather\" : \"GOOGLE_MAPS_API_KEY is not set o…[896 more chars]",
+     "ms": 190
+    },
+    {
+     "attempt": 2,
+     "step": 10,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "from": 83,
+      "to": 95
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 83-95 of 408:\n83\tconst TOOLS = [\n84\t  { name: \"get_week\", description: \"This week so far: the goal, games already booked, how many are still needed, your habitual play times and the partners you play best with.…[3610 more chars]",
+     "ms": 2
+    },
+    {
+     "attempt": 2,
+     "step": 11,
+     "tool": "write_patch",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "old": "  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each…[376 more chars]",
+      "new": "  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each…[409 more chars]",
+      "oldChars": 496,
+      "newChars": 529
+     },
+     "ok": true,
+     "result": "Changed agent/src/autopilot.js. Lines 84-88 now:\n84\t  { name: \"get_week\", description: \"This week so far: the goal, games already booked, how many are still needed, your habitual play times and the partners you play best with.\", parameters:…[1307 more chars]",
+     "ms": 258
+    },
+    {
+     "attempt": 2,
+     "step": 12,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "from": 147,
+      "to": 165
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 147-165 of 408:\n147\t    async find_places({ day, start = \"19:00\" }) {\n148\t      const d = days.find((x) => x.day === day);\n149\t      if (!d) return { error: `${day} is not in the next seven days` };\n150\t      i…[2029 more chars]",
+     "ms": 2
+    },
+    {
+     "attempt": 2,
+     "step": 13,
+     "tool": "write_patch",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "old": "    async find_places({ day, start = \"19:00\" }) {\n      const d = days.find((x) => x.day === day);\n      if (!d) return …[411 more chars]",
+      "new": "    async find_places({ day, start = \"19:00\", indoorOnly = false }) {\n      const d = days.find((x) => x.day === day);\n …[443 more chars]",
+      "oldChars": 531,
+      "newChars": 563
+     },
+     "ok": true,
+     "result": "Changed agent/src/autopilot.js. Lines 145-154 now:\n145\t        agentActions: org.actions.filter((a) => a.kind !== \"follow\").map((a) => a.text), fromHealthApp: org.linked.length ? org.linked.map((l) => `${l.date} game ran ${l.minutes} min (b…[804 more chars]",
+     "ms": 217
+    },
+    {
+     "attempt": 2,
+     "step": 14,
+     "tool": "run_unit",
+     "args": {},
+     "ok": true,
+     "result": "unit tests: 22 pass, 0 fail (4.8 s)",
+     "ms": 4760
+    },
+    {
+     "attempt": 2,
+     "step": 15,
+     "tool": "done",
+     "args": {
+      "summary": "Added optional indoorOnly parameter to Autopilot find_places tool and places.search, filtering out outdoor places when true.",
+      "checks": [
+       "R1:met: agent/src/autopilot.js lines 86",
+       "R2:met: agent/src/places.js lines 176",
+       "R3:met: agent/src/places.js lines 215-217",
+       "R4:met: agent/src/autopilot.js lines 86 and 147-152",
+       "R5:met: agent/src/places.js lines 176 and agent/src/autopilot.js lines 147-152"
+      ]
+     },
+     "ok": true,
+     "result": "Not yet: check your change against the spec first.\nYour diff:\ndiff --git a/agent/src/autopilot.js b/agent/src/autopilot.js\nindex 67f8e60..12f4c4c 100644\n--- a/agent/src/autopilot.js\n+++ b/agent/src/autopilot.js\n@@ -83,7 +83,7 @@ const freeA…[4134 more chars]",
+     "ms": 94
+    },
+    {
+     "attempt": 2,
+     "step": 16,
+     "tool": "done",
+     "args": {
+      "summary": "Added optional indoorOnly parameter to Autopilot find_places tool and places.search, filtering out outdoor places when true.",
+      "checks": [
+       "R1:met: agent/src/autopilot.js line 86: indoorOnly boolean property added to find_places…[11 more chars]",
+       "R2:met: agent/src/places.js line 176: search signature includes indoorOnly = false",
+       "R3:met: agent/src/places.js lines 215-217: pick filtered with !outdoor(p) when indoorOnl…[21 more chars]",
+       "R4:met: agent/src/autopilot.js line 86 declares indoorOnly boolean optional and line 152…[35 more chars]",
+       "R5:met: agent/src/places.js line 176 default false and filter only applied when indoorOn…[32 more chars]"
+      ]
+     },
+     "ok": true,
+     "result": "accepted",
+     "ms": 68
+    }
+   ]
+  },
+  {
+   "run": 2,
+   "id": "P-B04",
+   "class": "C2",
+   "files": [
+    "agent/src/places.js",
+    "agent/src/autopilot.js"
+   ],
+   "ok": true,
+   "built": true,
+   "infra": false,
+   "cannot": null,
+   "falseCannot": false,
+   "planned": [
+    3,
+    3
+   ],
+   "reviews": 2,
+   "planFirst": 0,
+   "cannotRefused": 0,
+   "oracle": {
+    "ok": true,
+    "pass": 4,
+    "fail": 0,
+    "output": "passed"
+   },
+   "attemptsUsed": 2,
+   "wonAt": 2,
+   "steps": 36,
+   "toolCalls": 39,
+   "tokens": {
+    "prompt": 340777,
+    "cached": 247448,
+    "output": 6884,
+    "reasoning": 1035,
+    "calls": 36
+   },
+   "seconds": 596.4,
+   "lockWaitS": 0.1,
+   "lock": null,
+   "endpoint": "http://127.0.0.1:11448/v1",
+   "lane": 1,
+   "buildSeconds": 588.1,
+   "refused": [],
+   "attempts": [
+    {
+     "n": 1,
+     "ok": false,
+     "end": "verify",
+     "steps": 21,
+     "toolCalls": 21,
+     "refused": [],
+     "compactions": 10,
+     "modelErrors": 0,
+     "planFirst": 0,
+     "cannotRefused": 0,
+     "plan": [
+      {
+       "file": "agent/src/places.js",
+       "where": "search(), lines 176-226",
+       "change": "Add optional indoorOnly parameter default false to search signature, and filter judged places to only non-outdoor when indoorOnly is true before returning."
+      },
+      {
+       "file": "agent/src/autopilot.js",
+       "where": "TOOLS array, lines 86",
+       "change": "Add optional boolean indoorOnly parameter to find_places tool definition, not required."
+      },
+      {
+       "file": "agent/src/autopilot.js",
+       "where": "find_places(), lines 147-162",
+       "change": "Accept indoorOnly param and pass it to places.search call."
+      }
+     ],
+     "cannot": null,
+     "reviews": 1,
+     "checks": [
+      {
+       "id": "R1",
+       "met": true,
+       "where": "agent/src/autopilot.js line 86 (TOOLS) and line 147 (find_places)"
+      },
+      {
+       "id": "R2",
+       "met": true,
+       "where": "agent/src/places.js line 176 (search signature with indoorOnly = false)"
+      },
+      {
+       "id": "R3",
+       "met": true,
+       "where": "agent/src/places.js line 220 (filtered = indoorOnly ? judged.filter(p => !outdoor(p)) : judged)"
+      },
+      {
+       "id": "R4",
+       "met": true,
+       "where": "agent/src/autopilot.js line 86 (parameter declaration) and line 152 (passed to places.search)"
+      },
+      {
+       "id": "R5",
+       "met": true,
+       "where": "agent/src/places.js line 220 default false and filter only applied when true; autopilot default false"
+      }
+     ],
+     "verify": {
+      "ok": false,
+      "output": "failed: indoorOnly: only those places are judged (no model call for an outdoor one)\nerror: |-"
+     },
+     "changed": [
+      "agent/src/autopilot.js",
+      "agent/src/places.js"
+     ],
+     "unit": {
+      "ok": true,
+      "pass": 22,
+      "fail": 0
+     },
+     "tokens": {
+      "calls": 21,
+      "prompt": 196223,
+      "cached": 138237,
+      "fresh": 57986,
+      "cachedShare": 0.704,
+      "output": 3771,
+      "reasoning": 548,
+      "seconds": 359,
+      "empty": 0,
+      "invalid": 0
+     },
+     "seconds": 367.6,
+     "summary": null,
+     "diffChars": 8688
+    },
+    {
+     "n": 2,
+     "ok": true,
+     "end": "done",
+     "steps": 15,
+     "toolCalls": 18,
+     "refused": [],
+     "compactions": 7,
+     "modelErrors": 0,
+     "planFirst": 0,
+     "cannotRefused": 0,
+     "plan": [
+      {
+       "file": "agent/src/places.js",
+       "where": "search() function, lines 176-226",
+       "change": "Add optional indoorOnly parameter with default false to search signature; filter pick to indoor places when indoorOnly true before judging, using outdoor(p) rule, so only non-outdoor places are judged and returned."
+      },
+      {
+       "file": "agent/src/autopilot.js",
+       "where": "TOOLS array, line 86",
+       "change": "Add optional boolean indoorOnly parameter to find_places tool definition, not required."
+      },
+      {
+       "file": "agent/src/autopilot.js",
+       "where": "find_places tool implementation, lines 147-162",
+       "change": "Accept indoorOnly in find_places args and pass it to places.search call."
+      }
+     ],
+     "cannot": null,
+     "reviews": 1,
+     "checks": [
+      {
+       "id": "R1",
+       "met": true,
+       "where": "agent/src/autopilot.js line 86 indoorOnly property added to find_places parameters"
+      },
+      {
+       "id": "R2",
+       "met": true,
+       "where": "agent/src/places.js line 176 search signature includes indoorOnly = false"
+      },
+      {
+       "id": "R3",
+       "met": true,
+       "where": "agent/src/places.js lines 218-221 filter pick with !outdoor(p) when indoorOnly true"
+      },
+      {
+       "id": "R4",
+       "met": true,
+       "where": "agent/src/autopilot.js line 86 declares indoorOnly boolean and line 152 passes indoorOnly to places.search"
+      },
+      {
+       "id": "R5",
+       "met": true,
+       "where": "agent/src/places.js line 176 default false and agent/src/autopilot.js line 147 default false keep prior behavior"
+      }
+     ],
+     "verify": {
+      "ok": true,
+      "output": "passed"
+     },
+     "changed": [
+      "agent/src/autopilot.js",
+      "agent/src/places.js"
+     ],
+     "unit": {
+      "ok": true,
+      "pass": 22,
+      "fail": 0
+     },
+     "tokens": {
+      "calls": 15,
+      "prompt": 144554,
+      "cached": 109211,
+      "fresh": 35343,
+      "cachedShare": 0.756,
+      "output": 3113,
+      "reasoning": 487,
+      "seconds": 212.4,
+      "empty": 0,
+      "invalid": 0
+     },
+     "seconds": 220.5,
+     "summary": "Added optional indoorOnly parameter to find_places tool and places.search, filtering to non-outdoor places when true.",
+     "diffChars": 7346
+    }
+   ],
+   "diff": "diff --git a/agent/src/autopilot.js b/agent/src/autopilot.js\nindex 67f8e60..12f4c4c 100644\n--- a/agent/src/autopilot.js\n+++ b/agent/src/autopilot.js\n@@ -83,7 +83,7 @@ const freeAt = (free, day, start, minutes) => windows(free).some((w) => DAYS[w.d\n const TOOLS = [\n   { name: \"get_week\", description: \"This week so far: the goal, games already booked, how many are still needed, your habitual play times and the partners you play best with.\", parameters: { type: \"object\", properties: {} } },\n   { name: \"check_body\", description: \"What the player's body log and health app say: anything sore, this week's training load against their usual week, and the limits that follow (format, game length, sports to skip, one game fewer).\", parameters: { type: \"object\", properties: {} } },\n-  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each judged playable or not from the map, Google Maps reviews and the forecast. Use for basketball, soccer or volleyball, or when club courts are full or far. Pass a place id to negotiate.\", parameters: { type: \"object\", properties: { day: { type: \"string\" }, start: { type: \"string\", description: \"HH:MM\" }, reason: { type: \"string\" } }, required: [\"day\", \"start\", \"reason\"] } },\n+  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each judged playable or not from the map, Google Maps reviews and the forecast. Use for basketball, soccer or volleyball, or when club courts are full or far. Pass a place id to negotiate.\", parameters: { type: \"object\", properties: { day: { type: \"string\" }, start: { type: \"string\", description: \"HH:MM\" }, reason: { type: \"string\" }, indoorOnly: { type: \"boolean\" } }, required: [\"day\", \"start\", \"reason\"] } },\n   { name: \"find_partners\", description: \"Rank the club members who are free at one of your times this week, for singles (one opponent) or doubles (three players).\", parameters: { type: \"object\", properties: { day: { type: \"string\", description: \"Mon..Sun\" }, start: { type: \"string\", description: \"HH:MM\" }, format: { type: \"string\", enum: [\"singles\", \"doubles\"] }, leaveOut: { type: \"array\", items: { type: \"string\" }, description: \"ids of members the player asked you to leave out (fromMemory, recall); they stay out for the rest of the run\" }, reason: { type: \"string\", description: \"one sentence: why this time\" } }, required: [\"day\", \"start\", \"format\", \"reason\"] } },\n   { name: \"negotiate\", description: \"Your agent agrees the game with these members' agents (in parallel). Returns the agreed time, court and trips, or why it failed.\", parameters: { type: \"object\", properties: { members: { type: \"array\", items: { type: \"string\" }, description: \"member ids: 1 for singles, 3 for doubles\" }, day: { type: \"string\" }, start: { type: \"string\" }, format: { type: \"string\", enum: [\"singles\", \"doubles\"] }, place: { type: \"string\", description: \"optional: a place id from find_places, for a public court instead of a club venue\" }, reason: { type: \"string\", description: \"one sentence: why these people\" } }, required: [\"members\", \"day\", \"start\", \"format\", \"reason\"] } },\n   { name: \"recall\", description: \"Search what the player told you before, and what happened in past talks, by meaning (the closest notes, with the day each was said). Use it when choosing people, times or places, if get_week's fromMemory does not cover the question.\", parameters: { type: \"object\", properties: { question: { type: \"string\", description: \"what you want to know, in a sentence\" }, reason: { type: \"string\", description: \"one sentence: why you ask\" } }, required: [\"question\", \"reason\"] } },\n@@ -144,12 +144,12 @@ async function runWeek({ you = {}, history = [], goal = {}, ratings = {}, upcomi\n         limits: { format: bp.format || \"any\", gameMinutes: minutes, skipSports: [...new Set([...bp.avoid, ...bp.pause])], gamesThisWeek: perWeek !== g.perWeek ? `${perWeek} instead of ${g.perWeek}` : g.perWeek },\n         agentActions: org.actions.filter((a) => a.kind !== \"follow\").map((a) => a.text), fromHealthApp: org.linked.length ? org.linked.map((l) => `${l.date} game ran ${l.minutes} min (booked ${l.booked || \"?\"})`) : undefined };\n     },\n-    async find_places({ day, start = \"19:00\" }) {\n+    async find_places({ day, start = \"19:00\", indoorOnly = false }) {\n       const d = days.find((x) => x.day === day);\n       if (!d) return { error: `${day} is not in the next seven days` };\n       if (!geo) return { error: \"the club map has no real-world location (venues.json map.geo)\" };\n       const here = places.toGeo(geo, club.you.area);\n-      const res = await places.search({ ...here, sport: g.sport, date: d.date, start, limit: 4, radius: flags.get(\"places.radius\", player || messenger), onStep: (e) => e.type === \"working\" && work(e.step) });\n+      const res = await places.search({ ...here, sport: g.sport, date: d.date, start, limit: 4, radius: flags.get(\"places.radius\", player || messenger), onStep: (e) => e.type === \"working\" && work(e.step), indoorOnly });\n       const ok = res.places.filter((p) => p.verdict !== \"no\").slice(0, 3);\n       ok.forEach((p) => { found[p.id] = p; places.note(p); });\n       const club0 = venues.venues.map((v) => v.sports?.[g.sport]).filter(Boolean).sort((a, b) => a.price - b.price)[0];\ndiff --git a/agent/src/places.js b/agent/src/places.js\nindex 7e9b708..3ad97f1 100644\n--- a/agent/src/places.js\n+++ b/agent/src/places.js\n@@ -173,7 +173,7 @@ async function english(list) {\n }\n \n // near a point, for a sport, at a time: the places, nearest first, each judged\n-export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {} } = {}) {\n+export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {}, indoorOnly = false } = {}) {\n   const tell = (s) => onStep({ type: \"step\", ...s }), work = (step) => onStep({ type: \"working\", step });\n   const here = { lat: +lat, lon: +lon };\n   if (!isFinite(here.lat) || !isFinite(here.lon)) throw new Error(\"No location to search around.\");\n@@ -215,8 +215,12 @@ export async function search({ lat, lon, sport = \"basketball\", date, start = \"19\n   work(\"Checking the weather at that hour\");\n   const w = await forecast(here.lat, here.lon, date, start);\n   if (w) tell({ step: \"Checked the forecast\", tool: \"weather\", detail: `${date} ${start}: rain ${w.rain}%, ${w.temp} °C, wind ${w.wind} km/h (Open-Meteo)` });\n-  work(`Muse Glimmer is judging ${pick.length} places`);\n-  const judged = await Promise.all(pick.map(async (p) => ({ ...p, outdoor: outdoor(p), weather: outdoor(p) ? w : null, ...(await judge(p, sport, date, start, w)) })));\n+  let pickFiltered = pick;\n+  if (indoorOnly) {\n+    pickFiltered = pick.filter((p) => !outdoor(p));\n+  }\n+  work(`Muse Glimmer is judging ${pickFiltered.length} places`);\n+  const judged = await Promise.all(pickFiltered.map(async (p) => ({ ...p, outdoor: outdoor(p), weather: outdoor(p) ? w : null, ...(await judge(p, sport, date, start, w)) })));\n   const order = { good: 0, maybe: 1, no: 2 };\n   judged.sort((a, b) => order[a.verdict] - order[b.verdict] || a.dist - b.dist);\n   const g = judged.filter((p) => p.verdict === \"good\").length;\n",
+   "attemptDiffs": [
+    "diff --git a/agent/src/autopilot.js b/agent/src/autopilot.js\nindex 67f8e60..12f4c4c 100644\n--- a/agent/src/autopilot.js\n+++ b/agent/src/autopilot.js\n@@ -83,7 +83,7 @@ const freeAt = (free, day, start, minutes) => windows(free).some((w) => DAYS[w.d\n const TOOLS = [\n   { name: \"get_week\", description: \"This week so far: the goal, games already booked, how many are still needed, your habitual play times and the partners you play best with.\", parameters: { type: \"object\", properties: {} } },\n   { name: \"check_body\", description: \"What the player's body log and health app say: anything sore, this week's training load against their usual week, and the limits that follow (format, game length, sports to skip, one game fewer).\", parameters: { type: \"object\", properties: {} } },\n-  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each judged playable or not from the map, Google Maps reviews and the forecast. Use for basketball, soccer or volleyball, or when club courts are full or far. Pass a place id to negotiate.\", parameters: { type: \"object\", properties: { day: { type: \"string\" }, start: { type: \"string\", description: \"HH:MM\" }, reason: { type: \"string\" } }, required: [\"day\", \"start\", \"reason\"] } },\n+  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each judged playable or not from the map, Google Maps reviews and the forecast. Use for basketball, soccer or volleyball, or when club courts are full or far. Pass a place id to negotiate.\", parameters: { type: \"object\", properties: { day: { type: \"string\" }, start: { type: \"string\", description: \"HH:MM\" }, reason: { type: \"string\" }, indoorOnly: { type: \"boolean\" } }, required: [\"day\", \"start\", \"reason\"] } },\n   { name: \"find_partners\", description: \"Rank the club members who are free at one of your times this week, for singles (one opponent) or doubles (three players).\", parameters: { type: \"object\", properties: { day: { type: \"string\", description: \"Mon..Sun\" }, start: { type: \"string\", description: \"HH:MM\" }, format: { type: \"string\", enum: [\"singles\", \"doubles\"] }, leaveOut: { type: \"array\", items: { type: \"string\" }, description: \"ids of members the player asked you to leave out (fromMemory, recall); they stay out for the rest of the run\" }, reason: { type: \"string\", description: \"one sentence: why this time\" } }, required: [\"day\", \"start\", \"format\", \"reason\"] } },\n   { name: \"negotiate\", description: \"Your agent agrees the game with these members' agents (in parallel). Returns the agreed time, court and trips, or why it failed.\", parameters: { type: \"object\", properties: { members: { type: \"array\", items: { type: \"string\" }, description: \"member ids: 1 for singles, 3 for doubles\" }, day: { type: \"string\" }, start: { type: \"string\" }, format: { type: \"string\", enum: [\"singles\", \"doubles\"] }, place: { type: \"string\", description: \"optional: a place id from find_places, for a public court instead of a club venue\" }, reason: { type: \"string\", description: \"one sentence: why these people\" } }, required: [\"members\", \"day\", \"start\", \"format\", \"reason\"] } },\n   { name: \"recall\", description: \"Search what the player told you before, and what happened in past talks, by meaning (the closest notes, with the day each was said). Use it when choosing people, times or places, if get_week's fromMemory does not cover the question.\", parameters: { type: \"object\", properties: { question: { type: \"string\", description: \"what you want to know, in a sentence\" }, reason: { type: \"string\", description: \"one sentence: why you ask\" } }, required: [\"question\", \"reason\"] } },\n@@ -144,12 +144,12 @@ async function runWeek({ you = {}, history = [], goal = {}, ratings = {}, upcomi\n         limits: { format: bp.format || \"any\", gameMinutes: minutes, skipSports: [...new Set([...bp.avoid, ...bp.pause])], gamesThisWeek: perWeek !== g.perWeek ? `${perWeek} instead of ${g.perWeek}` : g.perWeek },\n         agentActions: org.actions.filter((a) => a.kind !== \"follow\").map((a) => a.text), fromHealthApp: org.linked.length ? org.linked.map((l) => `${l.date} game ran ${l.minutes} min (booked ${l.booked || \"?\"})`) : undefined };\n     },\n-    async find_places({ day, start = \"19:00\" }) {\n+    async find_places({ day, start = \"19:00\", indoorOnly = false }) {\n       const d = days.find((x) => x.day === day);\n       if (!d) return { error: `${day} is not in the next seven days` };\n       if (!geo) return { error: \"the club map has no real-world location (venues.json map.geo)\" };\n       const here = places.toGeo(geo, club.you.area);\n-      const res = await places.search({ ...here, sport: g.sport, date: d.date, start, limit: 4, radius: flags.get(\"places.radius\", player || messenger), onStep: (e) => e.type === \"working\" && work(e.step) });\n+      const res = await places.search({ ...here, sport: g.sport, date: d.date, start, limit: 4, radius: flags.get(\"places.radius\", player || messenger), onStep: (e) => e.type === \"working\" && work(e.step), indoorOnly });\n       const ok = res.places.filter((p) => p.verdict !== \"no\").slice(0, 3);\n       ok.forEach((p) => { found[p.id] = p; places.note(p); });\n       const club0 = venues.venues.map((v) => v.sports?.[g.sport]).filter(Boolean).sort((a, b) => a.price - b.price)[0];\ndiff --git a/agent/src/places.js b/agent/src/places.js\nindex 7e9b708..af7c7f9 100644\n--- a/agent/src/places.js\n+++ b/agent/src/places.js\n@@ -173,7 +173,7 @@ async function english(list) {\n }\n \n // near a point, for a sport, at a time: the places, nearest first, each judged\n-export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {} } = {}) {\n+export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {}, indoorOnly = false } = {}) {\n   const tell = (s) => onStep({ type: \"step\", ...s }), work = (step) => onStep({ type: \"working\", step });\n   const here = { lat: +lat, lon: +lon };\n   if (!isFinite(here.lat) || !isFinite(here.lon)) throw new Error(\"No location to search around.\");\n@@ -217,12 +217,13 @@ export async function search({ lat, lon, sport = \"basketball\", date, start = \"19\n   if (w) tell({ step: \"Checked the forecast\", tool: \"weather\", detail: `${date} ${start}: rain ${w.rain}%, ${w.temp} °C, wind ${w.wind} km/h (Open-Meteo)` });\n   work(`Muse Glimmer is judging ${pick.length} places`);\n   const judged = await Promise.all(pick.map(async (p) => ({ ...p, outdoor: outdoor(p), weather: outdoor(p) ? w : null, ...(await judge(p, sport, date, start, w)) })));\n+  const filtered = indoorOnly ? judged.filter((p) => !outdoor(p)) : judged;\n   const order = { good: 0, maybe: 1, no: 2 };\n-  judged.sort((a, b) => order[a.verdict] - order[b.verdict] || a.dist - b.dist);\n-  const g = judged.filter((p) => p.verdict === \"good\").length;\n-  tell({ step: \"Judged every place\", tool: \"verify\", detail: `${g} good, ${judged.filter((p) => p.verdict === \"maybe\").length} maybe, ${judged.filter((p) => p.verdict === \"no\").length} no · ${judged.filter((p) => p.by === \"model\").length} by Muse Glimmer, every reason checked against its source` });\n+  filtered.sort((a, b) => order[a.verdict] - order[b.verdict] || a.dist - b.dist);\n+  const g = filtered.filter((p) => p.verdict === \"good\").length;\n+  tell({ step: \"Judged every place\", tool: \"verify\", detail: `${g} good, ${filtered.filter((p) => p.verdict === \"maybe\").length} maybe, ${filtered.filter((p) => p.verdict === \"no\").length} no · ${filtered.filter((p) => p.by === \"model\").length} by Muse Glimmer, every reason checked against its source` });\n   // reviews go back with their author and the link to Google Maps; only the ones a reason quotes\n-  return { here, sport, date, start, weather: w, google: judged.some((p) => p.rating != null), reviews: judged.some((p) => p.reviews?.length), places: judged.map((p) => ({ ...p, reviews: (p.reviews || []).filter((r) => p.reasons.some((x) => x.review === r.n)).map(({ n, stars, when, text, author, authorUrl }) => ({ n, stars, when, text, author, authorUrl })) })) };\n+  return { here, sport, date, start, weather: w, google: filtered.some((p) => p.rating != null), reviews: filtered.some((p) => p.reviews?.length), places: filtered.map((p) => ({ ...p, reviews: (p.reviews || []).filter((r) => p.reasons.some((x) => x.review === r.n)).map(({ n, stars, when, text, author, authorUrl }) => ({ n, stars, when, text, author, authorUrl })) })) };\n }\n \n // the map under a route, drawn by the app in its own style: roads, rivers and parks from OpenStreetMap, no labels\n",
+    "diff --git a/agent/src/autopilot.js b/agent/src/autopilot.js\nindex 67f8e60..12f4c4c 100644\n--- a/agent/src/autopilot.js\n+++ b/agent/src/autopilot.js\n@@ -83,7 +83,7 @@ const freeAt = (free, day, start, minutes) => windows(free).some((w) => DAYS[w.d\n const TOOLS = [\n   { name: \"get_week\", description: \"This week so far: the goal, games already booked, how many are still needed, your habitual play times and the partners you play best with.\", parameters: { type: \"object\", properties: {} } },\n   { name: \"check_body\", description: \"What the player's body log and health app say: anything sore, this week's training load against their usual week, and the limits that follow (format, game length, sports to skip, one game fewer).\", parameters: { type: \"object\", properties: {} } },\n-  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each judged playable or not from the map, Google Maps reviews and the forecast. Use for basketball, soccer or volleyball, or when club courts are full or far. Pass a place id to negotiate.\", parameters: { type: \"object\", properties: { day: { type: \"string\" }, start: { type: \"string\", description: \"HH:MM\" }, reason: { type: \"string\" } }, required: [\"day\", \"start\", \"reason\"] } },\n+  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each judged playable or not from the map, Google Maps reviews and the forecast. Use for basketball, soccer or volleyball, or when club courts are full or far. Pass a place id to negotiate.\", parameters: { type: \"object\", properties: { day: { type: \"string\" }, start: { type: \"string\", description: \"HH:MM\" }, reason: { type: \"string\" }, indoorOnly: { type: \"boolean\" } }, required: [\"day\", \"start\", \"reason\"] } },\n   { name: \"find_partners\", description: \"Rank the club members who are free at one of your times this week, for singles (one opponent) or doubles (three players).\", parameters: { type: \"object\", properties: { day: { type: \"string\", description: \"Mon..Sun\" }, start: { type: \"string\", description: \"HH:MM\" }, format: { type: \"string\", enum: [\"singles\", \"doubles\"] }, leaveOut: { type: \"array\", items: { type: \"string\" }, description: \"ids of members the player asked you to leave out (fromMemory, recall); they stay out for the rest of the run\" }, reason: { type: \"string\", description: \"one sentence: why this time\" } }, required: [\"day\", \"start\", \"format\", \"reason\"] } },\n   { name: \"negotiate\", description: \"Your agent agrees the game with these members' agents (in parallel). Returns the agreed time, court and trips, or why it failed.\", parameters: { type: \"object\", properties: { members: { type: \"array\", items: { type: \"string\" }, description: \"member ids: 1 for singles, 3 for doubles\" }, day: { type: \"string\" }, start: { type: \"string\" }, format: { type: \"string\", enum: [\"singles\", \"doubles\"] }, place: { type: \"string\", description: \"optional: a place id from find_places, for a public court instead of a club venue\" }, reason: { type: \"string\", description: \"one sentence: why these people\" } }, required: [\"members\", \"day\", \"start\", \"format\", \"reason\"] } },\n   { name: \"recall\", description: \"Search what the player told you before, and what happened in past talks, by meaning (the closest notes, with the day each was said). Use it when choosing people, times or places, if get_week's fromMemory does not cover the question.\", parameters: { type: \"object\", properties: { question: { type: \"string\", description: \"what you want to know, in a sentence\" }, reason: { type: \"string\", description: \"one sentence: why you ask\" } }, required: [\"question\", \"reason\"] } },\n@@ -144,12 +144,12 @@ async function runWeek({ you = {}, history = [], goal = {}, ratings = {}, upcomi\n         limits: { format: bp.format || \"any\", gameMinutes: minutes, skipSports: [...new Set([...bp.avoid, ...bp.pause])], gamesThisWeek: perWeek !== g.perWeek ? `${perWeek} instead of ${g.perWeek}` : g.perWeek },\n         agentActions: org.actions.filter((a) => a.kind !== \"follow\").map((a) => a.text), fromHealthApp: org.linked.length ? org.linked.map((l) => `${l.date} game ran ${l.minutes} min (booked ${l.booked || \"?\"})`) : undefined };\n     },\n-    async find_places({ day, start = \"19:00\" }) {\n+    async find_places({ day, start = \"19:00\", indoorOnly = false }) {\n       const d = days.find((x) => x.day === day);\n       if (!d) return { error: `${day} is not in the next seven days` };\n       if (!geo) return { error: \"the club map has no real-world location (venues.json map.geo)\" };\n       const here = places.toGeo(geo, club.you.area);\n-      const res = await places.search({ ...here, sport: g.sport, date: d.date, start, limit: 4, radius: flags.get(\"places.radius\", player || messenger), onStep: (e) => e.type === \"working\" && work(e.step) });\n+      const res = await places.search({ ...here, sport: g.sport, date: d.date, start, limit: 4, radius: flags.get(\"places.radius\", player || messenger), onStep: (e) => e.type === \"working\" && work(e.step), indoorOnly });\n       const ok = res.places.filter((p) => p.verdict !== \"no\").slice(0, 3);\n       ok.forEach((p) => { found[p.id] = p; places.note(p); });\n       const club0 = venues.venues.map((v) => v.sports?.[g.sport]).filter(Boolean).sort((a, b) => a.price - b.price)[0];\ndiff --git a/agent/src/places.js b/agent/src/places.js\nindex 7e9b708..3ad97f1 100644\n--- a/agent/src/places.js\n+++ b/agent/src/places.js\n@@ -173,7 +173,7 @@ async function english(list) {\n }\n \n // near a point, for a sport, at a time: the places, nearest first, each judged\n-export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {} } = {}) {\n+export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {}, indoorOnly = false } = {}) {\n   const tell = (s) => onStep({ type: \"step\", ...s }), work = (step) => onStep({ type: \"working\", step });\n   const here = { lat: +lat, lon: +lon };\n   if (!isFinite(here.lat) || !isFinite(here.lon)) throw new Error(\"No location to search around.\");\n@@ -215,8 +215,12 @@ export async function search({ lat, lon, sport = \"basketball\", date, start = \"19\n   work(\"Checking the weather at that hour\");\n   const w = await forecast(here.lat, here.lon, date, start);\n   if (w) tell({ step: \"Checked the forecast\", tool: \"weather\", detail: `${date} ${start}: rain ${w.rain}%, ${w.temp} °C, wind ${w.wind} km/h (Open-Meteo)` });\n-  work(`Muse Glimmer is judging ${pick.length} places`);\n-  const judged = await Promise.all(pick.map(async (p) => ({ ...p, outdoor: outdoor(p), weather: outdoor(p) ? w : null, ...(await judge(p, sport, date, start, w)) })));\n+  let pickFiltered = pick;\n+  if (indoorOnly) {\n+    pickFiltered = pick.filter((p) => !outdoor(p));\n+  }\n+  work(`Muse Glimmer is judging ${pickFiltered.length} places`);\n+  const judged = await Promise.all(pickFiltered.map(async (p) => ({ ...p, outdoor: outdoor(p), weather: outdoor(p) ? w : null, ...(await judge(p, sport, date, start, w)) })));\n   const order = { good: 0, maybe: 1, no: 2 };\n   judged.sort((a, b) => order[a.verdict] - order[b.verdict] || a.dist - b.dist);\n   const g = judged.filter((p) => p.verdict === \"good\").length;\n"
+   ],
+   "reasons": [],
+   "branch": "loop/P-B04",
+   "commit": "a8ce2665ece699e7b2ade5dd1b8801d806f0a5e1",
+   "stat": "2 files changed, 10 insertions(+), 6 deletions(-)",
+   "baseUnit": {
+    "ok": true,
+    "pass": 22,
+    "fail": 0,
+    "seconds": 4.5
+   },
+   "reviewStub": false,
+   "log": [
+    {
+     "attempt": 1,
+     "step": 1,
+     "tool": "list_files",
+     "args": {
+      "dir": "."
+     },
+     "ok": true,
+     "result": ".gitattributes (2 lines)\n.gitignore (31 lines)\nagent/\nCREDITS.md (83 lines)\ndocs/\nLICENSE (22 lines)\nREADME.md (468 lines)\nserver/\nsubmission/\nvideo/\nweb/",
+     "ms": 6
+    },
+    {
+     "attempt": 1,
+     "step": 2,
+     "tool": "list_files",
+     "args": {
+      "dir": "agent/src"
+     },
+     "ok": true,
+     "result": "agent/src/a2a_client.js (73 lines)\nagent/src/a2a_server.js (268 lines)\nagent/src/a2a.js (620 lines)\nagent/src/answer.js (145 lines)\nagent/src/ask.js (279 lines)\nagent/src/asr.js (58 lines)\nagent/src/auth.js (41 lines)\nagent/src/autopilot.js…[952 more chars]",
+     "ms": 33
+    },
+    {
+     "attempt": 1,
+     "step": 3,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js"
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 1-86 of 273:\n1\t// Courts near you: public courts, school fields, sports centres and parks where a game can happen, in any ball sport.\n2\t//   1. OpenStreetMap (Overpass) finds them around a point, with what the map…[6817 more chars]",
+     "ms": 2
+    },
+    {
+     "attempt": 1,
+     "step": 4,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js",
+      "from": 100,
+      "to": 180
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 100-158 of 273:\n100\t\n101\t// 3: the weather at that hour\n102\texport async function forecast(lat, lon, date, start) {\n103\t  try {\n104\t    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.…[6829 more chars]",
+     "ms": 0
+    },
+    {
+     "attempt": 1,
+     "step": 5,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js",
+      "from": 160,
+      "to": 230
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 160-230 of 273:\n160\t// names on the map are in the local language: one Muse Glimmer call gives every one in English (the map's own\n161\t// English name wins when it has one; the original is kept beside it)\n162\tasyn…[6440 more chars]",
+     "ms": 0
+    },
+    {
+     "attempt": 1,
+     "step": 6,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "from": 80,
+      "to": 160
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 80-120 of 408:\n80\tconst freeAt = (free, day, start, minutes) => windows(free).some((w) => DAYS[w.day] === day && w.from <= start && start + minutes <= w.to);\n81\t\n82\t// ---- the tools Muse Glimmer can call -----…[6805 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 1,
+     "step": 7,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "from": 140,
+      "to": 170
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 140-170 of 408:\n140\t    check_body() {\n141\t      const sore = org.parts.filter((p) => p.active);\n142\t      return { sore: sore.map((p) => `${p.name} ${p.latest.level}/5, ${p.trend === \"new\" ? \"first logged\" : p…[3818 more chars]",
+     "ms": 2
+    },
+    {
+     "attempt": 1,
+     "step": 8,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js",
+      "from": 110,
+      "to": 120
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 110-120 of 273:\n110\t\n111\tconst outdoor = (p) => !(p.kind === \"sports_centre\" || p.kind === \"sports_hall\" || p.tags.indoor === \"yes\" || p.tags.covered === \"yes\" || p.tags.building);\n112\tconst tagWords = (p) => p.id…[1101 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 1,
+     "step": 9,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js",
+      "from": 176,
+      "to": 226
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 176-226 of 273:\n176\texport async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {} } = {}) {\n177\t  const tell = (s) => onSte…[5051 more chars]",
+     "ms": 3
+    },
+    {
+     "attempt": 1,
+     "step": 10,
+     "tool": "plan",
+     "args": {
+      "steps": [
+       {
+        "change": "Add optional indoorOnly parameter default false to search signature, and filter judged places to only non-outdoor when indoorOnly is true before returning.",
+        "file": "agent/src/places.js",
+        "where": "search(), lines 176-226"
+       },
+       {
+        "change": "Add optional boolean indoorOnly parameter to find_places tool definition, not required.",
+        "file": "agent/src/autopilot.js",
+        "where": "TOOLS array, lines 86"
+       },
+       {
+        "change": "Accept indoorOnly param and pass it to places.search call.",
+        "file": "agent/src/autopilot.js",
+        "where": "find_places(), lines 147-162"
+       }
+      ]
+     },
+     "ok": true,
+     "result": "Plan accepted. Your checklist (it stays in view):\n1. agent/src/places.js, search(), lines 176-226: Add optional indoorOnly parameter default false to search signature, and filter judged places to only non-outdoor when indoorOnly is true bef…[309 more chars]",
+     "ms": 0
+    },
+    {
+     "attempt": 1,
+     "step": 11,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js",
+      "from": 176,
+      "to": 226
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 176-226 of 273:\n176\texport async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {} } = {}) {\n177\t  const tell = (s) => onSte…[5051 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 1,
+     "step": 12,
+     "tool": "write_patch",
+     "args": {
+      "path": "agent/src/places.js",
+      "old": "export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"…[41 more chars]",
+      "new": "export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"…[61 more chars]",
+      "oldChars": 161,
+      "newChars": 181
+     },
+     "ok": true,
+     "result": "Changed agent/src/places.js. Lines 174-178 now:\n174\t\n175\t// near a point, for a sport, at a time: the places, nearest first, each judged\n176\texport async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flag…[254 more chars]",
+     "ms": 273
+    },
+    {
+     "attempt": 1,
+     "step": 13,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js",
+      "from": 218,
+      "to": 226
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 218-226 of 273:\n218\t  work(`Muse Glimmer is judging ${pick.length} places`);\n219\t  const judged = await Promise.all(pick.map(async (p) => ({ ...p, outdoor: outdoor(p), weather: outdoor(p) ? w : null, ...(await jud…[1051 more chars]",
+     "ms": 2
+    },
+    {
+     "attempt": 1,
+     "step": 14,
+     "tool": "write_patch",
+     "args": {
+      "path": "agent/src/places.js",
+      "old": "  work(`Muse Glimmer is judging ${pick.length} places`);\n  const judged = await Promise.all(pick.map(async (p) => ({ ...…[1060 more chars]",
+      "new": "  work(`Muse Glimmer is judging ${pick.length} places`);\n  const judged = await Promise.all(pick.map(async (p) => ({ ...…[1152 more chars]",
+      "oldChars": 1180,
+      "newChars": 1272
+     },
+     "ok": true,
+     "result": "Changed agent/src/places.js. Lines 218-230 now:\n218\t  work(`Muse Glimmer is judging ${pick.length} places`);\n219\t  const judged = await Promise.all(pick.map(async (p) => ({ ...p, outdoor: outdoor(p), weather: outdoor(p) ? w : null, ...(awai…[1295 more chars]",
+     "ms": 141
+    },
+    {
+     "attempt": 1,
+     "step": 15,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "from": 86,
+      "to": 87
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 86-87 of 408:\n86\t  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each judged playable or not from the map, Google Maps reviews and the forecas…[1008 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 1,
+     "step": 16,
+     "tool": "write_patch",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "old": "  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each…[376 more chars]",
+      "new": "  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each…[409 more chars]",
+      "oldChars": 496,
+      "newChars": 529
+     },
+     "ok": true,
+     "result": "Changed agent/src/autopilot.js. Lines 84-88 now:\n84\t  { name: \"get_week\", description: \"This week so far: the goal, games already booked, how many are still needed, your habitual play times and the partners you play best with.\", parameters:…[1307 more chars]",
+     "ms": 242
+    },
+    {
+     "attempt": 1,
+     "step": 17,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "from": 147,
+      "to": 155
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 147-155 of 408:\n147\t    async find_places({ day, start = \"19:00\" }) {\n148\t      const d = days.find((x) => x.day === day);\n149\t      if (!d) return { error: `${day} is not in the next seven days` };\n150\t      i…[661 more chars]",
+     "ms": 0
+    },
+    {
+     "attempt": 1,
+     "step": 18,
+     "tool": "write_patch",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "old": "    async find_places({ day, start = \"19:00\" }) {\n      const d = days.find((x) => x.day === day);\n      if (!d) return …[411 more chars]",
+      "new": "    async find_places({ day, start = \"19:00\", indoorOnly = false }) {\n      const d = days.find((x) => x.day === day);\n …[443 more chars]",
+      "oldChars": 531,
+      "newChars": 563
+     },
+     "ok": true,
+     "result": "Changed agent/src/autopilot.js. Lines 145-154 now:\n145\t        agentActions: org.actions.filter((a) => a.kind !== \"follow\").map((a) => a.text), fromHealthApp: org.linked.length ? org.linked.map((l) => `${l.date} game ran ${l.minutes} min (b…[804 more chars]",
+     "ms": 275
+    },
+    {
+     "attempt": 1,
+     "step": 19,
+     "tool": "run_unit",
+     "args": {},
+     "ok": true,
+     "result": "unit tests: 22 pass, 0 fail (4.7 s)",
+     "ms": 4738
+    },
+    {
+     "attempt": 1,
+     "step": 20,
+     "tool": "done",
+     "args": {
+      "summary": "Added optional indoorOnly parameter to places.search and autopilot find_places, filtering results to non-outdoor places when true.",
+      "checks": [
+       "R1:met: agent/src/autopilot.js lines 86 and 147",
+       "R2:met: agent/src/places.js line 176",
+       "R3:met: agent/src/places.js line 220",
+       "R4:met: agent/src/autopilot.js lines 86 and 152",
+       "R5:met: agent/src/places.js line 220 and agent/src/autopilot.js line 147"
+      ]
+     },
+     "ok": true,
+     "result": "Not yet: check your change against the spec first.\nYour diff:\ndiff --git a/agent/src/autopilot.js b/agent/src/autopilot.js\nindex 67f8e60..12f4c4c 100644\n--- a/agent/src/autopilot.js\n+++ b/agent/src/autopilot.js\n@@ -83,7 +83,7 @@ const freeA…[4134 more chars]",
+     "ms": 114
+    },
+    {
+     "attempt": 1,
+     "step": 21,
+     "tool": "done",
+     "args": {
+      "summary": "Added optional indoorOnly parameter to places.search and autopilot find_places, filtering results to non-outdoor places when true.",
+      "checks": [
+       "R1:met: agent/src/autopilot.js line 86 (TOOLS) and line 147 (find_places)",
+       "R2:met: agent/src/places.js line 176 (search signature with indoorOnly = false)",
+       "R3:met: agent/src/places.js line 220 (filtered = indoorOnly ? judged.filter(p => !outdoo…[15 more chars]",
+       "R4:met: agent/src/autopilot.js line 86 (parameter declaration) and line 152 (passed to p…[13 more chars]",
+       "R5:met: agent/src/places.js line 220 default false and filter only applied when true; au…[21 more chars]"
+      ]
+     },
+     "ok": true,
+     "result": "accepted",
+     "ms": 131
+    },
+    {
+     "attempt": 2,
+     "step": 1,
+     "tool": "list_files",
+     "args": {
+      "dir": "."
+     },
+     "ok": true,
+     "result": ".gitattributes (2 lines)\n.gitignore (31 lines)\nagent/\nCREDITS.md (83 lines)\ndocs/\nLICENSE (22 lines)\nREADME.md (468 lines)\nserver/\nsubmission/\nvideo/\nweb/",
+     "ms": 1
+    },
+    {
+     "attempt": 2,
+     "step": 2,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js"
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 1-86 of 273:\n1\t// Courts near you: public courts, school fields, sports centres and parks where a game can happen, in any ball sport.\n2\t//   1. OpenStreetMap (Overpass) finds them around a point, with what the map…[6817 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 2,
+     "step": 2,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js"
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 1-78 of 408:\n1\t// Autopilot: your agent keeps you playing, without being asked.\n2\t//   It learns your habits from your games (the days and times you keep coming back to, and how long you play) and who\n3\t//   yo…[6660 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 2,
+     "step": 3,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js",
+      "from": 100,
+      "to": 200
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 100-158 of 273:\n100\t\n101\t// 3: the weather at that hour\n102\texport async function forecast(lat, lon, date, start) {\n103\t  try {\n104\t    const r = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat.…[6829 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 2,
+     "step": 3,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "from": 80,
+      "to": 160
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 80-120 of 408:\n80\tconst freeAt = (free, day, start, minutes) => windows(free).some((w) => DAYS[w.day] === day && w.from <= start && start + minutes <= w.to);\n81\t\n82\t// ---- the tools Muse Glimmer can call -----…[6805 more chars]",
+     "ms": 2
+    },
+    {
+     "attempt": 2,
+     "step": 4,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js",
+      "from": 176,
+      "to": 230
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 176-230 of 273:\n176\texport async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {} } = {}) {\n177\t  const tell = (s) => onSte…[5306 more chars]",
+     "ms": 4
+    },
+    {
+     "attempt": 2,
+     "step": 4,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "from": 147,
+      "to": 165
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 147-165 of 408:\n147\t    async find_places({ day, start = \"19:00\" }) {\n148\t      const d = days.find((x) => x.day === day);\n149\t      if (!d) return { error: `${day} is not in the next seven days` };\n150\t      i…[2029 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 2,
+     "step": 5,
+     "tool": "plan",
+     "args": {
+      "steps": [
+       {
+        "change": "Add optional indoorOnly parameter with default false to search signature; filter pick to indoor places when indoorOnly true before judging, using outdoor(p) rule, so only non-outdoor places are judged and returned.",
+        "file": "agent/src/places.js",
+        "where": "search() function, lines 176-226"
+       },
+       {
+        "change": "Add optional boolean indoorOnly parameter to find_places tool definition, not required.",
+        "file": "agent/src/autopilot.js",
+        "where": "TOOLS array, line 86"
+       },
+       {
+        "change": "Accept indoorOnly in find_places args and pass it to places.search call.",
+        "file": "agent/src/autopilot.js",
+        "where": "find_places tool implementation, lines 147-162"
+       }
+      ]
+     },
+     "ok": true,
+     "result": "Plan accepted. Your checklist (it stays in view):\n1. agent/src/places.js, search() function, lines 176-226: Add optional indoorOnly parameter with default false to search signature; filter pick to indoor places when indoorOnly true before j…[408 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 2,
+     "step": 6,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js",
+      "from": 111,
+      "to": 115
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 111-115 of 273:\n111\tconst outdoor = (p) => !(p.kind === \"sports_centre\" || p.kind === \"sports_hall\" || p.tags.indoor === \"yes\" || p.tags.covered === \"yes\" || p.tags.building);\n112\tconst tagWords = (p) => p.id.star…[793 more chars]",
+     "ms": 0
+    },
+    {
+     "attempt": 2,
+     "step": 7,
+     "tool": "write_patch",
+     "args": {
+      "path": "agent/src/places.js",
+      "old": "export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"…[41 more chars]",
+      "new": "export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"…[61 more chars]",
+      "oldChars": 161,
+      "newChars": 181
+     },
+     "ok": true,
+     "result": "Changed agent/src/places.js. Lines 174-178 now:\n174\t\n175\t// near a point, for a sport, at a time: the places, nearest first, each judged\n176\texport async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flag…[254 more chars]",
+     "ms": 215
+    },
+    {
+     "attempt": 2,
+     "step": 8,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js",
+      "from": 214,
+      "to": 226
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 214-226 of 273:\n214\t  await english(pick);\n215\t  work(\"Checking the weather at that hour\");\n216\t  const w = await forecast(here.lat, here.lon, date, start);\n217\t  if (w) tell({ step: \"Checked the forecast\", tool: …[1355 more chars]",
+     "ms": 2
+    },
+    {
+     "attempt": 2,
+     "step": 9,
+     "tool": "write_patch",
+     "args": {
+      "path": "agent/src/places.js",
+      "old": "  await english(pick);\n  work(\"Checking the weather at that hour\");\n  const w = await forecast(here.lat, here.lon, date,…[392 more chars]",
+      "new": "  await english(pick);\n  work(\"Checking the weather at that hour\");\n  const w = await forecast(here.lat, here.lon, date,…[511 more chars]",
+      "oldChars": 512,
+      "newChars": 631
+     },
+     "ok": true,
+     "result": "Changed agent/src/places.js. Lines 216-229 now:\n216\t  const w = await forecast(here.lat, here.lon, date, start);\n217\t  if (w) tell({ step: \"Checked the forecast\", tool: \"weather\", detail: `${date} ${start}: rain ${w.rain}%, ${w.temp} °C, wi…[1350 more chars]",
+     "ms": 237
+    },
+    {
+     "attempt": 2,
+     "step": 10,
+     "tool": "write_patch",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "old": "  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each…[376 more chars]",
+      "new": "  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each…[409 more chars]",
+      "oldChars": 496,
+      "newChars": 529
+     },
+     "ok": true,
+     "result": "Changed agent/src/autopilot.js. Lines 84-88 now:\n84\t  { name: \"get_week\", description: \"This week so far: the goal, games already booked, how many are still needed, your habitual play times and the partners you play best with.\", parameters:…[1307 more chars]",
+     "ms": 258
+    },
+    {
+     "attempt": 2,
+     "step": 11,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "from": 147,
+      "to": 155
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 147-155 of 408:\n147\t    async find_places({ day, start = \"19:00\" }) {\n148\t      const d = days.find((x) => x.day === day);\n149\t      if (!d) return { error: `${day} is not in the next seven days` };\n150\t      i…[661 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 2,
+     "step": 12,
+     "tool": "write_patch",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "old": "    async find_places({ day, start = \"19:00\" }) {\n      const d = days.find((x) => x.day === day);\n      if (!d) return …[411 more chars]",
+      "new": "    async find_places({ day, start = \"19:00\", indoorOnly = false }) {\n      const d = days.find((x) => x.day === day);\n …[443 more chars]",
+      "oldChars": 531,
+      "newChars": 563
+     },
+     "ok": true,
+     "result": "Changed agent/src/autopilot.js. Lines 145-154 now:\n145\t        agentActions: org.actions.filter((a) => a.kind !== \"follow\").map((a) => a.text), fromHealthApp: org.linked.length ? org.linked.map((l) => `${l.date} game ran ${l.minutes} min (b…[804 more chars]",
+     "ms": 237
+    },
+    {
+     "attempt": 2,
+     "step": 13,
+     "tool": "run_unit",
+     "args": {},
+     "ok": true,
+     "result": "unit tests: 22 pass, 0 fail (4.7 s)",
+     "ms": 4695
+    },
+    {
+     "attempt": 2,
+     "step": 14,
+     "tool": "done",
+     "args": {
+      "summary": "Added optional indoorOnly parameter to find_places tool and places.search, filtering to non-outdoor places when true.",
+      "checks": [
+       "R1:met: agent/src/autopilot.js lines 86 and 147",
+       "R2:met: agent/src/places.js line 176",
+       "R3:met: agent/src/places.js lines 218-221",
+       "R4:met: agent/src/autopilot.js lines 86 and 152",
+       "R5:met: agent/src/places.js line 176 default false and agent/src/autopilot.js line 147 d…[12 more chars]"
+      ]
+     },
+     "ok": true,
+     "result": "Not yet: check your change against the spec first.\nYour diff:\ndiff --git a/agent/src/autopilot.js b/agent/src/autopilot.js\nindex 67f8e60..12f4c4c 100644\n--- a/agent/src/autopilot.js\n+++ b/agent/src/autopilot.js\n@@ -83,7 +83,7 @@ const freeA…[4134 more chars]",
+     "ms": 221
+    },
+    {
+     "attempt": 2,
+     "step": 15,
+     "tool": "done",
+     "args": {
+      "summary": "Added optional indoorOnly parameter to find_places tool and places.search, filtering to non-outdoor places when true.",
+      "checks": [
+       "R1:met: agent/src/autopilot.js line 86 indoorOnly property added to find_places paramete…[2 more chars]",
+       "R2:met: agent/src/places.js line 176 search signature includes indoorOnly = false",
+       "R3:met: agent/src/places.js lines 218-221 filter pick with !outdoor(p) when indoorOnly t…[3 more chars]",
+       "R4:met: agent/src/autopilot.js line 86 declares indoorOnly boolean and line 152 passes i…[26 more chars]",
+       "R5:met: agent/src/places.js line 176 default false and agent/src/autopilot.js line 147 d…[32 more chars]"
+      ]
+     },
+     "ok": true,
+     "result": "accepted",
+     "ms": 223
+    }
+   ]
+  },
+  {
+   "run": 3,
+   "id": "P-B04",
+   "class": "C2",
+   "files": [
+    "agent/src/places.js",
+    "agent/src/autopilot.js"
+   ],
+   "ok": true,
+   "built": true,
+   "infra": false,
+   "cannot": null,
+   "falseCannot": false,
+   "planned": [
+    3
+   ],
+   "reviews": 1,
+   "planFirst": 0,
+   "cannotRefused": 0,
+   "oracle": {
+    "ok": true,
+    "pass": 4,
+    "fail": 0,
+    "output": "passed"
+   },
+   "attemptsUsed": 1,
+   "wonAt": 1,
+   "steps": 16,
+   "toolCalls": 19,
+   "tokens": {
+    "prompt": 156069,
+    "cached": 99071,
+    "output": 3510,
+    "reasoning": 667,
+    "calls": 16
+   },
+   "seconds": 372.7,
+   "lockWaitS": 0,
+   "lock": null,
+   "endpoint": "http://127.0.0.1:11448/v1",
+   "lane": 2,
+   "buildSeconds": 363.5,
+   "refused": [],
+   "attempts": [
+    {
+     "n": 1,
+     "ok": true,
+     "end": "done",
+     "steps": 16,
+     "toolCalls": 19,
+     "refused": [],
+     "compactions": 8,
+     "modelErrors": 0,
+     "planFirst": 0,
+     "cannotRefused": 0,
+     "plan": [
+      {
+       "file": "agent/src/places.js",
+       "where": "search() function, lines 176-226",
+       "change": "Add optional indoorOnly parameter default false to search signature, and filter pick to only indoor places when indoorOnly is true using outdoor() rule before judging and returning."
+      },
+      {
+       "file": "agent/src/autopilot.js",
+       "where": "TOOLS array find_places entry, lines 86-86",
+       "change": "Declare optional boolean parameter indoorOnly in find_places tool parameters (not required)."
+      },
+      {
+       "file": "agent/src/autopilot.js",
+       "where": "tools.find_places function, lines 147-162",
+       "change": "Accept indoorOnly argument and pass it to places.search call."
+      }
+     ],
+     "cannot": null,
+     "reviews": 1,
+     "checks": [
+      {
+       "id": "R1",
+       "met": true,
+       "where": "agent/src/autopilot.js line 86 parameter indoorOnly added, line 147 default false"
+      },
+      {
+       "id": "R2",
+       "met": true,
+       "where": "agent/src/places.js line 176 search signature includes indoorOnly = false"
+      },
+      {
+       "id": "R3",
+       "met": true,
+       "where": "agent/src/places.js lines 219-222 filter pick with !outdoor(p) when indoorOnly true"
+      },
+      {
+       "id": "R4",
+       "met": true,
+       "where": "agent/src/autopilot.js line 86 declares indoorOnly boolean not required, line 152 passes indoorOnly to places.search"
+      },
+      {
+       "id": "R5",
+       "met": true,
+       "where": "agent/src/places.js line 176 default false and agent/src/autopilot.js line 147 default false keep existing behavior"
+      }
+     ],
+     "verify": {
+      "ok": true,
+      "output": "passed"
+     },
+     "changed": [
+      "agent/src/autopilot.js",
+      "agent/src/places.js"
+     ],
+     "unit": {
+      "ok": true,
+      "pass": 22,
+      "fail": 0
+     },
+     "tokens": {
+      "calls": 16,
+      "prompt": 156069,
+      "cached": 99071,
+      "fresh": 56998,
+      "cachedShare": 0.635,
+      "output": 3510,
+      "reasoning": 667,
+      "seconds": 355.5,
+      "empty": 0,
+      "invalid": 0
+     },
+     "seconds": 363.5,
+     "summary": "Added optional indoorOnly parameter to find_places tool: updated places.search signature and filtering logic, and declared passed-through parameter in autopilot TOOLS and tools.find_places.",
+     "diffChars": 7234
+    }
+   ],
+   "diff": "diff --git a/agent/src/autopilot.js b/agent/src/autopilot.js\nindex 67f8e60..12f4c4c 100644\n--- a/agent/src/autopilot.js\n+++ b/agent/src/autopilot.js\n@@ -83,7 +83,7 @@ const freeAt = (free, day, start, minutes) => windows(free).some((w) => DAYS[w.d\n const TOOLS = [\n   { name: \"get_week\", description: \"This week so far: the goal, games already booked, how many are still needed, your habitual play times and the partners you play best with.\", parameters: { type: \"object\", properties: {} } },\n   { name: \"check_body\", description: \"What the player's body log and health app say: anything sore, this week's training load against their usual week, and the limits that follow (format, game length, sports to skip, one game fewer).\", parameters: { type: \"object\", properties: {} } },\n-  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each judged playable or not from the map, Google Maps reviews and the forecast. Use for basketball, soccer or volleyball, or when club courts are full or far. Pass a place id to negotiate.\", parameters: { type: \"object\", properties: { day: { type: \"string\" }, start: { type: \"string\", description: \"HH:MM\" }, reason: { type: \"string\" } }, required: [\"day\", \"start\", \"reason\"] } },\n+  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each judged playable or not from the map, Google Maps reviews and the forecast. Use for basketball, soccer or volleyball, or when club courts are full or far. Pass a place id to negotiate.\", parameters: { type: \"object\", properties: { day: { type: \"string\" }, start: { type: \"string\", description: \"HH:MM\" }, reason: { type: \"string\" }, indoorOnly: { type: \"boolean\" } }, required: [\"day\", \"start\", \"reason\"] } },\n   { name: \"find_partners\", description: \"Rank the club members who are free at one of your times this week, for singles (one opponent) or doubles (three players).\", parameters: { type: \"object\", properties: { day: { type: \"string\", description: \"Mon..Sun\" }, start: { type: \"string\", description: \"HH:MM\" }, format: { type: \"string\", enum: [\"singles\", \"doubles\"] }, leaveOut: { type: \"array\", items: { type: \"string\" }, description: \"ids of members the player asked you to leave out (fromMemory, recall); they stay out for the rest of the run\" }, reason: { type: \"string\", description: \"one sentence: why this time\" } }, required: [\"day\", \"start\", \"format\", \"reason\"] } },\n   { name: \"negotiate\", description: \"Your agent agrees the game with these members' agents (in parallel). Returns the agreed time, court and trips, or why it failed.\", parameters: { type: \"object\", properties: { members: { type: \"array\", items: { type: \"string\" }, description: \"member ids: 1 for singles, 3 for doubles\" }, day: { type: \"string\" }, start: { type: \"string\" }, format: { type: \"string\", enum: [\"singles\", \"doubles\"] }, place: { type: \"string\", description: \"optional: a place id from find_places, for a public court instead of a club venue\" }, reason: { type: \"string\", description: \"one sentence: why these people\" } }, required: [\"members\", \"day\", \"start\", \"format\", \"reason\"] } },\n   { name: \"recall\", description: \"Search what the player told you before, and what happened in past talks, by meaning (the closest notes, with the day each was said). Use it when choosing people, times or places, if get_week's fromMemory does not cover the question.\", parameters: { type: \"object\", properties: { question: { type: \"string\", description: \"what you want to know, in a sentence\" }, reason: { type: \"string\", description: \"one sentence: why you ask\" } }, required: [\"question\", \"reason\"] } },\n@@ -144,12 +144,12 @@ async function runWeek({ you = {}, history = [], goal = {}, ratings = {}, upcomi\n         limits: { format: bp.format || \"any\", gameMinutes: minutes, skipSports: [...new Set([...bp.avoid, ...bp.pause])], gamesThisWeek: perWeek !== g.perWeek ? `${perWeek} instead of ${g.perWeek}` : g.perWeek },\n         agentActions: org.actions.filter((a) => a.kind !== \"follow\").map((a) => a.text), fromHealthApp: org.linked.length ? org.linked.map((l) => `${l.date} game ran ${l.minutes} min (booked ${l.booked || \"?\"})`) : undefined };\n     },\n-    async find_places({ day, start = \"19:00\" }) {\n+    async find_places({ day, start = \"19:00\", indoorOnly = false }) {\n       const d = days.find((x) => x.day === day);\n       if (!d) return { error: `${day} is not in the next seven days` };\n       if (!geo) return { error: \"the club map has no real-world location (venues.json map.geo)\" };\n       const here = places.toGeo(geo, club.you.area);\n-      const res = await places.search({ ...here, sport: g.sport, date: d.date, start, limit: 4, radius: flags.get(\"places.radius\", player || messenger), onStep: (e) => e.type === \"working\" && work(e.step) });\n+      const res = await places.search({ ...here, sport: g.sport, date: d.date, start, limit: 4, radius: flags.get(\"places.radius\", player || messenger), onStep: (e) => e.type === \"working\" && work(e.step), indoorOnly });\n       const ok = res.places.filter((p) => p.verdict !== \"no\").slice(0, 3);\n       ok.forEach((p) => { found[p.id] = p; places.note(p); });\n       const club0 = venues.venues.map((v) => v.sports?.[g.sport]).filter(Boolean).sort((a, b) => a.price - b.price)[0];\ndiff --git a/agent/src/places.js b/agent/src/places.js\nindex 7e9b708..69ec6d2 100644\n--- a/agent/src/places.js\n+++ b/agent/src/places.js\n@@ -173,7 +173,7 @@ async function english(list) {\n }\n \n // near a point, for a sport, at a time: the places, nearest first, each judged\n-export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {} } = {}) {\n+export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {}, indoorOnly = false } = {}) {\n   const tell = (s) => onStep({ type: \"step\", ...s }), work = (step) => onStep({ type: \"working\", step });\n   const here = { lat: +lat, lon: +lon };\n   if (!isFinite(here.lat) || !isFinite(here.lon)) throw new Error(\"No location to search around.\");\n@@ -216,7 +216,11 @@ export async function search({ lat, lon, sport = \"basketball\", date, start = \"19\n   const w = await forecast(here.lat, here.lon, date, start);\n   if (w) tell({ step: \"Checked the forecast\", tool: \"weather\", detail: `${date} ${start}: rain ${w.rain}%, ${w.temp} °C, wind ${w.wind} km/h (Open-Meteo)` });\n   work(`Muse Glimmer is judging ${pick.length} places`);\n-  const judged = await Promise.all(pick.map(async (p) => ({ ...p, outdoor: outdoor(p), weather: outdoor(p) ? w : null, ...(await judge(p, sport, date, start, w)) })));\n+  let filteredPick = pick;\n+  if (indoorOnly) {\n+    filteredPick = pick.filter((p) => !outdoor(p));\n+  }\n+  const judged = await Promise.all(filteredPick.map(async (p) => ({ ...p, outdoor: outdoor(p), weather: outdoor(p) ? w : null, ...(await judge(p, sport, date, start, w)) })));\n   const order = { good: 0, maybe: 1, no: 2 };\n   judged.sort((a, b) => order[a.verdict] - order[b.verdict] || a.dist - b.dist);\n   const g = judged.filter((p) => p.verdict === \"good\").length;\n",
+   "attemptDiffs": [
+    "diff --git a/agent/src/autopilot.js b/agent/src/autopilot.js\nindex 67f8e60..12f4c4c 100644\n--- a/agent/src/autopilot.js\n+++ b/agent/src/autopilot.js\n@@ -83,7 +83,7 @@ const freeAt = (free, day, start, minutes) => windows(free).some((w) => DAYS[w.d\n const TOOLS = [\n   { name: \"get_week\", description: \"This week so far: the goal, games already booked, how many are still needed, your habitual play times and the partners you play best with.\", parameters: { type: \"object\", properties: {} } },\n   { name: \"check_body\", description: \"What the player's body log and health app say: anything sore, this week's training load against their usual week, and the limits that follow (format, game length, sports to skip, one game fewer).\", parameters: { type: \"object\", properties: {} } },\n-  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each judged playable or not from the map, Google Maps reviews and the forecast. Use for basketball, soccer or volleyball, or when club courts are full or far. Pass a place id to negotiate.\", parameters: { type: \"object\", properties: { day: { type: \"string\" }, start: { type: \"string\", description: \"HH:MM\" }, reason: { type: \"string\" } }, required: [\"day\", \"start\", \"reason\"] } },\n+  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each judged playable or not from the map, Google Maps reviews and the forecast. Use for basketball, soccer or volleyball, or when club courts are full or far. Pass a place id to negotiate.\", parameters: { type: \"object\", properties: { day: { type: \"string\" }, start: { type: \"string\", description: \"HH:MM\" }, reason: { type: \"string\" }, indoorOnly: { type: \"boolean\" } }, required: [\"day\", \"start\", \"reason\"] } },\n   { name: \"find_partners\", description: \"Rank the club members who are free at one of your times this week, for singles (one opponent) or doubles (three players).\", parameters: { type: \"object\", properties: { day: { type: \"string\", description: \"Mon..Sun\" }, start: { type: \"string\", description: \"HH:MM\" }, format: { type: \"string\", enum: [\"singles\", \"doubles\"] }, leaveOut: { type: \"array\", items: { type: \"string\" }, description: \"ids of members the player asked you to leave out (fromMemory, recall); they stay out for the rest of the run\" }, reason: { type: \"string\", description: \"one sentence: why this time\" } }, required: [\"day\", \"start\", \"format\", \"reason\"] } },\n   { name: \"negotiate\", description: \"Your agent agrees the game with these members' agents (in parallel). Returns the agreed time, court and trips, or why it failed.\", parameters: { type: \"object\", properties: { members: { type: \"array\", items: { type: \"string\" }, description: \"member ids: 1 for singles, 3 for doubles\" }, day: { type: \"string\" }, start: { type: \"string\" }, format: { type: \"string\", enum: [\"singles\", \"doubles\"] }, place: { type: \"string\", description: \"optional: a place id from find_places, for a public court instead of a club venue\" }, reason: { type: \"string\", description: \"one sentence: why these people\" } }, required: [\"members\", \"day\", \"start\", \"format\", \"reason\"] } },\n   { name: \"recall\", description: \"Search what the player told you before, and what happened in past talks, by meaning (the closest notes, with the day each was said). Use it when choosing people, times or places, if get_week's fromMemory does not cover the question.\", parameters: { type: \"object\", properties: { question: { type: \"string\", description: \"what you want to know, in a sentence\" }, reason: { type: \"string\", description: \"one sentence: why you ask\" } }, required: [\"question\", \"reason\"] } },\n@@ -144,12 +144,12 @@ async function runWeek({ you = {}, history = [], goal = {}, ratings = {}, upcomi\n         limits: { format: bp.format || \"any\", gameMinutes: minutes, skipSports: [...new Set([...bp.avoid, ...bp.pause])], gamesThisWeek: perWeek !== g.perWeek ? `${perWeek} instead of ${g.perWeek}` : g.perWeek },\n         agentActions: org.actions.filter((a) => a.kind !== \"follow\").map((a) => a.text), fromHealthApp: org.linked.length ? org.linked.map((l) => `${l.date} game ran ${l.minutes} min (booked ${l.booked || \"?\"})`) : undefined };\n     },\n-    async find_places({ day, start = \"19:00\" }) {\n+    async find_places({ day, start = \"19:00\", indoorOnly = false }) {\n       const d = days.find((x) => x.day === day);\n       if (!d) return { error: `${day} is not in the next seven days` };\n       if (!geo) return { error: \"the club map has no real-world location (venues.json map.geo)\" };\n       const here = places.toGeo(geo, club.you.area);\n-      const res = await places.search({ ...here, sport: g.sport, date: d.date, start, limit: 4, radius: flags.get(\"places.radius\", player || messenger), onStep: (e) => e.type === \"working\" && work(e.step) });\n+      const res = await places.search({ ...here, sport: g.sport, date: d.date, start, limit: 4, radius: flags.get(\"places.radius\", player || messenger), onStep: (e) => e.type === \"working\" && work(e.step), indoorOnly });\n       const ok = res.places.filter((p) => p.verdict !== \"no\").slice(0, 3);\n       ok.forEach((p) => { found[p.id] = p; places.note(p); });\n       const club0 = venues.venues.map((v) => v.sports?.[g.sport]).filter(Boolean).sort((a, b) => a.price - b.price)[0];\ndiff --git a/agent/src/places.js b/agent/src/places.js\nindex 7e9b708..69ec6d2 100644\n--- a/agent/src/places.js\n+++ b/agent/src/places.js\n@@ -173,7 +173,7 @@ async function english(list) {\n }\n \n // near a point, for a sport, at a time: the places, nearest first, each judged\n-export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {} } = {}) {\n+export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {}, indoorOnly = false } = {}) {\n   const tell = (s) => onStep({ type: \"step\", ...s }), work = (step) => onStep({ type: \"working\", step });\n   const here = { lat: +lat, lon: +lon };\n   if (!isFinite(here.lat) || !isFinite(here.lon)) throw new Error(\"No location to search around.\");\n@@ -216,7 +216,11 @@ export async function search({ lat, lon, sport = \"basketball\", date, start = \"19\n   const w = await forecast(here.lat, here.lon, date, start);\n   if (w) tell({ step: \"Checked the forecast\", tool: \"weather\", detail: `${date} ${start}: rain ${w.rain}%, ${w.temp} °C, wind ${w.wind} km/h (Open-Meteo)` });\n   work(`Muse Glimmer is judging ${pick.length} places`);\n-  const judged = await Promise.all(pick.map(async (p) => ({ ...p, outdoor: outdoor(p), weather: outdoor(p) ? w : null, ...(await judge(p, sport, date, start, w)) })));\n+  let filteredPick = pick;\n+  if (indoorOnly) {\n+    filteredPick = pick.filter((p) => !outdoor(p));\n+  }\n+  const judged = await Promise.all(filteredPick.map(async (p) => ({ ...p, outdoor: outdoor(p), weather: outdoor(p) ? w : null, ...(await judge(p, sport, date, start, w)) })));\n   const order = { good: 0, maybe: 1, no: 2 };\n   judged.sort((a, b) => order[a.verdict] - order[b.verdict] || a.dist - b.dist);\n   const g = judged.filter((p) => p.verdict === \"good\").length;\n"
+   ],
+   "reasons": [],
+   "branch": "loop/P-B04",
+   "commit": "db9c80db688279603279e0e4ad792dc5ac2988a6",
+   "stat": "2 files changed, 9 insertions(+), 5 deletions(-)",
+   "baseUnit": {
+    "ok": true,
+    "pass": 22,
+    "fail": 0,
+    "seconds": 4.6
+   },
+   "reviewStub": false,
+   "log": [
+    {
+     "attempt": 1,
+     "step": 1,
+     "tool": "list_files",
+     "args": {
+      "dir": "."
+     },
+     "ok": true,
+     "result": ".gitattributes (2 lines)\n.gitignore (31 lines)\nagent/\nCREDITS.md (83 lines)\ndocs/\nLICENSE (22 lines)\nREADME.md (468 lines)\nserver/\nsubmission/\nvideo/\nweb/",
+     "ms": 39
+    },
+    {
+     "attempt": 1,
+     "step": 2,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js"
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 1-86 of 273:\n1\t// Courts near you: public courts, school fields, sports centres and parks where a game can happen, in any ball sport.\n2\t//   1. OpenStreetMap (Overpass) finds them around a point, with what the map…[6817 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 1,
+     "step": 2,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js"
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 1-78 of 408:\n1\t// Autopilot: your agent keeps you playing, without being asked.\n2\t//   It learns your habits from your games (the days and times you keep coming back to, and how long you play) and who\n3\t//   yo…[6660 more chars]",
+     "ms": 2
+    },
+    {
+     "attempt": 1,
+     "step": 3,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js",
+      "from": 110,
+      "to": 180
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 110-168 of 273:\n110\t\n111\tconst outdoor = (p) => !(p.kind === \"sports_centre\" || p.kind === \"sports_hall\" || p.tags.indoor === \"yes\" || p.tags.covered === \"yes\" || p.tags.building);\n112\tconst tagWords = (p) => p.id…[6784 more chars]",
+     "ms": 0
+    },
+    {
+     "attempt": 1,
+     "step": 3,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "from": 80,
+      "to": 160
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 80-120 of 408:\n80\tconst freeAt = (free, day, start, minutes) => windows(free).some((w) => DAYS[w.day] === day && w.from <= start && start + minutes <= w.to);\n81\t\n82\t// ---- the tools Muse Glimmer can call -----…[6805 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 1,
+     "step": 4,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js",
+      "from": 176,
+      "to": 230
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 176-230 of 273:\n176\texport async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {} } = {}) {\n177\t  const tell = (s) => onSte…[5306 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 1,
+     "step": 4,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "from": 147,
+      "to": 165
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 147-165 of 408:\n147\t    async find_places({ day, start = \"19:00\" }) {\n148\t      const d = days.find((x) => x.day === day);\n149\t      if (!d) return { error: `${day} is not in the next seven days` };\n150\t      i…[2029 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 1,
+     "step": 5,
+     "tool": "plan",
+     "args": {
+      "steps": [
+       {
+        "change": "Add optional indoorOnly parameter default false to search signature, and filter pick to only indoor places when indoorOnly is true using outdoor() rule before judging and returning.",
+        "file": "agent/src/places.js",
+        "where": "search() function, lines 176-226"
+       },
+       {
+        "change": "Declare optional boolean parameter indoorOnly in find_places tool parameters (not required).",
+        "file": "agent/src/autopilot.js",
+        "where": "TOOLS array find_places entry, lines 86-86"
+       },
+       {
+        "change": "Accept indoorOnly argument and pass it to places.search call.",
+        "file": "agent/src/autopilot.js",
+        "where": "tools.find_places function, lines 147-162"
+       }
+      ]
+     },
+     "ok": true,
+     "result": "Plan accepted. Your checklist (it stays in view):\n1. agent/src/places.js, search() function, lines 176-226: Add optional indoorOnly parameter default false to search signature, and filter pick to only indoor places when indoorOnly is true u…[386 more chars]",
+     "ms": 0
+    },
+    {
+     "attempt": 1,
+     "step": 6,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js",
+      "from": 176,
+      "to": 226
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 176-226 of 273:\n176\texport async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"), limit = 6, onStep = () => {} } = {}) {\n177\t  const tell = (s) => onSte…[5051 more chars]",
+     "ms": 3
+    },
+    {
+     "attempt": 1,
+     "step": 7,
+     "tool": "write_patch",
+     "args": {
+      "path": "agent/src/places.js",
+      "old": "export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"…[41 more chars]",
+      "new": "export async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flags.get(\"places.radius\"…[61 more chars]",
+      "oldChars": 161,
+      "newChars": 181
+     },
+     "ok": true,
+     "result": "Changed agent/src/places.js. Lines 174-178 now:\n174\t\n175\t// near a point, for a sport, at a time: the places, nearest first, each judged\n176\texport async function search({ lat, lon, sport = \"basketball\", date, start = \"19:00\", radius = flag…[254 more chars]",
+     "ms": 238
+    },
+    {
+     "attempt": 1,
+     "step": 8,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/places.js",
+      "from": 210,
+      "to": 225
+     },
+     "ok": true,
+     "result": "agent/src/places.js, lines 210-225 of 273:\n210\t    }\n211\t    const nrev = pick.reduce((a, p) => a + (p.reviews?.length || 0), 0);\n212\t    tell({ step: err ? \"Google Maps did not answer\" : \"Read Google Maps\", tool: \"reviews\", detail: err || …[1918 more chars]",
+     "ms": 2
+    },
+    {
+     "attempt": 1,
+     "step": 9,
+     "tool": "write_patch",
+     "args": {
+      "path": "agent/src/places.js",
+      "old": "  work(`Muse Glimmer is judging ${pick.length} places`);\n  const judged = await Promise.all(pick.map(async (p) => ({ ...…[595 more chars]",
+      "new": "  work(`Muse Glimmer is judging ${pick.length} places`);\n  let filteredPick = pick;\n  if (indoorOnly) {\n    filteredPick…[706 more chars]",
+      "oldChars": 715,
+      "newChars": 826
+     },
+     "ok": true,
+     "result": "Changed agent/src/places.js. Lines 217-230 now:\n217\t  if (w) tell({ step: \"Checked the forecast\", tool: \"weather\", detail: `${date} ${start}: rain ${w.rain}%, ${w.temp} °C, wind ${w.wind} km/h (Open-Meteo)` });\n218\t  work(`Muse Glimmer is j…[1283 more chars]",
+     "ms": 215
+    },
+    {
+     "attempt": 1,
+     "step": 10,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "from": 84,
+      "to": 93
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 84-93 of 408:\n84\t  { name: \"get_week\", description: \"This week so far: the goal, games already booked, how many are still needed, your habitual play times and the partners you play best with.\", parameters: { ty…[3465 more chars]",
+     "ms": 1
+    },
+    {
+     "attempt": 1,
+     "step": 11,
+     "tool": "write_patch",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "old": "  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each…[376 more chars]",
+      "new": "  { name: \"find_places\", description: \"Free public courts and parks near the player for the goal sport at one time, each…[409 more chars]",
+      "oldChars": 496,
+      "newChars": 529
+     },
+     "ok": true,
+     "result": "Changed agent/src/autopilot.js. Lines 84-88 now:\n84\t  { name: \"get_week\", description: \"This week so far: the goal, games already booked, how many are still needed, your habitual play times and the partners you play best with.\", parameters:…[1307 more chars]",
+     "ms": 256
+    },
+    {
+     "attempt": 1,
+     "step": 12,
+     "tool": "read_file",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "from": 147,
+      "to": 155
+     },
+     "ok": true,
+     "result": "agent/src/autopilot.js, lines 147-155 of 408:\n147\t    async find_places({ day, start = \"19:00\" }) {\n148\t      const d = days.find((x) => x.day === day);\n149\t      if (!d) return { error: `${day} is not in the next seven days` };\n150\t      i…[661 more chars]",
+     "ms": 2
+    },
+    {
+     "attempt": 1,
+     "step": 13,
+     "tool": "write_patch",
+     "args": {
+      "path": "agent/src/autopilot.js",
+      "old": "    async find_places({ day, start = \"19:00\" }) {\n      const d = days.find((x) => x.day === day);\n      if (!d) return …[411 more chars]",
+      "new": "    async find_places({ day, start = \"19:00\", indoorOnly = false }) {\n      const d = days.find((x) => x.day === day);\n …[443 more chars]",
+      "oldChars": 531,
+      "newChars": 563
+     },
+     "ok": true,
+     "result": "Changed agent/src/autopilot.js. Lines 145-154 now:\n145\t        agentActions: org.actions.filter((a) => a.kind !== \"follow\").map((a) => a.text), fromHealthApp: org.linked.length ? org.linked.map((l) => `${l.date} game ran ${l.minutes} min (b…[804 more chars]",
+     "ms": 123
+    },
+    {
+     "attempt": 1,
+     "step": 14,
+     "tool": "run_unit",
+     "args": {},
+     "ok": true,
+     "result": "unit tests: 22 pass, 0 fail (4.7 s)",
+     "ms": 4703
+    },
+    {
+     "attempt": 1,
+     "step": 15,
+     "tool": "done",
+     "args": {
+      "summary": "Added optional indoorOnly parameter to find_places tool: updated places.search signature and filtering logic, and declared passed-through parameter in autopilot TOOLS and tools.find_places.",
+      "checks": [
+       "R1:met: agent/src/autopilot.js lines 86 and 147",
+       "R2:met: agent/src/places.js line 176",
+       "R3:met: agent/src/places.js lines 219-222",
+       "R4:met: agent/src/autopilot.js lines 86 and 152",
+       "R5:met: agent/src/places.js line 176 default false and agent/src/autopilot.js line 147 d…[12 more chars]"
+      ]
+     },
+     "ok": true,
+     "result": "Not yet: check your change against the spec first.\nYour diff:\ndiff --git a/agent/src/autopilot.js b/agent/src/autopilot.js\nindex 67f8e60..12f4c4c 100644\n--- a/agent/src/autopilot.js\n+++ b/agent/src/autopilot.js\n@@ -83,7 +83,7 @@ const freeA…[4134 more chars]",
+     "ms": 116
+    },
+    {
+     "attempt": 1,
+     "step": 16,
+     "tool": "done",
+     "args": {
+      "summary": "Added optional indoorOnly parameter to find_places tool: updated places.search signature and filtering logic, and declared passed-through parameter in autopilot TOOLS and tools.find_places.",
+      "checks": [
+       "R1:met: agent/src/autopilot.js line 86 parameter indoorOnly added, line 147 default fals…[1 more chars]",
+       "R2:met: agent/src/places.js line 176 search signature includes indoorOnly = false",
+       "R3:met: agent/src/places.js lines 219-222 filter pick with !outdoor(p) when indoorOnly t…[3 more chars]",
+       "R4:met: agent/src/autopilot.js line 86 declares indoorOnly boolean not required, line 15…[36 more chars]",
+       "R5:met: agent/src/places.js line 176 default false and agent/src/autopilot.js line 147 d…[35 more chars]"
+      ]
+     },
+     "ok": true,
+     "result": "accepted",
+     "ms": 107
+    }
+   ]
+  }
+ ]
+}

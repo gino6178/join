@@ -1,0 +1,39 @@
+# Gateway B: a second Serve gateway on the cloud VM serve-api-a100b, with simulated members only
+# (docs/a2a_two_gateways.md). Installed by agent/test/twogw/deploy_b.sh as /etc/systemd/system/serve-gateway-b.service.
+# It starts on boot (the VM is a spot VM, stopped and started again), listens on 127.0.0.1:23890 only, and may reach
+# nothing but this machine: Ollama on 127.0.0.1:11434, and gateway A through the SSH tunnel's reverse forward
+# (127.0.0.1:23790). Its settings, token included, are in /opt/serve-gwb/agent/.env (servegw, mode 600).
+[Unit]
+Description=Serve gateway B (simulated members only, A2A peer of the GPU server's gateway)
+After=network-online.target ollama.service
+Wants=network-online.target ollama.service
+
+[Service]
+Type=simple
+User=servegw
+Group=servegw
+WorkingDirectory=/opt/serve-gwb/agent
+Environment=TZ=Asia/Taipei
+ExecStart=/opt/serve-gwb/node/bin/node src/server.js
+Restart=always
+RestartSec=5
+TimeoutStopSec=10
+# localhost only, enforced by the kernel (cgroup BPF), whatever the code tries
+IPAddressDeny=any
+IPAddressAllow=localhost
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+NoNewPrivileges=yes
+CapabilityBoundingSet=
+ProtectSystem=strict
+ReadWritePaths=/opt/serve-gwb/agent/data
+ProtectHome=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectKernelTunables=yes
+ProtectKernelModules=yes
+ProtectControlGroups=yes
+LockPersonality=yes
+UMask=0077
+
+[Install]
+WantedBy=multi-user.target

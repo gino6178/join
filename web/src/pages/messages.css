@@ -1,0 +1,22 @@
+/* ---------- Serve in Messenger: the status, connecting a Page, each linked player ---------- */
+.status-strip { display: flex; flex-wrap: wrap; margin: 0 0 var(--s5); padding: 0; border-block: 1px solid var(--rule); }
+.status-strip > div { flex: 1 1 200px; min-width: 0; padding: var(--s3) var(--s5) var(--s3) 0; }
+.status-strip dt { font: 500 13px/1.4 var(--font); color: var(--ink-3); }
+.status-strip dd { margin: 2px 0 0; font: 700 18px/1.3 var(--font); }
+.status-strip dd .ok { color: var(--good); }
+.status-strip dd .bad { color: var(--bad); }
+.status-strip dd + dd { font: 400 13px/1.5 var(--font); color: var(--ink-3); overflow-wrap: anywhere; }
+.setup { counter-reset: s; list-style: none; padding: 0; margin: var(--s4) 0 0; display: grid; gap: var(--s3); max-width: 70ch; }
+.setup li { counter-increment: s; display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: var(--s3); align-items: start; }
+.setup li::before { content: counter(s); width: 28px; height: 28px; border-radius: 50%; display: grid; place-items: center; background: var(--surface-3); font: 700 13px var(--font); color: var(--accent); }
+.setup li.done::before { content: "✓"; color: var(--good); }
+.setup code, .notice code { font: 400 14px var(--mono); background: var(--bg); padding: 2px 6px; border-radius: 6px; }
+.msg-player { margin-bottom: var(--s4); }
+.msg-player > header { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3); flex-wrap: wrap; margin-bottom: var(--s3); }
+.msg-player h3 { margin: 0; }
+.msg-grid { display: grid; grid-template-columns: 320px minmax(0, 1fr); gap: var(--s5); }
+.msg-mem { padding-left: 18px; margin: 4px 0 var(--s4); display: grid; gap: 4px; font-size: 15px; }
+.msg-log { max-height: 440px; overflow: auto; display: grid; gap: var(--s3); align-content: start; }
+.msg-log .chat-msg { grid-template-columns: 28px minmax(0, 1fr); }
+.msg-log .chat-msg.user { grid-template-columns: minmax(0, 1fr); }
+@media (max-width: 1100px) { .msg-grid { grid-template-columns: minmax(0, 1fr); } }

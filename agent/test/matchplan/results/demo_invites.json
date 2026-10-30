@@ -1,0 +1,96 @@
+{
+ "at": "2026-10-28T11:06:29.707Z",
+ "members": 11,
+ "invitesEach": 200,
+ "model": "likely-lr-20261028",
+ "bands": {
+  "unlikely": {
+   "members": 1,
+   "took": 0.125,
+   "meanChance": 0.11
+  },
+  "maybe": {
+   "members": 7,
+   "took": 0.266,
+   "meanChance": 0.25
+  },
+  "likely": {
+   "members": 2,
+   "took": 0.557,
+   "meanChance": 0.538
+  },
+  "very likely": {
+   "members": 1,
+   "took": 0.62,
+   "meanChance": 0.622
+  }
+ },
+ "rows": [
+  {
+   "id": "hana",
+   "band": "maybe",
+   "p": 0.301,
+   "took": 0.35
+  },
+  {
+   "id": "ravi",
+   "band": "maybe",
+   "p": 0.159,
+   "took": 0.195
+  },
+  {
+   "id": "tomas",
+   "band": "likely",
+   "p": 0.59,
+   "took": 0.61
+  },
+  {
+   "id": "yuki",
+   "band": "likely",
+   "p": 0.486,
+   "took": 0.505
+  },
+  {
+   "id": "aisha",
+   "band": "maybe",
+   "p": 0.231,
+   "took": 0.22
+  },
+  {
+   "id": "leo",
+   "band": "very likely",
+   "p": 0.622,
+   "took": 0.62
+  },
+  {
+   "id": "noor",
+   "band": "maybe",
+   "p": 0.339,
+   "took": 0.4
+  },
+  {
+   "id": "sam",
+   "band": "unlikely",
+   "p": 0.11,
+   "took": 0.125
+  },
+  {
+   "id": "ines",
+   "band": "maybe",
+   "p": 0.325,
+   "took": 0.33
+  },
+  {
+   "id": "kenji",
+   "band": "maybe",
+   "p": 0.151,
+   "took": 0.13
+  },
+  {
+   "id": "priya",
+   "band": "maybe",
+   "p": 0.246,
+   "took": 0.24
+  }
+ ]
+}

@@ -1,0 +1,21 @@
+{
+ "simulated": true,
+ "note": "Simulated: made by Serve's user simulation (agent/test/sim_users), by simulated people. None of it is a real person's.",
+ "run": "d2",
+ "seed": 2,
+ "made": "2026-10-28T13:10:53.775Z",
+ "trial": {
+  "first": "2026-11-05",
+  "last": "2026-11-07"
+ },
+ "counts": {
+  "members": 20,
+  "records": 2,
+  "games": 1,
+  "played": 0,
+  "posts": 0,
+  "items": 4,
+  "votes": 0
+ },
+ "load": "node test/sim_users/load_seed.mjs --into <the demo gateway's data folder> --yes, then start that gateway with SIM_USERS=test/sim_users/seed LOOP_SIMULATED=1 SIM_SEED=<seed> (docs/simulated_users.md)"
+}

@@ -1,0 +1,84 @@
+/* Autopilot: the goal, what it learned, the live run (steps on the left, the agents' threads on the right), approval */
+.page.autopilot { max-width: 1240px; }
+.ap-top { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s4); margin-bottom: var(--s4); align-items: start; }
+.ap-goal { display: grid; gap: var(--s3); margin-bottom: var(--s3); }
+.ap-goal label { display: grid; gap: 6px; font: 600 13px/1.3 var(--font); color: var(--ink-2); }
+.ap-goal .seg { margin: 0; justify-self: start; max-width: 100%; overflow-x: auto; }
+.ap-habits, .ap-chem { list-style: none; margin: 0 0 var(--s3); padding: 0; display: grid; gap: var(--s2); }
+.ap-habits li { display: grid; grid-template-columns: 150px minmax(60px, 1fr); gap: 2px var(--s3); align-items: center; }
+.ap-habits li .tiny { grid-column: 1 / -1; }
+.ap-bar { height: 8px; border-radius: var(--r-pill); background: var(--control-hover); overflow: hidden; }
+.ap-bar i { display: block; height: 100%; background: var(--agent); transform-origin: left; }
+.ap-chem li { display: grid; grid-template-columns: 30px minmax(0, 1fr) auto; gap: var(--s3); align-items: center; }
+.ap-chem li > span:nth-child(2) { display: grid; }
+.ap-empty { display: flex; align-items: center; gap: var(--s3); color: var(--ink-2); }
+.ap-empty p { margin: 0; }
+.ap-run { margin-bottom: var(--s4); }
+.ap-grid { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: var(--s4); align-items: start; }
+.ap-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; }
+.ap-steps li { display: grid; grid-template-columns: 92px minmax(0, 1fr); gap: var(--s3); padding: 8px 0; border-bottom: 1px solid var(--rule); animation: land .35s cubic-bezier(.22, 1, .36, 1); }
+.ap-steps li:last-child { border-bottom: 0; }
+.ap-steps li p { margin: 2px 0 0; }
+.ap-tool { justify-self: start; align-self: start; font: 700 11px/1 var(--mono, ui-monospace, monospace); text-transform: uppercase; letter-spacing: .04em; padding: 4px 7px; border-radius: var(--r-pill); background: var(--control); color: var(--ink-2); }
+.ap-steps li.t-negotiate .ap-tool, .ap-steps li.t-a2a .ap-tool, .ap-steps li.t-recall .ap-tool { background: color-mix(in srgb, var(--agent) 14%, transparent); color: var(--agent); }
+.ap-steps li.t-verify .ap-tool, .ap-steps li.t-request_approval .ap-tool { background: var(--agent); color: var(--agent-ink); }
+.ap-steps li.refused .ap-tool, .ap-steps li.t-fallback .ap-tool { background: color-mix(in srgb, var(--warn) 16%, transparent); color: var(--warn); }
+.ap-by { margin-left: 8px; font: 600 11px/1 var(--font); color: var(--agent); }
+.ap-by.rules { color: var(--warn); }
+.ap-why { color: var(--ink-2); font-style: italic; font-size: 14px; }
+.ap-now { color: var(--agent); display: flex !important; align-items: center; gap: var(--s2); }
+.ap-now .dots { display: inline-flex; gap: 3px; } .ap-now .dots i { width: 5px; height: 5px; border-radius: 50%; background: var(--agent); animation: blink2 1s infinite; }
+.ap-now .dots i:nth-child(2) { animation-delay: .15s; } .ap-now .dots i:nth-child(3) { animation-delay: .3s; }
+.ap-side { display: grid; gap: var(--s3); }
+.ap-thread { margin-top: 0; }
+.ap-approve { margin-top: var(--s4); padding: var(--s3) var(--s4); border-radius: var(--r-lg); border: 1px solid color-mix(in srgb, var(--agent) 55%, transparent); background: color-mix(in srgb, var(--agent) 6%, var(--surface)); }
+.ap-approve.done { border-color: var(--rule); background: var(--surface); }
+.ap-approve ul { list-style: none; margin: 0 0 var(--s3); padding: 0; display: grid; gap: var(--s2); }
+.ap-approve li { display: grid; grid-template-columns: 96px minmax(0, 1fr) auto; gap: var(--s3); align-items: center; padding: var(--s2) 0; border-bottom: 1px solid var(--rule); }
+.ap-approve li:last-child { border-bottom: 0; }
+.ap-approve li > span:nth-child(2) { display: grid; gap: 2px; }
+.ap-when { display: grid; font: 600 13px/1.2 var(--font); color: var(--ink-3); } .ap-when b { font-size: 16px; color: var(--ink); }
+.ap-av { display: inline-flex; } .ap-av .mav + .mav { margin-left: -8px; }
+.ap-summary { display: flex; align-items: center; gap: var(--s2); margin: var(--s3) 0 0; color: var(--ink-2); }
+.ap-approve .talk-facts { margin-top: 2px; }
+.ap-thread > .talk-facts { margin: -2px 0 var(--s2); }
+/* who the plan left out because of what the player told their agent */
+.ap-leftout { margin-top: var(--s4); padding: var(--s3) var(--s4); border-radius: var(--r-lg); background: var(--surface); border: 1px solid var(--rule); }
+.ap-leftout .panel-h { display: flex; align-items: center; gap: var(--s2); margin-bottom: var(--s2); }
+.ap-leftout .panel-h .icon { color: var(--agent); }
+.ap-leftout ul { list-style: none; margin: 0 0 var(--s2); padding: 0; display: grid; gap: var(--s2); }
+.ap-leftout li { display: flex; align-items: center; gap: var(--s3); color: var(--ink-2); }
+.ap-leftout li b { color: var(--ink); }
+.ap-leftout p { margin: 0; }
+.ap-how ol { margin: 0; padding-left: 20px; display: grid; gap: var(--s2); color: var(--ink-2); max-width: 90ch; }
+@media (max-width: 1000px) { .ap-top, .ap-grid { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 640px) {
+  .ap-steps li { grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .ap-approve li { grid-template-columns: minmax(0, 1fr); }
+  .ap-habits li { grid-template-columns: minmax(0, 1fr); }
+}
+@media (prefers-reduced-motion: reduce) { .ap-steps li { animation: none; } .ap-now .dots i { animation: none; } }
+
+/* the run's OpenTelemetry trace, as a waterfall */
+.ap-trace { margin-top: var(--s4); border-top: 1px solid var(--rule); padding-top: var(--s3); }
+.ap-trace summary { cursor: pointer; font-weight: 600; font-size: 14px; color: var(--ink-2); }
+.trace { display: grid; gap: var(--s2); margin-top: var(--s3); }
+.trace-rows { list-style: none; margin: 0; padding: 0; display: grid; gap: 2px; max-height: 420px; overflow: auto; }
+.trace-row { display: grid; grid-template-columns: minmax(180px, 38%) minmax(0, 1fr) 56px; gap: var(--s2); align-items: center; font-size: 12px; line-height: 1.3; }
+.trace-name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--ink-2); }
+.trace-lane { position: relative; height: 10px; border-radius: 3px; background: var(--control); }
+.trace-lane i { position: absolute; top: 0; bottom: 0; border-radius: 3px; background: var(--ink-3); }
+/* (kinds as k-*: a bare .a2a is the agents' thread box, and it used to give every A2A row its frame) */
+.trace-row.k-agent .trace-name { color: var(--ink); font-weight: 600; }
+.trace-row.k-agent .trace-lane i { background: var(--agent); }
+.trace-row.k-chat .trace-lane i { background: color-mix(in srgb, var(--agent) 45%, var(--ink-3)); }
+.trace-row.k-tool .trace-lane i { background: var(--ink-2); }
+.trace-row.k-a2a .trace-lane i { background: color-mix(in srgb, var(--agent) 70%, transparent); }
+.trace-row.error .trace-name { color: var(--bad); }
+.trace-row.k-guard .trace-name { color: var(--ink); }
+.trace-row.k-guard .trace-lane i { background: var(--near); }
+.trace-ms { text-align: right; color: var(--ink-3); }
+/* the failure attribution: one plain line, and the step it names marked in the waterfall */
+.trace-why { margin: 0; color: var(--bad); }
+.trace-row.ended .trace-name { color: var(--bad); font-weight: 600; }
+@media (max-width: 640px) { .trace-row { grid-template-columns: minmax(120px, 45%) minmax(0, 1fr) 48px; } }

@@ -1,0 +1,176 @@
+{
+ "of": "final-11448.json",
+ "at": "2026-10-28T03:46:20.513Z",
+ "perSpec": {
+  "P-B01": "3/3",
+  "P-B02": "3/3",
+  "P-B03": "3/3",
+  "P-B04": "0/3",
+  "P-B05": "3/3",
+  "P-B06": "3/3"
+ },
+ "rows": [
+  {
+   "id": "P-B01",
+   "run": 1,
+   "before": true,
+   "now": true,
+   "pass": 2,
+   "fail": 0,
+   "output": "passed"
+  },
+  {
+   "id": "P-B02",
+   "run": 1,
+   "before": true,
+   "now": true,
+   "pass": 4,
+   "fail": 0,
+   "output": "passed"
+  },
+  {
+   "id": "P-B03",
+   "run": 1,
+   "before": true,
+   "now": true,
+   "pass": 4,
+   "fail": 0,
+   "output": "passed"
+  },
+  {
+   "id": "P-B04",
+   "run": 1,
+   "before": true,
+   "now": false,
+   "pass": 3,
+   "fail": 1,
+   "output": "failed: indoorOnly: only those places are judged (no model call for an outdoor one)\nerror: |-"
+  },
+  {
+   "id": "P-B05",
+   "run": 1,
+   "before": true,
+   "now": true,
+   "pass": 4,
+   "fail": 0,
+   "output": "passed"
+  },
+  {
+   "id": "P-B06",
+   "run": 1,
+   "before": true,
+   "now": true,
+   "pass": 3,
+   "fail": 0,
+   "output": "passed"
+  },
+  {
+   "id": "P-B01",
+   "run": 2,
+   "before": true,
+   "now": true,
+   "pass": 2,
+   "fail": 0,
+   "output": "passed"
+  },
+  {
+   "id": "P-B02",
+   "run": 2,
+   "before": true,
+   "now": true,
+   "pass": 4,
+   "fail": 0,
+   "output": "passed"
+  },
+  {
+   "id": "P-B03",
+   "run": 2,
+   "before": true,
+   "now": true,
+   "pass": 4,
+   "fail": 0,
+   "output": "passed"
+  },
+  {
+   "id": "P-B04",
+   "run": 2,
+   "before": true,
+   "now": false,
+   "pass": 3,
+   "fail": 1,
+   "output": "failed: indoorOnly: only those places are judged (no model call for an outdoor one)\nerror: |-"
+  },
+  {
+   "id": "P-B05",
+   "run": 2,
+   "before": true,
+   "now": true,
+   "pass": 4,
+   "fail": 0,
+   "output": "passed"
+  },
+  {
+   "id": "P-B06",
+   "run": 2,
+   "before": true,
+   "now": true,
+   "pass": 3,
+   "fail": 0,
+   "output": "passed"
+  },
+  {
+   "id": "P-B01",
+   "run": 3,
+   "before": true,
+   "now": true,
+   "pass": 2,
+   "fail": 0,
+   "output": "passed"
+  },
+  {
+   "id": "P-B02",
+   "run": 3,
+   "before": true,
+   "now": true,
+   "pass": 4,
+   "fail": 0,
+   "output": "passed"
+  },
+  {
+   "id": "P-B03",
+   "run": 3,
+   "before": true,
+   "now": true,
+   "pass": 4,
+   "fail": 0,
+   "output": "passed"
+  },
+  {
+   "id": "P-B04",
+   "run": 3,
+   "before": true,
+   "now": false,
+   "pass": 3,
+   "fail": 1,
+   "output": "failed: indoorOnly: only those places are judged (no model call for an outdoor one)\nerror: |-"
+  },
+  {
+   "id": "P-B05",
+   "run": 3,
+   "before": true,
+   "now": true,
+   "pass": 4,
+   "fail": 0,
+   "output": "passed"
+  },
+  {
+   "id": "P-B06",
+   "run": 3,
+   "before": true,
+   "now": true,
+   "pass": 3,
+   "fail": 0,
+   "output": "passed"
+  }
+ ]
+}

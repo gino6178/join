@@ -1,0 +1,1752 @@
+{
+ "at": "2026-10-28T05:55:42.202Z",
+ "members": 400,
+ "seed": 7,
+ "model": "likely-lr-20261028",
+ "weeks": {
+  "train": [
+   0,
+   17
+  ],
+  "calibration": [
+   18,
+   20
+  ],
+  "test": [
+   21,
+   25
+  ]
+ },
+ "heldOutMembers": 133,
+ "rows": {
+  "train": 11557,
+  "calibration": 1847,
+  "test": 3136,
+  "trainUsed": 7658,
+  "calibrationUsed": 1278
+ },
+ "features": [
+  "yes rate, asks in the last 28 days",
+  "asks in the last 28 days (log)",
+  "yes rate at this weekday and hour",
+  "asks at this weekday and hour (log)",
+  "yes rate to this asker",
+  "asks from this asker (log)",
+  "games with this asker (log)",
+  "minutes past the booking with this asker",
+  "games in the last 7 days",
+  "games already booked that week",
+  "games a week, last 8 weeks",
+  "booked that week minus usual",
+  "a game the day before or after",
+  "habit: share of the last 8 weeks played then",
+  "said no in the last 72 hours",
+  "yes rate to its own Match helper and plans, 28 days",
+  "sore, in the body log",
+  "sore and singles",
+  "level gap (100 rating points)",
+  "own trip (10 min)",
+  "notice (log hours)",
+  "prefers doubles",
+  "weekend",
+  "asks in the last 7 days (log)",
+  "this asker's yeses that became games",
+  "this asker dropped or cancelled after a yes (log)"
+ ],
+ "cuts": [
+  0.15,
+  0.35,
+  0.6
+ ],
+ "bands": [
+  "unlikely",
+  "maybe",
+  "likely",
+  "very likely"
+ ],
+ "offline": {
+  "all": {
+   "prior": {
+    "n": 3136,
+    "auc": 0.5,
+    "brier": 0.1704,
+    "logloss": 0.5242,
+    "ece": 0.006
+   },
+   "rules": {
+    "n": 3136,
+    "auc": 0.666,
+    "brier": 0.1597,
+    "logloss": 0.4942,
+    "ece": 0.0173
+   },
+   "asker": {
+    "n": 3136,
+    "auc": 0.566,
+    "brier": 0.1685,
+    "logloss": 0.5186,
+    "ece": 0.0067
+   },
+   "lr_raw": {
+    "n": 3136,
+    "auc": 0.714,
+    "brier": 0.1521,
+    "logloss": 0.4735,
+    "ece": 0.0224
+   },
+   "lr_platt": {
+    "n": 3136,
+    "auc": 0.714,
+    "brier": 0.152,
+    "logloss": 0.4725,
+    "ece": 0.0124
+   },
+   "lr": {
+    "n": 3136,
+    "auc": 0.714,
+    "brier": 0.1521,
+    "logloss": 0.4736,
+    "ece": 0.0203
+   },
+   "lr_v1": {
+    "n": 3136,
+    "auc": 0.714,
+    "brier": 0.1528,
+    "logloss": 0.4782,
+    "ece": 0.0176
+   },
+   "lr_words": {
+    "n": 3136,
+    "auc": 0.713,
+    "brier": 0.153,
+    "logloss": 0.4739,
+    "ece": 0.0162
+   },
+   "gbdt_raw": {
+    "n": 3136,
+    "auc": 0.704,
+    "brier": 0.1534,
+    "logloss": 0.4788,
+    "ece": 0.0227
+   },
+   "gbdt": {
+    "n": 3136,
+    "auc": 0.704,
+    "brier": 0.1547,
+    "logloss": 0.4821,
+    "ece": 0.0228
+   },
+   "shipped": {
+    "n": 3136,
+    "auc": 0.717,
+    "brier": 0.152,
+    "logloss": 0.4734,
+    "ece": 0.0236
+   },
+   "truth": {
+    "n": 3136,
+    "auc": 0.831,
+    "brier": 0.1273,
+    "logloss": 0.395,
+    "ece": 0.0252
+   }
+  },
+  "heldOutMembers": {
+   "prior": {
+    "n": 1059,
+    "auc": 0.5,
+    "brier": 0.1628,
+    "logloss": 0.507,
+    "ece": 0.02
+   },
+   "rules": {
+    "n": 1059,
+    "auc": 0.675,
+    "brier": 0.1524,
+    "logloss": 0.4761,
+    "ece": 0.0252
+   },
+   "asker": {
+    "n": 1059,
+    "auc": 0.554,
+    "brier": 0.1622,
+    "logloss": 0.5053,
+    "ece": 0.0172
+   },
+   "lr_raw": {
+    "n": 1059,
+    "auc": 0.725,
+    "brier": 0.1427,
+    "logloss": 0.4494,
+    "ece": 0.0228
+   },
+   "lr_platt": {
+    "n": 1059,
+    "auc": 0.725,
+    "brier": 0.143,
+    "logloss": 0.4502,
+    "ece": 0.0272
+   },
+   "lr": {
+    "n": 1059,
+    "auc": 0.725,
+    "brier": 0.1428,
+    "logloss": 0.4501,
+    "ece": 0.0218
+   },
+   "lr_v1": {
+    "n": 1059,
+    "auc": 0.729,
+    "brier": 0.1432,
+    "logloss": 0.4523,
+    "ece": 0.0212
+   },
+   "lr_words": {
+    "n": 1059,
+    "auc": 0.718,
+    "brier": 0.1452,
+    "logloss": 0.4559,
+    "ece": 0.0248
+   },
+   "gbdt_raw": {
+    "n": 1059,
+    "auc": 0.723,
+    "brier": 0.1431,
+    "logloss": 0.4513,
+    "ece": 0.0151
+   },
+   "gbdt": {
+    "n": 1059,
+    "auc": 0.723,
+    "brier": 0.1446,
+    "logloss": 0.4557,
+    "ece": 0.0282
+   },
+   "shipped": {
+    "n": 1059,
+    "auc": 0.733,
+    "brier": 0.1434,
+    "logloss": 0.4498,
+    "ece": 0.029
+   },
+   "truth": {
+    "n": 1059,
+    "auc": 0.814,
+    "brier": 0.1286,
+    "logloss": 0.4019,
+    "ece": 0.0471
+   }
+  },
+  "seenMembers": {
+   "prior": {
+    "n": 2077,
+    "auc": 0.5,
+    "brier": 0.1743,
+    "logloss": 0.533,
+    "ece": 0.001
+   },
+   "rules": {
+    "n": 2077,
+    "auc": 0.662,
+    "brier": 0.1635,
+    "logloss": 0.5035,
+    "ece": 0.0225
+   },
+   "asker": {
+    "n": 2077,
+    "auc": 0.573,
+    "brier": 0.1716,
+    "logloss": 0.5253,
+    "ece": 0.0137
+   },
+   "lr_raw": {
+    "n": 2077,
+    "auc": 0.71,
+    "brier": 0.1569,
+    "logloss": 0.4858,
+    "ece": 0.0317
+   },
+   "lr_platt": {
+    "n": 2077,
+    "auc": 0.71,
+    "brier": 0.1566,
+    "logloss": 0.4839,
+    "ece": 0.0194
+   },
+   "lr": {
+    "n": 2077,
+    "auc": 0.71,
+    "brier": 0.1568,
+    "logloss": 0.4856,
+    "ece": 0.021
+   },
+   "lr_v1": {
+    "n": 2077,
+    "auc": 0.708,
+    "brier": 0.1578,
+    "logloss": 0.4915,
+    "ece": 0.0226
+   },
+   "lr_words": {
+    "n": 2077,
+    "auc": 0.711,
+    "brier": 0.157,
+    "logloss": 0.483,
+    "ece": 0.0219
+   },
+   "gbdt_raw": {
+    "n": 2077,
+    "auc": 0.696,
+    "brier": 0.1587,
+    "logloss": 0.4927,
+    "ece": 0.0285
+   },
+   "gbdt": {
+    "n": 2077,
+    "auc": 0.696,
+    "brier": 0.1598,
+    "logloss": 0.4955,
+    "ece": 0.021
+   },
+   "shipped": {
+    "n": 2077,
+    "auc": 0.71,
+    "brier": 0.1563,
+    "logloss": 0.4854,
+    "ece": 0.0247
+   },
+   "truth": {
+    "n": 2077,
+    "auc": 0.84,
+    "brier": 0.1266,
+    "logloss": 0.3914,
+    "ece": 0.0297
+   }
+  },
+  "reliability_gain": {
+   "all": {
+    "n": 3136,
+    "yes": 0.218,
+    "without": {
+     "auc": 0.714,
+     "brier": 0.1528,
+     "ece": 0.0176
+    },
+    "with": {
+     "auc": 0.714,
+     "brier": 0.1521,
+     "ece": 0.0203
+    }
+   },
+   "flakyAskers": {
+    "n": 460,
+    "yes": 0.154,
+    "without": {
+     "auc": 0.741,
+     "brier": 0.1199,
+     "ece": 0.0439
+    },
+    "with": {
+     "auc": 0.75,
+     "brier": 0.1171,
+     "ece": 0.0466
+    }
+   },
+   "memberSaidYesToAskerBefore": {
+    "n": 1216,
+    "yes": 0.22,
+    "without": {
+     "auc": 0.724,
+     "brier": 0.1522,
+     "ece": 0.0225
+    },
+    "with": {
+     "auc": 0.727,
+     "brier": 0.1506,
+     "ece": 0.033
+    }
+   },
+   "flakyAndBefore": {
+    "n": 180,
+    "yes": 0.1,
+    "without": {
+     "auc": 0.706,
+     "brier": 0.0935,
+     "ece": 0.0737
+    },
+    "with": {
+     "auc": 0.723,
+     "brier": 0.0895,
+     "ece": 0.0648
+    }
+   }
+  },
+  "orderings": {
+   "a2a_memory": 0.626,
+   "play_partnerScore": 0.55
+  },
+  "ci": {
+   "lr": {
+    "ece": [
+     0.0139,
+     0.0362
+    ],
+    "brier": [
+     0.1421,
+     0.1624
+    ],
+    "auc": [
+     0.6926,
+     0.7371
+    ]
+   },
+   "shipped": {
+    "ece": [
+     0.0135,
+     0.0374
+    ],
+    "brier": [
+     0.1422,
+     0.1617
+    ],
+    "auc": [
+     0.6956,
+     0.7398
+    ]
+   },
+   "gbdt": {
+    "ece": [
+     0.0148,
+     0.0379
+    ],
+    "brier": [
+     0.1451,
+     0.1641
+    ],
+    "auc": [
+     0.6846,
+     0.7288
+    ]
+   },
+   "rules": {
+    "ece": [
+     0.0118,
+     0.0345
+    ],
+    "brier": [
+     0.151,
+     0.1708
+    ],
+    "auc": [
+     0.6434,
+     0.6899
+    ]
+   },
+   "asker": {
+    "ece": [
+     0.0042,
+     0.0279
+    ],
+    "brier": [
+     0.159,
+     0.1795
+    ],
+    "auc": [
+     0.5443,
+     0.5908
+    ]
+   }
+  },
+  "reliability": {
+   "lr": [
+    {
+     "from": 0,
+     "to": 0.1,
+     "n": 538,
+     "meanP": 0.052,
+     "observed": 0.072
+    },
+    {
+     "from": 0.1,
+     "to": 0.2,
+     "n": 1143,
+     "meanP": 0.137,
+     "observed": 0.145
+    },
+    {
+     "from": 0.2,
+     "to": 0.3,
+     "n": 875,
+     "meanP": 0.252,
+     "observed": 0.235
+    },
+    {
+     "from": 0.3,
+     "to": 0.4,
+     "n": 277,
+     "meanP": 0.345,
+     "observed": 0.401
+    },
+    {
+     "from": 0.4,
+     "to": 0.5,
+     "n": 206,
+     "meanP": 0.448,
+     "observed": 0.49
+    },
+    {
+     "from": 0.5,
+     "to": 0.6,
+     "n": 73,
+     "meanP": 0.533,
+     "observed": 0.575
+    },
+    {
+     "from": 0.6,
+     "to": 0.7,
+     "n": 15,
+     "meanP": 0.638,
+     "observed": 0.667
+    },
+    {
+     "from": 0.7,
+     "to": 0.8,
+     "n": 9,
+     "meanP": 0.738,
+     "observed": 0.889
+    },
+    {
+     "from": 0.8,
+     "to": 0.9,
+     "n": 0,
+     "meanP": null,
+     "observed": null
+    },
+    {
+     "from": 0.9,
+     "to": 1,
+     "n": 0,
+     "meanP": null,
+     "observed": null
+    }
+   ],
+   "lr_raw": [
+    {
+     "from": 0,
+     "to": 0.1,
+     "n": 764,
+     "meanP": 0.065,
+     "observed": 0.093
+    },
+    {
+     "from": 0.1,
+     "to": 0.2,
+     "n": 1148,
+     "meanP": 0.147,
+     "observed": 0.149
+    },
+    {
+     "from": 0.2,
+     "to": 0.3,
+     "n": 656,
+     "meanP": 0.246,
+     "observed": 0.261
+    },
+    {
+     "from": 0.3,
+     "to": 0.4,
+     "n": 320,
+     "meanP": 0.346,
+     "observed": 0.428
+    },
+    {
+     "from": 0.4,
+     "to": 0.5,
+     "n": 149,
+     "meanP": 0.443,
+     "observed": 0.483
+    },
+    {
+     "from": 0.5,
+     "to": 0.6,
+     "n": 70,
+     "meanP": 0.54,
+     "observed": 0.586
+    },
+    {
+     "from": 0.6,
+     "to": 0.7,
+     "n": 21,
+     "meanP": 0.636,
+     "observed": 0.619
+    },
+    {
+     "from": 0.7,
+     "to": 0.8,
+     "n": 8,
+     "meanP": 0.754,
+     "observed": 0.875
+    },
+    {
+     "from": 0.8,
+     "to": 0.9,
+     "n": 0,
+     "meanP": null,
+     "observed": null
+    },
+    {
+     "from": 0.9,
+     "to": 1,
+     "n": 0,
+     "meanP": null,
+     "observed": null
+    }
+   ],
+   "shipped": [
+    {
+     "from": 0,
+     "to": 0.1,
+     "n": 495,
+     "meanP": 0.053,
+     "observed": 0.075
+    },
+    {
+     "from": 0.1,
+     "to": 0.2,
+     "n": 1205,
+     "meanP": 0.153,
+     "observed": 0.136
+    },
+    {
+     "from": 0.2,
+     "to": 0.3,
+     "n": 704,
+     "meanP": 0.25,
+     "observed": 0.233
+    },
+    {
+     "from": 0.3,
+     "to": 0.4,
+     "n": 417,
+     "meanP": 0.339,
+     "observed": 0.376
+    },
+    {
+     "from": 0.4,
+     "to": 0.5,
+     "n": 258,
+     "meanP": 0.459,
+     "observed": 0.492
+    },
+    {
+     "from": 0.5,
+     "to": 0.6,
+     "n": 8,
+     "meanP": 0.557,
+     "observed": 0.375
+    },
+    {
+     "from": 0.6,
+     "to": 0.7,
+     "n": 23,
+     "meanP": 0.665,
+     "observed": 0.565
+    },
+    {
+     "from": 0.7,
+     "to": 0.8,
+     "n": 18,
+     "meanP": 0.746,
+     "observed": 0.611
+    },
+    {
+     "from": 0.8,
+     "to": 0.9,
+     "n": 8,
+     "meanP": 0.821,
+     "observed": 0.875
+    },
+    {
+     "from": 0.9,
+     "to": 1,
+     "n": 0,
+     "meanP": null,
+     "observed": null
+    }
+   ],
+   "gbdt": [
+    {
+     "from": 0,
+     "to": 0.1,
+     "n": 879,
+     "meanP": 0.069,
+     "observed": 0.093
+    },
+    {
+     "from": 0.1,
+     "to": 0.2,
+     "n": 550,
+     "meanP": 0.176,
+     "observed": 0.162
+    },
+    {
+     "from": 0.2,
+     "to": 0.3,
+     "n": 1201,
+     "meanP": 0.24,
+     "observed": 0.231
+    },
+    {
+     "from": 0.3,
+     "to": 0.4,
+     "n": 293,
+     "meanP": 0.349,
+     "observed": 0.416
+    },
+    {
+     "from": 0.4,
+     "to": 0.5,
+     "n": 181,
+     "meanP": 0.451,
+     "observed": 0.475
+    },
+    {
+     "from": 0.5,
+     "to": 0.6,
+     "n": 24,
+     "meanP": 0.525,
+     "observed": 0.792
+    },
+    {
+     "from": 0.6,
+     "to": 0.7,
+     "n": 2,
+     "meanP": 0.632,
+     "observed": 1
+    },
+    {
+     "from": 0.7,
+     "to": 0.8,
+     "n": 2,
+     "meanP": 0.77,
+     "observed": 1
+    },
+    {
+     "from": 0.8,
+     "to": 0.9,
+     "n": 4,
+     "meanP": 0.842,
+     "observed": 0.75
+    },
+    {
+     "from": 0.9,
+     "to": 1,
+     "n": 0,
+     "meanP": null,
+     "observed": null
+    }
+   ],
+   "rules": [
+    {
+     "from": 0,
+     "to": 0.1,
+     "n": 334,
+     "meanP": 0.081,
+     "observed": 0.099
+    },
+    {
+     "from": 0.1,
+     "to": 0.2,
+     "n": 1207,
+     "meanP": 0.146,
+     "observed": 0.152
+    },
+    {
+     "from": 0.2,
+     "to": 0.3,
+     "n": 1107,
+     "meanP": 0.262,
+     "observed": 0.238
+    },
+    {
+     "from": 0.3,
+     "to": 0.4,
+     "n": 269,
+     "meanP": 0.337,
+     "observed": 0.364
+    },
+    {
+     "from": 0.4,
+     "to": 0.5,
+     "n": 134,
+     "meanP": 0.439,
+     "observed": 0.455
+    },
+    {
+     "from": 0.5,
+     "to": 0.6,
+     "n": 59,
+     "meanP": 0.528,
+     "observed": 0.508
+    },
+    {
+     "from": 0.6,
+     "to": 0.7,
+     "n": 16,
+     "meanP": 0.654,
+     "observed": 0.563
+    },
+    {
+     "from": 0.7,
+     "to": 0.8,
+     "n": 10,
+     "meanP": 0.741,
+     "observed": 0.5
+    },
+    {
+     "from": 0.8,
+     "to": 0.9,
+     "n": 0,
+     "meanP": null,
+     "observed": null
+    },
+    {
+     "from": 0.9,
+     "to": 1,
+     "n": 0,
+     "meanP": null,
+     "observed": null
+    }
+   ],
+   "asker": [
+    {
+     "from": 0,
+     "to": 0.1,
+     "n": 15,
+     "meanP": 0.083,
+     "observed": 0.2
+    },
+    {
+     "from": 0.1,
+     "to": 0.2,
+     "n": 684,
+     "meanP": 0.151,
+     "observed": 0.159
+    },
+    {
+     "from": 0.2,
+     "to": 0.3,
+     "n": 2360,
+     "meanP": 0.227,
+     "observed": 0.229
+    },
+    {
+     "from": 0.3,
+     "to": 0.4,
+     "n": 1,
+     "meanP": 0.397,
+     "observed": 0
+    },
+    {
+     "from": 0.4,
+     "to": 0.5,
+     "n": 16,
+     "meanP": 0.449,
+     "observed": 0.375
+    },
+    {
+     "from": 0.5,
+     "to": 0.6,
+     "n": 60,
+     "meanP": 0.523,
+     "observed": 0.4
+    },
+    {
+     "from": 0.6,
+     "to": 0.7,
+     "n": 0,
+     "meanP": null,
+     "observed": null
+    },
+    {
+     "from": 0.7,
+     "to": 0.8,
+     "n": 0,
+     "meanP": null,
+     "observed": null
+    },
+    {
+     "from": 0.8,
+     "to": 0.9,
+     "n": 0,
+     "meanP": null,
+     "observed": null
+    },
+    {
+     "from": 0.9,
+     "to": 1,
+     "n": 0,
+     "meanP": null,
+     "observed": null
+    }
+   ]
+  },
+  "lrWeights": [
+   [
+    "level gap (100 rating points)",
+    -0.439
+   ],
+   [
+    "prefers doubles",
+    -0.22
+   ],
+   [
+    "a game the day before or after",
+    -0.217
+   ],
+   [
+    "yes rate, asks in the last 28 days",
+    0.213
+   ],
+   [
+    "yes rate at this weekday and hour",
+    0.193
+   ],
+   [
+    "yes rate to its own Match helper and plans, 28 days",
+    0.182
+   ],
+   [
+    "asks at this weekday and hour (log)",
+    -0.141
+   ],
+   [
+    "asks in the last 7 days (log)",
+    -0.126
+   ],
+   [
+    "asks from this asker (log)",
+    -0.116
+   ],
+   [
+    "this asker's yeses that became games",
+    0.114
+   ],
+   [
+    "own trip (10 min)",
+    -0.101
+   ],
+   [
+    "notice (log hours)",
+    0.078
+   ],
+   [
+    "booked that week minus usual",
+    -0.064
+   ],
+   [
+    "weekend",
+    0.062
+   ],
+   [
+    "games already booked that week",
+    -0.06
+   ],
+   [
+    "yes rate to this asker",
+    0.047
+   ],
+   [
+    "this asker dropped or cancelled after a yes (log)",
+    0.043
+   ],
+   [
+    "habit: share of the last 8 weeks played then",
+    0.04
+   ],
+   [
+    "said no in the last 72 hours",
+    -0.027
+   ],
+   [
+    "asks in the last 28 days (log)",
+    0.021
+   ],
+   [
+    "games a week, last 8 weeks",
+    0.02
+   ],
+   [
+    "games in the last 7 days",
+    0.017
+   ],
+   [
+    "minutes past the booking with this asker",
+    -0.014
+   ],
+   [
+    "games with this asker (log)",
+    0.011
+   ],
+   [
+    "sore, in the body log",
+    0
+   ],
+   [
+    "sore and singles",
+    0
+   ]
+  ],
+  "baseRate": {
+   "train": 0.224,
+   "test": 0.218
+  },
+  "bands": [
+   {
+    "band": "unlikely",
+    "range": [
+     0,
+     0.15
+    ],
+    "n": 935,
+    "share": 0.298,
+    "observedYes": 0.096
+   },
+   {
+    "band": "maybe",
+    "range": [
+     0.15,
+     0.35
+    ],
+    "n": 1760,
+    "share": 0.561,
+    "observedYes": 0.211
+   },
+   {
+    "band": "likely",
+    "range": [
+     0.35,
+     0.6
+    ],
+    "n": 392,
+    "share": 0.125,
+    "observedYes": 0.485
+   },
+   {
+    "band": "very likely",
+    "range": [
+     0.6,
+     1
+    ],
+    "n": 49,
+    "share": 0.016,
+    "observedYes": 0.633
+   }
+  ]
+ },
+ "online": {
+  "random": {
+   "requests": 927,
+   "agreed": 627,
+   "successRate": 0.676,
+   "success1": 0.208,
+   "success3": 0.457,
+   "asksPerGame": 5.32,
+   "declinesPerRequest": 2.92,
+   "roundsWhenAgreed": 2.76,
+   "secondsWhenAgreed": 41,
+   "estimatesPerRequest": 0,
+   "estimates": 0,
+   "refused": 0,
+   "cached": 0,
+   "releasedYes": 0,
+   "askerDropped": 61,
+   "cancelledAfterBooking": 28,
+   "exactGiven": 0,
+   "fairness": {
+    "eligibleMembers": 389,
+    "neverAsked": 0.005,
+    "giniAsks": 0.267,
+    "giniGames": 0.342,
+    "maxAsksInAWeek": 9
+   }
+  },
+  "play.js ranking (today)": {
+   "requests": 906,
+   "agreed": 683,
+   "successRate": 0.754,
+   "success1": 0.262,
+   "success3": 0.563,
+   "asksPerGame": 4.21,
+   "declinesPerRequest": 2.42,
+   "roundsWhenAgreed": 2.53,
+   "secondsWhenAgreed": 38,
+   "estimatesPerRequest": 0,
+   "estimates": 0,
+   "refused": 0,
+   "cached": 0,
+   "releasedYes": 0,
+   "askerDropped": 59,
+   "cancelledAfterBooking": 28,
+   "exactGiven": 0,
+   "fairness": {
+    "eligibleMembers": 389,
+    "neverAsked": 0.141,
+    "giniAsks": 0.482,
+    "giniGames": 0.344,
+    "maxAsksInAWeek": 11
+   }
+  },
+  "play.js ranking, rule-breakers asked too": {
+   "requests": 905,
+   "agreed": 663,
+   "successRate": 0.733,
+   "success1": 0.248,
+   "success3": 0.547,
+   "asksPerGame": 4.45,
+   "declinesPerRequest": 2.53,
+   "roundsWhenAgreed": 2.53,
+   "secondsWhenAgreed": 38,
+   "estimatesPerRequest": 0,
+   "estimates": 0,
+   "refused": 0,
+   "cached": 0,
+   "releasedYes": 0,
+   "askerDropped": 54,
+   "cancelledAfterBooking": 27,
+   "exactGiven": 0,
+   "fairness": {
+    "eligibleMembers": 389,
+    "neverAsked": 0.154,
+    "giniAsks": 0.488,
+    "giniGames": 0.348,
+    "maxAsksInAWeek": 12
+   }
+  },
+  "a2a.js memory, then play.js": {
+   "requests": 847,
+   "agreed": 679,
+   "successRate": 0.802,
+   "success1": 0.353,
+   "success3": 0.653,
+   "asksPerGame": 3.33,
+   "declinesPerRequest": 1.87,
+   "roundsWhenAgreed": 2.21,
+   "secondsWhenAgreed": 33,
+   "estimatesPerRequest": 0,
+   "estimates": 0,
+   "refused": 0,
+   "cached": 0,
+   "releasedYes": 0,
+   "askerDropped": 68,
+   "cancelledAfterBooking": 15,
+   "exactGiven": 0,
+   "fairness": {
+    "eligibleMembers": 389,
+    "neverAsked": 0.152,
+    "giniAsks": 0.511,
+    "giniGames": 0.39,
+    "maxAsksInAWeek": 13
+   }
+  },
+  "bands, top 12 by fit (fair exposure off)": {
+   "requests": 885,
+   "agreed": 709,
+   "successRate": 0.801,
+   "success1": 0.406,
+   "success3": 0.684,
+   "asksPerGame": 3.2,
+   "declinesPerRequest": 1.76,
+   "roundsWhenAgreed": 2.05,
+   "secondsWhenAgreed": 31,
+   "estimatesPerRequest": 12,
+   "estimates": 10620,
+   "refused": 0,
+   "cached": 0,
+   "releasedYes": 0,
+   "askerDropped": 63,
+   "cancelledAfterBooking": 24,
+   "exactGiven": 0,
+   "fairness": {
+    "eligibleMembers": 389,
+    "neverAsked": 0.18,
+    "giniAsks": 0.46,
+    "giniGames": 0.369,
+    "maxAsksInAWeek": 10
+   },
+   "bandsOnline": {
+    "unlikely": {
+     "asks": 27,
+     "observedYes": 0.148
+    },
+    "maybe": {
+     "asks": 1147,
+     "observedYes": 0.246
+    },
+    "likely": {
+     "asks": 926,
+     "observedYes": 0.413
+    },
+    "very likely": {
+     "asks": 171,
+     "observedYes": 0.608
+    }
+   }
+  },
+  "bands, fair exposure (the default)": {
+   "requests": 882,
+   "agreed": 691,
+   "successRate": 0.783,
+   "success1": 0.387,
+   "success3": 0.656,
+   "asksPerGame": 3.46,
+   "declinesPerRequest": 1.92,
+   "roundsWhenAgreed": 2.11,
+   "secondsWhenAgreed": 32,
+   "estimatesPerRequest": 12,
+   "estimates": 10584,
+   "refused": 0,
+   "cached": 0,
+   "releasedYes": 0,
+   "askerDropped": 58,
+   "cancelledAfterBooking": 23,
+   "exactGiven": 0,
+   "fairness": {
+    "eligibleMembers": 389,
+    "neverAsked": 0.075,
+    "giniAsks": 0.373,
+    "giniGames": 0.364,
+    "maxAsksInAWeek": 9
+   },
+   "bandsOnline": {
+    "unlikely": {
+     "asks": 48,
+     "observedYes": 0.042
+    },
+    "maybe": {
+     "asks": 1260,
+     "observedYes": 0.209
+    },
+    "likely": {
+     "asks": 924,
+     "observedYes": 0.424
+    },
+    "very likely": {
+     "asks": 156,
+     "observedYes": 0.59
+    }
+   }
+  },
+  "bands with the asker's reliability (MATCH_RELIABILITY=on)": {
+   "requests": 884,
+   "agreed": 697,
+   "successRate": 0.788,
+   "success1": 0.393,
+   "success3": 0.648,
+   "asksPerGame": 3.43,
+   "declinesPerRequest": 1.92,
+   "roundsWhenAgreed": 2.12,
+   "secondsWhenAgreed": 32,
+   "estimatesPerRequest": 12,
+   "estimates": 10608,
+   "refused": 0,
+   "cached": 0,
+   "releasedYes": 0,
+   "askerDropped": 53,
+   "cancelledAfterBooking": 20,
+   "exactGiven": 0,
+   "fairness": {
+    "eligibleMembers": 389,
+    "neverAsked": 0.064,
+    "giniAsks": 0.37,
+    "giniGames": 0.362,
+    "maxAsksInAWeek": 7
+   },
+   "bandsOnline": {
+    "unlikely": {
+     "asks": 23,
+     "observedYes": 0.043
+    },
+    "maybe": {
+     "asks": 1186,
+     "observedYes": 0.199
+    },
+    "likely": {
+     "asks": 1049,
+     "observedYes": 0.412
+    },
+    "very likely": {
+     "asks": 135,
+     "observedYes": 0.6
+    }
+   }
+  },
+  "exact chance, every member shares it": {
+   "requests": 879,
+   "agreed": 688,
+   "successRate": 0.783,
+   "success1": 0.381,
+   "success3": 0.664,
+   "asksPerGame": 3.47,
+   "declinesPerRequest": 1.93,
+   "roundsWhenAgreed": 2.07,
+   "secondsWhenAgreed": 31,
+   "estimatesPerRequest": 12,
+   "estimates": 10548,
+   "refused": 0,
+   "cached": 0,
+   "releasedYes": 0,
+   "askerDropped": 50,
+   "cancelledAfterBooking": 17,
+   "exactGiven": 7951,
+   "fairness": {
+    "eligibleMembers": 389,
+    "neverAsked": 0.057,
+    "giniAsks": 0.364,
+    "giniGames": 0.363,
+    "maxAsksInAWeek": 9
+   },
+   "bandsOnline": {
+    "unlikely": {
+     "asks": 54,
+     "observedYes": 0.056
+    },
+    "maybe": {
+     "asks": 1295,
+     "observedYes": 0.203
+    },
+    "likely": {
+     "asks": 883,
+     "observedYes": 0.436
+    },
+    "very likely": {
+     "asks": 152,
+     "observedYes": 0.572
+    }
+   }
+  },
+  "exact chance, a third of members share it": {
+   "requests": 888,
+   "agreed": 701,
+   "successRate": 0.789,
+   "success1": 0.374,
+   "success3": 0.671,
+   "asksPerGame": 3.41,
+   "declinesPerRequest": 1.9,
+   "roundsWhenAgreed": 2.09,
+   "secondsWhenAgreed": 31,
+   "estimatesPerRequest": 12,
+   "estimates": 10656,
+   "refused": 0,
+   "cached": 0,
+   "releasedYes": 0,
+   "askerDropped": 50,
+   "cancelledAfterBooking": 22,
+   "exactGiven": 2939,
+   "fairness": {
+    "eligibleMembers": 389,
+    "neverAsked": 0.062,
+    "giniAsks": 0.372,
+    "giniGames": 0.361,
+    "maxAsksInAWeek": 9
+   },
+   "bandsOnline": {
+    "unlikely": {
+     "asks": 51,
+     "observedYes": 0
+    },
+    "maybe": {
+     "asks": 1281,
+     "observedYes": 0.222
+    },
+    "likely": {
+     "asks": 909,
+     "observedYes": 0.419
+    },
+    "very likely": {
+     "asks": 149,
+     "observedYes": 0.577
+    }
+   }
+  },
+  "exact chance, every member, fair exposure off": {
+   "requests": 897,
+   "agreed": 700,
+   "successRate": 0.78,
+   "success1": 0.428,
+   "success3": 0.677,
+   "asksPerGame": 3.23,
+   "declinesPerRequest": 1.74,
+   "roundsWhenAgreed": 1.9,
+   "secondsWhenAgreed": 28,
+   "estimatesPerRequest": 12,
+   "estimates": 10764,
+   "refused": 0,
+   "cached": 0,
+   "releasedYes": 0,
+   "askerDropped": 62,
+   "cancelledAfterBooking": 20,
+   "exactGiven": 8331,
+   "fairness": {
+    "eligibleMembers": 389,
+    "neverAsked": 0.167,
+    "giniAsks": 0.468,
+    "giniGames": 0.384,
+    "maxAsksInAWeek": 11
+   },
+   "bandsOnline": {
+    "unlikely": {
+     "asks": 42,
+     "observedYes": 0.095
+    },
+    "maybe": {
+     "asks": 1174,
+     "observedYes": 0.227
+    },
+    "likely": {
+     "asks": 885,
+     "observedYes": 0.446
+    },
+    "very likely": {
+     "asks": 158,
+     "observedYes": 0.614
+    }
+   }
+  },
+  "probability, top 12 by fit (no bands)": {
+   "requests": 887,
+   "agreed": 713,
+   "successRate": 0.804,
+   "success1": 0.417,
+   "success3": 0.674,
+   "asksPerGame": 3.16,
+   "declinesPerRequest": 1.74,
+   "roundsWhenAgreed": 2.03,
+   "secondsWhenAgreed": 31,
+   "estimatesPerRequest": 0,
+   "estimates": 0,
+   "refused": 0,
+   "cached": 0,
+   "releasedYes": 0,
+   "askerDropped": 63,
+   "cancelledAfterBooking": 26,
+   "exactGiven": 0,
+   "fairness": {
+    "eligibleMembers": 389,
+    "neverAsked": 0.144,
+    "giniAsks": 0.473,
+    "giniGames": 0.375,
+    "maxAsksInAWeek": 9
+   }
+  },
+  "bands, randomized response (eps 2)": {
+   "requests": 893,
+   "agreed": 677,
+   "successRate": 0.758,
+   "success1": 0.277,
+   "success3": 0.577,
+   "asksPerGame": 4.16,
+   "declinesPerRequest": 2.39,
+   "roundsWhenAgreed": 2.48,
+   "secondsWhenAgreed": 37,
+   "estimatesPerRequest": 12,
+   "estimates": 10716,
+   "refused": 0,
+   "cached": 0,
+   "releasedYes": 0,
+   "askerDropped": 48,
+   "cancelledAfterBooking": 28,
+   "exactGiven": 0,
+   "fairness": {
+    "eligibleMembers": 389,
+    "neverAsked": 0.031,
+    "giniAsks": 0.339,
+    "giniGames": 0.347,
+    "maxAsksInAWeek": 9
+   },
+   "bandsOnline": {
+    "unlikely": {
+     "asks": 21,
+     "observedYes": 0.048
+    },
+    "maybe": {
+     "asks": 779,
+     "observedYes": 0.216
+    },
+    "likely": {
+     "asks": 1039,
+     "observedYes": 0.288
+    },
+    "very likely": {
+     "asks": 976,
+     "observedYes": 0.263
+    }
+   }
+  },
+  "bands, two at a time": {
+   "requests": 894,
+   "agreed": 692,
+   "successRate": 0.774,
+   "success1": 0,
+   "success3": 0.543,
+   "asksPerGame": 4.12,
+   "declinesPerRequest": 2.42,
+   "roundsWhenAgreed": 1.38,
+   "secondsWhenAgreed": 21,
+   "estimatesPerRequest": 12,
+   "estimates": 10728,
+   "refused": 0,
+   "cached": 0,
+   "releasedYes": 150,
+   "askerDropped": 71,
+   "cancelledAfterBooking": 30,
+   "exactGiven": 0,
+   "fairness": {
+    "eligibleMembers": 389,
+    "neverAsked": 0.064,
+    "giniAsks": 0.366,
+    "giniGames": 0.361,
+    "maxAsksInAWeek": 10
+   },
+   "bandsOnline": {
+    "unlikely": {
+     "asks": 50,
+     "observedYes": 0.04
+    },
+    "maybe": {
+     "asks": 1502,
+     "observedYes": 0.219
+    },
+    "likely": {
+     "asks": 1146,
+     "observedYes": 0.44
+    },
+    "very likely": {
+     "asks": 156,
+     "observedYes": 0.583
+    }
+   }
+  },
+  "bands, 1 in 10 agents inflate, no ledger": {
+   "requests": 893,
+   "agreed": 710,
+   "successRate": 0.795,
+   "success1": 0.286,
+   "success3": 0.615,
+   "asksPerGame": 3.76,
+   "declinesPerRequest": 2.19,
+   "roundsWhenAgreed": 2.44,
+   "secondsWhenAgreed": 37,
+   "estimatesPerRequest": 12,
+   "estimates": 9777,
+   "refused": 0,
+   "cached": 0,
+   "releasedYes": 0,
+   "askerDropped": 51,
+   "cancelledAfterBooking": 28,
+   "exactGiven": 0,
+   "fairness": {
+    "eligibleMembers": 389,
+    "neverAsked": 0.08,
+    "giniAsks": 0.465,
+    "giniGames": 0.354,
+    "maxAsksInAWeek": 12
+   },
+   "bandsOnline": {
+    "unlikely": {
+     "asks": 24,
+     "observedYes": 0
+    },
+    "maybe": {
+     "asks": 955,
+     "observedYes": 0.224
+    },
+    "likely": {
+     "asks": 743,
+     "observedYes": 0.408
+    },
+    "very likely": {
+     "asks": 946,
+     "observedYes": 0.258
+    }
+   },
+   "liars": 37,
+   "liarsFlagged": 0,
+   "honestFlagged": 0
+  },
+  "bands, 1 in 10 agents inflate, ledger": {
+   "requests": 892,
+   "agreed": 711,
+   "successRate": 0.797,
+   "success1": 0.344,
+   "success3": 0.657,
+   "asksPerGame": 3.48,
+   "declinesPerRequest": 1.98,
+   "roundsWhenAgreed": 2.19,
+   "secondsWhenAgreed": 33,
+   "estimatesPerRequest": 12,
+   "estimates": 9702,
+   "refused": 0,
+   "cached": 0,
+   "releasedYes": 0,
+   "askerDropped": 48,
+   "cancelledAfterBooking": 23,
+   "exactGiven": 0,
+   "fairness": {
+    "eligibleMembers": 389,
+    "neverAsked": 0.057,
+    "giniAsks": 0.382,
+    "giniGames": 0.357,
+    "maxAsksInAWeek": 8
+   },
+   "bandsOnline": {
+    "unlikely": {
+     "asks": 31,
+     "observedYes": 0
+    },
+    "maybe": {
+     "asks": 1058,
+     "observedYes": 0.217
+    },
+    "likely": {
+     "asks": 781,
+     "observedYes": 0.423
+    },
+    "very likely": {
+     "asks": 513,
+     "observedYes": 0.353
+    }
+   },
+   "liars": 37,
+   "liarsFlagged": 26,
+   "honestFlagged": 0
+  },
+  "bands, 15% refuse": {
+   "requests": 882,
+   "agreed": 684,
+   "successRate": 0.776,
+   "success1": 0.362,
+   "success3": 0.626,
+   "asksPerGame": 3.64,
+   "declinesPerRequest": 2.05,
+   "roundsWhenAgreed": 2.2,
+   "secondsWhenAgreed": 33,
+   "estimatesPerRequest": 12,
+   "estimates": 10584,
+   "refused": 1280,
+   "cached": 0,
+   "releasedYes": 0,
+   "askerDropped": 52,
+   "cancelledAfterBooking": 22,
+   "exactGiven": 0,
+   "fairness": {
+    "eligibleMembers": 389,
+    "neverAsked": 0.062,
+    "giniAsks": 0.348,
+    "giniGames": 0.353,
+    "maxAsksInAWeek": 10
+   },
+   "bandsOnline": {
+    "unlikely": {
+     "asks": 26,
+     "observedYes": 0.038
+    },
+    "maybe": {
+     "asks": 1222,
+     "observedYes": 0.201
+    },
+    "likely": {
+     "asks": 802,
+     "observedYes": 0.404
+    },
+    "very likely": {
+     "asks": 141,
+     "observedYes": 0.631
+    }
+   },
+   "askedPerEligible": {
+    "refusers": 0.032,
+    "others": 0.033
+   }
+  },
+  "oracle (true chance, the same 12)": {
+   "requests": 865,
+   "agreed": 723,
+   "successRate": 0.836,
+   "success1": 0.528,
+   "success3": 0.76,
+   "asksPerGame": 2.52,
+   "declinesPerRequest": 1.27,
+   "roundsWhenAgreed": 1.69,
+   "secondsWhenAgreed": 25,
+   "estimatesPerRequest": 0,
+   "estimates": 0,
+   "refused": 0,
+   "cached": 0,
+   "releasedYes": 0,
+   "askerDropped": 62,
+   "cancelledAfterBooking": 28,
+   "exactGiven": 0,
+   "fairness": {
+    "eligibleMembers": 389,
+    "neverAsked": 0.162,
+    "giniAsks": 0.507,
+    "giniGames": 0.359,
+    "maxAsksInAWeek": 9
+   }
+  },
+  "oracle (true chance, everyone free)": {
+   "requests": 845,
+   "agreed": 760,
+   "successRate": 0.899,
+   "success1": 0.643,
+   "success3": 0.87,
+   "asksPerGame": 1.62,
+   "declinesPerRequest": 0.56,
+   "roundsWhenAgreed": 1.44,
+   "secondsWhenAgreed": 22,
+   "estimatesPerRequest": 0,
+   "estimates": 0,
+   "refused": 0,
+   "cached": 0,
+   "releasedYes": 0,
+   "askerDropped": 81,
+   "cancelledAfterBooking": 31,
+   "exactGiven": 0,
+   "fairness": {
+    "eligibleMembers": 389,
+    "neverAsked": 0.347,
+    "giniAsks": 0.629,
+    "giniGames": 0.362,
+    "maxAsksInAWeek": 8
+   }
+  }
+ },
+ "attack": {
+  "targets": 80,
+  "probesEach": 98,
+  "rows": 7840,
+  "freeShare": 0.063,
+  "schedule": {
+   "bands": 0.876,
+   "exact": 0.876,
+   "exactNoFloor": 0.988
+  },
+  "alreadyBookedThatWeek": {
+   "bands": 0.399,
+   "exact": 0.383,
+   "exactNoFloor": 0.373
+  },
+  "distinctAnswers": {
+   "bands": 4,
+   "exact": 12,
+   "exactNoFloor": 14
+  },
+  "budget": {
+   "perAskerWeek": 10,
+   "weeksToProbeAWeek": 10,
+   "perMemberWeekFromAllAskers": 40
+  }
+ },
+ "seconds": 109.1
+}

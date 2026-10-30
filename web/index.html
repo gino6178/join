@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head><!-- all of it read before the first paint: the encoding, the page's name, the viewport, its colours and icon, the theme -->
+    <meta charset="UTF-8" />
+    <title>Serve · Play more. Manage less.</title>
+    <meta name="description" content="Say you want to play and your agent finds the court and the people. A sports social platform on Muse Glimmer, on hardware you own." />
+    <meta content="width=device-width, initial-scale=1" name="viewport" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0b0b0c" media="(prefers-color-scheme: dark)" />
+    <link rel="icon" type="image/svg+xml" href="/media/favicon.svg" />
+    <!-- the player's own theme choice (System / Light / Dark), applied before the first paint -->
+    <script>try { var t = localStorage.getItem("shuttlecoach.theme"); if (t === "light" || t === "dark") document.documentElement.dataset.theme = t; } catch (e) {}</script>
+  </head><!-- the app mounts in #root; a build swaps the module below for the bundle -->
+  <body><div id="root"></div><script src="/src/main.jsx" type="module"></script></body>

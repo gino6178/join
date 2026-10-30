@@ -1,0 +1,278 @@
+{
+ "version": "likely-lr-20261028-2a3b44",
+ "trainedOn": "simulated logs only (test/matchplan/logs.mjs: population.js seed 7, 400 members, 26 weeks)",
+ "features": [
+  "yes rate, asks in the last 28 days",
+  "asks in the last 28 days (log)",
+  "yes rate at this weekday and hour",
+  "asks at this weekday and hour (log)",
+  "yes rate to this asker",
+  "asks from this asker (log)",
+  "games with this asker (log)",
+  "minutes past the booking with this asker",
+  "games in the last 7 days",
+  "games already booked that week",
+  "games a week, last 8 weeks",
+  "booked that week minus usual",
+  "a game the day before or after",
+  "habit: share of the last 8 weeks played then",
+  "said no in the last 72 hours",
+  "yes rate to its own Match helper and plans, 28 days",
+  "sore, in the body log",
+  "sore and singles",
+  "level gap (100 rating points)",
+  "own trip (10 min)",
+  "notice (log hours)",
+  "prefers doubles",
+  "weekend",
+  "asks in the last 7 days (log)"
+ ],
+ "mu": 0.2258,
+ "lr": {
+  "w": [
+   -1.387344,
+   0.220901,
+   0.048488,
+   0.194084,
+   -0.120015,
+   0.01374,
+   -0.08405,
+   0.071388,
+   -0.001165,
+   0.014357,
+   -0.077407,
+   -0.005432,
+   -0.06037,
+   -0.185314,
+   0.036926,
+   -0.023237,
+   0.162232,
+   0,
+   0,
+   -0.440628,
+   -0.13955,
+   0.088486,
+   -0.23918,
+   0.077643,
+   -0.100886
+  ],
+  "mu": [
+   0.234943,
+   1.928759,
+   0.236591,
+   1.117761,
+   0.26108,
+   0.169294,
+   0.079712,
+   -0.006414,
+   0.68028,
+   0.252401,
+   0.54852,
+   -0.296119,
+   0.092412,
+   0.085186,
+   0.51008,
+   0.400657,
+   0,
+   0,
+   1.348156,
+   1.241706,
+   4.514409,
+   0.117331,
+   0.40071,
+   0.960964
+  ],
+  "sd": [
+   0.146347,
+   0.678329,
+   0.138841,
+   0.724995,
+   0.107527,
+   0.361021,
+   0.24876,
+   0.112644,
+   0.727561,
+   0.484487,
+   0.411566,
+   0.584173,
+   0.289606,
+   0.125063,
+   0.499898,
+   0.184736,
+   1,
+   1,
+   1.055014,
+   0.40537,
+   0.560902,
+   0.321815,
+   0.490042,
+   0.578101
+  ]
+ },
+ "iso": {
+  "xs": [
+   0.02947,
+   0.05273,
+   0.06867,
+   0.07975,
+   0.10128,
+   0.13218,
+   0.15836,
+   0.18148,
+   0.19388,
+   0.21304,
+   0.24224,
+   0.25719,
+   0.29366,
+   0.33557,
+   0.35667,
+   0.37388,
+   0.37984,
+   0.40535,
+   0.43171,
+   0.48549,
+   0.54818,
+   0.59361,
+   0.67046,
+   0.79338
+  ],
+  "ys": [
+   0.0026,
+   0.03085,
+   0.07787,
+   0.08301,
+   0.12209,
+   0.15156,
+   0.19004,
+   0.19459,
+   0.20617,
+   0.25547,
+   0.26746,
+   0.27637,
+   0.30254,
+   0.33186,
+   0.38457,
+   0.38448,
+   0.38417,
+   0.41749,
+   0.41506,
+   0.45884,
+   0.52341,
+   0.73412,
+   0.74873,
+   0.74195
+  ]
+ },
+ "cuts": [
+  0.15,
+  0.35,
+  0.6
+ ],
+ "bands": [
+  {
+   "band": "unlikely",
+   "share": 0.314,
+   "observedYes": 0.097
+  },
+  {
+   "band": "maybe",
+   "share": 0.542,
+   "observedYes": 0.216
+  },
+  {
+   "band": "likely",
+   "share": 0.128,
+   "observedYes": 0.468
+  },
+  {
+   "band": "very likely",
+   "share": 0.016,
+   "observedYes": 0.66
+  }
+ ],
+ "measured": {
+  "rows": {
+   "train": 11557,
+   "calibration": 1847,
+   "test": 3136
+  },
+  "test": {
+   "auc": 0.717,
+   "brier": 0.1523,
+   "logloss": 0.4744,
+   "ece": 0.0256
+  },
+  "reliability": [
+   {
+    "from": 0,
+    "to": 0.1,
+    "n": 505,
+    "meanP": 0.055,
+    "observed": 0.079
+   },
+   {
+    "from": 0.1,
+    "to": 0.2,
+    "n": 1157,
+    "meanP": 0.159,
+    "observed": 0.132
+   },
+   {
+    "from": 0.2,
+    "to": 0.3,
+    "n": 775,
+    "meanP": 0.259,
+    "observed": 0.244
+   },
+   {
+    "from": 0.3,
+    "to": 0.4,
+    "n": 393,
+    "meanP": 0.341,
+    "observed": 0.364
+   },
+   {
+    "from": 0.4,
+    "to": 0.5,
+    "n": 218,
+    "meanP": 0.435,
+    "observed": 0.486
+   },
+   {
+    "from": 0.5,
+    "to": 0.6,
+    "n": 38,
+    "meanP": 0.529,
+    "observed": 0.5
+   },
+   {
+    "from": 0.6,
+    "to": 0.7,
+    "n": 13,
+    "meanP": 0.639,
+    "observed": 0.692
+   },
+   {
+    "from": 0.7,
+    "to": 0.8,
+    "n": 37,
+    "meanP": 0.74,
+    "observed": 0.649
+   },
+   {
+    "from": 0.8,
+    "to": 0.9,
+    "n": 0,
+    "meanP": null,
+    "observed": null
+   },
+   {
+    "from": 0.9,
+    "to": 1,
+    "n": 0,
+    "meanP": null,
+    "observed": null
+   }
+  ]
+ }
+}

@@ -1,0 +1,276 @@
+{
+ "demo": true,
+ "note": "Sample venues and a sample town for the demo. Courts, prices, free slots and where members live are made up; a real venue plugs in through an adapter in agent/src/play.js.",
+ "currency": "NT$",
+ "venues": [
+  {
+   "id": "riverside",
+   "name": "Riverside Sports Centre",
+   "area": "Riverside",
+   "courts": 6,
+   "price": 320,
+   "open": [
+    "07:00",
+    "22:00"
+   ],
+   "peakBusy": 0.75,
+   "offBusy": 0.35,
+   "x": 3.0,
+   "y": 4.9,
+   "sports": {
+    "badminton": {
+     "courts": 6,
+     "price": 320
+    },
+    "tennis": {
+     "courts": 2,
+     "price": 400
+    },
+    "pickleball": {
+     "courts": 4,
+     "price": 260
+    },
+    "basketball": {
+     "courts": 1,
+     "price": 600
+    }
+   }
+  },
+  {
+   "id": "north",
+   "name": "North District Gym",
+   "area": "North",
+   "courts": 8,
+   "price": 260,
+   "open": [
+    "06:00",
+    "23:00"
+   ],
+   "peakBusy": 0.6,
+   "offBusy": 0.25,
+   "x": 5.6,
+   "y": 1.5,
+   "sports": {
+    "badminton": {
+     "courts": 8,
+     "price": 260
+    },
+    "basketball": {
+     "courts": 2,
+     "price": 500
+    },
+    "volleyball": {
+     "courts": 1,
+     "price": 480
+    }
+   }
+  },
+  {
+   "id": "lakeside",
+   "name": "Lakeside School Hall",
+   "area": "Lakeside",
+   "courts": 4,
+   "price": 200,
+   "open": [
+    "18:00",
+    "22:00"
+   ],
+   "peakBusy": 0.5,
+   "offBusy": 0.5,
+   "weekendOpen": [
+    "08:00",
+    "18:00"
+   ],
+   "x": 7.3,
+   "y": 5.7,
+   "sports": {
+    "badminton": {
+     "courts": 4,
+     "price": 200
+    },
+    "pickleball": {
+     "courts": 2,
+     "price": 180
+    }
+   }
+  },
+  {
+   "id": "midtown",
+   "name": "Midtown Community Gym",
+   "area": "Midtown",
+   "courts": 5,
+   "price": 280,
+   "open": [
+    "08:00",
+    "22:00"
+   ],
+   "peakBusy": 0.65,
+   "offBusy": 0.3,
+   "x": 5.1,
+   "y": 3.9,
+   "sports": {
+    "badminton": {
+     "courts": 5,
+     "price": 280
+    },
+    "tennis": {
+     "courts": 2,
+     "price": 360
+    },
+    "table tennis": {
+     "courts": 6,
+     "price": 120
+    }
+   }
+  },
+  {
+   "id": "westgate",
+   "name": "Westgate Badminton Hall",
+   "area": "Westgate",
+   "courts": 6,
+   "price": 240,
+   "open": [
+    "09:00",
+    "22:00"
+   ],
+   "peakBusy": 0.55,
+   "offBusy": 0.3,
+   "x": 1.2,
+   "y": 2.4,
+   "sports": {
+    "badminton": {
+     "courts": 6,
+     "price": 240
+    }
+   }
+  }
+ ],
+ "map": {
+  "w": 10,
+  "h": 8,
+  "river": [
+   [
+    0,
+    3.0
+   ],
+   [
+    1.6,
+    3.6
+   ],
+   [
+    2.8,
+    4.25
+   ],
+   [
+    4.0,
+    5.0
+   ],
+   [
+    5.2,
+    6.2
+   ],
+   [
+    6.2,
+    8.0
+   ]
+  ],
+  "lake": {
+   "x": 8.3,
+   "y": 6.1,
+   "rx": 1.05,
+   "ry": 0.7
+  },
+  "parks": [
+   {
+    "x": 4.4,
+    "y": 2.6,
+    "w": 1.3,
+    "h": 0.9,
+    "name": "Central Park"
+   },
+   {
+    "x": 0.4,
+    "y": 5.6,
+    "w": 1.2,
+    "h": 1.4,
+    "name": ""
+   }
+  ],
+  "roads": [
+   [
+    [
+     0,
+     4.6
+    ],
+    [
+     10,
+     3.6
+    ]
+   ],
+   [
+    [
+     5.0,
+     0
+    ],
+    [
+     5.3,
+     8
+    ]
+   ],
+   [
+    [
+     0.6,
+     7.6
+    ],
+    [
+     9.6,
+     0.6
+    ]
+   ],
+   [
+    [
+     0,
+     1.6
+    ],
+    [
+     10,
+     2.2
+    ]
+   ]
+  ],
+  "districts": [
+   {
+    "name": "North",
+    "x": 6.4,
+    "y": 0.7
+   },
+   {
+    "name": "Westgate",
+    "x": 1.1,
+    "y": 1.5
+   },
+   {
+    "name": "Midtown",
+    "x": 4.2,
+    "y": 3.0
+   },
+   {
+    "name": "Riverside",
+    "x": 2.0,
+    "y": 6.9
+   },
+   {
+    "name": "Lakeside",
+    "x": 8.6,
+    "y": 4.9
+   }
+  ],
+  "geo": {
+   "lat": 25.062,
+   "lon": 121.503,
+   "unitKm": 1.25,
+   "place": "Taipei",
+   "note": "Where the sample town sits on a real map, so courts and parks near members are real places (OpenStreetMap). x runs east and y south, in map units of 1.25 km."
+  }
+ }
+}

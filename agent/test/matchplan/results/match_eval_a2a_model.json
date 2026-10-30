@@ -1,0 +1,1166 @@
+{
+ "at": "2026-10-28T04:09:44.912Z",
+ "members": 300,
+ "seed": 7,
+ "requests": 24,
+ "a2a": true,
+ "model": "http://127.0.0.1:11446/v1",
+ "arms": {
+  "play.js": {
+   "summary": {
+    "arm": "play.js",
+    "requests": 23,
+    "agreed": 19,
+    "successRate": 0.826,
+    "success1": 0.217,
+    "success3": 0.696,
+    "talksPerGame": 3.11,
+    "agentsAgreedButMemberSaidNo": 36,
+    "secondsPerRequest": {
+     "mean": 49.8,
+     "p50": 45,
+     "p95": 99.7
+    },
+    "secondsToAgreement": 47.9,
+    "estimateSeconds": 0.01,
+    "estimatesPerRequest": 0,
+    "modelCalls": 55,
+    "modelCallsPerGame": 2.89,
+    "tokens": {
+     "calls": 55,
+     "prompt": 22341,
+     "cached": 0,
+     "fresh": 22341,
+     "cachedShare": 0,
+     "output": 16381,
+     "reasoning": 14635,
+     "seconds": 1142.7,
+     "empty": 0,
+     "invalid": 0
+    },
+    "fairness": {
+     "eligibleTwice": 219,
+     "neverAsked": 0.763,
+     "giniAsks": 0.787
+    },
+    "bandsAtTalks": {
+     "unlikely": {
+      "talks": 0,
+      "endedInGame": 0
+     },
+     "maybe": {
+      "talks": 0,
+      "endedInGame": 0
+     },
+     "likely": {
+      "talks": 0,
+      "endedInGame": 0
+     },
+     "very likely": {
+      "talks": 0,
+      "endedInGame": 0
+     },
+     "null": {
+      "talks": 59,
+      "endedInGame": 19
+     }
+    },
+    "refused": 0,
+    "seconds": 1144.7
+   },
+   "rows": [
+    {
+     "k": 1,
+     "asker": "s028",
+     "when": "Mon 19:00",
+     "cands": 92,
+     "estimates": 0,
+     "talks": 3,
+     "agentsAgreed": 3,
+     "game": {
+      "with": "s058",
+      "date": "2026-11-02",
+      "start": "19:00",
+      "band": null,
+      "p": 0.776
+     },
+     "firstYes": 3,
+     "bands": [
+      null,
+      null,
+      null
+     ],
+     "estSeconds": 0,
+     "seconds": 61.8
+    },
+    {
+     "k": 3,
+     "asker": "s085",
+     "when": "Sun 09:00",
+     "cands": 91,
+     "estimates": 0,
+     "talks": 2,
+     "agentsAgreed": 2,
+     "game": {
+      "with": "s265",
+      "date": "2026-11-01",
+      "start": "09:00",
+      "band": null,
+      "p": 0.592
+     },
+     "firstYes": 2,
+     "bands": [
+      null,
+      null
+     ],
+     "estSeconds": 0.01,
+     "seconds": 46.1
+    },
+    {
+     "k": 4,
+     "asker": "s150",
+     "when": "Wed 20:00",
+     "cands": 41,
+     "estimates": 0,
+     "talks": 4,
+     "agentsAgreed": 0,
+     "game": null,
+     "firstYes": null,
+     "bands": [
+      null,
+      null,
+      null,
+      null
+     ],
+     "estSeconds": 0,
+     "seconds": 0
+    },
+    {
+     "k": 5,
+     "asker": "s208",
+     "when": "Tue 19:00",
+     "cands": 84,
+     "estimates": 0,
+     "talks": 2,
+     "agentsAgreed": 2,
+     "game": {
+      "with": "s066",
+      "date": "2026-11-03",
+      "start": "19:00",
+      "band": null,
+      "p": 0.451
+     },
+     "firstYes": 2,
+     "bands": [
+      null,
+      null
+     ],
+     "estSeconds": 0.01,
+     "seconds": 47.4
+    },
+    {
+     "k": 6,
+     "asker": "s185",
+     "when": "Thu 18:00",
+     "cands": 45,
+     "estimates": 0,
+     "talks": 4,
+     "agentsAgreed": 4,
+     "game": null,
+     "firstYes": null,
+     "bands": [
+      null,
+      null,
+      null,
+      null
+     ],
+     "estSeconds": 0,
+     "seconds": 93.1
+    },
+    {
+     "k": 7,
+     "asker": "s174",
+     "when": "Sat 14:00",
+     "cands": 42,
+     "estimates": 0,
+     "talks": 2,
+     "agentsAgreed": 2,
+     "game": {
+      "with": "s126",
+      "date": "2026-10-31",
+      "start": "14:00",
+      "band": null,
+      "p": 0.456
+     },
+     "firstYes": 2,
+     "bands": [
+      null,
+      null
+     ],
+     "estSeconds": 0,
+     "seconds": 42.2
+    },
+    {
+     "k": 8,
+     "asker": "s255",
+     "when": "Mon 19:00",
+     "cands": 89,
+     "estimates": 0,
+     "talks": 2,
+     "agentsAgreed": 2,
+     "game": {
+      "with": "s277",
+      "date": "2026-11-02",
+      "start": "19:00",
+      "band": null,
+      "p": 0.299
+     },
+     "firstYes": 2,
+     "bands": [
+      null,
+      null
+     ],
+     "estSeconds": 0.01,
+     "seconds": 34.2
+    },
+    {
+     "k": 10,
+     "skipped": "a game that day already"
+    },
+    {
+     "k": 16,
+     "asker": "s113",
+     "when": "Sat 09:00",
+     "cands": 85,
+     "estimates": 0,
+     "talks": 3,
+     "agentsAgreed": 3,
+     "game": {
+      "with": "s235",
+      "date": "2026-10-31",
+      "start": "09:00",
+      "band": null,
+      "p": 0.585
+     },
+     "firstYes": 3,
+     "bands": [
+      null,
+      null,
+      null
+     ],
+     "estSeconds": 0,
+     "seconds": 86.5
+    },
+    {
+     "k": 17,
+     "asker": "s277",
+     "when": "Sun 10:00",
+     "cands": 90,
+     "estimates": 0,
+     "talks": 4,
+     "agentsAgreed": 4,
+     "game": {
+      "with": "s210",
+      "date": "2026-11-01",
+      "start": "10:00",
+      "band": null,
+      "p": 0.775
+     },
+     "firstYes": 4,
+     "bands": [
+      null,
+      null,
+      null,
+      null
+     ],
+     "estSeconds": 0.01,
+     "seconds": 99.7
+    },
+    {
+     "k": 18,
+     "asker": "s263",
+     "when": "Sat 10:00",
+     "cands": 83,
+     "estimates": 0,
+     "talks": 1,
+     "agentsAgreed": 1,
+     "game": {
+      "with": "s013",
+      "date": "2026-10-31",
+      "start": "10:00",
+      "band": null,
+      "p": 0.388
+     },
+     "firstYes": 1,
+     "bands": [
+      null
+     ],
+     "estSeconds": 0.01,
+     "seconds": 25.3
+    },
+    {
+     "k": 20,
+     "asker": "s289",
+     "when": "Thu 20:00",
+     "cands": 37,
+     "estimates": 0,
+     "talks": 4,
+     "agentsAgreed": 4,
+     "game": {
+      "with": "s291",
+      "date": "2026-10-29",
+      "start": "20:00",
+      "band": null,
+      "p": 0.333
+     },
+     "firstYes": 4,
+     "bands": [
+      null,
+      null,
+      null,
+      null
+     ],
+     "estSeconds": 0.01,
+     "seconds": 111
+    },
+    {
+     "k": 21,
+     "asker": "s101",
+     "when": "Sun 09:00",
+     "cands": 88,
+     "estimates": 0,
+     "talks": 2,
+     "agentsAgreed": 2,
+     "game": {
+      "with": "s252",
+      "date": "2026-11-01",
+      "start": "09:00",
+      "band": null,
+      "p": 0.888
+     },
+     "firstYes": 2,
+     "bands": [
+      null,
+      null
+     ],
+     "estSeconds": 0.01,
+     "seconds": 45
+    },
+    {
+     "k": 22,
+     "asker": "s214",
+     "when": "Tue 19:00",
+     "cands": 82,
+     "estimates": 0,
+     "talks": 4,
+     "agentsAgreed": 4,
+     "game": {
+      "with": "s183",
+      "date": "2026-11-03",
+      "start": "19:00",
+      "band": null,
+      "p": 0.523
+     },
+     "firstYes": 4,
+     "bands": [
+      null,
+      null,
+      null,
+      null
+     ],
+     "estSeconds": 0,
+     "seconds": 89.5
+    },
+    {
+     "k": 23,
+     "asker": "s226",
+     "when": "Sat 09:00",
+     "cands": 80,
+     "estimates": 0,
+     "talks": 1,
+     "agentsAgreed": 1,
+     "game": {
+      "with": "s102",
+      "date": "2026-10-31",
+      "start": "09:00",
+      "band": null,
+      "p": 0.774
+     },
+     "firstYes": 1,
+     "bands": [
+      null
+     ],
+     "estSeconds": 0.01,
+     "seconds": 27.2
+    },
+    {
+     "k": 24,
+     "asker": "s169",
+     "when": "Sun 09:00",
+     "cands": 85,
+     "estimates": 0,
+     "talks": 4,
+     "agentsAgreed": 4,
+     "game": null,
+     "firstYes": null,
+     "bands": [
+      null,
+      null,
+      null,
+      null
+     ],
+     "estSeconds": 0,
+     "seconds": 96.7
+    },
+    {
+     "k": 25,
+     "asker": "s015",
+     "when": "Sun 10:00",
+     "cands": 83,
+     "estimates": 0,
+     "talks": 2,
+     "agentsAgreed": 2,
+     "game": {
+      "with": "s199",
+      "date": "2026-11-01",
+      "start": "10:00",
+      "band": null,
+      "p": 0.643
+     },
+     "firstYes": 2,
+     "bands": [
+      null,
+      null
+     ],
+     "estSeconds": 0.01,
+     "seconds": 40.3
+    },
+    {
+     "k": 27,
+     "asker": "s229",
+     "when": "Sat 09:00",
+     "cands": 79,
+     "estimates": 0,
+     "talks": 3,
+     "agentsAgreed": 3,
+     "game": {
+      "with": "s099",
+      "date": "2026-10-31",
+      "start": "09:00",
+      "band": null,
+      "p": 0.61
+     },
+     "firstYes": 3,
+     "bands": [
+      null,
+      null,
+      null
+     ],
+     "estSeconds": 0,
+     "seconds": 55.5
+    },
+    {
+     "k": 28,
+     "asker": "s125",
+     "when": "Thu 20:00",
+     "cands": 35,
+     "estimates": 0,
+     "talks": 3,
+     "agentsAgreed": 3,
+     "game": {
+      "with": "s041",
+      "date": "2026-10-29",
+      "start": "20:00",
+      "band": null,
+      "p": 0.745
+     },
+     "firstYes": 3,
+     "bands": [
+      null,
+      null,
+      null
+     ],
+     "estSeconds": 0,
+     "seconds": 37.4
+    },
+    {
+     "k": 29,
+     "asker": "s113",
+     "when": "Sun 09:00",
+     "cands": 82,
+     "estimates": 0,
+     "talks": 1,
+     "agentsAgreed": 1,
+     "game": {
+      "with": "s021",
+      "date": "2026-11-01",
+      "start": "09:00",
+      "band": null,
+      "p": 0.469
+     },
+     "firstYes": 1,
+     "bands": [
+      null
+     ],
+     "estSeconds": 0.01,
+     "seconds": 14.4
+    },
+    {
+     "k": 30,
+     "asker": "s122",
+     "when": "Sat 14:00",
+     "cands": 39,
+     "estimates": 0,
+     "talks": 4,
+     "agentsAgreed": 4,
+     "game": null,
+     "firstYes": null,
+     "bands": [
+      null,
+      null,
+      null,
+      null
+     ],
+     "estSeconds": 0.01,
+     "seconds": 45.2
+    },
+    {
+     "k": 31,
+     "asker": "s282",
+     "when": "Sun 14:00",
+     "cands": 30,
+     "estimates": 0,
+     "talks": 1,
+     "agentsAgreed": 1,
+     "game": {
+      "with": "s074",
+      "date": "2026-11-01",
+      "start": "14:00",
+      "band": null,
+      "p": 0.807
+     },
+     "firstYes": 1,
+     "bands": [
+      null
+     ],
+     "estSeconds": 0.01,
+     "seconds": 12.2
+    },
+    {
+     "k": 32,
+     "asker": "s197",
+     "when": "Tue 20:00",
+     "cands": 36,
+     "estimates": 0,
+     "talks": 1,
+     "agentsAgreed": 1,
+     "game": {
+      "with": "s151",
+      "date": "2026-11-03",
+      "start": "20:00",
+      "band": null,
+      "p": 0.429
+     },
+     "firstYes": 1,
+     "bands": [
+      null
+     ],
+     "estSeconds": 0,
+     "seconds": 11.7
+    },
+    {
+     "k": 33,
+     "asker": "s129",
+     "when": "Thu 18:00",
+     "cands": 45,
+     "estimates": 0,
+     "talks": 2,
+     "agentsAgreed": 2,
+     "game": {
+      "with": "s238",
+      "date": "2026-10-29",
+      "start": "18:00",
+      "band": null,
+      "p": 0.987
+     },
+     "firstYes": 2,
+     "bands": [
+      null,
+      null
+     ],
+     "estSeconds": 0.01,
+     "seconds": 22.4
+    }
+   ]
+  },
+  "bands": {
+   "summary": {
+    "arm": "bands",
+    "requests": 23,
+    "agreed": 17,
+    "successRate": 0.739,
+    "success1": 0.391,
+    "success3": 0.696,
+    "talksPerGame": 3.12,
+    "agentsAgreedButMemberSaidNo": 32,
+    "secondsPerRequest": {
+     "mean": 14.7,
+     "p50": 12.2,
+     "p95": 31.1
+    },
+    "secondsToAgreement": 10.9,
+    "estimateSeconds": 0.19,
+    "estimatesPerRequest": 12,
+    "modelCalls": 49,
+    "modelCallsPerGame": 2.88,
+    "tokens": {
+     "calls": 49,
+     "prompt": 19787,
+     "cached": 7550,
+     "fresh": 12237,
+     "cachedShare": 0.382,
+     "output": 14445,
+     "reasoning": 12885,
+     "seconds": 331.3,
+     "empty": 0,
+     "invalid": 0
+    },
+    "fairness": {
+     "eligibleTwice": 221,
+     "neverAsked": 0.787,
+     "giniAsks": 0.808
+    },
+    "bandsAtTalks": {
+     "unlikely": {
+      "talks": 0,
+      "endedInGame": 0
+     },
+     "maybe": {
+      "talks": 6,
+      "endedInGame": 0
+     },
+     "likely": {
+      "talks": 34,
+      "endedInGame": 11
+     },
+     "very likely": {
+      "talks": 13,
+      "endedInGame": 6
+     },
+     "null": {
+      "talks": 0,
+      "endedInGame": 0
+     }
+    },
+    "refused": 0,
+    "seconds": 337.6
+   },
+   "rows": [
+    {
+     "k": 1,
+     "asker": "s028",
+     "when": "Mon 19:00",
+     "cands": 92,
+     "estimates": 12,
+     "talks": 4,
+     "agentsAgreed": 4,
+     "game": null,
+     "firstYes": null,
+     "bands": [
+      "likely",
+      "likely",
+      "maybe",
+      "maybe"
+     ],
+     "estSeconds": 0.13,
+     "seconds": 43.8
+    },
+    {
+     "k": 3,
+     "asker": "s085",
+     "when": "Sun 09:00",
+     "cands": 91,
+     "estimates": 12,
+     "talks": 3,
+     "agentsAgreed": 3,
+     "game": {
+      "with": "s265",
+      "date": "2026-11-01",
+      "start": "09:00",
+      "band": "likely",
+      "p": 0.592
+     },
+     "firstYes": 3,
+     "bands": [
+      "very likely",
+      "likely",
+      "likely"
+     ],
+     "estSeconds": 0.15,
+     "seconds": 17.7
+    },
+    {
+     "k": 4,
+     "asker": "s150",
+     "when": "Wed 20:00",
+     "cands": 41,
+     "estimates": 12,
+     "talks": 4,
+     "agentsAgreed": 0,
+     "game": null,
+     "firstYes": null,
+     "bands": [
+      "very likely",
+      "likely",
+      "likely",
+      "likely"
+     ],
+     "estSeconds": 0.15,
+     "seconds": 0.2
+    },
+    {
+     "k": 5,
+     "asker": "s208",
+     "when": "Tue 19:00",
+     "cands": 84,
+     "estimates": 12,
+     "talks": 4,
+     "agentsAgreed": 4,
+     "game": null,
+     "firstYes": null,
+     "bands": [
+      "very likely",
+      "likely",
+      "likely",
+      "likely"
+     ],
+     "estSeconds": 0.14,
+     "seconds": 31.1
+    },
+    {
+     "k": 6,
+     "asker": "s185",
+     "when": "Thu 18:00",
+     "cands": 45,
+     "estimates": 12,
+     "talks": 2,
+     "agentsAgreed": 2,
+     "game": {
+      "with": "s277",
+      "date": "2026-10-29",
+      "start": "18:00",
+      "band": "likely",
+      "p": 0.475
+     },
+     "firstYes": 2,
+     "bands": [
+      "likely",
+      "likely"
+     ],
+     "estSeconds": 0.15,
+     "seconds": 12.6
+    },
+    {
+     "k": 7,
+     "asker": "s174",
+     "when": "Sat 14:00",
+     "cands": 42,
+     "estimates": 12,
+     "talks": 1,
+     "agentsAgreed": 1,
+     "game": {
+      "with": "s228",
+      "date": "2026-10-31",
+      "start": "14:00",
+      "band": "likely",
+      "p": 0.252
+     },
+     "firstYes": 1,
+     "bands": [
+      "likely"
+     ],
+     "estSeconds": 0.16,
+     "seconds": 6.9
+    },
+    {
+     "k": 8,
+     "asker": "s255",
+     "when": "Mon 19:00",
+     "cands": 91,
+     "estimates": 12,
+     "talks": 1,
+     "agentsAgreed": 1,
+     "game": {
+      "with": "s153",
+      "date": "2026-11-02",
+      "start": "19:00",
+      "band": "very likely",
+      "p": 0.671
+     },
+     "firstYes": 1,
+     "bands": [
+      "very likely"
+     ],
+     "estSeconds": 0.17,
+     "seconds": 6.5
+    },
+    {
+     "k": 10,
+     "skipped": "a game that day already"
+    },
+    {
+     "k": 16,
+     "asker": "s113",
+     "when": "Sat 09:00",
+     "cands": 85,
+     "estimates": 12,
+     "talks": 2,
+     "agentsAgreed": 2,
+     "game": {
+      "with": "s235",
+      "date": "2026-10-31",
+      "start": "09:00",
+      "band": "likely",
+      "p": 0.585
+     },
+     "firstYes": 2,
+     "bands": [
+      "very likely",
+      "likely"
+     ],
+     "estSeconds": 0.17,
+     "seconds": 12.5
+    },
+    {
+     "k": 17,
+     "asker": "s277",
+     "when": "Sun 10:00",
+     "cands": 90,
+     "estimates": 12,
+     "talks": 4,
+     "agentsAgreed": 4,
+     "game": {
+      "with": "s210",
+      "date": "2026-11-01",
+      "start": "10:00",
+      "band": "likely",
+      "p": 0.775
+     },
+     "firstYes": 4,
+     "bands": [
+      "likely",
+      "likely",
+      "likely",
+      "likely"
+     ],
+     "estSeconds": 0.17,
+     "seconds": 24.5
+    },
+    {
+     "k": 18,
+     "asker": "s263",
+     "when": "Sat 10:00",
+     "cands": 83,
+     "estimates": 12,
+     "talks": 1,
+     "agentsAgreed": 1,
+     "game": {
+      "with": "s094",
+      "date": "2026-10-31",
+      "start": "10:00",
+      "band": "very likely",
+      "p": 0.877
+     },
+     "firstYes": 1,
+     "bands": [
+      "very likely"
+     ],
+     "estSeconds": 0.16,
+     "seconds": 7.7
+    },
+    {
+     "k": 20,
+     "asker": "s289",
+     "when": "Thu 20:00",
+     "cands": 37,
+     "estimates": 12,
+     "talks": 4,
+     "agentsAgreed": 4,
+     "game": null,
+     "firstYes": null,
+     "bands": [
+      "likely",
+      "likely",
+      "likely",
+      "likely"
+     ],
+     "estSeconds": 0.19,
+     "seconds": 25.2
+    },
+    {
+     "k": 21,
+     "asker": "s101",
+     "when": "Sun 09:00",
+     "cands": 88,
+     "estimates": 12,
+     "talks": 1,
+     "agentsAgreed": 1,
+     "game": {
+      "with": "s252",
+      "date": "2026-11-01",
+      "start": "09:00",
+      "band": "very likely",
+      "p": 0.888
+     },
+     "firstYes": 1,
+     "bands": [
+      "very likely"
+     ],
+     "estSeconds": 0.21,
+     "seconds": 5.4
+    },
+    {
+     "k": 22,
+     "asker": "s214",
+     "when": "Tue 19:00",
+     "cands": 84,
+     "estimates": 12,
+     "talks": 4,
+     "agentsAgreed": 4,
+     "game": null,
+     "firstYes": null,
+     "bands": [
+      "likely",
+      "maybe",
+      "maybe",
+      "maybe"
+     ],
+     "estSeconds": 0.21,
+     "seconds": 24.2
+    },
+    {
+     "k": 23,
+     "asker": "s226",
+     "when": "Sat 09:00",
+     "cands": 80,
+     "estimates": 12,
+     "talks": 1,
+     "agentsAgreed": 1,
+     "game": {
+      "with": "s102",
+      "date": "2026-10-31",
+      "start": "09:00",
+      "band": "likely",
+      "p": 0.774
+     },
+     "firstYes": 1,
+     "bands": [
+      "likely"
+     ],
+     "estSeconds": 0.23,
+     "seconds": 7.1
+    },
+    {
+     "k": 24,
+     "asker": "s169",
+     "when": "Sun 09:00",
+     "cands": 85,
+     "estimates": 12,
+     "talks": 1,
+     "agentsAgreed": 1,
+     "game": {
+      "with": "s271",
+      "date": "2026-11-01",
+      "start": "09:00",
+      "band": "likely",
+      "p": 0.714
+     },
+     "firstYes": 1,
+     "bands": [
+      "likely"
+     ],
+     "estSeconds": 0.21,
+     "seconds": 6.9
+    },
+    {
+     "k": 25,
+     "asker": "s015",
+     "when": "Sun 10:00",
+     "cands": 81,
+     "estimates": 12,
+     "talks": 2,
+     "agentsAgreed": 2,
+     "game": {
+      "with": "s215",
+      "date": "2026-11-01",
+      "start": "10:00",
+      "band": "very likely",
+      "p": 0.296
+     },
+     "firstYes": 2,
+     "bands": [
+      "very likely",
+      "very likely"
+     ],
+     "estSeconds": 0.21,
+     "seconds": 12.2
+    },
+    {
+     "k": 27,
+     "asker": "s229",
+     "when": "Sat 09:00",
+     "cands": 78,
+     "estimates": 12,
+     "talks": 2,
+     "agentsAgreed": 2,
+     "game": {
+      "with": "s260",
+      "date": "2026-10-31",
+      "start": "09:00",
+      "band": "likely",
+      "p": 0.467
+     },
+     "firstYes": 2,
+     "bands": [
+      "likely",
+      "likely"
+     ],
+     "estSeconds": 0.22,
+     "seconds": 11.7
+    },
+    {
+     "k": 28,
+     "asker": "s125",
+     "when": "Thu 20:00",
+     "cands": 37,
+     "estimates": 12,
+     "talks": 1,
+     "agentsAgreed": 1,
+     "game": {
+      "with": "s153",
+      "date": "2026-10-29",
+      "start": "20:00",
+      "band": "very likely",
+      "p": 0.769
+     },
+     "firstYes": 1,
+     "bands": [
+      "very likely"
+     ],
+     "estSeconds": 0.22,
+     "seconds": 7.4
+    },
+    {
+     "k": 29,
+     "asker": "s113",
+     "when": "Sun 09:00",
+     "cands": 80,
+     "estimates": 12,
+     "talks": 2,
+     "agentsAgreed": 2,
+     "game": {
+      "with": "s199",
+      "date": "2026-11-01",
+      "start": "09:00",
+      "band": "likely",
+      "p": 0.555
+     },
+     "firstYes": 2,
+     "bands": [
+      "likely",
+      "likely"
+     ],
+     "estSeconds": 0.23,
+     "seconds": 15.2
+    },
+    {
+     "k": 30,
+     "asker": "s122",
+     "when": "Sat 14:00",
+     "cands": 39,
+     "estimates": 12,
+     "talks": 4,
+     "agentsAgreed": 4,
+     "game": null,
+     "firstYes": null,
+     "bands": [
+      "very likely",
+      "likely",
+      "likely",
+      "maybe"
+     ],
+     "estSeconds": 0.22,
+     "seconds": 27.2
+    },
+    {
+     "k": 31,
+     "asker": "s282",
+     "when": "Sun 14:00",
+     "cands": 30,
+     "estimates": 12,
+     "talks": 1,
+     "agentsAgreed": 1,
+     "game": {
+      "with": "s141",
+      "date": "2026-11-01",
+      "start": "14:00",
+      "band": "very likely",
+      "p": 0.963
+     },
+     "firstYes": 1,
+     "bands": [
+      "very likely"
+     ],
+     "estSeconds": 0.24,
+     "seconds": 6.5
+    },
+    {
+     "k": 32,
+     "asker": "s197",
+     "when": "Tue 20:00",
+     "cands": 38,
+     "estimates": 12,
+     "talks": 3,
+     "agentsAgreed": 3,
+     "game": {
+      "with": "s058",
+      "date": "2026-11-03",
+      "start": "20:00",
+      "band": "likely",
+      "p": 0.556
+     },
+     "firstYes": 3,
+     "bands": [
+      "very likely",
+      "likely",
+      "likely"
+     ],
+     "estSeconds": 0.26,
+     "seconds": 17.9
+    },
+    {
+     "k": 33,
+     "asker": "s129",
+     "when": "Thu 18:00",
+     "cands": 43,
+     "estimates": 12,
+     "talks": 1,
+     "agentsAgreed": 1,
+     "game": {
+      "with": "s141",
+      "date": "2026-10-29",
+      "start": "18:00",
+      "band": "likely",
+      "p": 0.754
+     },
+     "firstYes": 1,
+     "bands": [
+      "likely"
+     ],
+     "estSeconds": 0.25,
+     "seconds": 7.1
+    }
+   ]
+  }
+ }
+}

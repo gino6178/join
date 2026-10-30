@@ -1,0 +1,65 @@
+/* ---------- film a highlight: your own video, read on your server, cut into a reel here ---------- */
+.page.highlights { max-width: 1240px; }
+.hl-grid { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: var(--s5); align-items: start; }
+.hl-grid.wide { grid-template-columns: minmax(0, 1fr); }
+.hl-grid.wide .hl-view { order: -1; }
+.hl-grid .panel { display: grid; gap: var(--s3); align-content: start; }
+.hl-grid .panel > p, .hl-grid .seg { margin: 0; }
+.hl-view { position: sticky; top: calc(var(--nav-h) + var(--s4)); }
+.hl-canvas { width: 100%; height: auto; border-radius: var(--r-lg); border: 1px solid var(--rule); background: var(--bg); display: block; }
+.hl-canvas[hidden] { display: none; }
+.hl-how { margin: var(--s2) var(--s1) 0; text-wrap: pretty; }
+.hl-how b { color: var(--ink); font-weight: 650; }
+.hl-actions { display: flex; gap: var(--s3); flex-wrap: wrap; }
+.hl-done { padding: var(--s4); border-radius: var(--r-md); border: 1px solid color-mix(in srgb, var(--good) 50%, transparent); background: color-mix(in srgb, var(--good) 6%, transparent); display: grid; gap: var(--s3); }
+.hl-done p { margin: 0; }
+.hl-done textarea { width: 100%; resize: vertical; font-size: 14px; color: var(--ink-2); }
+
+/* the clip: choose it, watch the server read it */
+.own-card { display: grid; gap: var(--s2); padding: var(--s3) var(--s4); border-radius: var(--r-md); border: 1px solid var(--rule-strong); background: radial-gradient(ellipse at 0% 0%, color-mix(in srgb, var(--agent) 9%, transparent), transparent 60%), var(--surface); }
+.own-card.ready { border-color: color-mix(in srgb, var(--agent) 55%, transparent); }
+.own-card p { margin: 0; }
+.own-h { display: flex; justify-content: space-between; align-items: baseline; gap: var(--s3); }
+.own-h b { font-size: 16px; }
+.own-row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s2) var(--s3); }
+.own-row label.tiny { display: inline-flex; align-items: center; gap: 6px; }
+.own-pick { justify-self: start; position: relative; cursor: pointer; }
+.own-pick input { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; }
+.own-pick:focus-within { outline: 2px solid var(--ink); outline-offset: 2px; }
+.own-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.own-steps li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: var(--s2); align-items: start; }
+.own-steps li > .icon { color: var(--agent); margin-top: 2px; }
+.own-steps li span { display: grid; min-width: 0; }
+.own-steps b { font-size: 14px; }
+.own-steps em { font-style: normal; font-size: 13px; color: var(--ink-3); }
+.own-steps .working b { color: var(--agent); }
+.own-steps .failed { grid-template-columns: minmax(0, 1fr); }
+.own-steps .failed b { color: var(--bad); }
+.own-steps .dots { display: inline-flex; gap: 3px; height: auto; margin-top: 6px; }
+.own-steps .dots i { width: 4px; height: 4px; background: var(--agent); }
+
+/* the sample clips, for a reel without a video of your own; each with its credit */
+.hl-samples { display: grid; gap: var(--s2); }
+.hl-samples ul { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); }
+.hl-sample { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: var(--s3); align-items: center; width: 100%; padding: var(--s2); border-radius: var(--r-md); border: 1px solid var(--rule); background: var(--surface); color: inherit; text-align: left; cursor: pointer; font: inherit; }
+.hl-sample:hover { background: var(--control-hover); }
+.hl-sample.on { border-color: var(--agent); box-shadow: 0 0 0 1px var(--agent); }
+.hl-sample video { width: 96px; aspect-ratio: 16 / 9; object-fit: cover; border-radius: var(--r-sm); background: var(--bg); pointer-events: none; }
+.hl-sample span { display: grid; gap: 2px; min-width: 0; }
+.hl-sample b { font-size: 15px; }
+.hl-sample em { font-style: normal; font-size: 13px; color: var(--ink-3); }
+.hl-samples > .btn { justify-self: start; }
+.hl-sample-play { background: #000; }
+.hl-credit { margin: var(--s2) var(--s1) 0; }
+.hl-credit a { color: inherit; }
+
+@media (max-width: 1100px) {
+  .hl-grid { grid-template-columns: minmax(0, 1fr); }
+  .hl-view { position: static; order: -1; max-width: 420px; width: 100%; justify-self: center; }
+  .hl-grid.wide .hl-view { max-width: none; }
+  .hl-grid:not(.has-clip) .hl-view { order: 0; max-width: 320px; }
+}
+@media (max-width: 640px) {
+  .hl-actions .btn { flex: 1 1 140px; }
+  .hl-sticky { position: sticky; bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom)); z-index: var(--z-sticky); background: var(--surface); padding: var(--s3) 0; border-top: 1px solid var(--rule); }
+}

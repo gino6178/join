@@ -1,0 +1,32 @@
+{
+ "note": "Sample clips for the highlight reel: 720p H.264, no sound, trimmed from CC BY 3.0 videos (full attribution in CREDITS.md). The players are not named in the app.",
+ "clips": [
+  {
+   "file": "singles_point_01.mp4",
+   "label": "Singles, a winning rally",
+   "sport": "badminton",
+   "seconds": 24,
+   "author": "Badminton klub Ljubljana",
+   "source": "https://www.youtube.com/watch?v=IoDl6OirN1A",
+   "license": "https://creativecommons.org/licenses/by/3.0/"
+  },
+  {
+   "file": "doubles_rally_01.mp4",
+   "label": "Doubles, a rally from the stands",
+   "sport": "badminton",
+   "seconds": 22,
+   "author": "Roy Huang",
+   "source": "https://www.youtube.com/watch?v=z_uUFuw7n2Q",
+   "license": "https://creativecommons.org/licenses/by/3.0/"
+  },
+  {
+   "file": "singles_rally_01.mp4",
+   "label": "Singles, a rally from the stands",
+   "sport": "badminton",
+   "seconds": 22,
+   "author": "Roy Huang",
+   "source": "https://www.youtube.com/watch?v=eMfNpjUpx8k",
+   "license": "https://creativecommons.org/licenses/by/3.0/"
+  }
+ ]
+}

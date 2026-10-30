@@ -1,0 +1,404 @@
+{
+ "filing": [
+  {
+   "id": "f0",
+   "text": "Friday 7pm: badminton practice",
+   "intent": "event",
+   "start": "19:00"
+  },
+  {
+   "id": "f1",
+   "text": "I have basketball run Monday 18:00-20:00",
+   "intent": "event",
+   "start": "18:00"
+  },
+  {
+   "id": "f2",
+   "text": "Sunday 9am: basketball run",
+   "intent": "event",
+   "start": "09:00"
+  },
+  {
+   "id": "f3",
+   "text": "I have doubles with the club Friday 07:00-09:00",
+   "intent": "event",
+   "start": "07:00"
+  },
+  {
+   "id": "f4",
+   "text": "Sunday 9am: basketball run",
+   "intent": "event",
+   "start": "09:00"
+  },
+  {
+   "id": "f5",
+   "text": "basketball run on Tuesday at 07:00",
+   "intent": "event",
+   "start": "07:00"
+  },
+  {
+   "id": "f6",
+   "text": "Put doubles with the club in my calendar for Tuesday at 7am",
+   "intent": "event",
+   "start": "07:00"
+  },
+  {
+   "id": "f7",
+   "text": "I have basketball run Tuesday 07:00-09:00",
+   "intent": "event",
+   "start": "07:00"
+  },
+  {
+   "id": "f8",
+   "text": "I have badminton practice Wednesday 20:00-22:00",
+   "intent": "event",
+   "start": "20:00"
+  },
+  {
+   "id": "f9",
+   "text": "Put basketball run in my calendar for Tuesday at 8pm",
+   "intent": "event",
+   "start": "20:00"
+  },
+  {
+   "id": "f10",
+   "text": "a tennis lesson on Thursday at 19:00",
+   "intent": "event",
+   "start": "19:00"
+  },
+  {
+   "id": "f11",
+   "text": "Put a singles match in my calendar for Friday at 6pm",
+   "intent": "event",
+   "start": "18:00"
+  },
+  {
+   "id": "f12",
+   "text": "I have a league match Friday 07:00-09:00",
+   "intent": "event",
+   "start": "07:00"
+  },
+  {
+   "id": "f13",
+   "text": "badminton practice on Wednesday at 20:00",
+   "intent": "event",
+   "start": "20:00"
+  },
+  {
+   "id": "f14",
+   "text": "a league match on Saturday at 09:00",
+   "intent": "event",
+   "start": "09:00"
+  },
+  {
+   "id": "f15",
+   "text": "Wednesday 7pm: a singles match",
+   "intent": "event",
+   "start": "19:00"
+  },
+  {
+   "id": "l0",
+   "text": "did a 45 min session at the club",
+   "intent": "log",
+   "minutes": 45
+  },
+  {
+   "id": "l1",
+   "text": "trained for 90 minutes today, felt good",
+   "intent": "log",
+   "minutes": 90
+  },
+  {
+   "id": "l2",
+   "text": "trained for 45 minutes today, felt good",
+   "intent": "log",
+   "minutes": 45
+  },
+  {
+   "id": "l3",
+   "text": "trained for 1 hour today, felt good",
+   "intent": "log",
+   "minutes": 60
+  },
+  {
+   "id": "l4",
+   "text": "trained for 2 hours today, felt good",
+   "intent": "log",
+   "minutes": 120
+  },
+  {
+   "id": "l5",
+   "text": "played 90 minutes with Noor",
+   "intent": "log",
+   "minutes": 90
+  },
+  {
+   "id": "l6",
+   "text": "played 1 hour with Noor",
+   "intent": "log",
+   "minutes": 60
+  },
+  {
+   "id": "l7",
+   "text": "played 1 hour with Sam",
+   "intent": "log",
+   "minutes": 60
+  },
+  {
+   "id": "l8",
+   "text": "trained for 45 minutes today, felt good",
+   "intent": "log",
+   "minutes": 45
+  },
+  {
+   "id": "l9",
+   "text": "played 90 minutes with Kenji",
+   "intent": "log",
+   "minutes": 90
+  },
+  {
+   "id": "l10",
+   "text": "just finished 1 hour of smash practice",
+   "intent": "log",
+   "minutes": 60
+  },
+  {
+   "id": "l11",
+   "text": "played 90 minutes with Sam",
+   "intent": "log",
+   "minutes": 90
+  },
+  {
+   "id": "l12",
+   "text": "did a 120 min session at the club",
+   "intent": "log",
+   "minutes": 120
+  },
+  {
+   "id": "l13",
+   "text": "just finished 45 minutes of smash practice",
+   "intent": "log",
+   "minutes": 45
+  },
+  {
+   "id": "c0",
+   "text": "when is my next game?",
+   "intent": "chat"
+  },
+  {
+   "id": "c1",
+   "text": "is Leo free on Thursday?",
+   "intent": "chat"
+  },
+  {
+   "id": "c2",
+   "text": "how many games did I play this week?",
+   "intent": "chat"
+  },
+  {
+   "id": "c3",
+   "text": "can I bring a friend to club night?",
+   "intent": "chat"
+  },
+  {
+   "id": "c4",
+   "text": "what's my win rate this month?",
+   "intent": "chat"
+  },
+  {
+   "id": "c5",
+   "text": "when is my next game?",
+   "intent": "chat"
+  },
+  {
+   "id": "c6",
+   "text": "what's my win rate this month?",
+   "intent": "chat"
+  },
+  {
+   "id": "c7",
+   "text": "when is my next game?",
+   "intent": "chat"
+  },
+  {
+   "id": "c8",
+   "text": "thanks!",
+   "intent": "chat"
+  },
+  {
+   "id": "c9",
+   "text": "what's my win rate this month?",
+   "intent": "chat"
+  }
+ ],
+ "body": [
+  {
+   "id": "b0",
+   "text": "Right ankle sore after the game, barely",
+   "part": "ankle",
+   "side": "right",
+   "level": 1
+  },
+  {
+   "id": "b1",
+   "text": "Left wrist hurts after the game, slightly",
+   "part": "wrist",
+   "side": "left",
+   "level": 2
+  },
+  {
+   "id": "b2",
+   "text": "Lower back sore after the game, a tiny bit",
+   "part": "lowerback",
+   "side": null,
+   "level": 1
+  },
+  {
+   "id": "b3",
+   "text": "Got a sore left ankle this morning (slightly)",
+   "part": "ankle",
+   "side": "left",
+   "level": 2
+  },
+  {
+   "id": "b4",
+   "text": "My right elbow is sore, a bit",
+   "part": "elbow",
+   "side": "right",
+   "level": 2
+  },
+  {
+   "id": "b5",
+   "text": "Got a sore right ankle this morning (a bit)",
+   "part": "ankle",
+   "side": "right",
+   "level": 2
+  },
+  {
+   "id": "b6",
+   "text": "My right shoulder is sore, 4 out of 5",
+   "part": "shoulder",
+   "side": "right",
+   "level": 4
+  },
+  {
+   "id": "b7",
+   "text": "Got a sore lower back this morning (a bit)",
+   "part": "lowerback",
+   "side": null,
+   "level": 2
+  },
+  {
+   "id": "b8",
+   "text": "Right wrist aches after the game, a bit",
+   "part": "wrist",
+   "side": "right",
+   "level": 2
+  },
+  {
+   "id": "b9",
+   "text": "Right calf sore after the game, 3 out of 5",
+   "part": "calf",
+   "side": "right",
+   "level": 3
+  },
+  {
+   "id": "b10",
+   "text": "Left knee hurts after the game, a bit",
+   "part": "knee",
+   "side": "left",
+   "level": 2
+  },
+  {
+   "id": "b11",
+   "text": "My left calf is hurting, 3 out of 5",
+   "part": "calf",
+   "side": "left",
+   "level": 3
+  },
+  {
+   "id": "b12",
+   "text": "Got a sore right calf this morning (a bit)",
+   "part": "calf",
+   "side": "right",
+   "level": 2
+  },
+  {
+   "id": "b13",
+   "text": "Got a sore right shoulder this morning (barely)",
+   "part": "shoulder",
+   "side": "right",
+   "level": 1
+  },
+  {
+   "id": "b14",
+   "text": "Got a sore left calf this morning (barely)",
+   "part": "calf",
+   "side": "left",
+   "level": 1
+  },
+  {
+   "id": "b15",
+   "text": "Right knee sore after the game, it hurts",
+   "part": "knee",
+   "side": "right",
+   "level": 3
+  },
+  {
+   "id": "b16",
+   "text": "My right ankle is aches, 4 out of 5",
+   "part": "ankle",
+   "side": "right",
+   "level": 4
+  },
+  {
+   "id": "b17",
+   "text": "Got a sore left calf this morning (barely)",
+   "part": "calf",
+   "side": "left",
+   "level": 1
+  },
+  {
+   "id": "b18",
+   "text": "Got a sore left ankle this morning (really bad)",
+   "part": "ankle",
+   "side": "left",
+   "level": 4
+  },
+  {
+   "id": "b19",
+   "text": "My left wrist is aches, slightly",
+   "part": "wrist",
+   "side": "left",
+   "level": 2
+  },
+  {
+   "id": "b20",
+   "text": "Right calf aches after the game, a bit",
+   "part": "calf",
+   "side": "right",
+   "level": 2
+  },
+  {
+   "id": "b21",
+   "text": "Got a sore left ankle this morning (barely)",
+   "part": "ankle",
+   "side": "left",
+   "level": 1
+  },
+  {
+   "id": "b22",
+   "text": "Lower back sore after the game, 4 out of 5",
+   "part": "lowerback",
+   "side": null,
+   "level": 4
+  },
+  {
+   "id": "b23",
+   "text": "Right knee hurts after the game, it hurts",
+   "part": "knee",
+   "side": "right",
+   "level": 3
+  }
+ ]
+}

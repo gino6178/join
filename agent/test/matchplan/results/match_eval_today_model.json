@@ -1,0 +1,1739 @@
+{
+ "at": "2026-10-28T05:30:17.214Z",
+ "members": 300,
+ "seed": 7,
+ "requests": 16,
+ "today": true,
+ "a2a": true,
+ "route": "off",
+ "model": "http://127.0.0.1:11446/v1",
+ "arms": {
+  "bands": {
+   "summary": {
+    "arm": "bands",
+    "model": "likely-lr-20261028-20508c",
+    "requests": 15,
+    "agreed": 10,
+    "successRate": 0.667,
+    "success1": 0.2,
+    "success3": 0.533,
+    "talks": 41,
+    "talksPerGame": 4.1,
+    "agentsAgreedButMemberSaidNo": 31,
+    "yesesTurnedAway": 0,
+    "askerDropped": 0,
+    "secondsPerRequest": {
+     "mean": 24.2,
+     "p50": 21.9,
+     "p95": 67.5
+    },
+    "secondsToAgreement": {
+     "mean": 19.3,
+     "p50": 13.2
+    },
+    "estimateSeconds": 0.15,
+    "estimatesPerRequest": 12,
+    "modelCalls": 41,
+    "modelCallsPerGame": 4.1,
+    "modelSecondsPerCall": 8.8,
+    "tokens": {
+     "calls": 41,
+     "prompt": 16472,
+     "cached": 0,
+     "fresh": 16472,
+     "cachedShare": 0,
+     "output": 12609,
+     "reasoning": 11322,
+     "seconds": 359.3,
+     "empty": 0,
+     "invalid": 0
+    },
+    "fairness": {
+     "eligibleTwice": 78,
+     "neverAsked": 0.551,
+     "giniAsks": 0.599
+    },
+    "bandsAtTalks": {
+     "unlikely": {
+      "talks": 0,
+      "agentsAgreed": 0,
+      "memberSaidYes": 0,
+      "yesRate": null,
+      "meanTrueChance": null
+     },
+     "maybe": {
+      "talks": 21,
+      "agentsAgreed": 21,
+      "memberSaidYes": 5,
+      "yesRate": 0.238,
+      "meanTrueChance": 0.26
+     },
+     "likely": {
+      "talks": 18,
+      "agentsAgreed": 18,
+      "memberSaidYes": 4,
+      "yesRate": 0.222,
+      "meanTrueChance": 0.305
+     },
+     "very likely": {
+      "talks": 2,
+      "agentsAgreed": 2,
+      "memberSaidYes": 1,
+      "yesRate": 0.5,
+      "meanTrueChance": 0.592
+     },
+     "null": {
+      "talks": 0,
+      "agentsAgreed": 0,
+      "memberSaidYes": 0,
+      "yesRate": null,
+      "meanTrueChance": null
+     }
+    },
+    "notAgreed": {},
+    "refused": 0,
+    "exactGiven": 0,
+    "seconds": 363.4
+   },
+   "rows": [
+    {
+     "k": 4,
+     "asker": "s150",
+     "when": "Wed 20:00",
+     "cands": 41,
+     "estimates": 12,
+     "talks": 4,
+     "agentsAgreed": 4,
+     "turnedAway": 0,
+     "dropped": false,
+     "game": {
+      "with": "s074",
+      "date": "2026-10-28",
+      "start": "20:00",
+      "band": "maybe",
+      "p": 0.272
+     },
+     "firstYes": 4,
+     "detail": [
+      {
+       "band": "likely",
+       "p": 0.397,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": 0.208,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": 0.227,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": 0.272,
+       "agreed": true,
+       "why": null,
+       "yes": true
+      }
+     ],
+     "estSeconds": 0.21,
+     "seconds": 29.6
+    },
+    {
+     "k": 16,
+     "asker": "s113",
+     "when": "Wed 19:00",
+     "cands": 78,
+     "estimates": 12,
+     "talks": 2,
+     "agentsAgreed": 2,
+     "turnedAway": 0,
+     "dropped": false,
+     "game": {
+      "with": "s095",
+      "date": "2026-10-28",
+      "start": "19:00",
+      "band": "maybe",
+      "p": 0.236
+     },
+     "firstYes": 2,
+     "detail": [
+      {
+       "band": "maybe",
+       "p": 0.597,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": 0.236,
+       "agreed": true,
+       "why": null,
+       "yes": true
+      }
+     ],
+     "estSeconds": 0.13,
+     "seconds": 13.2
+    },
+    {
+     "k": 20,
+     "asker": "s289",
+     "when": "Wed 19:00",
+     "cands": 73,
+     "estimates": 12,
+     "talks": 4,
+     "agentsAgreed": 4,
+     "turnedAway": 0,
+     "dropped": false,
+     "game": null,
+     "firstYes": null,
+     "detail": [
+      {
+       "band": "likely",
+       "p": 0.472,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "likely",
+       "p": 0.092,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "likely",
+       "p": 0.496,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "likely",
+       "p": 0.025,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      }
+     ],
+     "estSeconds": 0.11,
+     "seconds": 26.3
+    },
+    {
+     "k": 22,
+     "asker": "s214",
+     "when": "Wed 19:00",
+     "cands": 76,
+     "estimates": 12,
+     "talks": 2,
+     "agentsAgreed": 2,
+     "turnedAway": 0,
+     "dropped": false,
+     "game": {
+      "with": "s041",
+      "date": "2026-10-28",
+      "start": "19:00",
+      "band": "likely",
+      "p": 0.252
+     },
+     "firstYes": 2,
+     "detail": [
+      {
+       "band": "very likely",
+       "p": 0.411,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "likely",
+       "p": 0.252,
+       "agreed": true,
+       "why": null,
+       "yes": true
+      }
+     ],
+     "estSeconds": 0.15,
+     "seconds": 9.6
+    },
+    {
+     "k": 24,
+     "asker": "s169",
+     "when": "Wed 19:00",
+     "cands": 74,
+     "estimates": 12,
+     "talks": 4,
+     "agentsAgreed": 4,
+     "turnedAway": 0,
+     "dropped": false,
+     "game": null,
+     "firstYes": null,
+     "detail": [
+      {
+       "band": "maybe",
+       "p": 0.18,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": 0.016,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": 0.072,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": 0.004,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      }
+     ],
+     "estSeconds": 0.16,
+     "seconds": 26.8
+    },
+    {
+     "k": 29,
+     "skipped": "a game that day already"
+    },
+    {
+     "k": 33,
+     "asker": "s129",
+     "when": "Wed 18:00",
+     "cands": 36,
+     "estimates": 12,
+     "talks": 2,
+     "agentsAgreed": 2,
+     "turnedAway": 0,
+     "dropped": false,
+     "game": {
+      "with": "s165",
+      "date": "2026-10-28",
+      "start": "18:00",
+      "band": "maybe",
+      "p": 0.617
+     },
+     "firstYes": 2,
+     "detail": [
+      {
+       "band": "maybe",
+       "p": 0.251,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": 0.617,
+       "agreed": true,
+       "why": null,
+       "yes": true
+      }
+     ],
+     "estSeconds": 0.13,
+     "seconds": 15.1
+    },
+    {
+     "k": 34,
+     "asker": "s189",
+     "when": "Wed 18:00",
+     "cands": 34,
+     "estimates": 12,
+     "talks": 2,
+     "agentsAgreed": 2,
+     "turnedAway": 0,
+     "dropped": false,
+     "game": {
+      "with": "s026",
+      "date": "2026-10-28",
+      "start": "18:00",
+      "band": "maybe",
+      "p": 0.562
+     },
+     "firstYes": 2,
+     "detail": [
+      {
+       "band": "maybe",
+       "p": 0.095,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": 0.562,
+       "agreed": true,
+       "why": null,
+       "yes": true
+      }
+     ],
+     "estSeconds": 0.12,
+     "seconds": 12.6
+    },
+    {
+     "k": 38,
+     "asker": "s177",
+     "when": "Wed 19:00",
+     "cands": 68,
+     "estimates": 12,
+     "talks": 1,
+     "agentsAgreed": 1,
+     "turnedAway": 0,
+     "dropped": false,
+     "game": {
+      "with": "s258",
+      "date": "2026-10-28",
+      "start": "19:00",
+      "band": "maybe",
+      "p": 0.773
+     },
+     "firstYes": 1,
+     "detail": [
+      {
+       "band": "maybe",
+       "p": 0.773,
+       "agreed": true,
+       "why": null,
+       "yes": true
+      }
+     ],
+     "estSeconds": 0.12,
+     "seconds": 8.6
+    },
+    {
+     "k": 41,
+     "asker": "s022",
+     "when": "Wed 18:00",
+     "cands": 32,
+     "estimates": 12,
+     "talks": 4,
+     "agentsAgreed": 4,
+     "turnedAway": 0,
+     "dropped": false,
+     "game": null,
+     "firstYes": null,
+     "detail": [
+      {
+       "band": "likely",
+       "p": 0.379,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "likely",
+       "p": 0.046,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": 0.509,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": 0.12,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      }
+     ],
+     "estSeconds": 0.12,
+     "seconds": 29.5
+    },
+    {
+     "k": 42,
+     "asker": "s134",
+     "when": "Wed 18:00",
+     "cands": 32,
+     "estimates": 12,
+     "talks": 1,
+     "agentsAgreed": 1,
+     "turnedAway": 0,
+     "dropped": false,
+     "game": {
+      "with": "s153",
+      "date": "2026-10-28",
+      "start": "18:00",
+      "band": "very likely",
+      "p": 0.773
+     },
+     "firstYes": 1,
+     "detail": [
+      {
+       "band": "very likely",
+       "p": 0.773,
+       "agreed": true,
+       "why": null,
+       "yes": true
+      }
+     ],
+     "estSeconds": 0.13,
+     "seconds": 6.8
+    },
+    {
+     "k": 45,
+     "asker": "s081",
+     "when": "Wed 18:00",
+     "cands": 30,
+     "estimates": 12,
+     "talks": 1,
+     "agentsAgreed": 1,
+     "turnedAway": 0,
+     "dropped": false,
+     "game": {
+      "with": "s075",
+      "date": "2026-10-28",
+      "start": "18:00",
+      "band": "likely",
+      "p": 0.182
+     },
+     "firstYes": 1,
+     "detail": [
+      {
+       "band": "likely",
+       "p": 0.182,
+       "agreed": true,
+       "why": null,
+       "yes": true
+      }
+     ],
+     "estSeconds": 0.15,
+     "seconds": 7.8
+    },
+    {
+     "k": 53,
+     "asker": "s006",
+     "when": "Wed 20:00",
+     "cands": 35,
+     "estimates": 12,
+     "talks": 4,
+     "agentsAgreed": 4,
+     "turnedAway": 0,
+     "dropped": false,
+     "game": {
+      "with": "s099",
+      "date": "2026-10-28",
+      "start": "19:00",
+      "band": "likely",
+      "p": 0.663
+     },
+     "firstYes": 4,
+     "detail": [
+      {
+       "band": "likely",
+       "p": 0.304,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "likely",
+       "p": 0.044,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "likely",
+       "p": 0.497,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "likely",
+       "p": 0.663,
+       "agreed": true,
+       "why": null,
+       "yes": true
+      }
+     ],
+     "estSeconds": 0.15,
+     "seconds": 67.5
+    },
+    {
+     "k": 56,
+     "asker": "s244",
+     "when": "Wed 18:00",
+     "cands": 28,
+     "estimates": 12,
+     "talks": 4,
+     "agentsAgreed": 4,
+     "turnedAway": 0,
+     "dropped": false,
+     "game": null,
+     "firstYes": null,
+     "detail": [
+      {
+       "band": "likely",
+       "p": 0.463,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "likely",
+       "p": 0.056,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": 0.138,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": 0.19,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      }
+     ],
+     "estSeconds": 0.25,
+     "seconds": 44.3
+    },
+    {
+     "k": 58,
+     "asker": "s091",
+     "when": "Wed 18:00",
+     "cands": 28,
+     "estimates": 12,
+     "talks": 4,
+     "agentsAgreed": 4,
+     "turnedAway": 0,
+     "dropped": false,
+     "game": null,
+     "firstYes": null,
+     "detail": [
+      {
+       "band": "likely",
+       "p": 0.43,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": 0.1,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": 0.069,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": 0.221,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      }
+     ],
+     "estSeconds": 0.16,
+     "seconds": 43.9
+    },
+    {
+     "k": 63,
+     "asker": "s220",
+     "when": "Wed 19:00",
+     "cands": 62,
+     "estimates": 12,
+     "talks": 2,
+     "agentsAgreed": 2,
+     "turnedAway": 0,
+     "dropped": false,
+     "game": {
+      "with": "s289",
+      "date": "2026-10-28",
+      "start": "19:00",
+      "band": "likely",
+      "p": 0.664
+     },
+     "firstYes": 2,
+     "detail": [
+      {
+       "band": "likely",
+       "p": 0.023,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "likely",
+       "p": 0.664,
+       "agreed": true,
+       "why": null,
+       "yes": true
+      }
+     ],
+     "estSeconds": 0.2,
+     "seconds": 21.9
+    }
+   ]
+  },
+  "two": {
+   "summary": {
+    "arm": "two",
+    "model": "likely-lr-20261028-20508c",
+    "requests": 15,
+    "agreed": 6,
+    "successRate": 0.4,
+    "success1": 0,
+    "success3": 0.133,
+    "talks": 92,
+    "talksPerGame": 15.33,
+    "agentsAgreedButMemberSaidNo": 39,
+    "yesesTurnedAway": 45,
+    "askerDropped": 1,
+    "secondsPerRequest": {
+     "mean": 45.2,
+     "p50": 46.7,
+     "p95": 88.8
+    },
+    "secondsToAgreement": {
+     "mean": 24,
+     "p50": 23.3
+    },
+    "estimateSeconds": 0.33,
+    "estimatesPerRequest": 12,
+    "modelCalls": 92,
+    "modelCallsPerGame": 15.33,
+    "modelSecondsPerCall": 13.5,
+    "tokens": {
+     "calls": 92,
+     "prompt": 36881,
+     "cached": 16573,
+     "fresh": 20308,
+     "cachedShare": 0.449,
+     "output": 28933,
+     "reasoning": 26072,
+     "seconds": 1244.7,
+     "empty": 0,
+     "invalid": 0
+    },
+    "fairness": {
+     "eligibleTwice": 81,
+     "neverAsked": 0.346,
+     "giniAsks": 0.481
+    },
+    "bandsAtTalks": {
+     "unlikely": {
+      "talks": 0,
+      "agentsAgreed": 0,
+      "memberSaidYes": 0,
+      "yesRate": null,
+      "meanTrueChance": null
+     },
+     "maybe": {
+      "talks": 68,
+      "agentsAgreed": 31,
+      "memberSaidYes": 3,
+      "yesRate": 0.097,
+      "meanTrueChance": 0.18
+     },
+     "likely": {
+      "talks": 23,
+      "agentsAgreed": 14,
+      "memberSaidYes": 4,
+      "yesRate": 0.286,
+      "meanTrueChance": 0.434
+     },
+     "very likely": {
+      "talks": 1,
+      "agentsAgreed": 1,
+      "memberSaidYes": 0,
+      "yesRate": 0,
+      "meanTrueChance": 0.411
+     },
+     "null": {
+      "talks": 0,
+      "agentsAgreed": 0,
+      "memberSaidYes": 0,
+      "yesRate": null,
+      "meanTrueChance": null
+     }
+    },
+    "notAgreed": {
+     "Felix can't play at any of the times": 1
+    },
+    "refused": 0,
+    "exactGiven": 0,
+    "seconds": 678.2
+   },
+   "rows": [
+    {
+     "k": 4,
+     "asker": "s150",
+     "when": "Wed 20:00",
+     "cands": 41,
+     "estimates": 12,
+     "talks": 8,
+     "agentsAgreed": 8,
+     "turnedAway": 4,
+     "dropped": false,
+     "game": null,
+     "firstYes": null,
+     "detail": [
+      {
+       "band": "likely",
+       "p": 0.397,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.227,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.151,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.012,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      }
+     ],
+     "estSeconds": 0.18,
+     "seconds": 74.1
+    },
+    {
+     "k": 16,
+     "asker": "s113",
+     "when": "Wed 19:00",
+     "cands": 80,
+     "estimates": 12,
+     "talks": 8,
+     "agentsAgreed": 7,
+     "turnedAway": 3,
+     "dropped": false,
+     "game": null,
+     "firstYes": null,
+     "detail": [
+      {
+       "band": "maybe",
+       "p": 0.597,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.011,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": false,
+       "why": "Felix can't play at any of the times",
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.208,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": 0.073,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      }
+     ],
+     "estSeconds": 0.22,
+     "seconds": 88.8
+    },
+    {
+     "k": 20,
+     "asker": "s289",
+     "when": "Wed 19:00",
+     "cands": 77,
+     "estimates": 12,
+     "talks": 8,
+     "agentsAgreed": 8,
+     "turnedAway": 4,
+     "dropped": false,
+     "game": null,
+     "firstYes": null,
+     "detail": [
+      {
+       "band": "likely",
+       "p": 0.496,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "likely",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "likely",
+       "p": 0.386,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "likely",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.307,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.023,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      }
+     ],
+     "estSeconds": 0.25,
+     "seconds": 65.5
+    },
+    {
+     "k": 22,
+     "asker": "s214",
+     "when": "Wed 19:00",
+     "cands": 80,
+     "estimates": 12,
+     "talks": 4,
+     "agentsAgreed": 4,
+     "turnedAway": 2,
+     "dropped": false,
+     "game": {
+      "with": "s153",
+      "date": "2026-10-28",
+      "start": "19:00",
+      "band": "likely",
+      "p": 0.699
+     },
+     "firstYes": 4,
+     "detail": [
+      {
+       "band": "very likely",
+       "p": 0.411,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "likely",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "likely",
+       "p": 0.699,
+       "agreed": true,
+       "why": null,
+       "yes": true
+      },
+      {
+       "band": "likely",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      }
+     ],
+     "estSeconds": 0.24,
+     "seconds": 17.8
+    },
+    {
+     "k": 24,
+     "asker": "s169",
+     "when": "Wed 19:00",
+     "cands": 78,
+     "estimates": 12,
+     "talks": 8,
+     "agentsAgreed": 8,
+     "turnedAway": 4,
+     "dropped": false,
+     "game": null,
+     "firstYes": null,
+     "detail": [
+      {
+       "band": "maybe",
+       "p": 0.18,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.072,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.024,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.037,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      }
+     ],
+     "estSeconds": 0.26,
+     "seconds": 46.7
+    },
+    {
+     "k": 29,
+     "asker": "s113",
+     "when": "Wed 19:00",
+     "cands": 78,
+     "estimates": 12,
+     "talks": 6,
+     "agentsAgreed": 6,
+     "turnedAway": 3,
+     "dropped": false,
+     "game": {
+      "with": "s134",
+      "date": "2026-10-28",
+      "start": "19:00",
+      "band": "maybe",
+      "p": 0.055
+     },
+     "firstYes": 6,
+     "detail": [
+      {
+       "band": "likely",
+       "p": 0.168,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.236,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.055,
+       "agreed": true,
+       "why": null,
+       "yes": true
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      }
+     ],
+     "estSeconds": 0.27,
+     "seconds": 45.2
+    },
+    {
+     "k": 33,
+     "asker": "s129",
+     "when": "Wed 18:00",
+     "cands": 34,
+     "estimates": 12,
+     "talks": 4,
+     "agentsAgreed": 4,
+     "turnedAway": 2,
+     "dropped": false,
+     "game": {
+      "with": "s211",
+      "date": "2026-10-28",
+      "start": "18:00",
+      "band": "maybe",
+      "p": 0.578
+     },
+     "firstYes": 4,
+     "detail": [
+      {
+       "band": "maybe",
+       "p": 0.251,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.578,
+       "agreed": true,
+       "why": null,
+       "yes": true
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      }
+     ],
+     "estSeconds": 0.26,
+     "seconds": 23.3
+    },
+    {
+     "k": 34,
+     "asker": "s189",
+     "when": "Wed 18:00",
+     "cands": 32,
+     "estimates": 12,
+     "talks": 4,
+     "agentsAgreed": 4,
+     "turnedAway": 2,
+     "dropped": true,
+     "game": null,
+     "firstYes": null,
+     "detail": [
+      {
+       "band": "maybe",
+       "p": 0.032,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.216,
+       "agreed": true,
+       "why": null,
+       "yes": true
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      }
+     ],
+     "estSeconds": 0.35,
+     "seconds": 31.3
+    },
+    {
+     "k": 38,
+     "asker": "s177",
+     "when": "Wed 19:00",
+     "cands": 71,
+     "estimates": 12,
+     "talks": 2,
+     "agentsAgreed": 2,
+     "turnedAway": 1,
+     "dropped": false,
+     "game": {
+      "with": "s074",
+      "date": "2026-10-28",
+      "start": "19:00",
+      "band": "likely",
+      "p": 0.608
+     },
+     "firstYes": 2,
+     "detail": [
+      {
+       "band": "likely",
+       "p": 0.608,
+       "agreed": true,
+       "why": null,
+       "yes": true
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      }
+     ],
+     "estSeconds": 0.37,
+     "seconds": 8.6
+    },
+    {
+     "k": 41,
+     "asker": "s022",
+     "when": "Wed 18:00",
+     "cands": 32,
+     "estimates": 12,
+     "talks": 8,
+     "agentsAgreed": 8,
+     "turnedAway": 4,
+     "dropped": false,
+     "game": null,
+     "firstYes": null,
+     "detail": [
+      {
+       "band": "likely",
+       "p": 0.379,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.51,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.072,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.12,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      }
+     ],
+     "estSeconds": 0.38,
+     "seconds": 53.9
+    },
+    {
+     "k": 42,
+     "skipped": "a game that day already"
+    },
+    {
+     "k": 45,
+     "asker": "s081",
+     "when": "Wed 18:00",
+     "cands": 32,
+     "estimates": 12,
+     "talks": 8,
+     "agentsAgreed": 8,
+     "turnedAway": 4,
+     "dropped": false,
+     "game": null,
+     "firstYes": null,
+     "detail": [
+      {
+       "band": "likely",
+       "p": 0.023,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "likely",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.063,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.708,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.106,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      }
+     ],
+     "estSeconds": 0.41,
+     "seconds": 62.8
+    },
+    {
+     "k": 53,
+     "asker": "s006",
+     "when": "Wed 20:00",
+     "cands": 39,
+     "estimates": 12,
+     "talks": 6,
+     "agentsAgreed": 6,
+     "turnedAway": 3,
+     "dropped": false,
+     "game": {
+      "with": "s099",
+      "date": "2026-10-28",
+      "start": "20:00",
+      "band": "likely",
+      "p": 0.574
+     },
+     "firstYes": 6,
+     "detail": [
+      {
+       "band": "likely",
+       "p": 0.304,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "likely",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "likely",
+       "p": 0.497,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "likely",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "likely",
+       "p": 0.574,
+       "agreed": true,
+       "why": null,
+       "yes": true
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      }
+     ],
+     "estSeconds": 0.42,
+     "seconds": 41.8
+    },
+    {
+     "k": 56,
+     "asker": "s244",
+     "when": "Wed 18:00",
+     "cands": 32,
+     "estimates": 12,
+     "talks": 8,
+     "agentsAgreed": 8,
+     "turnedAway": 4,
+     "dropped": false,
+     "game": null,
+     "firstYes": null,
+     "detail": [
+      {
+       "band": "likely",
+       "p": 0.232,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.088,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.138,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.056,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      }
+     ],
+     "estSeconds": 0.42,
+     "seconds": 58.6
+    },
+    {
+     "k": 58,
+     "asker": "s091",
+     "when": "Wed 18:00",
+     "cands": 32,
+     "estimates": 12,
+     "talks": 8,
+     "agentsAgreed": 8,
+     "turnedAway": 4,
+     "dropped": false,
+     "game": null,
+     "firstYes": null,
+     "detail": [
+      {
+       "band": "likely",
+       "p": 0.649,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "likely",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.069,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.147,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      },
+      {
+       "band": "maybe",
+       "p": 0.221,
+       "agreed": true,
+       "why": null,
+       "yes": false
+      },
+      {
+       "band": "maybe",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      }
+     ],
+     "estSeconds": 0.43,
+     "seconds": 52.1
+    },
+    {
+     "k": 63,
+     "asker": "s220",
+     "when": "Wed 19:00",
+     "cands": 70,
+     "estimates": 12,
+     "talks": 2,
+     "agentsAgreed": 2,
+     "turnedAway": 1,
+     "dropped": false,
+     "game": {
+      "with": "s289",
+      "date": "2026-10-28",
+      "start": "19:00",
+      "band": "likely",
+      "p": 0.664
+     },
+     "firstYes": 2,
+     "detail": [
+      {
+       "band": "likely",
+       "p": 0.664,
+       "agreed": true,
+       "why": null,
+       "yes": true
+      },
+      {
+       "band": "likely",
+       "p": null,
+       "agreed": true,
+       "why": null,
+       "yes": null
+      }
+     ],
+     "estSeconds": 0.45,
+     "seconds": 7.4
+    }
+   ]
+  }
+ }
+}

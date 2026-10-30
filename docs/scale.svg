@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 760 400" width="760" height="400" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
+<title id="t">Prompt tokens per model call, by club size</title>
+<desc id="d">Whole club in the prompt: 11 members 788 tokens; 51 members 3,139 tokens; 101 members 6,011 tokens; 201 members 11,807 tokens; 401 members 23,406 tokens (estimated, does not fit); 1001 members 58,203 tokens (estimated, does not fit). Serve, an Autopilot week's model calls on average (the members' agents' answers included): 11 members 1,505 tokens; 301 members 1,563 tokens.</desc>
+<rect width="760" height="400" rx="10" fill="#fcfcfb"/>
+<text x="76" y="26" font-size="16" font-weight="600" fill="#0b0b0b">Prompt tokens per model call, by club size</text>
+<text x="76" y="44" font-size="12" fill="#52514e">Muse Glimmer on one RTX 3090. Members beyond the 11 in the demo club are simulated.</text>
+<line x1="76" x2="550" y1="338" y2="338" stroke="#e7e6e1" stroke-width="1"/><text x="68" y="342" font-size="11" fill="#52514e" text-anchor="end">0</text>
+<line x1="76" x2="550" y1="267.5" y2="267.5" stroke="#e7e6e1" stroke-width="1"/><text x="68" y="271.5" font-size="11" fill="#52514e" text-anchor="end">15k</text>
+<line x1="76" x2="550" y1="197" y2="197" stroke="#e7e6e1" stroke-width="1"/><text x="68" y="201" font-size="11" fill="#52514e" text-anchor="end">30k</text>
+<line x1="76" x2="550" y1="126.5" y2="126.5" stroke="#e7e6e1" stroke-width="1"/><text x="68" y="130.5" font-size="11" fill="#52514e" text-anchor="end">45k</text>
+<line x1="76" x2="550" y1="56" y2="56" stroke="#e7e6e1" stroke-width="1"/><text x="68" y="60" font-size="11" fill="#52514e" text-anchor="end">60k</text>
+<text x="85.61115071472781" y="356" font-size="11" fill="#52514e" text-anchor="middle">11</text>
+<text x="240.293849933349" y="356" font-size="11" fill="#52514e" text-anchor="middle">51</text>
+<text x="309.19782354176255" y="356" font-size="11" fill="#52514e" text-anchor="middle">101</text>
+<text x="378.5948587493022" y="356" font-size="11" fill="#52514e" text-anchor="middle">201</text>
+<text x="448.241185219623" y="356" font-size="11" fill="#52514e" text-anchor="middle">401</text>
+<text x="540.4896396558329" y="356" font-size="11" fill="#52514e" text-anchor="middle">1,001</text>
+<text x="313" y="382" font-size="12" fill="#52514e" text-anchor="middle">Members in the club (log scale)</text>
+<text x="18" y="197" font-size="12" fill="#52514e" text-anchor="middle" transform="rotate(-90 18 197)">Prompt tokens</text>
+<line x1="76" x2="550" y1="260.9952" y2="260.9952" stroke="#52514e" stroke-width="1" stroke-dasharray="2 4"/>
+<text x="82" y="254.9952" font-size="11" fill="#52514e">The model's context on this server: 16,384 tokens</text>
+<path d="M85.6,334.3 L240.3,323.2 L309.2,309.7 L378.6,282.5" fill="none" stroke="#eb6834" stroke-width="2" stroke-linejoin="round"/>
+<path d="M378.6,282.5 L448.2,228.0 L540.5,64.4" fill="none" stroke="#eb6834" stroke-width="2" stroke-dasharray="6 5"/>
+<circle cx="85.61115071472781" cy="334.2964" r="4.5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>11 members: 788 tokens</title></circle>
+<circle cx="240.293849933349" cy="323.2467" r="4.5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>51 members: 3,139 tokens</title></circle>
+<circle cx="309.19782354176255" cy="309.7483" r="4.5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>101 members: 6,011 tokens</title></circle>
+<circle cx="378.5948587493022" cy="282.5071" r="4.5" fill="#eb6834" stroke="#fcfcfb" stroke-width="2"><title>201 members: 11,807 tokens</title></circle>
+<circle cx="448.241185219623" cy="227.9918" r="4.5" fill="#fcfcfb" stroke="#eb6834" stroke-width="2"><title>401 members: 23,406 tokens (estimated; does not fit)</title></circle>
+<circle cx="540.4896396558329" cy="64.4459" r="4.5" fill="#fcfcfb" stroke="#eb6834" stroke-width="2"><title>1,001 members: 58,203 tokens (estimated; does not fit)</title></circle>
+<path d="M85.6,330.9 L419.3,330.7" fill="none" stroke="#2a78d6" stroke-width="2"/>
+<circle cx="85.61115071472781" cy="330.9265" r="4.5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>11 members: 1,505 tokens per call (2 weeks)</title></circle>
+<circle cx="419.31489674029115" cy="330.6539" r="4.5" fill="#2a78d6" stroke="#fcfcfb" stroke-width="2"><title>301 members: 1,563 tokens per call (2 weeks)</title></circle>
+<text x="550.4896396558329" y="68.4459" font-size="12" fill="#0b0b0b"><tspan font-weight="600">Whole club in the prompt</tspan><tspan x="550.4896396558329" dy="15" fill="#52514e">58,203 at 1,001 (estimated;</tspan><tspan x="550.4896396558329" dy="14" fill="#52514e">does not fit past ~270)</tspan></text>
+<text x="429.31489674029115" y="304.6539" font-size="12" fill="#0b0b0b"><tspan font-weight="600">Serve: members found by code</tspan><tspan x="429.31489674029115" dy="15" fill="#52514e">1,505 → 1,563, an Autopilot week's calls on average</tspan></text>
+<g transform="translate(550.4896396558329,126)" font-size="11" fill="#52514e">
+<line x1="0" x2="18" y1="0" y2="0" stroke="#eb6834" stroke-width="2"/><text x="24" y="4">measured</text>
+<line x1="0" x2="18" y1="18" y2="18" stroke="#eb6834" stroke-width="2" stroke-dasharray="6 5"/><text x="24" y="22">estimated</text>
+</g>
+</svg>

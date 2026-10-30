@@ -1,0 +1,131 @@
+/* One ground, one ink, one accent. Light and dark follow the system unless the player picks one (data-theme on <html>).
+   Actions are ink (black on light, white on dark); green is the agent: it marks work in progress, progress and the
+   live state. Blue / coral are the two players; the teal-to-red ramp is shuttle speed. Status colours say good /
+   watch / bad. Coach colours live in coaches/personas.js and only tint that coach's own messages.
+   Video, 3D and the live court view are media: they keep the dark tokens in both themes (.dark-scope and the media
+   containers listed below), the way a video stays dark in a light feed. */
+:root { /* light, the default theme */
+  --bg: #ffffff;
+  --surface: #f5f5f6;
+  --surface-2: #ececee;
+  --surface-3: #e2e2e5;
+  --card: #ffffff;
+  --control: rgb(0 0 0 / .05);
+  --control-hover: rgb(0 0 0 / .09);
+  --rule: rgb(0 0 0 / .09);
+  --rule-strong: rgb(0 0 0 / .18);
+  --ink: #0a0a0b;
+  --ink-2: #3b3b40;
+  --ink-3: #65656c;
+  --accent: #0a0a0b;
+  --accent-ink: #ffffff;
+  --accent-hover: #2b2b30;
+  --agent: #0a7f44;
+  --agent-ink: #ffffff;
+  --near: #1f6fd6;
+  --far: #c9501f;
+  --good: #0a7f44;
+  --warn: #a86400;
+  --bad: #d1352b;
+  --bad-2: #c4574c;
+  --heat-attack: #e8902a;
+  --heat-defence: #e5484d;
+  --sp1: #0ea5a4; --sp2: #5aa02c; --sp3: #d29b00; --sp4: #e07a1f; --sp5: #d93a37;
+  --glass: rgb(255 255 255 / .86);
+  --seg-on: #ffffff;
+  --scrim: rgb(0 0 0 / .45);
+  --shadow-pop: 0 12px 32px rgb(0 0 0 / .12), 0 2px 6px rgb(0 0 0 / .06);
+  --shadow-card: 0 1px 2px rgb(0 0 0 / .05);
+  --map-land: #f1f0ec; --map-water: #cfe3f2; --map-park: #dcebd5; --map-road: #ffffff; --map-ink: #8a8a90;
+  /* the same in both themes: the court's green, and the red that marks something live */
+  --court: #2f8f6f; --live: #e5443a;
+  --font: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --display: var(--font);
+  --mono: var(--font);
+  /* Type sizes. The fixed steps go no lower than 12 px; the role sizes are named for where they are used, and the
+     headings grow with the window. */
+  --fs-12: 12px; --fs-14: 14px; --fs-16: 16px;
+  --fs-20: 20px; --fs-24: 24px;
+  --fs-small: 14px; --fs-body: 16px; --fs-lead: 18px;
+  --fs-h1: clamp(26px, 2.4vw, 34px);
+  --fs-h2: clamp(22px, 2.2vw, 30px);
+  --fs-display: clamp(44px, 6vw, 88px);
+  /* Spacing, all of it multiples of 4 px, then the page's side margin and the corner radii */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px;
+  --s5: 24px; --s6: 32px; --s7: 48px; --s8: 64px;
+  --gutter: clamp(16px, 3vw, 48px);
+  --r-sm: 8px; --r-md: 12px; --r-lg: 18px; --r-pill: 999px;
+  /* What sits over what, lowest first: sticky headers, the navigation, menus, sheets, dialogs, toasts */
+  --z-sticky: 10; --z-nav: 30; --z-menu: 40;
+  --z-sheet: 50; --z-modal: 70; --z-toast: 90;
+  /* the shell: a sidebar on a laptop, an icon rail on a tablet, top and bottom bars on a phone */
+  --side-w: 248px;
+  --nav-h: 0px;
+  --tabbar-h: 0px; /* the two bars appear at phone width (below) */
+  /* motion: one easing curve, a short and a longer duration */
+  --ease: cubic-bezier(.22, 1, .36, 1); --dur-1: 150ms; --dur-2: 220ms;
+  color-scheme: light;
+}
+@media (max-width: 1099px) { :root { --side-w: 76px; } }
+@media (max-width: 640px) { :root { --side-w: 0px; --nav-h: 56px; --tabbar-h: 60px; } }
+
+/* dark: the system's choice, the player's choice, and media in either theme */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b0b0c; --surface: #161618; --surface-2: #1f1f22; --surface-3: #2a2a2e; --card: #121214;
+    --control: rgb(255 255 255 / .07); --control-hover: rgb(255 255 255 / .12);
+    --rule: rgb(255 255 255 / .1); --rule-strong: rgb(255 255 255 / .2);
+    --ink: #f2f2f3; --ink-2: #c8c8cd; --ink-3: #9b9ba3;
+    --accent: #f2f2f3; --accent-ink: #0b0b0c; --accent-hover: #ffffff;
+    --agent: #4fd18b; --agent-ink: #06210f;
+    --near: #6fb6ff; --far: #ff8a6b; --good: #5fd39a; --warn: #f2c14e; --bad: #ff6b6b; --bad-2: #d9786e;
+    --heat-attack: #f2a33a; --heat-defence: #ff5f56;
+    --sp1: #3fd0c9; --sp2: #9be37a; --sp3: #f2d46b; --sp4: #f5a25d; --sp5: #ef5f5c;
+    --glass: rgb(11 11 12 / .86); --seg-on: #2c2c30; --scrim: rgb(0 0 0 / .7);
+    --shadow-pop: 0 18px 48px rgb(0 0 0 / .55); --shadow-card: none;
+    --map-land: #17181a; --map-water: #16283a; --map-park: #17261b; --map-road: #26272b; --map-ink: #8b8b93;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"], .dark-scope,
+.hero, .player, .court-wrap, .tech-court, .proc-view, .rclip-stage, .calib-stage, .live-page, .drop.has, .coach-visual .body3d, .bm-figs {
+  --bg: #0b0b0c; --surface: #161618; --surface-2: #1f1f22; --surface-3: #2a2a2e; --card: #121214;
+  --control: rgb(255 255 255 / .07); --control-hover: rgb(255 255 255 / .12);
+  --rule: rgb(255 255 255 / .1); --rule-strong: rgb(255 255 255 / .2);
+  --ink: #f2f2f3; --ink-2: #c8c8cd; --ink-3: #9b9ba3;
+  --accent: #f2f2f3; --accent-ink: #0b0b0c; --accent-hover: #ffffff;
+  --agent: #4fd18b; --agent-ink: #06210f;
+  --near: #6fb6ff; --far: #ff8a6b; --good: #5fd39a; --warn: #f2c14e; --bad: #ff6b6b; --bad-2: #d9786e;
+  --heat-attack: #f2a33a; --heat-defence: #ff5f56;
+  --sp1: #3fd0c9; --sp2: #9be37a; --sp3: #f2d46b; --sp4: #f5a25d; --sp5: #ef5f5c;
+  --glass: rgb(11 11 12 / .86); --seg-on: #2c2c30; --scrim: rgb(0 0 0 / .7);
+  --shadow-pop: 0 18px 48px rgb(0 0 0 / .55); --shadow-card: none;
+  --map-land: #17181a; --map-water: #16283a; --map-park: #17261b; --map-road: #26272b; --map-ink: #8b8b93;
+  color-scheme: dark; }
+.dark-scope, .hero, .player, .court-wrap, .tech-court, .proc-view, .rclip-stage, .calib-stage, .live-page, .drop.has, .coach-visual .body3d, .bm-figs { color: var(--ink); }
+/* The page: sizes include padding and border, the ground reaches past the content's edge (overscroll included), and
+   links and buttons take the text they sit in rather than the browser's own font and blue. */
+* { box-sizing: border-box; } /* padding and border inside the size */
+html, body { background: var(--bg); }
+body { margin: 0;
+  color: var(--ink);
+  font: 400 var(--fs-body)/1.55 var(--font);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased; }
+a, button { color: inherit; }
+button { font: inherit; }
+::selection { background: color-mix(in srgb, var(--agent) 30%, transparent); color: var(--ink); }
+/* a keyboard focus ring in the near player's blue, kept off the element's edge */
+:focus-visible {
+  outline: 2px solid var(--near);
+  outline-offset: 3px;
+  border-radius: 4px; }
+::placeholder { opacity: 1; color: var(--ink-3); }
+/* media never wider than its column */
+img, svg, video, canvas { max-width: 100%; }
+@media (prefers-reduced-motion: reduce) { /* asked for less motion: the end state at once, no animation, transition or smooth scroll */
+  *, *::before, *::after {
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+    scroll-behavior: auto !important; } }

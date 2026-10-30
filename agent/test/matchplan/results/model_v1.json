@@ -1,0 +1,258 @@
+{
+ "version": "likely-lr-20261028",
+ "trainedOn": "simulated logs only (test/matchplan/logs.mjs: population.js seed 7, 400 members, 26 weeks)",
+ "features": [
+  "yes rate, asks in the last 28 days",
+  "asks in the last 28 days (log)",
+  "yes rate at this weekday and hour",
+  "asks at this weekday and hour (log)",
+  "yes rate to this asker",
+  "asks from this asker (log)",
+  "games with this asker (log)",
+  "minutes past the booking with this asker",
+  "games in the last 7 days",
+  "games already booked that week",
+  "games a week, last 8 weeks",
+  "booked that week minus usual",
+  "a game the day before or after",
+  "habit: share of the last 8 weeks played then",
+  "said no in the last 72 hours",
+  "yes rate to its own Match helper and plans, 28 days",
+  "sore, in the body log",
+  "sore and singles",
+  "level gap (100 rating points)",
+  "own trip (10 min)",
+  "notice (log hours)",
+  "prefers doubles",
+  "weekend",
+  "asks in the last 7 days (log)"
+ ],
+ "mu": 0.2348,
+ "lr": {
+  "w": [
+   -1.329982,
+   0.223254,
+   -0.0122,
+   0.175465,
+   -0.129912,
+   0.019462,
+   -0.045724,
+   0.041957,
+   0.001131,
+   0.031272,
+   -0.088159,
+   -0.005438,
+   -0.0689,
+   -0.195899,
+   0.085597,
+   -0.032018,
+   0.144705,
+   0,
+   0,
+   -0.438512,
+   -0.165429,
+   0.061475,
+   -0.20828,
+   0.077137,
+   -0.035399
+  ],
+  "mu": [
+   0.240338,
+   1.90018,
+   0.238801,
+   1.092845,
+   0.261546,
+   0.165061,
+   0.085266,
+   -0.007503,
+   0.760844,
+   0.290582,
+   0.613943,
+   -0.323361,
+   0.104731,
+   0.094848,
+   0.50076,
+   0.399494,
+   0,
+   0,
+   1.344447,
+   1.242814,
+   4.520893,
+   0.118236,
+   0.39594,
+   0.940195
+  ],
+  "sd": [
+   0.148683,
+   0.679214,
+   0.139815,
+   0.716499,
+   0.1075,
+   0.352543,
+   0.254475,
+   0.117833,
+   0.749236,
+   0.515297,
+   0.444881,
+   0.624223,
+   0.306207,
+   0.13163,
+   0.499999,
+   0.18518,
+   1,
+   1,
+   1.053671,
+   0.406155,
+   0.56089,
+   0.322888,
+   0.489052,
+   0.57349
+  ]
+ },
+ "iso": {
+  "xs": [
+   0.04411,
+   0.08366,
+   0.1126,
+   0.13398,
+   0.15738,
+   0.18955,
+   0.23242,
+   0.30522,
+   0.36366,
+   0.46617,
+   0.56375,
+   0.58377,
+   0.67037,
+   0.82104
+  ],
+  "ys": [
+   0.00104,
+   0.09403,
+   0.1139,
+   0.15635,
+   0.16684,
+   0.19138,
+   0.24619,
+   0.31862,
+   0.35963,
+   0.48592,
+   0.4796,
+   0.64394,
+   0.77525,
+   0.84695
+  ]
+ },
+ "cuts": [
+  0.15,
+  0.35,
+  0.6
+ ],
+ "bands": [
+  {
+   "band": "unlikely",
+   "share": 0.287,
+   "observedYes": 0.084
+  },
+  {
+   "band": "maybe",
+   "share": 0.553,
+   "observedYes": 0.235
+  },
+  {
+   "band": "likely",
+   "share": 0.143,
+   "observedYes": 0.455
+  },
+  {
+   "band": "very likely",
+   "share": 0.017,
+   "observedYes": 0.736
+  }
+ ],
+ "measured": {
+  "rows": {
+   "train": 11181,
+   "calibration": 1747,
+   "test": 3058
+  },
+  "test": {
+   "auc": 0.722,
+   "brier": 0.1575,
+   "logloss": 0.4874,
+   "ece": 0.0125
+  },
+  "reliability": [
+   {
+    "from": 0,
+    "to": 0.1,
+    "n": 482,
+    "meanP": 0.053,
+    "observed": 0.066
+   },
+   {
+    "from": 0.1,
+    "to": 0.2,
+    "n": 1108,
+    "meanP": 0.154,
+    "observed": 0.148
+   },
+   {
+    "from": 0.2,
+    "to": 0.3,
+    "n": 700,
+    "meanP": 0.251,
+    "observed": 0.256
+   },
+   {
+    "from": 0.3,
+    "to": 0.4,
+    "n": 433,
+    "meanP": 0.341,
+    "observed": 0.356
+   },
+   {
+    "from": 0.4,
+    "to": 0.5,
+    "n": 275,
+    "meanP": 0.456,
+    "observed": 0.491
+   },
+   {
+    "from": 0.5,
+    "to": 0.6,
+    "n": 7,
+    "meanP": 0.53,
+    "observed": 0.857
+   },
+   {
+    "from": 0.6,
+    "to": 0.7,
+    "n": 20,
+    "meanP": 0.671,
+    "observed": 0.75
+   },
+   {
+    "from": 0.7,
+    "to": 0.8,
+    "n": 25,
+    "meanP": 0.754,
+    "observed": 0.76
+   },
+   {
+    "from": 0.8,
+    "to": 0.9,
+    "n": 8,
+    "meanP": 0.816,
+    "observed": 0.625
+   },
+   {
+    "from": 0.9,
+    "to": 1,
+    "n": 0,
+    "meanP": null,
+    "observed": null
+   }
+  ]
+ }
+}

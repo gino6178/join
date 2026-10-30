@@ -1,0 +1,1290 @@
+{
+ "simulated": true,
+ "note": "Simulated: made by Serve's user simulation (agent/test/sim_users), by simulated people. None of it is a real person's.",
+ "members": [
+  {
+   "id": "u01",
+   "name": "Lo Yi-Hsuan",
+   "simulated": true,
+   "level": "B",
+   "hand": "R",
+   "weak": "rear forehand",
+   "strength": {
+    "shot": "drop",
+    "zone": "front forehand"
+   },
+   "limit": null,
+   "net": null,
+   "sessions": 0,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": false,
+    "likely": true
+   },
+   "xp": 0,
+   "badges": [],
+   "free": [
+    "Thu 20-22",
+    "Sat 08-11"
+   ],
+   "prefers": "singles",
+   "venue": "north",
+   "mix": {
+    "Smash": 15,
+    "Drive": 12,
+    "Clear": 14,
+    "Drop": 12,
+    "Net shot": 14,
+    "Lift": 12,
+    "Block": 8,
+    "Push": 8
+   },
+   "area": {
+    "x": 6.9,
+    "y": 0.3,
+    "name": "North"
+   },
+   "rating": 1433,
+   "w": 0,
+   "l": 0,
+   "form": [],
+   "agent": "A simulated member (Serve's user simulation). Yi has to be home for the kids, so nothing that ends after 21:45. Yi prefers singles.",
+   "rules": {
+    "endBy": "21:45"
+   },
+   "rulesComplete": true,
+   "sports": [
+    "badminton",
+    "tennis"
+   ],
+   "goal": {
+    "perWeek": 3,
+    "sport": "badminton",
+    "approval": "ask",
+    "maxTrip": 30
+   },
+   "history": []
+  },
+  {
+   "id": "u02",
+   "name": "Kuo Chen-Hao",
+   "simulated": true,
+   "level": "C",
+   "hand": "L",
+   "weak": "mid court",
+   "strength": {
+    "shot": "net shot",
+    "zone": "rear forehand"
+   },
+   "limit": null,
+   "net": null,
+   "sessions": 0,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": false,
+    "likely": true
+   },
+   "xp": 0,
+   "badges": [],
+   "free": [
+    "Tue 10-13",
+    "Wed 10-13",
+    "Fri 14-17"
+   ],
+   "prefers": "any",
+   "venue": "lakeside",
+   "mix": {
+    "Smash": 15,
+    "Drive": 12,
+    "Clear": 14,
+    "Drop": 12,
+    "Net shot": 14,
+    "Lift": 12,
+    "Block": 8,
+    "Push": 8
+   },
+   "area": {
+    "x": 7.1,
+    "y": 6.8,
+    "name": "Lakeside"
+   },
+   "rating": 1384,
+   "w": 0,
+   "l": 0,
+   "form": [],
+   "agent": "A simulated member (Serve's user simulation).",
+   "rules": {},
+   "rulesComplete": true,
+   "sports": [
+    "badminton"
+   ],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton",
+    "approval": "ask",
+    "maxTrip": 30
+   },
+   "history": []
+  },
+  {
+   "id": "u03",
+   "name": "Bao Tran",
+   "simulated": true,
+   "level": "A",
+   "hand": "R",
+   "weak": "front backhand",
+   "strength": {
+    "shot": "smash",
+    "zone": "front forehand"
+   },
+   "limit": null,
+   "net": null,
+   "sessions": 0,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": false,
+    "likely": true
+   },
+   "xp": 0,
+   "badges": [],
+   "free": [
+    "Mon 14-17",
+    "Wed 10-13",
+    "Thu 14-17",
+    "Sun 15-18"
+   ],
+   "prefers": "doubles",
+   "venue": "riverside",
+   "mix": {
+    "Smash": 15,
+    "Drive": 12,
+    "Clear": 14,
+    "Drop": 12,
+    "Net shot": 14,
+    "Lift": 12,
+    "Block": 8,
+    "Push": 8
+   },
+   "area": {
+    "x": 3.4,
+    "y": 4.5,
+    "name": "Riverside"
+   },
+   "rating": 1668,
+   "w": 0,
+   "l": 0,
+   "form": [],
+   "agent": "A simulated member (Serve's user simulation). Tran won't travel more than 20 minutes for a game. Tran prefers doubles.",
+   "rules": {
+    "maxTrip": 20
+   },
+   "rulesComplete": true,
+   "sports": [
+    "badminton",
+    "table tennis"
+   ],
+   "goal": {
+    "perWeek": 3,
+    "sport": "badminton",
+    "approval": "ask",
+    "maxTrip": 20
+   },
+   "history": []
+  },
+  {
+   "id": "u04",
+   "name": "Mateo Albarran",
+   "simulated": true,
+   "level": "B",
+   "hand": "R",
+   "weak": "mid court",
+   "strength": {
+    "shot": "drop",
+    "zone": "front forehand"
+   },
+   "limit": null,
+   "net": null,
+   "sessions": 0,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": false,
+    "likely": true
+   },
+   "xp": 0,
+   "badges": [],
+   "free": [
+    "Mon 19-22",
+    "Wed 19-22",
+    "Thu 19-22",
+    "Fri 19-22"
+   ],
+   "prefers": "any",
+   "venue": "westgate",
+   "mix": {
+    "Smash": 15,
+    "Drive": 12,
+    "Clear": 14,
+    "Drop": 12,
+    "Net shot": 14,
+    "Lift": 12,
+    "Block": 8,
+    "Push": 8
+   },
+   "area": {
+    "x": 0.3,
+    "y": 1.8,
+    "name": "Westgate"
+   },
+   "rating": 1473,
+   "w": 0,
+   "l": 0,
+   "form": [],
+   "agent": "A simulated member (Serve's user simulation).",
+   "rules": {},
+   "rulesComplete": true,
+   "sports": [
+    "badminton"
+   ],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton",
+    "approval": "ask",
+    "maxTrip": 30
+   },
+   "history": []
+  },
+  {
+   "id": "u05",
+   "name": "Tsai Wan-Ju",
+   "simulated": true,
+   "level": "A",
+   "hand": "R",
+   "weak": "front forehand",
+   "strength": {
+    "shot": "drive",
+    "zone": "front backhand"
+   },
+   "limit": null,
+   "net": null,
+   "sessions": 0,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": false,
+    "likely": true
+   },
+   "xp": 0,
+   "badges": [],
+   "free": [
+    "Mon 14-18",
+    "Fri 19-22",
+    "Sat 13-17",
+    "Sun 15-19"
+   ],
+   "prefers": "singles",
+   "venue": "midtown",
+   "mix": {
+    "Smash": 15,
+    "Drive": 12,
+    "Clear": 14,
+    "Drop": 12,
+    "Net shot": 14,
+    "Lift": 12,
+    "Block": 8,
+    "Push": 8
+   },
+   "area": {
+    "x": 5,
+    "y": 2.7,
+    "name": "Midtown"
+   },
+   "rating": 1712,
+   "w": 0,
+   "l": 0,
+   "form": [],
+   "agent": "A simulated member (Serve's user simulation). Wan prefers singles.",
+   "rules": {},
+   "rulesComplete": true,
+   "sports": [
+    "badminton"
+   ],
+   "goal": {
+    "perWeek": 2,
+    "sport": "badminton",
+    "approval": "ask",
+    "maxTrip": 30
+   },
+   "history": []
+  },
+  {
+   "id": "u06",
+   "name": "Hsieh Bo-Wei",
+   "simulated": true,
+   "level": "A",
+   "hand": "R",
+   "weak": "mid court",
+   "strength": {
+    "shot": "clear",
+    "zone": "rear backhand"
+   },
+   "limit": null,
+   "net": null,
+   "sessions": 0,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": false,
+    "likely": true
+   },
+   "xp": 0,
+   "badges": [],
+   "free": [
+    "Tue 14-18",
+    "Wed 14-18",
+    "Thu 14-18",
+    "Sat 13-17"
+   ],
+   "prefers": "doubles",
+   "venue": "midtown",
+   "mix": {
+    "Smash": 15,
+    "Drive": 12,
+    "Clear": 14,
+    "Drop": 12,
+    "Net shot": 14,
+    "Lift": 12,
+    "Block": 8,
+    "Push": 8
+   },
+   "area": {
+    "x": 6.1,
+    "y": 4.2,
+    "name": "Midtown"
+   },
+   "rating": 1599,
+   "w": 0,
+   "l": 0,
+   "form": [],
+   "agent": "A simulated member (Serve's user simulation). Bo prefers doubles.",
+   "rules": {},
+   "rulesComplete": true,
+   "sports": [
+    "badminton",
+    "tennis"
+   ],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton",
+    "approval": "ask",
+    "maxTrip": 30
+   },
+   "history": []
+  },
+  {
+   "id": "u07",
+   "name": "Freya Ashcombe",
+   "simulated": true,
+   "level": "D",
+   "hand": "R",
+   "weak": "rear backhand",
+   "strength": {
+    "shot": "clear",
+    "zone": "front forehand"
+   },
+   "limit": null,
+   "net": null,
+   "sessions": 0,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": false,
+    "likely": true
+   },
+   "xp": 0,
+   "badges": [],
+   "free": [
+    "Tue 08-11",
+    "Wed 14-17",
+    "Thu 08-11"
+   ],
+   "prefers": "singles",
+   "venue": "lakeside",
+   "mix": {
+    "Smash": 15,
+    "Drive": 12,
+    "Clear": 14,
+    "Drop": 12,
+    "Net shot": 14,
+    "Lift": 12,
+    "Block": 8,
+    "Push": 8
+   },
+   "area": {
+    "x": 7.3,
+    "y": 6.6,
+    "name": "Lakeside"
+   },
+   "rating": 1392,
+   "w": 0,
+   "l": 0,
+   "form": [],
+   "agent": "A simulated member (Serve's user simulation). Ashcombe won't travel more than 20 minutes for a game. Ashcombe prefers singles.",
+   "rules": {
+    "maxTrip": 20
+   },
+   "rulesComplete": true,
+   "sports": [
+    "badminton"
+   ],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton",
+    "approval": "ask",
+    "maxTrip": 20
+   },
+   "history": []
+  },
+  {
+   "id": "u08",
+   "name": "Chiang Yu-Ting",
+   "simulated": true,
+   "level": "D",
+   "hand": "R",
+   "weak": "rear backhand",
+   "strength": {
+    "shot": "net shot",
+    "zone": "mid court"
+   },
+   "limit": null,
+   "net": null,
+   "sessions": 0,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": false,
+    "likely": true
+   },
+   "xp": 0,
+   "badges": [],
+   "free": [
+    "Thu 20-22",
+    "Sat 14-18",
+    "Sun 09-13"
+   ],
+   "prefers": "any",
+   "venue": "riverside",
+   "mix": {
+    "Smash": 15,
+    "Drive": 12,
+    "Clear": 14,
+    "Drop": 12,
+    "Net shot": 14,
+    "Lift": 12,
+    "Block": 8,
+    "Push": 8
+   },
+   "area": {
+    "x": 3.7,
+    "y": 4.7,
+    "name": "Riverside"
+   },
+   "rating": 1318,
+   "w": 0,
+   "l": 0,
+   "form": [],
+   "agent": "A simulated member (Serve's user simulation).",
+   "rules": {},
+   "rulesComplete": true,
+   "sports": [
+    "badminton"
+   ],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton",
+    "approval": "ask",
+    "maxTrip": 30
+   },
+   "history": []
+  },
+  {
+   "id": "u09",
+   "name": "Daniel Achterberg",
+   "simulated": true,
+   "level": "A",
+   "hand": "L",
+   "weak": "rear backhand",
+   "strength": {
+    "shot": "drive",
+    "zone": "front backhand"
+   },
+   "limit": null,
+   "net": null,
+   "sessions": 0,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": false,
+    "likely": true
+   },
+   "xp": 0,
+   "badges": [],
+   "free": [
+    "Mon 19-22",
+    "Tue 19-22",
+    "Thu 19-22",
+    "Sat 14-18"
+   ],
+   "prefers": "any",
+   "venue": "north",
+   "mix": {
+    "Smash": 15,
+    "Drive": 12,
+    "Clear": 14,
+    "Drop": 12,
+    "Net shot": 14,
+    "Lift": 12,
+    "Block": 8,
+    "Push": 8
+   },
+   "area": {
+    "x": 6.5,
+    "y": 1.3,
+    "name": "North"
+   },
+   "rating": 1632,
+   "w": 0,
+   "l": 0,
+   "form": [],
+   "agent": "A simulated member (Serve's user simulation).",
+   "rules": {},
+   "rulesComplete": true,
+   "sports": [
+    "badminton"
+   ],
+   "goal": {
+    "perWeek": 2,
+    "sport": "badminton",
+    "approval": "ask",
+    "maxTrip": 30
+   },
+   "history": []
+  },
+  {
+   "id": "u10",
+   "name": "Tseng Pin-Jung",
+   "simulated": true,
+   "level": "B",
+   "hand": "R",
+   "weak": "front backhand",
+   "strength": {
+    "shot": "drop",
+    "zone": "mid court"
+   },
+   "limit": null,
+   "net": null,
+   "sessions": 0,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": false,
+    "likely": true
+   },
+   "xp": 0,
+   "badges": [],
+   "free": [
+    "Mon 19-22",
+    "Tue 19-22",
+    "Wed 19-22",
+    "Sat 09-13"
+   ],
+   "prefers": "any",
+   "venue": "midtown",
+   "mix": {
+    "Smash": 15,
+    "Drive": 12,
+    "Clear": 14,
+    "Drop": 12,
+    "Net shot": 14,
+    "Lift": 12,
+    "Block": 8,
+    "Push": 8
+   },
+   "area": {
+    "x": 4.7,
+    "y": 5.6,
+    "name": "Midtown"
+   },
+   "rating": 1577,
+   "w": 0,
+   "l": 0,
+   "form": [],
+   "agent": "A simulated member (Serve's user simulation).",
+   "rules": {},
+   "rulesComplete": true,
+   "sports": [
+    "badminton",
+    "tennis"
+   ],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton",
+    "approval": "ask",
+    "maxTrip": 30
+   },
+   "history": []
+  },
+  {
+   "id": "u11",
+   "name": "Hung Kuan-Lin",
+   "simulated": true,
+   "level": "C",
+   "hand": "R",
+   "weak": "mid court",
+   "strength": {
+    "shot": "smash",
+    "zone": "mid court"
+   },
+   "limit": null,
+   "net": null,
+   "sessions": 0,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": false,
+    "likely": true
+   },
+   "xp": 0,
+   "badges": [],
+   "free": [
+    "Mon 14-17",
+    "Tue 09-13",
+    "Thu 14-17"
+   ],
+   "prefers": "singles",
+   "venue": "lakeside",
+   "mix": {
+    "Smash": 15,
+    "Drive": 12,
+    "Clear": 14,
+    "Drop": 12,
+    "Net shot": 14,
+    "Lift": 12,
+    "Block": 8,
+    "Push": 8
+   },
+   "area": {
+    "x": 7,
+    "y": 6.7,
+    "name": "Lakeside"
+   },
+   "rating": 1434,
+   "w": 0,
+   "l": 0,
+   "form": [],
+   "agent": "A simulated member (Serve's user simulation). Kuan prefers singles.",
+   "rules": {},
+   "rulesComplete": true,
+   "sports": [
+    "badminton"
+   ],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton",
+    "approval": "ask",
+    "maxTrip": 30
+   },
+   "history": []
+  },
+  {
+   "id": "u12",
+   "name": "Siti Rahmawati",
+   "simulated": true,
+   "level": "B",
+   "hand": "R",
+   "weak": "rear forehand",
+   "strength": {
+    "shot": "smash",
+    "zone": "front backhand"
+   },
+   "limit": null,
+   "net": null,
+   "sessions": 0,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": false,
+    "likely": true
+   },
+   "xp": 0,
+   "badges": [],
+   "free": [
+    "Thu 19-22",
+    "Fri 19-22",
+    "Sun 14-18"
+   ],
+   "prefers": "singles",
+   "venue": "riverside",
+   "mix": {
+    "Smash": 15,
+    "Drive": 12,
+    "Clear": 14,
+    "Drop": 12,
+    "Net shot": 14,
+    "Lift": 12,
+    "Block": 8,
+    "Push": 8
+   },
+   "area": {
+    "x": 3.8,
+    "y": 4.8,
+    "name": "Riverside"
+   },
+   "rating": 1535,
+   "w": 0,
+   "l": 0,
+   "form": [],
+   "agent": "A simulated member (Serve's user simulation). Rahmawati prefers singles.",
+   "rules": {},
+   "rulesComplete": true,
+   "sports": [
+    "badminton",
+    "table tennis"
+   ],
+   "goal": {
+    "perWeek": 2,
+    "sport": "badminton",
+    "approval": "ask",
+    "maxTrip": 30
+   },
+   "history": []
+  },
+  {
+   "id": "u13",
+   "name": "Pan Hsin-Yi",
+   "simulated": true,
+   "level": "D",
+   "hand": "R",
+   "weak": "rear backhand",
+   "strength": {
+    "shot": "drive",
+    "zone": "front backhand"
+   },
+   "limit": null,
+   "net": null,
+   "sessions": 0,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": false,
+    "likely": true
+   },
+   "xp": 0,
+   "badges": [],
+   "free": [
+    "Sat 14-18",
+    "Sun 09-13"
+   ],
+   "prefers": "singles",
+   "venue": "riverside",
+   "mix": {
+    "Smash": 15,
+    "Drive": 12,
+    "Clear": 14,
+    "Drop": 12,
+    "Net shot": 14,
+    "Lift": 12,
+    "Block": 8,
+    "Push": 8
+   },
+   "area": {
+    "x": 3.7,
+    "y": 5.8,
+    "name": "Riverside"
+   },
+   "rating": 1339,
+   "w": 0,
+   "l": 0,
+   "form": [],
+   "agent": "A simulated member (Serve's user simulation). Hsin prefers singles.",
+   "rules": {},
+   "rulesComplete": true,
+   "sports": [
+    "badminton"
+   ],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton",
+    "approval": "ask",
+    "maxTrip": 30
+   },
+   "history": []
+  },
+  {
+   "id": "u14",
+   "name": "Arnav Kulkarni",
+   "simulated": true,
+   "level": "C",
+   "hand": "R",
+   "weak": "front forehand",
+   "strength": {
+    "shot": "drive",
+    "zone": "rear forehand"
+   },
+   "limit": null,
+   "net": null,
+   "sessions": 0,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": false,
+    "likely": true
+   },
+   "xp": 0,
+   "badges": [],
+   "free": [
+    "Tue 19-22",
+    "Thu 19-22",
+    "Fri 19-22",
+    "Sat 09-13"
+   ],
+   "prefers": "doubles",
+   "venue": "riverside",
+   "mix": {
+    "Smash": 15,
+    "Drive": 12,
+    "Clear": 14,
+    "Drop": 12,
+    "Net shot": 14,
+    "Lift": 12,
+    "Block": 8,
+    "Push": 8
+   },
+   "area": {
+    "x": 3.6,
+    "y": 4.8,
+    "name": "Riverside"
+   },
+   "rating": 1456,
+   "w": 0,
+   "l": 0,
+   "form": [],
+   "agent": "A simulated member (Serve's user simulation). Kulkarni won't travel more than 20 minutes for a game. Kulkarni prefers doubles.",
+   "rules": {
+    "maxTrip": 20
+   },
+   "rulesComplete": true,
+   "sports": [
+    "badminton",
+    "table tennis"
+   ],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton",
+    "approval": "ask",
+    "maxTrip": 20
+   },
+   "history": []
+  },
+  {
+   "id": "u15",
+   "name": "Liao Chih-Wei",
+   "simulated": true,
+   "level": "D",
+   "hand": "R",
+   "weak": "front backhand",
+   "strength": {
+    "shot": "clear",
+    "zone": "rear forehand"
+   },
+   "limit": null,
+   "net": null,
+   "sessions": 0,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": false,
+    "likely": true
+   },
+   "xp": 0,
+   "badges": [],
+   "free": [
+    "Wed 19-22",
+    "Thu 09-13",
+    "Sat 14-18"
+   ],
+   "prefers": "doubles",
+   "venue": "north",
+   "mix": {
+    "Smash": 15,
+    "Drive": 12,
+    "Clear": 14,
+    "Drop": 12,
+    "Net shot": 14,
+    "Lift": 12,
+    "Block": 8,
+    "Push": 8
+   },
+   "area": {
+    "x": 6.6,
+    "y": 0.3,
+    "name": "North"
+   },
+   "rating": 1285,
+   "w": 0,
+   "l": 0,
+   "form": [],
+   "agent": "A simulated member (Serve's user simulation). Chih prefers doubles.",
+   "rules": {},
+   "rulesComplete": true,
+   "sports": [
+    "badminton"
+   ],
+   "goal": {
+    "perWeek": 2,
+    "sport": "badminton",
+    "approval": "ask",
+    "maxTrip": 30
+   },
+   "history": []
+  },
+  {
+   "id": "u16",
+   "name": "Camille Roussel",
+   "simulated": true,
+   "level": "D",
+   "hand": "L",
+   "weak": "mid court",
+   "strength": {
+    "shot": "smash",
+    "zone": "mid court"
+   },
+   "limit": null,
+   "net": null,
+   "sessions": 0,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": false,
+    "likely": true
+   },
+   "xp": 0,
+   "badges": [],
+   "free": [
+    "Tue 14-17",
+    "Wed 14-17",
+    "Thu 14-17"
+   ],
+   "prefers": "doubles",
+   "venue": "westgate",
+   "mix": {
+    "Smash": 15,
+    "Drive": 12,
+    "Clear": 14,
+    "Drop": 12,
+    "Net shot": 14,
+    "Lift": 12,
+    "Block": 8,
+    "Push": 8
+   },
+   "area": {
+    "x": 0.9,
+    "y": 4.1,
+    "name": "Westgate"
+   },
+   "rating": 1305,
+   "w": 0,
+   "l": 0,
+   "form": [],
+   "agent": "A simulated member (Serve's user simulation). Roussel prefers doubles.",
+   "rules": {},
+   "rulesComplete": true,
+   "sports": [
+    "badminton",
+    "tennis"
+   ],
+   "goal": {
+    "perWeek": 3,
+    "sport": "badminton",
+    "approval": "ask",
+    "maxTrip": 30
+   },
+   "history": []
+  },
+  {
+   "id": "u17",
+   "name": "Yeh Shu-Fen",
+   "simulated": true,
+   "level": "C",
+   "hand": "R",
+   "weak": "mid court",
+   "strength": {
+    "shot": "drop",
+    "zone": "front forehand"
+   },
+   "limit": null,
+   "net": null,
+   "sessions": 0,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": false,
+    "likely": true
+   },
+   "xp": 0,
+   "badges": [],
+   "free": [
+    "Tue 14-18",
+    "Fri 19-22",
+    "Sat 13-17",
+    "Sun 15-19"
+   ],
+   "prefers": "singles",
+   "venue": "midtown",
+   "mix": {
+    "Smash": 15,
+    "Drive": 12,
+    "Clear": 14,
+    "Drop": 12,
+    "Net shot": 14,
+    "Lift": 12,
+    "Block": 8,
+    "Push": 8
+   },
+   "area": {
+    "x": 3.8,
+    "y": 3.3,
+    "name": "Midtown"
+   },
+   "rating": 1414,
+   "w": 0,
+   "l": 0,
+   "form": [],
+   "agent": "A simulated member (Serve's user simulation). Shu prefers singles.",
+   "rules": {},
+   "rulesComplete": true,
+   "sports": [
+    "badminton"
+   ],
+   "goal": {
+    "perWeek": 2,
+    "sport": "badminton",
+    "approval": "ask",
+    "maxTrip": 30
+   },
+   "history": []
+  },
+  {
+   "id": "u18",
+   "name": "Hwang Jae-won",
+   "simulated": true,
+   "level": "C",
+   "hand": "R",
+   "weak": "rear backhand",
+   "strength": {
+    "shot": "drive",
+    "zone": "front backhand"
+   },
+   "limit": null,
+   "net": null,
+   "sessions": 0,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": false,
+    "likely": true
+   },
+   "xp": 0,
+   "badges": [],
+   "free": [
+    "Tue 19-22",
+    "Sat 14-18",
+    "Sun 14-18"
+   ],
+   "prefers": "any",
+   "venue": "lakeside",
+   "mix": {
+    "Smash": 15,
+    "Drive": 12,
+    "Clear": 14,
+    "Drop": 12,
+    "Net shot": 14,
+    "Lift": 12,
+    "Block": 8,
+    "Push": 8
+   },
+   "area": {
+    "x": 6.5,
+    "y": 5.7,
+    "name": "Lakeside"
+   },
+   "rating": 1429,
+   "w": 0,
+   "l": 0,
+   "form": [],
+   "agent": "A simulated member (Serve's user simulation).",
+   "rules": {},
+   "rulesComplete": true,
+   "sports": [
+    "badminton",
+    "tennis"
+   ],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton",
+    "approval": "ask",
+    "maxTrip": 30
+   },
+   "history": []
+  },
+  {
+   "id": "u19",
+   "name": "Fang Ting-Yu",
+   "simulated": true,
+   "level": "B",
+   "hand": "L",
+   "weak": "front backhand",
+   "strength": {
+    "shot": "smash",
+    "zone": "rear backhand"
+   },
+   "limit": null,
+   "net": null,
+   "sessions": 0,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": false,
+    "likely": true
+   },
+   "xp": 0,
+   "badges": [],
+   "free": [
+    "Wed 20-22",
+    "Sat 08-11"
+   ],
+   "prefers": "any",
+   "venue": "lakeside",
+   "mix": {
+    "Smash": 15,
+    "Drive": 12,
+    "Clear": 14,
+    "Drop": 12,
+    "Net shot": 14,
+    "Lift": 12,
+    "Block": 8,
+    "Push": 8
+   },
+   "area": {
+    "x": 7.3,
+    "y": 6.5,
+    "name": "Lakeside"
+   },
+   "rating": 1603,
+   "w": 0,
+   "l": 0,
+   "form": [],
+   "agent": "A simulated member (Serve's user simulation). Ting has to be home for the kids, so nothing that ends after 21:45.",
+   "rules": {
+    "endBy": "21:45"
+   },
+   "rulesComplete": true,
+   "sports": [
+    "badminton"
+   ],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton",
+    "approval": "ask",
+    "maxTrip": 30
+   },
+   "history": []
+  },
+  {
+   "id": "u20",
+   "name": "Marta Szymanek",
+   "simulated": true,
+   "level": "A",
+   "hand": "R",
+   "weak": "mid court",
+   "strength": {
+    "shot": "net shot",
+    "zone": "rear forehand"
+   },
+   "limit": null,
+   "net": null,
+   "sessions": 0,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": false,
+    "likely": true
+   },
+   "xp": 0,
+   "badges": [],
+   "free": [
+    "Mon 17-20",
+    "Wed 17-20",
+    "Sat 09-12"
+   ],
+   "prefers": "doubles",
+   "venue": "riverside",
+   "mix": {
+    "Smash": 15,
+    "Drive": 12,
+    "Clear": 14,
+    "Drop": 12,
+    "Net shot": 14,
+    "Lift": 12,
+    "Block": 8,
+    "Push": 8
+   },
+   "area": {
+    "x": 2.2,
+    "y": 5.3,
+    "name": "Riverside"
+   },
+   "rating": 1620,
+   "w": 0,
+   "l": 0,
+   "form": [],
+   "agent": "A simulated member (Serve's user simulation). Szymanek prefers doubles.",
+   "rules": {},
+   "rulesComplete": true,
+   "sports": [
+    "badminton",
+    "table tennis"
+   ],
+   "goal": {
+    "perWeek": 1,
+    "sport": "badminton",
+    "approval": "ask",
+    "maxTrip": 30
+   },
+   "history": []
+  }
+ ]
+}

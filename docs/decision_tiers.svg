@@ -1,0 +1,51 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 780 500" width="780" height="500" font-family="Inter, Segoe UI, Helvetica, Arial, sans-serif" role="img" aria-labelledby="t d">
+<!-- Generated from submission/results/decider_summary.json, decider_dev_summary.json, cascade_summary.json, persona_eval.json and autopilot_eval_route*.json. -->
+<title id="t">One member's decision: what each tier costs, and how often it is right</title>
+<desc id="d">Code and routing: 0 tokens; kept the member's rule in 60 of 60 talks (the model alone: 59 of 60). One-pass decider (off): 1 token; agreed with the full answer 62.2%; the member's stated preference 12 of 32. Quick pick (off) at a 150-token budget: 161 tokens written; right 4.2% of 120. Quick pick (off) at a 300-token budget: 285 tokens written; right 34.2% of 120. Quick pick (off) at a 600-token budget: 402 tokens written; right 75.8% of 120. Full answer: 606 tokens; agreed with itself 73.5%; the member's stated preference 27 of 32. Distilled student (on, Llama 3.2 1B in int4 on the CPU): writes 0 tokens; agreed with the full answer 60.7%; the member's stated preference 30 of 32.</desc>
+<rect width="780" height="500" rx="10" fill="#fcfcfb"/>
+<text x="40" y="28" font-size="16" font-weight="600" fill="#0b0b0b">One member's decision: what each tier costs, and how often it is right</text>
+<text x="40" y="47" font-size="12" fill="#52514e">Muse Glimmer. Simulated members. Tokens written per decision, reasoning included; seconds on the RTX 3090.</text>
+<g font-size="11" fill="#52514e"><circle cx="46" cy="66" r="4.5" fill="#eb6834"/><text x="56" y="70">picks the same time as Glimmer's full answer (196 cases)</text>
+<rect x="363" y="61.5" width="9" height="9" fill="#2a78d6"/><text x="378" y="70">right against an answer code can grade</text>
+<text x="606" y="70">hollow: switched off</text></g>
+<line x1="90" x2="565" y1="380" y2="380" stroke="#e7e6e1" stroke-width="1"/><text x="84" y="384" font-size="11" fill="#52514e" text-anchor="end">0%</text>
+<line x1="90" x2="565" y1="307.5" y2="307.5" stroke="#e7e6e1" stroke-width="1"/><text x="84" y="311.5" font-size="11" fill="#52514e" text-anchor="end">25%</text>
+<line x1="90" x2="565" y1="235" y2="235" stroke="#e7e6e1" stroke-width="1"/><text x="84" y="239" font-size="11" fill="#52514e" text-anchor="end">50%</text>
+<line x1="90" x2="565" y1="162.5" y2="162.5" stroke="#e7e6e1" stroke-width="1"/><text x="84" y="166.5" font-size="11" fill="#52514e" text-anchor="end">75%</text>
+<line x1="90" x2="565" y1="90" y2="90" stroke="#e7e6e1" stroke-width="1"/><text x="84" y="94" font-size="11" fill="#52514e" text-anchor="end">100%</text>
+<text x="190" y="398" font-size="11" fill="#52514e" text-anchor="middle">1</text>
+<text x="315" y="398" font-size="11" fill="#52514e" text-anchor="middle">10</text>
+<text x="440" y="398" font-size="11" fill="#52514e" text-anchor="middle">100</text>
+<text x="565" y="398" font-size="11" fill="#52514e" text-anchor="middle">1,000</text>
+<text x="112" y="398" font-size="11" fill="#52514e" text-anchor="middle">0</text>
+<path d="M147,386 l4,-12 M153,386 l4,-12" stroke="#52514e" stroke-width="1"/>
+<text x="377.5" y="418" font-size="12" fill="#52514e" text-anchor="middle">Tokens Glimmer writes per decision (log scale)</text>
+<text x="20" y="235" font-size="12" fill="#52514e" text-anchor="middle" transform="rotate(-90 20 235)">Same as the full answer, or right</text>
+<rect x="107.5" y="85.5" width="9" height="9" fill="#2a78d6" stroke="#2a78d6" stroke-width="2"><title>Code: kept the member's rule in 60 of 60 talks, by construction</title></rect>
+<text x="150" y="94" font-size="11" fill="#52514e" text-anchor="start"><tspan x="150" dy="0" font-weight="600" fill="#0b0b0b">Code and routing</tspan><tspan x="150" dy="14">rule kept 60 of 60, by construction</tspan><tspan x="150" dy="14">(Glimmer alone 59 of 60)</tspan></text>
+<line x1="183" x2="183" y1="221.95" y2="177.58" stroke="#eb6834" stroke-width="1.5"/><line x1="179" x2="187" y1="221.95" y2="221.95" stroke="#eb6834" stroke-width="1.5"/><line x1="179" x2="187" y1="177.58" y2="177.58" stroke="#eb6834" stroke-width="1.5"/>
+<circle cx="183" cy="199.62" r="5" fill="#fcfcfb" stroke="#eb6834" stroke-width="2"><title>Decider: same as the full answer 62.2% [54.5%, 69.8%]</title></circle>
+<line x1="197" x2="197" y1="323.74" y2="210.06" stroke="#2a78d6" stroke-width="1.5"/><line x1="193" x2="201" y1="323.74" y2="323.74" stroke="#2a78d6" stroke-width="1.5"/><line x1="193" x2="201" y1="210.06" y2="210.06" stroke="#2a78d6" stroke-width="1.5"/>
+<rect x="192.5" y="266.75" width="9" height="9" fill="#fcfcfb" stroke="#2a78d6" stroke-width="2"><title>Decider: the member's stated preference 12 of 32</title></rect>
+<text x="210" y="195.62" font-size="11" fill="#52514e" text-anchor="start"><tspan x="210" dy="0" font-weight="600" fill="#0b0b0b">One-pass decider (off)</tspan><tspan x="210" dy="14">1 token, 0.53 s</tspan><tspan x="210" dy="14">same as full 62.2%</tspan><tspan x="210" dy="14">preference 12 of 32</tspan></text>
+<path d="M465.9,367.8 L496.9,280.8 L515.5,160.2" fill="none" stroke="#2a78d6" stroke-width="1.5" stroke-dasharray="4 3"/>
+<line x1="465.8532345039812" x2="465.8532345039812" y1="377.39" y2="356.8" stroke="#2a78d6" stroke-width="1.5"/><line x1="461.8532345039812" x2="469.8532345039812" y1="377.39" y2="377.39" stroke="#2a78d6" stroke-width="1.5"/><line x1="461.8532345039812" x2="469.8532345039812" y1="356.8" y2="356.8" stroke="#2a78d6" stroke-width="1.5"/>
+<rect x="461.3532345039812" y="363.32" width="9" height="9" fill="#fcfcfb" stroke="#2a78d6" stroke-width="2"><title>Quick pick, 150-token budget: 161 tokens written, right 4.2% of 120 (115 empty)</title></rect>
+<line x1="496.8556075010638" x2="496.8556075010638" y1="303.73" y2="257.91" stroke="#2a78d6" stroke-width="1.5"/><line x1="492.8556075010638" x2="500.8556075010638" y1="303.73" y2="303.73" stroke="#2a78d6" stroke-width="1.5"/><line x1="492.8556075010638" x2="500.8556075010638" y1="257.91" y2="257.91" stroke="#2a78d6" stroke-width="1.5"/>
+<rect x="492.3556075010638" y="276.32" width="9" height="9" fill="#fcfcfb" stroke="#2a78d6" stroke-width="2"><title>Quick pick, 300-token budget: 285 tokens written, right 34.2% of 120 (79 empty)</title></rect>
+<line x1="515.5282566355587" x2="515.5282566355587" y1="186.57" y2="134.95000000000002" stroke="#2a78d6" stroke-width="1.5"/><line x1="511.5282566355587" x2="519.5282566355587" y1="186.57" y2="186.57" stroke="#2a78d6" stroke-width="1.5"/><line x1="511.5282566355587" x2="519.5282566355587" y1="134.95000000000002" y2="134.95000000000002" stroke="#2a78d6" stroke-width="1.5"/>
+<rect x="511.0282566355587" y="155.68" width="9" height="9" fill="#fcfcfb" stroke="#2a78d6" stroke-width="2"><title>Quick pick, 600-token budget: 402 tokens written, right 75.8% of 120 (26 empty)</title></rect>
+<text x="456.8532345039812" y="371.82" font-size="10" fill="#52514e" text-anchor="end">budget 150</text>
+<text x="487.8556075010638" y="284.82" font-size="10" fill="#52514e" text-anchor="end">budget 300</text>
+<text x="501.5282566355587" y="156.18" font-size="11" fill="#52514e" text-anchor="end"><tspan x="501.5282566355587" dy="0" font-weight="600" fill="#0b0b0b">Quick pick (off)</tspan><tspan x="501.5282566355587" dy="14">402 tokens at a 600 budget, 24.1 s</tspan><tspan x="501.5282566355587" dy="14">right 75.8% of 120; 26 empty</tspan></text>
+<line x1="543.8090780207858" x2="543.8090780207858" y1="183.08999999999997" y2="150.03" stroke="#eb6834" stroke-width="1.5"/><line x1="539.8090780207858" x2="547.8090780207858" y1="183.08999999999997" y2="183.08999999999997" stroke="#eb6834" stroke-width="1.5"/><line x1="539.8090780207858" x2="547.8090780207858" y1="150.03" y2="150.03" stroke="#eb6834" stroke-width="1.5"/>
+<circle cx="543.8090780207858" cy="166.85" r="5" fill="#eb6834" stroke="#eb6834" stroke-width="2"><title>Full answer: same as itself 73.5% [67.9%, 79.3%]</title></circle>
+<line x1="553.8090780207858" x2="553.8090780207858" y1="174.10000000000002" y2="105.66000000000003" stroke="#2a78d6" stroke-width="1.5"/><line x1="549.8090780207858" x2="557.8090780207858" y1="174.10000000000002" y2="174.10000000000002" stroke="#2a78d6" stroke-width="1.5"/><line x1="549.8090780207858" x2="557.8090780207858" y1="105.66000000000003" y2="105.66000000000003" stroke="#2a78d6" stroke-width="1.5"/>
+<rect x="549.3090780207858" y="130.74" width="9" height="9" fill="#2a78d6" stroke="#2a78d6" stroke-width="2"><title>Full answer: the member's stated preference 27 of 32</title></rect>
+<text x="581" y="131.24" font-size="11" fill="#52514e" text-anchor="start"><tspan x="581" dy="0" font-weight="600" fill="#0b0b0b">Full answer</tspan><tspan x="581" dy="14">606 tokens, 40.4 s</tspan><tspan x="581" dy="14">same as itself 73.5%</tspan><tspan x="581" dy="14">preference 27 of 32</tspan></text>
+<!-- the distilled student as served (1B, Q4_K_M, on the CPU): docs/decision_model.md (int4), the decider's 196 cases; submission/results/decision_model/int4_decider_cases.json -->
+<circle cx="137" cy="203.97" r="5" fill="#eb6834" stroke="#eb6834" stroke-width="2"><title>Distilled student (1B, int4): same as the full answer 60.7%</title></circle>
+<rect x="132.5" y="103.62" width="9" height="9" fill="#2a78d6" stroke="#2a78d6" stroke-width="2"><title>Distilled student (1B, int4): the member's stated preference 30 of 32</title></rect>
+<text x="150" y="140" font-size="10.5" fill="#52514e" text-anchor="start"><tspan x="150" dy="0"><tspan font-weight="600" fill="#0b0b0b">Distilled student (on)</tspan>: Llama 3.2 1B, int4, CPU</tspan><tspan x="150" dy="13">0 tokens, 0.9 s; same as full 60.7%</tspan><tspan x="150" dy="13">preference 30 of 32</tspan></text>
+<text x="40" y="450" font-size="10.5" fill="#52514e"><tspan x="40">Bars: 95% intervals from a bootstrap over members. Decider and full answer: 196 cases from 152 members, 32 with a stated preference</tspan><tspan x="40" dy="13">(decider_summary.json). Quick pick: 120 labelled decisions from 33 members (cascade_summary.json). Code: 60 rule talks (persona_eval.json); routing also cut</tspan><tspan x="40" dy="13">the members' model answers in the Autopilot's eight weeks from 43 and 43 to 10 and 11 (autopilot_eval_route*.json).</tspan></text>
+</svg>

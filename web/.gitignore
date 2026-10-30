@@ -1,0 +1,20 @@
+# Made by tools: the installed packages and the build
+**/node_modules/
+**/dist/
+# this machine's own settings, the gateway's token among them (.env.local)
+**/*.local
+# Not in the repository: the scripts that prepare the match data, the data made from broadcast footage, the footage
+# itself and the speech model. The demo club and its venues are our own, so they are published; so is the 3D anatomy
+# model in public/body/ (BodyParts3D, CC BY 4.0: its credit and the changes made to it are in public/body/ATTRIBUTION.md).
+**/scripts/
+public/data/*
+!public/data/club.json
+!public/data/venues.json
+# the sample health export (made up) and the measured Autopilot numbers the About page shows
+!public/data/sample/
+!public/data/agent_eval.json
+/public/media/*
+!/public/media/favicon.svg
+# short sample clips for the highlight reel, trimmed from CC BY 3.0 videos (CREDITS.md)
+!public/media/samples/
+/public/models/

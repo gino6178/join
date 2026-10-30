@@ -1,0 +1,65 @@
+/* The web features' own styles (docs/web_features.md): settings rows, what your agent remembers on your server, what
+   a talk says about itself, and the safety checks. On the design tokens of theme.css. */
+
+/* ---------- settings on You: a row per setting, the switch on the right ---------- */
+.settings { display: grid; gap: var(--s4); padding: var(--s4) var(--s5); }
+.setting { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--s4); }
+.setting + .setting { border-top: 1px solid var(--rule); padding-top: var(--s4); }
+.setting-txt { min-width: 0; display: grid; gap: 2px; }
+.setting-txt b { font: 650 16px/1.35 var(--font); }
+.setting-txt p { margin: 0; }
+.switch { flex: none; position: relative; width: 52px; height: 32px; margin-top: 2px; border-radius: var(--r-pill); border: 1px solid var(--rule-strong); background: var(--control-hover); cursor: pointer; transition: background var(--dur-1), border-color var(--dur-1); }
+.switch i { position: absolute; top: 3px; left: 3px; width: 24px; height: 24px; border-radius: 50%; background: var(--card); box-shadow: 0 1px 3px rgb(0 0 0 / .25); transition: transform var(--dur-2) var(--ease); }
+.switch[aria-checked="true"] { background: var(--agent); border-color: var(--agent); }
+.switch[aria-checked="true"] i { transform: translateX(20px); background: #fff; }
+.switch:disabled { opacity: .5; cursor: not-allowed; }
+/* (a 44 px touch target around the 32 px track) */
+.switch::after { content: ""; position: absolute; inset: -7px -4px; }
+
+/* ---------- what your agent remembers on your server (ServerMemory) ---------- */
+.sm-panel { display: grid; gap: var(--s3); margin-bottom: var(--s6); }
+.sm-panel > p { margin: 0; max-width: 80ch; }
+.sm-panel .seg { margin: 0; }
+.sm-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: var(--s2) var(--s3); }
+.sm-head .panel-h { margin: 0; }
+.sm-tell { display: flex; gap: var(--s2); flex-wrap: wrap; }
+.sm-tell input { flex: 1 1 240px; min-width: 0; }
+.sm-notes { list-style: none; margin: 0; padding: 0; display: grid; gap: var(--s2); }
+.sm-notes li { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 2px var(--s3); padding: var(--s3) var(--s3) var(--s3) var(--s4); border-radius: var(--r-md); background: var(--surface-2); }
+.sm-notes p { margin: 0; color: var(--ink); overflow-wrap: anywhere; }
+.sm-notes .tiny { grid-column: 1; }
+.sm-notes .icon-btn { grid-row: 1 / span 2; grid-column: 2; }
+.sm-device-h { margin: 0 0 var(--s3) !important; }
+/* a note that a newer one replaced, or that is past its last day: kept, struck through, no longer followed */
+.sm-notes li.sm-old { background: none; border: 1px dashed var(--rule); }
+.sm-notes li.sm-old p { color: var(--ink-3); text-decoration: line-through; text-decoration-color: var(--ink-3); }
+.sm-notes .sm-why { grid-column: 1; margin: 0; font-size: 13px; line-height: 1.4; color: var(--ink-3); overflow-wrap: anywhere; }
+.sm-rule { grid-column: 1; justify-self: start; display: inline-flex; align-items: center; gap: 5px; padding: 2px 10px; border-radius: var(--r-pill); font: 600 12px/1.6 var(--font); color: var(--agent); background: color-mix(in srgb, var(--agent) 12%, transparent); }
+.sm-rule.off { color: var(--ink-3); background: var(--control); text-decoration: line-through; }
+.sm-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s2) var(--s3); }
+.sm-forget { display: flex; gap: var(--s2); flex-wrap: wrap; flex: 1 1 280px; }
+.sm-forget input { flex: 1 1 180px; min-width: 0; }
+
+/* ---------- what a talk says about itself: calendars mode, the hold's countdown, the agents' cards (TalkFacts) ---------- */
+.talk-facts { display: flex; flex-wrap: wrap; align-items: center; gap: 4px var(--s3); margin: 0; font-size: 13px; line-height: 1.4; color: var(--ink-3); }
+.talk-facts:empty { display: none; }
+.talk-mode, .hold-clock, .cards-note { display: inline-flex; align-items: center; gap: 5px; min-width: 0; }
+.talk-mode { font-weight: 600; color: var(--ink-2); }
+.talk-mode.private .icon { color: var(--agent); }
+.hold-clock { color: var(--ink-2); }
+.hold-clock b { font-weight: 700; color: var(--ink); min-width: 4ch; }
+.hold-clock .icon { color: var(--agent); }
+.hold-clock.soon b, .hold-clock.soon .icon { color: var(--warn); }
+.hold-clock.gone { color: var(--ink-3); }
+.cards-note .icon { color: var(--ink-3); }
+.cards-note.bad, .cards-note.bad .icon { color: var(--bad); }
+
+/* ---------- safety checks, in plain words (SafetyList): when, the verdict and what happened, never the text ---------- */
+.safety-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.safety-list li { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 2px var(--s2); align-items: start; font-size: 14px; color: var(--ink-2); }
+.safety-list li > .icon { margin-top: 2px; color: var(--good); }
+.safety-list li.flagged > .icon { color: var(--bad); }
+.safety-list li.unchecked > .icon { color: var(--ink-3); }
+.safety-list b { color: var(--ink); font-weight: 600; }
+.safety-list time { font-size: 13px; color: var(--ink-3); white-space: nowrap; }
+.safety-list .tiny { grid-column: 2 / -1; }

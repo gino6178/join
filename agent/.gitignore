@@ -1,0 +1,5 @@
+# The gateway's secrets, what it stores about players, and the installed packages stay on the machine it runs on
+# (each at any depth below agent/).
+**/.env
+**/data/
+**/node_modules/

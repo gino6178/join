@@ -1,0 +1,7258 @@
+[
+ {
+  "id": "d2",
+  "member": {
+   "id": "sim-arun",
+   "name": "Arun",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Thu 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "Tuesday is Arun's favourite day to play. At weekends Arun won't start before 10:00. Arun has an evening class on Thursdays until December and can't play then."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Tue",
+   "date": "2026-11-03",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Tue 3 Nov 19:00–20:30 at North Hall, court 2"
+  },
+  "alts": [
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sat 7 Nov 10:00–11:30 at North Hall, court 2"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Thu 5 Nov 19:00–20:30 at North Hall, court 2"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Thu 5 Nov 18:00–19:30 at North Hall, court 2"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Thu",
+   "earliest": 10,
+   "only": null,
+   "day": "Tue",
+   "part": null
+  }
+ },
+ {
+  "id": "d4",
+  "member": {
+   "id": "sim-arun",
+   "name": "Arun",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Thu 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "Tuesday is Arun's favourite day to play. At weekends Arun won't start before 10:00. Arun has an evening class on Thursdays until December and can't play then."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Sat",
+   "date": "2026-11-07",
+   "start": "09:00",
+   "end": "10:30",
+   "h": 9,
+   "text": "Sat 7 Nov 09:00–10:30 at Lakeside Courts, court 3"
+  },
+  "alts": [
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Thu 5 Nov 20:00–21:30 at Lakeside Courts, court 3"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sat 7 Nov 10:00–11:30 at Lakeside Courts, court 3"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at Lakeside Courts, court 3"
+   }
+  ],
+  "gold": "D",
+  "why": {
+   "works": false,
+   "out": "Thu",
+   "earliest": 10,
+   "only": null,
+   "day": "Tue",
+   "part": null
+  }
+ },
+ {
+  "id": "d5",
+  "member": {
+   "id": "sim-arun",
+   "name": "Arun",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Thu 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "Tuesday is Arun's favourite day to play. At weekends Arun won't start before 10:00. Arun has an evening class on Thursdays until December and can't play then."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Thu",
+   "date": "2026-11-05",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Thu 5 Nov 18:00–19:30 at North Hall, court 1"
+  },
+  "alts": [
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Thu 5 Nov 20:00–21:30 at North Hall, court 1"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sat 7 Nov 10:00–11:30 at North Hall, court 1"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sat 7 Nov 09:00–10:30 at North Hall, court 1"
+   }
+  ],
+  "gold": "C",
+  "why": {
+   "works": false,
+   "out": "Thu",
+   "earliest": 10,
+   "only": null,
+   "day": "Tue",
+   "part": null
+  }
+ },
+ {
+  "id": "d6",
+  "member": {
+   "id": "sim-bea",
+   "name": "Bea",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Wed 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Bea has an evening class on Wednesdays until December and can't play then. At weekends Bea won't start before 11:00. Monday is Bea's favourite day to play."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Mon",
+   "date": "2026-11-02",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Mon 2 Nov 20:00–21:30 at North Hall, court 1"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Tue 3 Nov 18:00–19:30 at North Hall, court 1"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "11:00",
+    "end": "12:30",
+    "h": 11,
+    "text": "Sun 8 Nov 11:00–12:30 at North Hall, court 1"
+   },
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Mon 2 Nov 18:00–19:30 at North Hall, court 1"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Wed",
+   "earliest": 11,
+   "only": null,
+   "day": "Mon",
+   "part": null
+  }
+ },
+ {
+  "id": "d26",
+  "member": {
+   "id": "sim-bea",
+   "name": "Bea",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Wed 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Bea has an evening class on Wednesdays until December and can't play then. At weekends Bea won't start before 11:00. Monday is Bea's favourite day to play."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Wed",
+   "date": "2026-11-04",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Wed 4 Nov 20:00–21:30 at North Hall, court 1"
+  },
+  "alts": [
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sun 8 Nov 09:00–10:30 at North Hall, court 1"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sun 8 Nov 10:00–11:30 at North Hall, court 1"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at North Hall, court 1"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Wed",
+   "earliest": 11,
+   "only": null,
+   "day": "Mon",
+   "part": null
+  }
+ },
+ {
+  "id": "d27",
+  "member": {
+   "id": "sim-bea",
+   "name": "Bea",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Wed 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Bea has an evening class on Wednesdays until December and can't play then. At weekends Bea won't start before 11:00. Monday is Bea's favourite day to play."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "12:00",
+   "end": "13:30",
+   "h": 12,
+   "text": "Sun 8 Nov 12:00–13:30 at North Hall, court 2"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Tue 3 Nov 19:00–20:30 at North Hall, court 2"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Wed 4 Nov 19:00–20:30 at North Hall, court 2"
+   },
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Mon 2 Nov 20:00–21:30 at North Hall, court 2"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Wed",
+   "earliest": 11,
+   "only": null,
+   "day": "Mon",
+   "part": null
+  }
+ },
+ {
+  "id": "d29",
+  "member": {
+   "id": "sim-carlos",
+   "name": "Carlos",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Wed 18-22",
+    "Thu 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "If the time has to move, Carlos likes Sundays best. Wednesday doesn't work for Carlos at the moment."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Wed",
+   "date": "2026-11-04",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Wed 4 Nov 18:00–19:30 at Lakeside Courts, court 5"
+  },
+  "alts": [
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Thu 5 Nov 18:00–19:30 at Lakeside Courts, court 5"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Wed 4 Nov 20:00–21:30 at Lakeside Courts, court 5"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Wed 4 Nov 19:00–20:30 at Lakeside Courts, court 5"
+   }
+  ],
+  "gold": "B",
+  "why": {
+   "works": false,
+   "out": "Wed",
+   "earliest": null,
+   "only": null,
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d32",
+  "member": {
+   "id": "sim-carlos",
+   "name": "Carlos",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Wed 18-22",
+    "Thu 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "If the time has to move, Carlos likes Sundays best. Wednesday doesn't work for Carlos at the moment."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Wed",
+   "date": "2026-11-04",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Wed 4 Nov 19:00–20:30 at Lakeside Courts, court 4"
+  },
+  "alts": [
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at Lakeside Courts, court 4"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "11:00",
+    "end": "12:30",
+    "h": 11,
+    "text": "Sun 8 Nov 11:00–12:30 at Lakeside Courts, court 4"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Thu 5 Nov 18:00–19:30 at Lakeside Courts, court 4"
+   }
+  ],
+  "gold": "C",
+  "why": {
+   "works": false,
+   "out": "Wed",
+   "earliest": null,
+   "only": null,
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d34",
+  "member": {
+   "id": "sim-carlos",
+   "name": "Carlos",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Wed 18-22",
+    "Thu 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "If the time has to move, Carlos likes Sundays best. Wednesday doesn't work for Carlos at the moment."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Thu",
+   "date": "2026-11-05",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Thu 5 Nov 20:00–21:30 at Lakeside Courts, court 5"
+  },
+  "alts": [
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sun 8 Nov 12:00–13:30 at Lakeside Courts, court 5"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sun 8 Nov 09:00–10:30 at Lakeside Courts, court 5"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Thu 5 Nov 19:00–20:30 at Lakeside Courts, court 5"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Wed",
+   "earliest": null,
+   "only": null,
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d202",
+  "member": {
+   "id": "sim-dana",
+   "name": "Dana",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Fri 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "Dana needs a slow start at weekends: nothing before 10:00 on Saturday or Sunday. Dana works late on Fridays this month, so Friday evenings are out. If the time has to move, Dana likes Saturdays best."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Fri",
+   "date": "2026-11-06",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Fri 6 Nov 20:00–21:30 at Lakeside Courts, court 4"
+  },
+  "alts": [
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Fri 6 Nov 19:00–20:30 at Lakeside Courts, court 4"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "08:00",
+    "end": "09:30",
+    "h": 8,
+    "text": "Sat 7 Nov 08:00–09:30 at Lakeside Courts, court 4"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sat 7 Nov 09:00–10:30 at Lakeside Courts, court 4"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Fri",
+   "earliest": 10,
+   "only": null,
+   "day": "Sat",
+   "part": null
+  }
+ },
+ {
+  "id": "d203",
+  "member": {
+   "id": "sim-emeka",
+   "name": "Emeka",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Thu 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Emeka prefers evenings. Emeka works late on Thursdays this month, so Thursday evenings are out."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sat",
+   "date": "2026-11-07",
+   "start": "08:00",
+   "end": "09:30",
+   "h": 8,
+   "text": "Sat 7 Nov 08:00–09:30 at Riverside Sports Centre, court 1"
+  },
+  "alts": [
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "11:00",
+    "end": "12:30",
+    "h": 11,
+    "text": "Sun 8 Nov 11:00–12:30 at Riverside Sports Centre, court 1"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sat 7 Nov 10:00–11:30 at Riverside Sports Centre, court 1"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sun 8 Nov 10:00–11:30 at Riverside Sports Centre, court 1"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Thu",
+   "earliest": null,
+   "only": null,
+   "day": null,
+   "part": "evening"
+  }
+ },
+ {
+  "id": "d217",
+  "member": {
+   "id": "sim-emeka",
+   "name": "Emeka",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Thu 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Emeka prefers evenings. Emeka works late on Thursdays this month, so Thursday evenings are out."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Thu",
+   "date": "2026-11-05",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Thu 5 Nov 20:00–21:30 at Riverside Sports Centre, court 1"
+  },
+  "alts": [
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Mon 2 Nov 20:00–21:30 at Riverside Sports Centre, court 1"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sun 8 Nov 12:00–13:30 at Riverside Sports Centre, court 1"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Thu 5 Nov 19:00–20:30 at Riverside Sports Centre, court 1"
+   }
+  ],
+  "gold": "B",
+  "why": {
+   "works": false,
+   "out": "Thu",
+   "earliest": null,
+   "only": null,
+   "day": null,
+   "part": "evening"
+  }
+ },
+ {
+  "id": "d228",
+  "member": {
+   "id": "sim-emeka",
+   "name": "Emeka",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Thu 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Emeka prefers evenings. Emeka works late on Thursdays this month, so Thursday evenings are out."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Thu",
+   "date": "2026-11-05",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Thu 5 Nov 19:00–20:30 at Midtown Community Gym, court 2"
+  },
+  "alts": [
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sun 8 Nov 12:00–13:30 at Midtown Community Gym, court 2"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "11:00",
+    "end": "12:30",
+    "h": 11,
+    "text": "Sat 7 Nov 11:00–12:30 at Midtown Community Gym, court 2"
+   },
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Mon 2 Nov 20:00–21:30 at Midtown Community Gym, court 2"
+   }
+  ],
+  "gold": "D",
+  "why": {
+   "works": false,
+   "out": "Thu",
+   "earliest": null,
+   "only": null,
+   "day": null,
+   "part": "evening"
+  }
+ },
+ {
+  "id": "d229",
+  "member": {
+   "id": "sim-fatima",
+   "name": "Fatima",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Wed 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "At weekends Fatima won't start before 10:00. Monday is Fatima's favourite day to play. Fatima has an evening class on Wednesdays until December and can't play then."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Mon",
+   "date": "2026-11-02",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Mon 2 Nov 18:00–19:30 at Riverside Sports Centre, court 2"
+  },
+  "alts": [
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sun 8 Nov 10:00–11:30 at Riverside Sports Centre, court 2"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at Riverside Sports Centre, court 2"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sun 8 Nov 12:00–13:30 at Riverside Sports Centre, court 2"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Wed",
+   "earliest": 10,
+   "only": null,
+   "day": "Mon",
+   "part": null
+  }
+ },
+ {
+  "id": "d269",
+  "member": {
+   "id": "sim-fatima",
+   "name": "Fatima",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Wed 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "At weekends Fatima won't start before 10:00. Monday is Fatima's favourite day to play. Fatima has an evening class on Wednesdays until December and can't play then."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "09:00",
+   "end": "10:30",
+   "h": 9,
+   "text": "Sun 8 Nov 09:00–10:30 at Riverside Sports Centre, court 2"
+  },
+  "alts": [
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Wed 4 Nov 19:00–20:30 at Riverside Sports Centre, court 2"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at Riverside Sports Centre, court 2"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Wed 4 Nov 20:00–21:30 at Riverside Sports Centre, court 2"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Wed",
+   "earliest": 10,
+   "only": null,
+   "day": "Mon",
+   "part": null
+  }
+ },
+ {
+  "id": "d271",
+  "member": {
+   "id": "sim-fatima",
+   "name": "Fatima",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Wed 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "At weekends Fatima won't start before 10:00. Monday is Fatima's favourite day to play. Fatima has an evening class on Wednesdays until December and can't play then."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "12:00",
+   "end": "13:30",
+   "h": 12,
+   "text": "Sun 8 Nov 12:00–13:30 at Midtown Community Gym, court 3"
+  },
+  "alts": [
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Wed 4 Nov 19:00–20:30 at Midtown Community Gym, court 3"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Wed 4 Nov 20:00–21:30 at Midtown Community Gym, court 3"
+   },
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Mon 2 Nov 19:00–20:30 at Midtown Community Gym, court 3"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Wed",
+   "earliest": 10,
+   "only": null,
+   "day": "Mon",
+   "part": null
+  }
+ },
+ {
+  "id": "d453",
+  "member": {
+   "id": "sim-hiro",
+   "name": "Hiro",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Thu 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Monday doesn't work for Hiro at the moment. Hiro prefers mornings."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Mon",
+   "date": "2026-11-02",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Mon 2 Nov 18:00–19:30 at North Hall, court 1"
+  },
+  "alts": [
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Thu 5 Nov 19:00–20:30 at North Hall, court 1"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sun 8 Nov 12:00–13:30 at North Hall, court 1"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sat 7 Nov 10:00–11:30 at North Hall, court 1"
+   }
+  ],
+  "gold": "D",
+  "why": {
+   "works": false,
+   "out": "Mon",
+   "earliest": null,
+   "only": null,
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d456",
+  "member": {
+   "id": "sim-hiro",
+   "name": "Hiro",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Thu 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Monday doesn't work for Hiro at the moment. Hiro prefers mornings."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Mon",
+   "date": "2026-11-02",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Mon 2 Nov 18:00–19:30 at Midtown Community Gym, court 1"
+  },
+  "alts": [
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sat 7 Nov 12:00–13:30 at Midtown Community Gym, court 1"
+   },
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Mon 2 Nov 19:00–20:30 at Midtown Community Gym, court 1"
+   },
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Mon 2 Nov 20:00–21:30 at Midtown Community Gym, court 1"
+   }
+  ],
+  "gold": "B",
+  "why": {
+   "works": false,
+   "out": "Mon",
+   "earliest": null,
+   "only": null,
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d457",
+  "member": {
+   "id": "sim-hiro",
+   "name": "Hiro",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Thu 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Monday doesn't work for Hiro at the moment. Hiro prefers mornings."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "09:00",
+   "end": "10:30",
+   "h": 9,
+   "text": "Sun 8 Nov 09:00–10:30 at Riverside Sports Centre, court 1"
+  },
+  "alts": [
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Thu 5 Nov 18:00–19:30 at Riverside Sports Centre, court 1"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sat 7 Nov 12:00–13:30 at Riverside Sports Centre, court 1"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Thu 5 Nov 20:00–21:30 at Riverside Sports Centre, court 1"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Mon",
+   "earliest": null,
+   "only": null,
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d1359",
+  "member": {
+   "id": "sim-nadia",
+   "name": "Nadia",
+   "level": "A",
+   "prefers": "singles",
+   "free": [
+    "Tue 18-22",
+    "Wed 18-22",
+    "Fri 18-22"
+   ],
+   "agent": "Nadia has an evening class on Wednesdays until December and can't play then. Nadia prefers mornings. Nadia only plays singles."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Tue",
+   "date": "2026-11-03",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Tue 3 Nov 20:00–21:30 at Riverside Sports Centre, court 1"
+  },
+  "alts": [
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Fri 6 Nov 18:00–19:30 at Riverside Sports Centre, court 1"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Fri 6 Nov 20:00–21:30 at Riverside Sports Centre, court 1"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Wed 4 Nov 19:00–20:30 at Riverside Sports Centre, court 1"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Wed",
+   "earliest": null,
+   "only": "singles",
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d1364",
+  "member": {
+   "id": "sim-nadia",
+   "name": "Nadia",
+   "level": "A",
+   "prefers": "singles",
+   "free": [
+    "Tue 18-22",
+    "Wed 18-22",
+    "Fri 18-22"
+   ],
+   "agent": "Nadia has an evening class on Wednesdays until December and can't play then. Nadia prefers mornings. Nadia only plays singles."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Tue",
+   "date": "2026-11-03",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Tue 3 Nov 19:00–20:30 at North Hall, court 1"
+  },
+  "alts": [
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Fri 6 Nov 18:00–19:30 at North Hall, court 1"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Tue 3 Nov 18:00–19:30 at North Hall, court 1"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Fri 6 Nov 19:00–20:30 at North Hall, court 1"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Wed",
+   "earliest": null,
+   "only": "singles",
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d1367",
+  "member": {
+   "id": "sim-nadia",
+   "name": "Nadia",
+   "level": "A",
+   "prefers": "singles",
+   "free": [
+    "Tue 18-22",
+    "Wed 18-22",
+    "Fri 18-22"
+   ],
+   "agent": "Nadia has an evening class on Wednesdays until December and can't play then. Nadia prefers mornings. Nadia only plays singles."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Wed",
+   "date": "2026-11-04",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Wed 4 Nov 19:00–20:30 at Midtown Community Gym, court 4"
+  },
+  "alts": [
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Wed 4 Nov 20:00–21:30 at Midtown Community Gym, court 4"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at Midtown Community Gym, court 4"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Tue 3 Nov 18:00–19:30 at Midtown Community Gym, court 4"
+   }
+  ],
+  "gold": "D",
+  "why": {
+   "works": false,
+   "out": "Wed",
+   "earliest": null,
+   "only": "singles",
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d1373",
+  "member": {
+   "id": "sim-oskar",
+   "name": "Oskar",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Wed 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Oskar needs a slow start at weekends: nothing before 10:00 on Saturday or Sunday. Wednesday is Oskar's favourite day to play."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "09:00",
+   "end": "10:30",
+   "h": 9,
+   "text": "Sun 8 Nov 09:00–10:30 at Riverside Sports Centre, court 5"
+  },
+  "alts": [
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sun 8 Nov 12:00–13:30 at Riverside Sports Centre, court 5"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sun 8 Nov 10:00–11:30 at Riverside Sports Centre, court 5"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at Riverside Sports Centre, court 5"
+   }
+  ],
+  "gold": "D",
+  "why": {
+   "works": false,
+   "out": null,
+   "earliest": 10,
+   "only": null,
+   "day": "Wed",
+   "part": null
+  }
+ },
+ {
+  "id": "d1374",
+  "member": {
+   "id": "sim-oskar",
+   "name": "Oskar",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Wed 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Oskar needs a slow start at weekends: nothing before 10:00 on Saturday or Sunday. Wednesday is Oskar's favourite day to play."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Wed",
+   "date": "2026-11-04",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Wed 4 Nov 20:00–21:30 at Riverside Sports Centre, court 1"
+  },
+  "alts": [
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sun 8 Nov 12:00–13:30 at Riverside Sports Centre, court 1"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sun 8 Nov 10:00–11:30 at Riverside Sports Centre, court 1"
+   },
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Mon 2 Nov 19:00–20:30 at Riverside Sports Centre, court 1"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": null,
+   "earliest": 10,
+   "only": null,
+   "day": "Wed",
+   "part": null
+  }
+ },
+ {
+  "id": "d1709",
+  "member": {
+   "id": "sim-quinn",
+   "name": "Quinn",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Wed 18-22",
+    "Thu 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "Quinn works late on Wednesdays this month, so Wednesday evenings are out. Quinn prefers evenings. At weekends Quinn won't start before 10:00."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Wed",
+   "date": "2026-11-04",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Wed 4 Nov 20:00–21:30 at Midtown Community Gym, court 4"
+  },
+  "alts": [
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "08:00",
+    "end": "09:30",
+    "h": 8,
+    "text": "Sat 7 Nov 08:00–09:30 at Midtown Community Gym, court 4"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at Midtown Community Gym, court 4"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sat 7 Nov 09:00–10:30 at Midtown Community Gym, court 4"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Wed",
+   "earliest": 10,
+   "only": null,
+   "day": null,
+   "part": "evening"
+  }
+ },
+ {
+  "id": "d1711",
+  "member": {
+   "id": "sim-quinn",
+   "name": "Quinn",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Wed 18-22",
+    "Thu 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "Quinn works late on Wednesdays this month, so Wednesday evenings are out. Quinn prefers evenings. At weekends Quinn won't start before 10:00."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sat",
+   "date": "2026-11-07",
+   "start": "10:00",
+   "end": "11:30",
+   "h": 10,
+   "text": "Sat 7 Nov 10:00–11:30 at Midtown Community Gym, court 3"
+  },
+  "alts": [
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Wed 4 Nov 20:00–21:30 at Midtown Community Gym, court 3"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Thu 5 Nov 20:00–21:30 at Midtown Community Gym, court 3"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at Midtown Community Gym, court 3"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Wed",
+   "earliest": 10,
+   "only": null,
+   "day": null,
+   "part": "evening"
+  }
+ },
+ {
+  "id": "d1716",
+  "member": {
+   "id": "sim-rosa",
+   "name": "Rosa",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Rosa works late on Tuesdays this month, so Tuesday evenings are out. Rosa needs a slow start at weekends: nothing before 11:00 on Saturday or Sunday. If the time has to move, Rosa likes Sundays best."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "10:00",
+   "end": "11:30",
+   "h": 10,
+   "text": "Sun 8 Nov 10:00–11:30 at North Hall, court 4"
+  },
+  "alts": [
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Mon 2 Nov 20:00–21:30 at North Hall, court 4"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sun 8 Nov 09:00–10:30 at North Hall, court 4"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Tue 3 Nov 19:00–20:30 at North Hall, court 4"
+   }
+  ],
+  "gold": "B",
+  "why": {
+   "works": false,
+   "out": "Tue",
+   "earliest": 11,
+   "only": null,
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d1720",
+  "member": {
+   "id": "sim-rosa",
+   "name": "Rosa",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Rosa works late on Tuesdays this month, so Tuesday evenings are out. Rosa needs a slow start at weekends: nothing before 11:00 on Saturday or Sunday. If the time has to move, Rosa likes Sundays best."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Tue",
+   "date": "2026-11-03",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Tue 3 Nov 19:00–20:30 at Lakeside Courts, court 1"
+  },
+  "alts": [
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Mon 2 Nov 20:00–21:30 at Lakeside Courts, court 1"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Tue 3 Nov 18:00–19:30 at Lakeside Courts, court 1"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sun 8 Nov 09:00–10:30 at Lakeside Courts, court 1"
+   }
+  ],
+  "gold": "B",
+  "why": {
+   "works": false,
+   "out": "Tue",
+   "earliest": 11,
+   "only": null,
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d1722",
+  "member": {
+   "id": "sim-rosa",
+   "name": "Rosa",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Rosa works late on Tuesdays this month, so Tuesday evenings are out. Rosa needs a slow start at weekends: nothing before 11:00 on Saturday or Sunday. If the time has to move, Rosa likes Sundays best."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "11:00",
+   "end": "12:30",
+   "h": 11,
+   "text": "Sun 8 Nov 11:00–12:30 at North Hall, court 1"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at North Hall, court 1"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Tue 3 Nov 18:00–19:30 at North Hall, court 1"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sun 8 Nov 09:00–10:30 at North Hall, court 1"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Tue",
+   "earliest": 11,
+   "only": null,
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d1938",
+  "member": {
+   "id": "sim-tara",
+   "name": "Tara",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Wed 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Tara needs a slow start at weekends: nothing before 11:00 on Saturday or Sunday. Tara works late on Wednesdays this month, so Wednesday evenings are out. Given a choice, Tara picks a morning game."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "10:00",
+   "end": "11:30",
+   "h": 10,
+   "text": "Sun 8 Nov 10:00–11:30 at Midtown Community Gym, court 3"
+  },
+  "alts": [
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Wed 4 Nov 20:00–21:30 at Midtown Community Gym, court 3"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sun 8 Nov 09:00–10:30 at Midtown Community Gym, court 3"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at Midtown Community Gym, court 3"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Wed",
+   "earliest": 11,
+   "only": null,
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d1939",
+  "member": {
+   "id": "sim-tara",
+   "name": "Tara",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Wed 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Tara needs a slow start at weekends: nothing before 11:00 on Saturday or Sunday. Tara works late on Wednesdays this month, so Wednesday evenings are out. Given a choice, Tara picks a morning game."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "11:00",
+   "end": "12:30",
+   "h": 11,
+   "text": "Sun 8 Nov 11:00–12:30 at Midtown Community Gym, court 2"
+  },
+  "alts": [
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at Midtown Community Gym, court 2"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sun 8 Nov 10:00–11:30 at Midtown Community Gym, court 2"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at Midtown Community Gym, court 2"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Wed",
+   "earliest": 11,
+   "only": null,
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d1946",
+  "member": {
+   "id": "sim-tara",
+   "name": "Tara",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Wed 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Tara needs a slow start at weekends: nothing before 11:00 on Saturday or Sunday. Tara works late on Wednesdays this month, so Wednesday evenings are out. Given a choice, Tara picks a morning game."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "10:00",
+   "end": "11:30",
+   "h": 10,
+   "text": "Sun 8 Nov 10:00–11:30 at North Hall, court 4"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at North Hall, court 4"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Wed 4 Nov 19:00–20:30 at North Hall, court 4"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "11:00",
+    "end": "12:30",
+    "h": 11,
+    "text": "Sun 8 Nov 11:00–12:30 at North Hall, court 4"
+   }
+  ],
+  "gold": "D",
+  "why": {
+   "works": false,
+   "out": "Wed",
+   "earliest": 11,
+   "only": null,
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d2129",
+  "member": {
+   "id": "sim-vera",
+   "name": "Vera",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Thu 18-22",
+    "Fri 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Sunday is Vera's favourite day to play. Vera has an evening class on Fridays until December and can't play then."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Fri",
+   "date": "2026-11-06",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Fri 6 Nov 18:00–19:30 at Lakeside Courts, court 2"
+  },
+  "alts": [
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sun 8 Nov 10:00–11:30 at Lakeside Courts, court 2"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Thu 5 Nov 20:00–21:30 at Lakeside Courts, court 2"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Thu 5 Nov 19:00–20:30 at Lakeside Courts, court 2"
+   }
+  ],
+  "gold": "B",
+  "why": {
+   "works": false,
+   "out": "Fri",
+   "earliest": null,
+   "only": null,
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d2130",
+  "member": {
+   "id": "sim-vera",
+   "name": "Vera",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Thu 18-22",
+    "Fri 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Sunday is Vera's favourite day to play. Vera has an evening class on Fridays until December and can't play then."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Thu",
+   "date": "2026-11-05",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Thu 5 Nov 19:00–20:30 at Lakeside Courts, court 4"
+  },
+  "alts": [
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sun 8 Nov 10:00–11:30 at Lakeside Courts, court 4"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Thu 5 Nov 20:00–21:30 at Lakeside Courts, court 4"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Fri 6 Nov 18:00–19:30 at Lakeside Courts, court 4"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Fri",
+   "earliest": null,
+   "only": null,
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d2193",
+  "member": {
+   "id": "sim-wen",
+   "name": "Wen",
+   "level": "A",
+   "prefers": "doubles",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "Wen works late on Mondays this month, so Monday evenings are out. Wen only plays doubles. Monday is Wen's favourite day to play."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Tue",
+   "date": "2026-11-03",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Tue 3 Nov 20:00–21:30 at Riverside Sports Centre, court 4"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Tue 3 Nov 19:00–20:30 at Riverside Sports Centre, court 4"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sat 7 Nov 09:00–10:30 at Riverside Sports Centre, court 4"
+   },
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Mon 2 Nov 19:00–20:30 at Riverside Sports Centre, court 4"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Mon",
+   "earliest": null,
+   "only": "doubles",
+   "day": "Mon",
+   "part": null
+  }
+ },
+ {
+  "id": "d2196",
+  "member": {
+   "id": "sim-wen",
+   "name": "Wen",
+   "level": "A",
+   "prefers": "doubles",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "Wen works late on Mondays this month, so Monday evenings are out. Wen only plays doubles. Monday is Wen's favourite day to play."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Sat",
+   "date": "2026-11-07",
+   "start": "08:00",
+   "end": "09:30",
+   "h": 8,
+   "text": "Sat 7 Nov 08:00–09:30 at Riverside Sports Centre, court 3"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at Riverside Sports Centre, court 3"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sat 7 Nov 12:00–13:30 at Riverside Sports Centre, court 3"
+   },
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Mon 2 Nov 20:00–21:30 at Riverside Sports Centre, court 3"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Mon",
+   "earliest": null,
+   "only": "doubles",
+   "day": "Mon",
+   "part": null
+  }
+ },
+ {
+  "id": "d2258",
+  "member": {
+   "id": "sim-ximena",
+   "name": "Ximena",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Wed 18-22",
+    "Fri 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "Tuesday doesn't work for Ximena at the moment. Given a choice, Ximena picks a morning game. Ximena needs a slow start at weekends: nothing before 10:00 on Saturday or Sunday."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sat",
+   "date": "2026-11-07",
+   "start": "09:00",
+   "end": "10:30",
+   "h": 9,
+   "text": "Sat 7 Nov 09:00–10:30 at Riverside Sports Centre, court 2"
+  },
+  "alts": [
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "08:00",
+    "end": "09:30",
+    "h": 8,
+    "text": "Sat 7 Nov 08:00–09:30 at Riverside Sports Centre, court 2"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Tue 3 Nov 18:00–19:30 at Riverside Sports Centre, court 2"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Wed 4 Nov 19:00–20:30 at Riverside Sports Centre, court 2"
+   }
+  ],
+  "gold": "D",
+  "why": {
+   "works": false,
+   "out": "Tue",
+   "earliest": 10,
+   "only": null,
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d2263",
+  "member": {
+   "id": "sim-ximena",
+   "name": "Ximena",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Wed 18-22",
+    "Fri 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "Tuesday doesn't work for Ximena at the moment. Given a choice, Ximena picks a morning game. Ximena needs a slow start at weekends: nothing before 10:00 on Saturday or Sunday."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Tue",
+   "date": "2026-11-03",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Tue 3 Nov 19:00–20:30 at Riverside Sports Centre, court 3"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at Riverside Sports Centre, court 3"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sat 7 Nov 09:00–10:30 at Riverside Sports Centre, court 3"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Fri 6 Nov 20:00–21:30 at Riverside Sports Centre, court 3"
+   }
+  ],
+  "gold": "D",
+  "why": {
+   "works": false,
+   "out": "Tue",
+   "earliest": 10,
+   "only": null,
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d2265",
+  "member": {
+   "id": "sim-ximena",
+   "name": "Ximena",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Wed 18-22",
+    "Fri 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "Tuesday doesn't work for Ximena at the moment. Given a choice, Ximena picks a morning game. Ximena needs a slow start at weekends: nothing before 10:00 on Saturday or Sunday."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Wed",
+   "date": "2026-11-04",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Wed 4 Nov 20:00–21:30 at Midtown Community Gym, court 4"
+  },
+  "alts": [
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "11:00",
+    "end": "12:30",
+    "h": 11,
+    "text": "Sat 7 Nov 11:00–12:30 at Midtown Community Gym, court 4"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sat 7 Nov 12:00–13:30 at Midtown Community Gym, court 4"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Fri 6 Nov 18:00–19:30 at Midtown Community Gym, court 4"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Tue",
+   "earliest": 10,
+   "only": null,
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d2267",
+  "member": {
+   "id": "sim-yusuf",
+   "name": "Yusuf",
+   "level": "B",
+   "prefers": "doubles",
+   "free": [
+    "Wed 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Yusuf only plays doubles. Wednesday doesn't work for Yusuf at the moment. Saturday is Yusuf's favourite day to play."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sat",
+   "date": "2026-11-07",
+   "start": "12:00",
+   "end": "13:30",
+   "h": 12,
+   "text": "Sat 7 Nov 12:00–13:30 at Riverside Sports Centre, court 3"
+  },
+  "alts": [
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at Riverside Sports Centre, court 3"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "11:00",
+    "end": "12:30",
+    "h": 11,
+    "text": "Sat 7 Nov 11:00–12:30 at Riverside Sports Centre, court 3"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Wed 4 Nov 19:00–20:30 at Riverside Sports Centre, court 3"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Wed",
+   "earliest": null,
+   "only": "doubles",
+   "day": "Sat",
+   "part": null
+  }
+ },
+ {
+  "id": "d2268",
+  "member": {
+   "id": "sim-yusuf",
+   "name": "Yusuf",
+   "level": "B",
+   "prefers": "doubles",
+   "free": [
+    "Wed 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Yusuf only plays doubles. Wednesday doesn't work for Yusuf at the moment. Saturday is Yusuf's favourite day to play."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "09:00",
+   "end": "10:30",
+   "h": 9,
+   "text": "Sun 8 Nov 09:00–10:30 at Midtown Community Gym, court 1"
+  },
+  "alts": [
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sat 7 Nov 12:00–13:30 at Midtown Community Gym, court 1"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Wed 4 Nov 20:00–21:30 at Midtown Community Gym, court 1"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "11:00",
+    "end": "12:30",
+    "h": 11,
+    "text": "Sun 8 Nov 11:00–12:30 at Midtown Community Gym, court 1"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Wed",
+   "earliest": null,
+   "only": "doubles",
+   "day": "Sat",
+   "part": null
+  }
+ },
+ {
+  "id": "d2300",
+  "member": {
+   "id": "sim-yusuf",
+   "name": "Yusuf",
+   "level": "B",
+   "prefers": "doubles",
+   "free": [
+    "Wed 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Yusuf only plays doubles. Wednesday doesn't work for Yusuf at the moment. Saturday is Yusuf's favourite day to play."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Wed",
+   "date": "2026-11-04",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Wed 4 Nov 19:00–20:30 at Midtown Community Gym, court 2"
+  },
+  "alts": [
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sun 8 Nov 12:00–13:30 at Midtown Community Gym, court 2"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "11:00",
+    "end": "12:30",
+    "h": 11,
+    "text": "Sat 7 Nov 11:00–12:30 at Midtown Community Gym, court 2"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Wed 4 Nov 20:00–21:30 at Midtown Community Gym, court 2"
+   }
+  ],
+  "gold": "C",
+  "why": {
+   "works": false,
+   "out": "Wed",
+   "earliest": null,
+   "only": "doubles",
+   "day": "Sat",
+   "part": null
+  }
+ },
+ {
+  "id": "d2306",
+  "member": {
+   "id": "sim-zoe",
+   "name": "Zoe",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Fri 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "At weekends Zoe won't start before 10:00. Zoe works late on Fridays this month, so Friday evenings are out. Given a choice, Zoe picks a morning game."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Fri",
+   "date": "2026-11-06",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Fri 6 Nov 19:00–20:30 at Lakeside Courts, court 5"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at Lakeside Courts, court 5"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sat 7 Nov 10:00–11:30 at Lakeside Courts, court 5"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Tue 3 Nov 19:00–20:30 at Lakeside Courts, court 5"
+   }
+  ],
+  "gold": "C",
+  "why": {
+   "works": false,
+   "out": "Fri",
+   "earliest": 10,
+   "only": null,
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d2310",
+  "member": {
+   "id": "sim-zoe",
+   "name": "Zoe",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Fri 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "At weekends Zoe won't start before 10:00. Zoe works late on Fridays this month, so Friday evenings are out. Given a choice, Zoe picks a morning game."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Tue",
+   "date": "2026-11-03",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Tue 3 Nov 20:00–21:30 at North Hall, court 3"
+  },
+  "alts": [
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Fri 6 Nov 20:00–21:30 at North Hall, court 3"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Tue 3 Nov 19:00–20:30 at North Hall, court 3"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Fri 6 Nov 18:00–19:30 at North Hall, court 3"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Fri",
+   "earliest": 10,
+   "only": null,
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d2396",
+  "member": {
+   "id": "sim-amara",
+   "name": "Amara",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Thu 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "Tuesday doesn't work for Amara at the moment. Thursday is Amara's favourite day to play. At weekends Amara won't start before 11:00."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sat",
+   "date": "2026-11-07",
+   "start": "08:00",
+   "end": "09:30",
+   "h": 8,
+   "text": "Sat 7 Nov 08:00–09:30 at Midtown Community Gym, court 5"
+  },
+  "alts": [
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sat 7 Nov 09:00–10:30 at Midtown Community Gym, court 5"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Tue 3 Nov 18:00–19:30 at Midtown Community Gym, court 5"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sat 7 Nov 10:00–11:30 at Midtown Community Gym, court 5"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Tue",
+   "earliest": 11,
+   "only": null,
+   "day": "Thu",
+   "part": null
+  }
+ },
+ {
+  "id": "d2397",
+  "member": {
+   "id": "sim-amara",
+   "name": "Amara",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Thu 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "Tuesday doesn't work for Amara at the moment. Thursday is Amara's favourite day to play. At weekends Amara won't start before 11:00."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Thu",
+   "date": "2026-11-05",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Thu 5 Nov 19:00–20:30 at North Hall, court 1"
+  },
+  "alts": [
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Thu 5 Nov 18:00–19:30 at North Hall, court 1"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sat 7 Nov 09:00–10:30 at North Hall, court 1"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at North Hall, court 1"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Tue",
+   "earliest": 11,
+   "only": null,
+   "day": "Thu",
+   "part": null
+  }
+ },
+ {
+  "id": "d2399",
+  "member": {
+   "id": "sim-amara",
+   "name": "Amara",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Thu 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "Tuesday doesn't work for Amara at the moment. Thursday is Amara's favourite day to play. At weekends Amara won't start before 11:00."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Tue",
+   "date": "2026-11-03",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Tue 3 Nov 18:00–19:30 at Riverside Sports Centre, court 1"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Tue 3 Nov 19:00–20:30 at Riverside Sports Centre, court 1"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at Riverside Sports Centre, court 1"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Thu 5 Nov 19:00–20:30 at Riverside Sports Centre, court 1"
+   }
+  ],
+  "gold": "D",
+  "why": {
+   "works": false,
+   "out": "Tue",
+   "earliest": 11,
+   "only": null,
+   "day": "Thu",
+   "part": null
+  }
+ },
+ {
+  "id": "d2401",
+  "member": {
+   "id": "sim-bo",
+   "name": "Bo",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Wed 18-22",
+    "Fri 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Wednesday doesn't work for Bo at the moment. Friday is Bo's favourite day to play. At weekends Bo won't start before 10:00."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Wed",
+   "date": "2026-11-04",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Wed 4 Nov 20:00–21:30 at Riverside Sports Centre, court 1"
+  },
+  "alts": [
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sun 8 Nov 12:00–13:30 at Riverside Sports Centre, court 1"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Wed 4 Nov 19:00–20:30 at Riverside Sports Centre, court 1"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Fri 6 Nov 19:00–20:30 at Riverside Sports Centre, court 1"
+   }
+  ],
+  "gold": "D",
+  "why": {
+   "works": false,
+   "out": "Wed",
+   "earliest": 10,
+   "only": null,
+   "day": "Fri",
+   "part": null
+  }
+ },
+ {
+  "id": "d2404",
+  "member": {
+   "id": "sim-bo",
+   "name": "Bo",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Wed 18-22",
+    "Fri 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Wednesday doesn't work for Bo at the moment. Friday is Bo's favourite day to play. At weekends Bo won't start before 10:00."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "11:00",
+   "end": "12:30",
+   "h": 11,
+   "text": "Sun 8 Nov 11:00–12:30 at Midtown Community Gym, court 5"
+  },
+  "alts": [
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sun 8 Nov 09:00–10:30 at Midtown Community Gym, court 5"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Fri 6 Nov 20:00–21:30 at Midtown Community Gym, court 5"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Wed 4 Nov 19:00–20:30 at Midtown Community Gym, court 5"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Wed",
+   "earliest": 10,
+   "only": null,
+   "day": "Fri",
+   "part": null
+  }
+ },
+ {
+  "id": "d2468",
+  "member": {
+   "id": "sim-chidi",
+   "name": "Chidi",
+   "level": "B",
+   "prefers": "doubles",
+   "free": [
+    "Mon 18-22",
+    "Wed 18-22",
+    "Fri 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "Monday doesn't work for Chidi at the moment. Chidi plays doubles and nothing else. If the time has to move, Chidi likes Wednesdays best."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Mon",
+   "date": "2026-11-02",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Mon 2 Nov 20:00–21:30 at Riverside Sports Centre, court 5"
+  },
+  "alts": [
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "11:00",
+    "end": "12:30",
+    "h": 11,
+    "text": "Sat 7 Nov 11:00–12:30 at Riverside Sports Centre, court 5"
+   },
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Mon 2 Nov 18:00–19:30 at Riverside Sports Centre, court 5"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sat 7 Nov 12:00–13:30 at Riverside Sports Centre, court 5"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Mon",
+   "earliest": null,
+   "only": "doubles",
+   "day": "Wed",
+   "part": null
+  }
+ },
+ {
+  "id": "d2473",
+  "member": {
+   "id": "sim-chidi",
+   "name": "Chidi",
+   "level": "B",
+   "prefers": "doubles",
+   "free": [
+    "Mon 18-22",
+    "Wed 18-22",
+    "Fri 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "Monday doesn't work for Chidi at the moment. Chidi plays doubles and nothing else. If the time has to move, Chidi likes Wednesdays best."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Fri",
+   "date": "2026-11-06",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Fri 6 Nov 19:00–20:30 at Lakeside Courts, court 3"
+  },
+  "alts": [
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sat 7 Nov 10:00–11:30 at Lakeside Courts, court 3"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Fri 6 Nov 18:00–19:30 at Lakeside Courts, court 3"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sat 7 Nov 12:00–13:30 at Lakeside Courts, court 3"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Mon",
+   "earliest": null,
+   "only": "doubles",
+   "day": "Wed",
+   "part": null
+  }
+ },
+ {
+  "id": "d2510",
+  "member": {
+   "id": "sim-chidi",
+   "name": "Chidi",
+   "level": "B",
+   "prefers": "doubles",
+   "free": [
+    "Mon 18-22",
+    "Wed 18-22",
+    "Fri 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "Monday doesn't work for Chidi at the moment. Chidi plays doubles and nothing else. If the time has to move, Chidi likes Wednesdays best."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Mon",
+   "date": "2026-11-02",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Mon 2 Nov 18:00–19:30 at North Hall, court 3"
+  },
+  "alts": [
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "08:00",
+    "end": "09:30",
+    "h": 8,
+    "text": "Sat 7 Nov 08:00–09:30 at North Hall, court 3"
+   },
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Mon 2 Nov 19:00–20:30 at North Hall, court 3"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at North Hall, court 3"
+   }
+  ],
+  "gold": "D",
+  "why": {
+   "works": false,
+   "out": "Mon",
+   "earliest": null,
+   "only": "doubles",
+   "day": "Wed",
+   "part": null
+  }
+ },
+ {
+  "id": "d2560",
+  "member": {
+   "id": "sim-dev",
+   "name": "Dev",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Wed 18-22",
+    "Thu 18-22"
+   ],
+   "agent": "Dev prefers mornings. Tuesday doesn't work for Dev at the moment."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Tue",
+   "date": "2026-11-03",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Tue 3 Nov 18:00–19:30 at Lakeside Courts, court 5"
+  },
+  "alts": [
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Wed 4 Nov 19:00–20:30 at Lakeside Courts, court 5"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Tue 3 Nov 19:00–20:30 at Lakeside Courts, court 5"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at Lakeside Courts, court 5"
+   }
+  ],
+  "gold": "B",
+  "why": {
+   "works": false,
+   "out": "Tue",
+   "earliest": null,
+   "only": null,
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d2562",
+  "member": {
+   "id": "sim-dev",
+   "name": "Dev",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Wed 18-22",
+    "Thu 18-22"
+   ],
+   "agent": "Dev prefers mornings. Tuesday doesn't work for Dev at the moment."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Mon",
+   "date": "2026-11-02",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Mon 2 Nov 20:00–21:30 at North Hall, court 4"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at North Hall, court 4"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Thu 5 Nov 19:00–20:30 at North Hall, court 4"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Tue 3 Nov 19:00–20:30 at North Hall, court 4"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Tue",
+   "earliest": null,
+   "only": null,
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d3029",
+  "member": {
+   "id": "sim-greta",
+   "name": "Greta",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Greta has an evening class on Tuesdays until December and can't play then. Greta prefers mornings. Greta needs a slow start at weekends: nothing before 10:00 on Saturday or Sunday."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Sat",
+   "date": "2026-11-07",
+   "start": "08:00",
+   "end": "09:30",
+   "h": 8,
+   "text": "Sat 7 Nov 08:00–09:30 at Midtown Community Gym, court 3"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Tue 3 Nov 19:00–20:30 at Midtown Community Gym, court 3"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sun 8 Nov 09:00–10:30 at Midtown Community Gym, court 3"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at Midtown Community Gym, court 3"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Tue",
+   "earliest": 10,
+   "only": null,
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d3030",
+  "member": {
+   "id": "sim-greta",
+   "name": "Greta",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Greta has an evening class on Tuesdays until December and can't play then. Greta prefers mornings. Greta needs a slow start at weekends: nothing before 10:00 on Saturday or Sunday."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "10:00",
+   "end": "11:30",
+   "h": 10,
+   "text": "Sun 8 Nov 10:00–11:30 at Lakeside Courts, court 4"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Tue 3 Nov 18:00–19:30 at Lakeside Courts, court 4"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sun 8 Nov 09:00–10:30 at Lakeside Courts, court 4"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sat 7 Nov 10:00–11:30 at Lakeside Courts, court 4"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Tue",
+   "earliest": 10,
+   "only": null,
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d3031",
+  "member": {
+   "id": "sim-greta",
+   "name": "Greta",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Greta has an evening class on Tuesdays until December and can't play then. Greta prefers mornings. Greta needs a slow start at weekends: nothing before 10:00 on Saturday or Sunday."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Tue",
+   "date": "2026-11-03",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Tue 3 Nov 20:00–21:30 at Riverside Sports Centre, court 3"
+  },
+  "alts": [
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Mon 2 Nov 18:00–19:30 at Riverside Sports Centre, court 3"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sat 7 Nov 10:00–11:30 at Riverside Sports Centre, court 3"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Tue 3 Nov 19:00–20:30 at Riverside Sports Centre, court 3"
+   }
+  ],
+  "gold": "C",
+  "why": {
+   "works": false,
+   "out": "Tue",
+   "earliest": 10,
+   "only": null,
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d3032",
+  "member": {
+   "id": "sim-hamid",
+   "name": "Hamid",
+   "level": "B",
+   "prefers": "doubles",
+   "free": [
+    "Thu 18-22",
+    "Fri 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Hamid only plays doubles. Hamid has an evening class on Fridays until December and can't play then. At weekends Hamid won't start before 11:00. Hamid prefers evenings."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Fri",
+   "date": "2026-11-06",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Fri 6 Nov 20:00–21:30 at Riverside Sports Centre, court 5"
+  },
+  "alts": [
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Fri 6 Nov 19:00–20:30 at Riverside Sports Centre, court 5"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "11:00",
+    "end": "12:30",
+    "h": 11,
+    "text": "Sat 7 Nov 11:00–12:30 at Riverside Sports Centre, court 5"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sun 8 Nov 09:00–10:30 at Riverside Sports Centre, court 5"
+   }
+  ],
+  "gold": "C",
+  "why": {
+   "works": false,
+   "out": "Fri",
+   "earliest": 11,
+   "only": "doubles",
+   "day": null,
+   "part": "evening"
+  }
+ },
+ {
+  "id": "d3037",
+  "member": {
+   "id": "sim-hamid",
+   "name": "Hamid",
+   "level": "B",
+   "prefers": "doubles",
+   "free": [
+    "Thu 18-22",
+    "Fri 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Hamid only plays doubles. Hamid has an evening class on Fridays until December and can't play then. At weekends Hamid won't start before 11:00. Hamid prefers evenings."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Sat",
+   "date": "2026-11-07",
+   "start": "11:00",
+   "end": "12:30",
+   "h": 11,
+   "text": "Sat 7 Nov 11:00–12:30 at Midtown Community Gym, court 1"
+  },
+  "alts": [
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sat 7 Nov 12:00–13:30 at Midtown Community Gym, court 1"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Fri 6 Nov 18:00–19:30 at Midtown Community Gym, court 1"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sat 7 Nov 10:00–11:30 at Midtown Community Gym, court 1"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Fri",
+   "earliest": 11,
+   "only": "doubles",
+   "day": null,
+   "part": "evening"
+  }
+ },
+ {
+  "id": "d3040",
+  "member": {
+   "id": "sim-hamid",
+   "name": "Hamid",
+   "level": "B",
+   "prefers": "doubles",
+   "free": [
+    "Thu 18-22",
+    "Fri 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Hamid only plays doubles. Hamid has an evening class on Fridays until December and can't play then. At weekends Hamid won't start before 11:00. Hamid prefers evenings."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Thu",
+   "date": "2026-11-05",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Thu 5 Nov 20:00–21:30 at Riverside Sports Centre, court 4"
+  },
+  "alts": [
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Fri 6 Nov 18:00–19:30 at Riverside Sports Centre, court 4"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "08:00",
+    "end": "09:30",
+    "h": 8,
+    "text": "Sat 7 Nov 08:00–09:30 at Riverside Sports Centre, court 4"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "11:00",
+    "end": "12:30",
+    "h": 11,
+    "text": "Sat 7 Nov 11:00–12:30 at Riverside Sports Centre, court 4"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Fri",
+   "earliest": 11,
+   "only": "doubles",
+   "day": null,
+   "part": "evening"
+  }
+ },
+ {
+  "id": "d3041",
+  "member": {
+   "id": "sim-ines",
+   "name": "Ines",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Wed 18-22",
+    "Thu 18-22",
+    "Fri 18-22"
+   ],
+   "agent": "Ines has an evening class on Mondays until December and can't play then. Ines prefers mornings."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Thu",
+   "date": "2026-11-05",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Thu 5 Nov 18:00–19:30 at Midtown Community Gym, court 1"
+  },
+  "alts": [
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Fri 6 Nov 19:00–20:30 at Midtown Community Gym, court 1"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Thu 5 Nov 20:00–21:30 at Midtown Community Gym, court 1"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Fri 6 Nov 18:00–19:30 at Midtown Community Gym, court 1"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Mon",
+   "earliest": null,
+   "only": null,
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d3133",
+  "member": {
+   "id": "sim-ines",
+   "name": "Ines",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Wed 18-22",
+    "Thu 18-22",
+    "Fri 18-22"
+   ],
+   "agent": "Ines has an evening class on Mondays until December and can't play then. Ines prefers mornings."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Mon",
+   "date": "2026-11-02",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Mon 2 Nov 18:00–19:30 at North Hall, court 3"
+  },
+  "alts": [
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Thu 5 Nov 19:00–20:30 at North Hall, court 3"
+   },
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Mon 2 Nov 20:00–21:30 at North Hall, court 3"
+   },
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Mon 2 Nov 19:00–20:30 at North Hall, court 3"
+   }
+  ],
+  "gold": "B",
+  "why": {
+   "works": false,
+   "out": "Mon",
+   "earliest": null,
+   "only": null,
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d3142",
+  "member": {
+   "id": "sim-joon",
+   "name": "Joon",
+   "level": "C",
+   "prefers": "doubles",
+   "free": [
+    "Tue 18-22",
+    "Wed 18-22",
+    "Fri 18-22"
+   ],
+   "agent": "Joon works late on Tuesdays this month, so Tuesday evenings are out. Joon only plays doubles. Friday is Joon's favourite day to play."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Tue",
+   "date": "2026-11-03",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Tue 3 Nov 19:00–20:30 at North Hall, court 5"
+  },
+  "alts": [
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Wed 4 Nov 20:00–21:30 at North Hall, court 5"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Fri 6 Nov 19:00–20:30 at North Hall, court 5"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at North Hall, court 5"
+   }
+  ],
+  "gold": "C",
+  "why": {
+   "works": false,
+   "out": "Tue",
+   "earliest": null,
+   "only": "doubles",
+   "day": "Fri",
+   "part": null
+  }
+ },
+ {
+  "id": "d3144",
+  "member": {
+   "id": "sim-joon",
+   "name": "Joon",
+   "level": "C",
+   "prefers": "doubles",
+   "free": [
+    "Tue 18-22",
+    "Wed 18-22",
+    "Fri 18-22"
+   ],
+   "agent": "Joon works late on Tuesdays this month, so Tuesday evenings are out. Joon only plays doubles. Friday is Joon's favourite day to play."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Fri",
+   "date": "2026-11-06",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Fri 6 Nov 19:00–20:30 at Lakeside Courts, court 4"
+  },
+  "alts": [
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Wed 4 Nov 19:00–20:30 at Lakeside Courts, court 4"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Wed 4 Nov 20:00–21:30 at Lakeside Courts, court 4"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at Lakeside Courts, court 4"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Tue",
+   "earliest": null,
+   "only": "doubles",
+   "day": "Fri",
+   "part": null
+  }
+ },
+ {
+  "id": "d3145",
+  "member": {
+   "id": "sim-joon",
+   "name": "Joon",
+   "level": "C",
+   "prefers": "doubles",
+   "free": [
+    "Tue 18-22",
+    "Wed 18-22",
+    "Fri 18-22"
+   ],
+   "agent": "Joon works late on Tuesdays this month, so Tuesday evenings are out. Joon only plays doubles. Friday is Joon's favourite day to play."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Wed",
+   "date": "2026-11-04",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Wed 4 Nov 18:00–19:30 at Midtown Community Gym, court 4"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at Midtown Community Gym, court 4"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Wed 4 Nov 19:00–20:30 at Midtown Community Gym, court 4"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Wed 4 Nov 20:00–21:30 at Midtown Community Gym, court 4"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Tue",
+   "earliest": null,
+   "only": "doubles",
+   "day": "Fri",
+   "part": null
+  }
+ },
+ {
+  "id": "d3148",
+  "member": {
+   "id": "sim-kalea",
+   "name": "Kalea",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Fri 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "If the time has to move, Kalea likes Sundays best. Kalea has an evening class on Fridays until December and can't play then."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Tue",
+   "date": "2026-11-03",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Tue 3 Nov 19:00–20:30 at Midtown Community Gym, court 5"
+  },
+  "alts": [
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sun 8 Nov 09:00–10:30 at Midtown Community Gym, court 5"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sun 8 Nov 10:00–11:30 at Midtown Community Gym, court 5"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Tue 3 Nov 18:00–19:30 at Midtown Community Gym, court 5"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Fri",
+   "earliest": null,
+   "only": null,
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d3158",
+  "member": {
+   "id": "sim-kalea",
+   "name": "Kalea",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Fri 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "If the time has to move, Kalea likes Sundays best. Kalea has an evening class on Fridays until December and can't play then."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Fri",
+   "date": "2026-11-06",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Fri 6 Nov 18:00–19:30 at North Hall, court 3"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at North Hall, court 3"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sun 8 Nov 12:00–13:30 at North Hall, court 3"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Fri 6 Nov 19:00–20:30 at North Hall, court 3"
+   }
+  ],
+  "gold": "C",
+  "why": {
+   "works": false,
+   "out": "Fri",
+   "earliest": null,
+   "only": null,
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d3163",
+  "member": {
+   "id": "sim-kalea",
+   "name": "Kalea",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Fri 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "If the time has to move, Kalea likes Sundays best. Kalea has an evening class on Fridays until December and can't play then."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Fri",
+   "date": "2026-11-06",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Fri 6 Nov 20:00–21:30 at North Hall, court 4"
+  },
+  "alts": [
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "11:00",
+    "end": "12:30",
+    "h": 11,
+    "text": "Sun 8 Nov 11:00–12:30 at North Hall, court 4"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Fri 6 Nov 19:00–20:30 at North Hall, court 4"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Tue 3 Nov 19:00–20:30 at North Hall, court 4"
+   }
+  ],
+  "gold": "B",
+  "why": {
+   "works": false,
+   "out": "Fri",
+   "earliest": null,
+   "only": null,
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d3164",
+  "member": {
+   "id": "sim-luca",
+   "name": "Luca",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Wed 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Tuesday is Luca's favourite day to play. At weekends Luca won't start before 11:00."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Wed",
+   "date": "2026-11-04",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Wed 4 Nov 19:00–20:30 at Midtown Community Gym, court 4"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Tue 3 Nov 18:00–19:30 at Midtown Community Gym, court 4"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sun 8 Nov 10:00–11:30 at Midtown Community Gym, court 4"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Wed 4 Nov 20:00–21:30 at Midtown Community Gym, court 4"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": null,
+   "earliest": 11,
+   "only": null,
+   "day": "Tue",
+   "part": null
+  }
+ },
+ {
+  "id": "d3675",
+  "member": {
+   "id": "sim-arun",
+   "name": "Arun",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Arun needs a slow start at weekends: nothing before 11:00 on Saturday or Sunday. Arun works late on Tuesdays this month, so Tuesday evenings are out. Sunday is Arun's favourite day to play."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Tue",
+   "date": "2026-11-03",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Tue 3 Nov 20:00–21:30 at Riverside Sports Centre, court 1"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Tue 3 Nov 18:00–19:30 at Riverside Sports Centre, court 1"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Tue 3 Nov 19:00–20:30 at Riverside Sports Centre, court 1"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sun 8 Nov 10:00–11:30 at Riverside Sports Centre, court 1"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Tue",
+   "earliest": 11,
+   "only": null,
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d3676",
+  "member": {
+   "id": "sim-arun",
+   "name": "Arun",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Arun needs a slow start at weekends: nothing before 11:00 on Saturday or Sunday. Arun works late on Tuesdays this month, so Tuesday evenings are out. Sunday is Arun's favourite day to play."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Mon",
+   "date": "2026-11-02",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Mon 2 Nov 20:00–21:30 at Riverside Sports Centre, court 5"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Tue 3 Nov 19:00–20:30 at Riverside Sports Centre, court 5"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sun 8 Nov 12:00–13:30 at Riverside Sports Centre, court 5"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "11:00",
+    "end": "12:30",
+    "h": 11,
+    "text": "Sun 8 Nov 11:00–12:30 at Riverside Sports Centre, court 5"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Tue",
+   "earliest": 11,
+   "only": null,
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d3678",
+  "member": {
+   "id": "sim-arun",
+   "name": "Arun",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Arun needs a slow start at weekends: nothing before 11:00 on Saturday or Sunday. Arun works late on Tuesdays this month, so Tuesday evenings are out. Sunday is Arun's favourite day to play."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "10:00",
+   "end": "11:30",
+   "h": 10,
+   "text": "Sun 8 Nov 10:00–11:30 at North Hall, court 5"
+  },
+  "alts": [
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Mon 2 Nov 20:00–21:30 at North Hall, court 5"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sun 8 Nov 09:00–10:30 at North Hall, court 5"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at North Hall, court 5"
+   }
+  ],
+  "gold": "B",
+  "why": {
+   "works": false,
+   "out": "Tue",
+   "earliest": 11,
+   "only": null,
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d3683",
+  "member": {
+   "id": "sim-bea",
+   "name": "Bea",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Thu 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Thursday doesn't work for Bea at the moment. At weekends Bea won't start before 10:00. If the time has to move, Bea likes Sundays best."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "09:00",
+   "end": "10:30",
+   "h": 9,
+   "text": "Sun 8 Nov 09:00–10:30 at North Hall, court 4"
+  },
+  "alts": [
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Mon 2 Nov 20:00–21:30 at North Hall, court 4"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Thu 5 Nov 19:00–20:30 at North Hall, court 4"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Thu 5 Nov 18:00–19:30 at North Hall, court 4"
+   }
+  ],
+  "gold": "B",
+  "why": {
+   "works": false,
+   "out": "Thu",
+   "earliest": 10,
+   "only": null,
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d3685",
+  "member": {
+   "id": "sim-bea",
+   "name": "Bea",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Thu 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Thursday doesn't work for Bea at the moment. At weekends Bea won't start before 10:00. If the time has to move, Bea likes Sundays best."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "12:00",
+   "end": "13:30",
+   "h": 12,
+   "text": "Sun 8 Nov 12:00–13:30 at Lakeside Courts, court 4"
+  },
+  "alts": [
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Mon 2 Nov 18:00–19:30 at Lakeside Courts, court 4"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sun 8 Nov 09:00–10:30 at Lakeside Courts, court 4"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Thu 5 Nov 19:00–20:30 at Lakeside Courts, court 4"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Thu",
+   "earliest": 10,
+   "only": null,
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d3703",
+  "member": {
+   "id": "sim-bea",
+   "name": "Bea",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Thu 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Thursday doesn't work for Bea at the moment. At weekends Bea won't start before 10:00. If the time has to move, Bea likes Sundays best."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "09:00",
+   "end": "10:30",
+   "h": 9,
+   "text": "Sun 8 Nov 09:00–10:30 at Riverside Sports Centre, court 4"
+  },
+  "alts": [
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Thu 5 Nov 19:00–20:30 at Riverside Sports Centre, court 4"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Thu 5 Nov 18:00–19:30 at Riverside Sports Centre, court 4"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Thu 5 Nov 20:00–21:30 at Riverside Sports Centre, court 4"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Thu",
+   "earliest": 10,
+   "only": null,
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d3706",
+  "member": {
+   "id": "sim-carlos",
+   "name": "Carlos",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Fri 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "Monday doesn't work for Carlos at the moment. Given a choice, Carlos picks a morning game."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Fri",
+   "date": "2026-11-06",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Fri 6 Nov 19:00–20:30 at Midtown Community Gym, court 1"
+  },
+  "alts": [
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sat 7 Nov 10:00–11:30 at Midtown Community Gym, court 1"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Tue 3 Nov 19:00–20:30 at Midtown Community Gym, court 1"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at Midtown Community Gym, court 1"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Mon",
+   "earliest": null,
+   "only": null,
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d3710",
+  "member": {
+   "id": "sim-carlos",
+   "name": "Carlos",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Fri 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "Monday doesn't work for Carlos at the moment. Given a choice, Carlos picks a morning game."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Mon",
+   "date": "2026-11-02",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Mon 2 Nov 19:00–20:30 at Midtown Community Gym, court 5"
+  },
+  "alts": [
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Fri 6 Nov 20:00–21:30 at Midtown Community Gym, court 5"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sat 7 Nov 12:00–13:30 at Midtown Community Gym, court 5"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "08:00",
+    "end": "09:30",
+    "h": 8,
+    "text": "Sat 7 Nov 08:00–09:30 at Midtown Community Gym, court 5"
+   }
+  ],
+  "gold": "D",
+  "why": {
+   "works": false,
+   "out": "Mon",
+   "earliest": null,
+   "only": null,
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d3718",
+  "member": {
+   "id": "sim-carlos",
+   "name": "Carlos",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Fri 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "Monday doesn't work for Carlos at the moment. Given a choice, Carlos picks a morning game."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Mon",
+   "date": "2026-11-02",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Mon 2 Nov 18:00–19:30 at Riverside Sports Centre, court 2"
+  },
+  "alts": [
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Fri 6 Nov 18:00–19:30 at Riverside Sports Centre, court 2"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sat 7 Nov 09:00–10:30 at Riverside Sports Centre, court 2"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Tue 3 Nov 18:00–19:30 at Riverside Sports Centre, court 2"
+   }
+  ],
+  "gold": "C",
+  "why": {
+   "works": false,
+   "out": "Mon",
+   "earliest": null,
+   "only": null,
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d3720",
+  "member": {
+   "id": "sim-dana",
+   "name": "Dana",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Thu 18-22",
+    "Fri 18-22"
+   ],
+   "agent": "Dana works late on Thursdays this month, so Thursday evenings are out. Tuesday is Dana's favourite day to play."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Fri",
+   "date": "2026-11-06",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Fri 6 Nov 20:00–21:30 at Midtown Community Gym, court 2"
+  },
+  "alts": [
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Thu 5 Nov 20:00–21:30 at Midtown Community Gym, court 2"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Thu 5 Nov 18:00–19:30 at Midtown Community Gym, court 2"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Fri 6 Nov 19:00–20:30 at Midtown Community Gym, court 2"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Thu",
+   "earliest": null,
+   "only": null,
+   "day": "Tue",
+   "part": null
+  }
+ },
+ {
+  "id": "d3857",
+  "member": {
+   "id": "sim-emeka",
+   "name": "Emeka",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Wed 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Emeka needs a slow start at weekends: nothing before 10:00 on Saturday or Sunday. Wednesday doesn't work for Emeka at the moment. If the time has to move, Emeka likes Saturdays best."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Wed",
+   "date": "2026-11-04",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Wed 4 Nov 18:00–19:30 at North Hall, court 4"
+  },
+  "alts": [
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Wed 4 Nov 19:00–20:30 at North Hall, court 4"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sun 8 Nov 09:00–10:30 at North Hall, court 4"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Wed 4 Nov 20:00–21:30 at North Hall, court 4"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Wed",
+   "earliest": 10,
+   "only": null,
+   "day": "Sat",
+   "part": null
+  }
+ },
+ {
+  "id": "d3859",
+  "member": {
+   "id": "sim-emeka",
+   "name": "Emeka",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Wed 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Emeka needs a slow start at weekends: nothing before 10:00 on Saturday or Sunday. Wednesday doesn't work for Emeka at the moment. If the time has to move, Emeka likes Saturdays best."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sat",
+   "date": "2026-11-07",
+   "start": "12:00",
+   "end": "13:30",
+   "h": 12,
+   "text": "Sat 7 Nov 12:00–13:30 at North Hall, court 5"
+  },
+  "alts": [
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sun 8 Nov 12:00–13:30 at North Hall, court 5"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "11:00",
+    "end": "12:30",
+    "h": 11,
+    "text": "Sat 7 Nov 11:00–12:30 at North Hall, court 5"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sat 7 Nov 09:00–10:30 at North Hall, court 5"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Wed",
+   "earliest": 10,
+   "only": null,
+   "day": "Sat",
+   "part": null
+  }
+ },
+ {
+  "id": "d3860",
+  "member": {
+   "id": "sim-emeka",
+   "name": "Emeka",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Wed 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Emeka needs a slow start at weekends: nothing before 10:00 on Saturday or Sunday. Wednesday doesn't work for Emeka at the moment. If the time has to move, Emeka likes Saturdays best."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Wed",
+   "date": "2026-11-04",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Wed 4 Nov 19:00–20:30 at North Hall, court 3"
+  },
+  "alts": [
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sun 8 Nov 10:00–11:30 at North Hall, court 3"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sun 8 Nov 09:00–10:30 at North Hall, court 3"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at North Hall, court 3"
+   }
+  ],
+  "gold": "B",
+  "why": {
+   "works": false,
+   "out": "Wed",
+   "earliest": 10,
+   "only": null,
+   "day": "Sat",
+   "part": null
+  }
+ },
+ {
+  "id": "d3864",
+  "member": {
+   "id": "sim-fatima",
+   "name": "Fatima",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Fri 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Fatima works late on Fridays this month, so Friday evenings are out. If the time has to move, Fatima likes Sundays best."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Fri",
+   "date": "2026-11-06",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Fri 6 Nov 20:00–21:30 at Midtown Community Gym, court 3"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at Midtown Community Gym, court 3"
+   },
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Mon 2 Nov 20:00–21:30 at Midtown Community Gym, court 3"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sun 8 Nov 10:00–11:30 at Midtown Community Gym, court 3"
+   }
+  ],
+  "gold": "D",
+  "why": {
+   "works": false,
+   "out": "Fri",
+   "earliest": null,
+   "only": null,
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d3866",
+  "member": {
+   "id": "sim-fatima",
+   "name": "Fatima",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Fri 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Fatima works late on Fridays this month, so Friday evenings are out. If the time has to move, Fatima likes Sundays best."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "10:00",
+   "end": "11:30",
+   "h": 10,
+   "text": "Sun 8 Nov 10:00–11:30 at Riverside Sports Centre, court 5"
+  },
+  "alts": [
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Mon 2 Nov 20:00–21:30 at Riverside Sports Centre, court 5"
+   },
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Mon 2 Nov 18:00–19:30 at Riverside Sports Centre, court 5"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Tue 3 Nov 19:00–20:30 at Riverside Sports Centre, court 5"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Fri",
+   "earliest": null,
+   "only": null,
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d4207",
+  "member": {
+   "id": "sim-hiro",
+   "name": "Hiro",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Thu 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Thursday doesn't work for Hiro at the moment. If the time has to move, Hiro likes Tuesdays best. Hiro needs a slow start at weekends: nothing before 11:00 on Saturday or Sunday."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "10:00",
+   "end": "11:30",
+   "h": 10,
+   "text": "Sun 8 Nov 10:00–11:30 at North Hall, court 2"
+  },
+  "alts": [
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Thu 5 Nov 20:00–21:30 at North Hall, court 2"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Thu 5 Nov 19:00–20:30 at North Hall, court 2"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sun 8 Nov 09:00–10:30 at North Hall, court 2"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Thu",
+   "earliest": 11,
+   "only": null,
+   "day": "Tue",
+   "part": null
+  }
+ },
+ {
+  "id": "d4208",
+  "member": {
+   "id": "sim-hiro",
+   "name": "Hiro",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Thu 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Thursday doesn't work for Hiro at the moment. If the time has to move, Hiro likes Tuesdays best. Hiro needs a slow start at weekends: nothing before 11:00 on Saturday or Sunday."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "12:00",
+   "end": "13:30",
+   "h": 12,
+   "text": "Sun 8 Nov 12:00–13:30 at Midtown Community Gym, court 1"
+  },
+  "alts": [
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "11:00",
+    "end": "12:30",
+    "h": 11,
+    "text": "Sun 8 Nov 11:00–12:30 at Midtown Community Gym, court 1"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sun 8 Nov 10:00–11:30 at Midtown Community Gym, court 1"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Thu 5 Nov 20:00–21:30 at Midtown Community Gym, court 1"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Thu",
+   "earliest": 11,
+   "only": null,
+   "day": "Tue",
+   "part": null
+  }
+ },
+ {
+  "id": "d4262",
+  "member": {
+   "id": "sim-ilse",
+   "name": "Ilse",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Thu 18-22",
+    "Fri 18-22"
+   ],
+   "agent": "Ilse works late on Mondays this month, so Monday evenings are out. If the time has to move, Ilse likes Mondays best."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Mon",
+   "date": "2026-11-02",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Mon 2 Nov 19:00–20:30 at Riverside Sports Centre, court 2"
+  },
+  "alts": [
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Mon 2 Nov 18:00–19:30 at Riverside Sports Centre, court 2"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Fri 6 Nov 20:00–21:30 at Riverside Sports Centre, court 2"
+   },
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Mon 2 Nov 20:00–21:30 at Riverside Sports Centre, court 2"
+   }
+  ],
+  "gold": "C",
+  "why": {
+   "works": false,
+   "out": "Mon",
+   "earliest": null,
+   "only": null,
+   "day": "Mon",
+   "part": null
+  }
+ },
+ {
+  "id": "d4274",
+  "member": {
+   "id": "sim-ilse",
+   "name": "Ilse",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Thu 18-22",
+    "Fri 18-22"
+   ],
+   "agent": "Ilse works late on Mondays this month, so Monday evenings are out. If the time has to move, Ilse likes Mondays best."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Mon",
+   "date": "2026-11-02",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Mon 2 Nov 18:00–19:30 at Midtown Community Gym, court 3"
+  },
+  "alts": [
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Mon 2 Nov 19:00–20:30 at Midtown Community Gym, court 3"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at Midtown Community Gym, court 3"
+   },
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Mon 2 Nov 20:00–21:30 at Midtown Community Gym, court 3"
+   }
+  ],
+  "gold": "C",
+  "why": {
+   "works": false,
+   "out": "Mon",
+   "earliest": null,
+   "only": null,
+   "day": "Mon",
+   "part": null
+  }
+ },
+ {
+  "id": "d4275",
+  "member": {
+   "id": "sim-ilse",
+   "name": "Ilse",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Thu 18-22",
+    "Fri 18-22"
+   ],
+   "agent": "Ilse works late on Mondays this month, so Monday evenings are out. If the time has to move, Ilse likes Mondays best."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Thu",
+   "date": "2026-11-05",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Thu 5 Nov 20:00–21:30 at Riverside Sports Centre, court 5"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at Riverside Sports Centre, court 5"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Fri 6 Nov 18:00–19:30 at Riverside Sports Centre, court 5"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Tue 3 Nov 18:00–19:30 at Riverside Sports Centre, court 5"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Mon",
+   "earliest": null,
+   "only": null,
+   "day": "Mon",
+   "part": null
+  }
+ },
+ {
+  "id": "d4636",
+  "member": {
+   "id": "sim-lina",
+   "name": "Lina",
+   "level": "B",
+   "prefers": "singles",
+   "free": [
+    "Wed 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "If the time has to move, Lina likes Saturdays best. Lina only plays singles. Wednesday doesn't work for Lina at the moment."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Wed",
+   "date": "2026-11-04",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Wed 4 Nov 19:00–20:30 at Midtown Community Gym, court 2"
+  },
+  "alts": [
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sat 7 Nov 12:00–13:30 at Midtown Community Gym, court 2"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at Midtown Community Gym, court 2"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sun 8 Nov 12:00–13:30 at Midtown Community Gym, court 2"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Wed",
+   "earliest": null,
+   "only": "singles",
+   "day": "Sat",
+   "part": null
+  }
+ },
+ {
+  "id": "d4637",
+  "member": {
+   "id": "sim-lina",
+   "name": "Lina",
+   "level": "B",
+   "prefers": "singles",
+   "free": [
+    "Wed 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "If the time has to move, Lina likes Saturdays best. Lina only plays singles. Wednesday doesn't work for Lina at the moment."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "10:00",
+   "end": "11:30",
+   "h": 10,
+   "text": "Sun 8 Nov 10:00–11:30 at Lakeside Courts, court 5"
+  },
+  "alts": [
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sat 7 Nov 10:00–11:30 at Lakeside Courts, court 5"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sat 7 Nov 12:00–13:30 at Lakeside Courts, court 5"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at Lakeside Courts, court 5"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Wed",
+   "earliest": null,
+   "only": "singles",
+   "day": "Sat",
+   "part": null
+  }
+ },
+ {
+  "id": "d4638",
+  "member": {
+   "id": "sim-lina",
+   "name": "Lina",
+   "level": "B",
+   "prefers": "singles",
+   "free": [
+    "Wed 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "If the time has to move, Lina likes Saturdays best. Lina only plays singles. Wednesday doesn't work for Lina at the moment."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Wed",
+   "date": "2026-11-04",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Wed 4 Nov 20:00–21:30 at Riverside Sports Centre, court 4"
+  },
+  "alts": [
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Wed 4 Nov 19:00–20:30 at Riverside Sports Centre, court 4"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "08:00",
+    "end": "09:30",
+    "h": 8,
+    "text": "Sat 7 Nov 08:00–09:30 at Riverside Sports Centre, court 4"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at Riverside Sports Centre, court 4"
+   }
+  ],
+  "gold": "C",
+  "why": {
+   "works": false,
+   "out": "Wed",
+   "earliest": null,
+   "only": "singles",
+   "day": "Sat",
+   "part": null
+  }
+ },
+ {
+  "id": "d4641",
+  "member": {
+   "id": "sim-mateo",
+   "name": "Mateo",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Tuesday doesn't work for Mateo at the moment. If the time has to move, Mateo likes Tuesdays best. At weekends Mateo won't start before 10:00."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Tue",
+   "date": "2026-11-03",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Tue 3 Nov 19:00–20:30 at Midtown Community Gym, court 2"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Tue 3 Nov 18:00–19:30 at Midtown Community Gym, court 2"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at Midtown Community Gym, court 2"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sun 8 Nov 10:00–11:30 at Midtown Community Gym, court 2"
+   }
+  ],
+  "gold": "D",
+  "why": {
+   "works": false,
+   "out": "Tue",
+   "earliest": 10,
+   "only": null,
+   "day": "Tue",
+   "part": null
+  }
+ },
+ {
+  "id": "d4645",
+  "member": {
+   "id": "sim-mateo",
+   "name": "Mateo",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Tuesday doesn't work for Mateo at the moment. If the time has to move, Mateo likes Tuesdays best. At weekends Mateo won't start before 10:00."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Sat",
+   "date": "2026-11-07",
+   "start": "10:00",
+   "end": "11:30",
+   "h": 10,
+   "text": "Sat 7 Nov 10:00–11:30 at Lakeside Courts, court 2"
+  },
+  "alts": [
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "08:00",
+    "end": "09:30",
+    "h": 8,
+    "text": "Sat 7 Nov 08:00–09:30 at Lakeside Courts, court 2"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sat 7 Nov 12:00–13:30 at Lakeside Courts, court 2"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Tue 3 Nov 19:00–20:30 at Lakeside Courts, court 2"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Tue",
+   "earliest": 10,
+   "only": null,
+   "day": "Tue",
+   "part": null
+  }
+ },
+ {
+  "id": "d4647",
+  "member": {
+   "id": "sim-mateo",
+   "name": "Mateo",
+   "level": "C",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Tuesday doesn't work for Mateo at the moment. If the time has to move, Mateo likes Tuesdays best. At weekends Mateo won't start before 10:00."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "09:00",
+   "end": "10:30",
+   "h": 9,
+   "text": "Sun 8 Nov 09:00–10:30 at Riverside Sports Centre, court 2"
+  },
+  "alts": [
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "08:00",
+    "end": "09:30",
+    "h": 8,
+    "text": "Sat 7 Nov 08:00–09:30 at Riverside Sports Centre, court 2"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sat 7 Nov 09:00–10:30 at Riverside Sports Centre, court 2"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Tue 3 Nov 18:00–19:30 at Riverside Sports Centre, court 2"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Tue",
+   "earliest": 10,
+   "only": null,
+   "day": "Tue",
+   "part": null
+  }
+ },
+ {
+  "id": "d4649",
+  "member": {
+   "id": "sim-nadia",
+   "name": "Nadia",
+   "level": "B",
+   "prefers": "doubles",
+   "free": [
+    "Mon 18-22",
+    "Thu 18-22",
+    "Fri 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Nadia only plays doubles. If the time has to move, Nadia likes Sundays best. Nadia works late on Thursdays this month, so Thursday evenings are out."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Mon",
+   "date": "2026-11-02",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Mon 2 Nov 20:00–21:30 at Lakeside Courts, court 5"
+  },
+  "alts": [
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Mon 2 Nov 19:00–20:30 at Lakeside Courts, court 5"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Fri 6 Nov 20:00–21:30 at Lakeside Courts, court 5"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sun 8 Nov 09:00–10:30 at Lakeside Courts, court 5"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Thu",
+   "earliest": null,
+   "only": "doubles",
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d4670",
+  "member": {
+   "id": "sim-nadia",
+   "name": "Nadia",
+   "level": "B",
+   "prefers": "doubles",
+   "free": [
+    "Mon 18-22",
+    "Thu 18-22",
+    "Fri 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Nadia only plays doubles. If the time has to move, Nadia likes Sundays best. Nadia works late on Thursdays this month, so Thursday evenings are out."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Thu",
+   "date": "2026-11-05",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Thu 5 Nov 20:00–21:30 at North Hall, court 2"
+  },
+  "alts": [
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Thu 5 Nov 19:00–20:30 at North Hall, court 2"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Fri 6 Nov 18:00–19:30 at North Hall, court 2"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sun 8 Nov 10:00–11:30 at North Hall, court 2"
+   }
+  ],
+  "gold": "D",
+  "why": {
+   "works": false,
+   "out": "Thu",
+   "earliest": null,
+   "only": "doubles",
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d4687",
+  "member": {
+   "id": "sim-nadia",
+   "name": "Nadia",
+   "level": "B",
+   "prefers": "doubles",
+   "free": [
+    "Mon 18-22",
+    "Thu 18-22",
+    "Fri 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Nadia only plays doubles. If the time has to move, Nadia likes Sundays best. Nadia works late on Thursdays this month, so Thursday evenings are out."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Thu",
+   "date": "2026-11-05",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Thu 5 Nov 18:00–19:30 at North Hall, court 5"
+  },
+  "alts": [
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Fri 6 Nov 19:00–20:30 at North Hall, court 5"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sun 8 Nov 10:00–11:30 at North Hall, court 5"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Fri 6 Nov 18:00–19:30 at North Hall, court 5"
+   }
+  ],
+  "gold": "C",
+  "why": {
+   "works": false,
+   "out": "Thu",
+   "earliest": null,
+   "only": "doubles",
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d4688",
+  "member": {
+   "id": "sim-oskar",
+   "name": "Oskar",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Wed 18-22",
+    "Thu 18-22"
+   ],
+   "agent": "Wednesday is Oskar's favourite day to play."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Mon",
+   "date": "2026-11-02",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Mon 2 Nov 18:00–19:30 at North Hall, court 4"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Tue 3 Nov 19:00–20:30 at North Hall, court 4"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at North Hall, court 4"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Tue 3 Nov 18:00–19:30 at North Hall, court 4"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": null,
+   "earliest": null,
+   "only": null,
+   "day": "Wed",
+   "part": null
+  }
+ },
+ {
+  "id": "d4809",
+  "member": {
+   "id": "sim-pita",
+   "name": "Pita",
+   "level": "A",
+   "prefers": "doubles",
+   "free": [
+    "Mon 18-22",
+    "Wed 18-22",
+    "Thu 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Pita plays doubles and nothing else. Pita has an evening class on Mondays until December and can't play then. At weekends Pita won't start before 10:00. If the time has to move, Pita likes Sundays best."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Thu",
+   "date": "2026-11-05",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Thu 5 Nov 19:00–20:30 at North Hall, court 1"
+  },
+  "alts": [
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Thu 5 Nov 20:00–21:30 at North Hall, court 1"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at North Hall, court 1"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sun 8 Nov 09:00–10:30 at North Hall, court 1"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Mon",
+   "earliest": 10,
+   "only": "doubles",
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d4810",
+  "member": {
+   "id": "sim-pita",
+   "name": "Pita",
+   "level": "A",
+   "prefers": "doubles",
+   "free": [
+    "Mon 18-22",
+    "Wed 18-22",
+    "Thu 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Pita plays doubles and nothing else. Pita has an evening class on Mondays until December and can't play then. At weekends Pita won't start before 10:00. If the time has to move, Pita likes Sundays best."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Thu",
+   "date": "2026-11-05",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Thu 5 Nov 20:00–21:30 at North Hall, court 2"
+  },
+  "alts": [
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at North Hall, court 2"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Thu 5 Nov 19:00–20:30 at North Hall, court 2"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Wed 4 Nov 20:00–21:30 at North Hall, court 2"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Mon",
+   "earliest": 10,
+   "only": "doubles",
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d4813",
+  "member": {
+   "id": "sim-pita",
+   "name": "Pita",
+   "level": "A",
+   "prefers": "doubles",
+   "free": [
+    "Mon 18-22",
+    "Wed 18-22",
+    "Thu 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Pita plays doubles and nothing else. Pita has an evening class on Mondays until December and can't play then. At weekends Pita won't start before 10:00. If the time has to move, Pita likes Sundays best."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Mon",
+   "date": "2026-11-02",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Mon 2 Nov 19:00–20:30 at Riverside Sports Centre, court 2"
+  },
+  "alts": [
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at Riverside Sports Centre, court 2"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Wed 4 Nov 19:00–20:30 at Riverside Sports Centre, court 2"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "11:00",
+    "end": "12:30",
+    "h": 11,
+    "text": "Sun 8 Nov 11:00–12:30 at Riverside Sports Centre, court 2"
+   }
+  ],
+  "gold": "D",
+  "why": {
+   "works": false,
+   "out": "Mon",
+   "earliest": 10,
+   "only": "doubles",
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d4834",
+  "member": {
+   "id": "sim-quinn",
+   "name": "Quinn",
+   "level": "A",
+   "prefers": "doubles",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Wed 18-22"
+   ],
+   "agent": "Quinn prefers mornings. Quinn has an evening class on Mondays until December and can't play then. Quinn plays doubles and nothing else."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Mon",
+   "date": "2026-11-02",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Mon 2 Nov 18:00–19:30 at North Hall, court 2"
+  },
+  "alts": [
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Mon 2 Nov 19:00–20:30 at North Hall, court 2"
+   },
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Mon 2 Nov 20:00–21:30 at North Hall, court 2"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Wed 4 Nov 20:00–21:30 at North Hall, court 2"
+   }
+  ],
+  "gold": "D",
+  "why": {
+   "works": false,
+   "out": "Mon",
+   "earliest": null,
+   "only": "doubles",
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d4836",
+  "member": {
+   "id": "sim-quinn",
+   "name": "Quinn",
+   "level": "A",
+   "prefers": "doubles",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Wed 18-22"
+   ],
+   "agent": "Quinn prefers mornings. Quinn has an evening class on Mondays until December and can't play then. Quinn plays doubles and nothing else."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Wed",
+   "date": "2026-11-04",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Wed 4 Nov 18:00–19:30 at Riverside Sports Centre, court 4"
+  },
+  "alts": [
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Mon 2 Nov 18:00–19:30 at Riverside Sports Centre, court 4"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at Riverside Sports Centre, court 4"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Tue 3 Nov 18:00–19:30 at Riverside Sports Centre, court 4"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Mon",
+   "earliest": null,
+   "only": "doubles",
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d4837",
+  "member": {
+   "id": "sim-quinn",
+   "name": "Quinn",
+   "level": "A",
+   "prefers": "doubles",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Wed 18-22"
+   ],
+   "agent": "Quinn prefers mornings. Quinn has an evening class on Mondays until December and can't play then. Quinn plays doubles and nothing else."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Wed",
+   "date": "2026-11-04",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Wed 4 Nov 20:00–21:30 at North Hall, court 5"
+  },
+  "alts": [
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Mon 2 Nov 18:00–19:30 at North Hall, court 5"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Tue 3 Nov 18:00–19:30 at North Hall, court 5"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at North Hall, court 5"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Mon",
+   "earliest": null,
+   "only": "doubles",
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d4838",
+  "member": {
+   "id": "sim-rosa",
+   "name": "Rosa",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Wed 18-22",
+    "Thu 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Rosa works late on Thursdays this month, so Thursday evenings are out. Tuesday is Rosa's favourite day to play. Rosa needs a slow start at weekends: nothing before 10:00 on Saturday or Sunday."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "10:00",
+   "end": "11:30",
+   "h": 10,
+   "text": "Sun 8 Nov 10:00–11:30 at Midtown Community Gym, court 3"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Tue 3 Nov 18:00–19:30 at Midtown Community Gym, court 3"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Thu 5 Nov 20:00–21:30 at Midtown Community Gym, court 3"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at Midtown Community Gym, court 3"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Thu",
+   "earliest": 10,
+   "only": null,
+   "day": "Tue",
+   "part": null
+  }
+ },
+ {
+  "id": "d4842",
+  "member": {
+   "id": "sim-rosa",
+   "name": "Rosa",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Wed 18-22",
+    "Thu 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Rosa works late on Thursdays this month, so Thursday evenings are out. Tuesday is Rosa's favourite day to play. Rosa needs a slow start at weekends: nothing before 10:00 on Saturday or Sunday."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Thu",
+   "date": "2026-11-05",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Thu 5 Nov 18:00–19:30 at Riverside Sports Centre, court 5"
+  },
+  "alts": [
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Thu 5 Nov 19:00–20:30 at Riverside Sports Centre, court 5"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Wed 4 Nov 19:00–20:30 at Riverside Sports Centre, court 5"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at Riverside Sports Centre, court 5"
+   }
+  ],
+  "gold": "D",
+  "why": {
+   "works": false,
+   "out": "Thu",
+   "earliest": 10,
+   "only": null,
+   "day": "Tue",
+   "part": null
+  }
+ },
+ {
+  "id": "d4850",
+  "member": {
+   "id": "sim-rosa",
+   "name": "Rosa",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Wed 18-22",
+    "Thu 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Rosa works late on Thursdays this month, so Thursday evenings are out. Tuesday is Rosa's favourite day to play. Rosa needs a slow start at weekends: nothing before 10:00 on Saturday or Sunday."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Thu",
+   "date": "2026-11-05",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Thu 5 Nov 18:00–19:30 at North Hall, court 3"
+  },
+  "alts": [
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sun 8 Nov 10:00–11:30 at North Hall, court 3"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Tue 3 Nov 18:00–19:30 at North Hall, court 3"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Thu 5 Nov 20:00–21:30 at North Hall, court 3"
+   }
+  ],
+  "gold": "C",
+  "why": {
+   "works": false,
+   "out": "Thu",
+   "earliest": 10,
+   "only": null,
+   "day": "Tue",
+   "part": null
+  }
+ },
+ {
+  "id": "d4851",
+  "member": {
+   "id": "sim-sven",
+   "name": "Sven",
+   "level": "A",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Fri 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Given a choice, Sven picks a morning game. At weekends Sven won't start before 11:00."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "11:00",
+   "end": "12:30",
+   "h": 11,
+   "text": "Sun 8 Nov 11:00–12:30 at Lakeside Courts, court 2"
+  },
+  "alts": [
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Mon 2 Nov 19:00–20:30 at Lakeside Courts, court 2"
+   },
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Mon 2 Nov 18:00–19:30 at Lakeside Courts, court 2"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sun 8 Nov 12:00–13:30 at Lakeside Courts, court 2"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": null,
+   "earliest": 11,
+   "only": null,
+   "day": null,
+   "part": "morning"
+  }
+ },
+ {
+  "id": "d5045",
+  "member": {
+   "id": "sim-tara",
+   "name": "Tara",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Fri 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "If the time has to move, Tara likes Sundays best. Tara works late on Fridays this month, so Friday evenings are out. At weekends Tara won't start before 10:00."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Fri",
+   "date": "2026-11-06",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Fri 6 Nov 20:00–21:30 at Midtown Community Gym, court 4"
+  },
+  "alts": [
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sun 8 Nov 09:00–10:30 at Midtown Community Gym, court 4"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Fri 6 Nov 18:00–19:30 at Midtown Community Gym, court 4"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Fri 6 Nov 19:00–20:30 at Midtown Community Gym, court 4"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Fri",
+   "earliest": 10,
+   "only": null,
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d5047",
+  "member": {
+   "id": "sim-tara",
+   "name": "Tara",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Tue 18-22",
+    "Fri 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "If the time has to move, Tara likes Sundays best. Tara works late on Fridays this month, so Friday evenings are out. At weekends Tara won't start before 10:00."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "11:00",
+   "end": "12:30",
+   "h": 11,
+   "text": "Sun 8 Nov 11:00–12:30 at Midtown Community Gym, court 4"
+  },
+  "alts": [
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Mon 2 Nov 18:00–19:30 at Midtown Community Gym, court 4"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at Midtown Community Gym, court 4"
+   },
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Mon 2 Nov 20:00–21:30 at Midtown Community Gym, court 4"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Fri",
+   "earliest": 10,
+   "only": null,
+   "day": "Sun",
+   "part": null
+  }
+ },
+ {
+  "id": "d5049",
+  "member": {
+   "id": "sim-umar",
+   "name": "Umar",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Wed 18-22",
+    "Thu 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Umar needs a slow start at weekends: nothing before 10:00 on Saturday or Sunday. If the time has to move, Umar likes Thursdays best. Umar has an evening class on Mondays until December and can't play then."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Mon",
+   "date": "2026-11-02",
+   "start": "18:00",
+   "end": "19:30",
+   "h": 18,
+   "text": "Mon 2 Nov 18:00–19:30 at Midtown Community Gym, court 5"
+  },
+  "alts": [
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Thu 5 Nov 18:00–19:30 at Midtown Community Gym, court 5"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at Midtown Community Gym, court 5"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Wed 4 Nov 20:00–21:30 at Midtown Community Gym, court 5"
+   }
+  ],
+  "gold": "B",
+  "why": {
+   "works": false,
+   "out": "Mon",
+   "earliest": 10,
+   "only": null,
+   "day": "Thu",
+   "part": null
+  }
+ },
+ {
+  "id": "d5054",
+  "member": {
+   "id": "sim-umar",
+   "name": "Umar",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Wed 18-22",
+    "Thu 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Umar needs a slow start at weekends: nothing before 10:00 on Saturday or Sunday. If the time has to move, Umar likes Thursdays best. Umar has an evening class on Mondays until December and can't play then."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Mon",
+   "date": "2026-11-02",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Mon 2 Nov 20:00–21:30 at North Hall, court 4"
+  },
+  "alts": [
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Wed 4 Nov 19:00–20:30 at North Hall, court 4"
+   },
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Mon 2 Nov 19:00–20:30 at North Hall, court 4"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Thu 5 Nov 19:00–20:30 at North Hall, court 4"
+   }
+  ],
+  "gold": "D",
+  "why": {
+   "works": false,
+   "out": "Mon",
+   "earliest": 10,
+   "only": null,
+   "day": "Thu",
+   "part": null
+  }
+ },
+ {
+  "id": "d5056",
+  "member": {
+   "id": "sim-umar",
+   "name": "Umar",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Mon 18-22",
+    "Wed 18-22",
+    "Thu 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "Umar needs a slow start at weekends: nothing before 10:00 on Saturday or Sunday. If the time has to move, Umar likes Thursdays best. Umar has an evening class on Mondays until December and can't play then."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Wed",
+   "date": "2026-11-04",
+   "start": "19:00",
+   "end": "20:30",
+   "h": 19,
+   "text": "Wed 4 Nov 19:00–20:30 at Riverside Sports Centre, court 3"
+  },
+  "alts": [
+   {
+    "day": "Mon",
+    "date": "2026-11-02",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Mon 2 Nov 20:00–21:30 at Riverside Sports Centre, court 3"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sun 8 Nov 12:00–13:30 at Riverside Sports Centre, court 3"
+   },
+   {
+    "day": "Wed",
+    "date": "2026-11-04",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Wed 4 Nov 18:00–19:30 at Riverside Sports Centre, court 3"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Mon",
+   "earliest": 10,
+   "only": null,
+   "day": "Thu",
+   "part": null
+  }
+ },
+ {
+  "id": "d5644",
+  "member": {
+   "id": "sim-yusuf",
+   "name": "Yusuf",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Thu 18-22",
+    "Fri 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "At weekends Yusuf won't start before 11:00. Saturday is Yusuf's favourite day to play. Yusuf works late on Tuesdays this month, so Tuesday evenings are out."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sat",
+   "date": "2026-11-07",
+   "start": "09:00",
+   "end": "10:30",
+   "h": 9,
+   "text": "Sat 7 Nov 09:00–10:30 at Riverside Sports Centre, court 4"
+  },
+  "alts": [
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "08:00",
+    "end": "09:30",
+    "h": 8,
+    "text": "Sat 7 Nov 08:00–09:30 at Riverside Sports Centre, court 4"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Tue 3 Nov 18:00–19:30 at Riverside Sports Centre, court 4"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Tue 3 Nov 19:00–20:30 at Riverside Sports Centre, court 4"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Tue",
+   "earliest": 11,
+   "only": null,
+   "day": "Sat",
+   "part": null
+  }
+ },
+ {
+  "id": "d5645",
+  "member": {
+   "id": "sim-yusuf",
+   "name": "Yusuf",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Thu 18-22",
+    "Fri 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "At weekends Yusuf won't start before 11:00. Saturday is Yusuf's favourite day to play. Yusuf works late on Tuesdays this month, so Tuesday evenings are out."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Thu",
+   "date": "2026-11-05",
+   "start": "20:00",
+   "end": "21:30",
+   "h": 20,
+   "text": "Thu 5 Nov 20:00–21:30 at North Hall, court 4"
+  },
+  "alts": [
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sat 7 Nov 09:00–10:30 at North Hall, court 4"
+   },
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Thu 5 Nov 18:00–19:30 at North Hall, court 4"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Tue 3 Nov 19:00–20:30 at North Hall, court 4"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Tue",
+   "earliest": 11,
+   "only": null,
+   "day": "Sat",
+   "part": null
+  }
+ },
+ {
+  "id": "d5647",
+  "member": {
+   "id": "sim-yusuf",
+   "name": "Yusuf",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Thu 18-22",
+    "Fri 18-22",
+    "Sat 8-14"
+   ],
+   "agent": "At weekends Yusuf won't start before 11:00. Saturday is Yusuf's favourite day to play. Yusuf works late on Tuesdays this month, so Tuesday evenings are out."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sat",
+   "date": "2026-11-07",
+   "start": "09:00",
+   "end": "10:30",
+   "h": 9,
+   "text": "Sat 7 Nov 09:00–10:30 at Riverside Sports Centre, court 2"
+  },
+  "alts": [
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Tue 3 Nov 19:00–20:30 at Riverside Sports Centre, court 2"
+   },
+   {
+    "day": "Tue",
+    "date": "2026-11-03",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Tue 3 Nov 20:00–21:30 at Riverside Sports Centre, court 2"
+   },
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "20:00",
+    "end": "21:30",
+    "h": 20,
+    "text": "Fri 6 Nov 20:00–21:30 at Riverside Sports Centre, court 2"
+   }
+  ],
+  "gold": "D",
+  "why": {
+   "works": false,
+   "out": "Tue",
+   "earliest": 11,
+   "only": null,
+   "day": "Sat",
+   "part": null
+  }
+ },
+ {
+  "id": "d5772",
+  "member": {
+   "id": "sim-zoe",
+   "name": "Zoe",
+   "level": "B",
+   "prefers": "any",
+   "free": [
+    "Tue 18-22",
+    "Thu 18-22",
+    "Sun 9-14"
+   ],
+   "agent": "At weekends Zoe won't start before 10:00. Given a choice, Zoe picks an evening game."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "09:00",
+   "end": "10:30",
+   "h": 9,
+   "text": "Sun 8 Nov 09:00–10:30 at Midtown Community Gym, court 2"
+  },
+  "alts": [
+   {
+    "day": "Thu",
+    "date": "2026-11-05",
+    "start": "19:00",
+    "end": "20:30",
+    "h": 19,
+    "text": "Thu 5 Nov 19:00–20:30 at Midtown Community Gym, court 2"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "11:00",
+    "end": "12:30",
+    "h": 11,
+    "text": "Sun 8 Nov 11:00–12:30 at Midtown Community Gym, court 2"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "10:00",
+    "end": "11:30",
+    "h": 10,
+    "text": "Sun 8 Nov 10:00–11:30 at Midtown Community Gym, court 2"
+   }
+  ],
+  "gold": "B",
+  "why": {
+   "works": false,
+   "out": null,
+   "earliest": 10,
+   "only": null,
+   "day": null,
+   "part": "evening"
+  }
+ },
+ {
+  "id": "d5776",
+  "member": {
+   "id": "sim-amara",
+   "name": "Amara",
+   "level": "B",
+   "prefers": "doubles",
+   "free": [
+    "Fri 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Amara prefers evenings. Amara only plays doubles. Amara works late on Fridays this month, so Friday evenings are out."
+  },
+  "sport": "badminton",
+  "format": "doubles",
+  "cur": {
+   "day": "Sun",
+   "date": "2026-11-08",
+   "start": "10:00",
+   "end": "11:30",
+   "h": 10,
+   "text": "Sun 8 Nov 10:00–11:30 at Midtown Community Gym, court 2"
+  },
+  "alts": [
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sat 7 Nov 09:00–10:30 at Midtown Community Gym, court 2"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sun 8 Nov 12:00–13:30 at Midtown Community Gym, court 2"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sun 8 Nov 09:00–10:30 at Midtown Community Gym, court 2"
+   }
+  ],
+  "gold": "A",
+  "why": {
+   "works": true,
+   "out": "Fri",
+   "earliest": null,
+   "only": "doubles",
+   "day": null,
+   "part": "evening"
+  }
+ },
+ {
+  "id": "d5778",
+  "member": {
+   "id": "sim-amara",
+   "name": "Amara",
+   "level": "B",
+   "prefers": "doubles",
+   "free": [
+    "Fri 18-22",
+    "Sat 8-14",
+    "Sun 9-14"
+   ],
+   "agent": "Amara prefers evenings. Amara only plays doubles. Amara works late on Fridays this month, so Friday evenings are out."
+  },
+  "sport": "badminton",
+  "format": "singles",
+  "cur": {
+   "day": "Sat",
+   "date": "2026-11-07",
+   "start": "11:00",
+   "end": "12:30",
+   "h": 11,
+   "text": "Sat 7 Nov 11:00–12:30 at Riverside Sports Centre, court 1"
+  },
+  "alts": [
+   {
+    "day": "Fri",
+    "date": "2026-11-06",
+    "start": "18:00",
+    "end": "19:30",
+    "h": 18,
+    "text": "Fri 6 Nov 18:00–19:30 at Riverside Sports Centre, court 1"
+   },
+   {
+    "day": "Sun",
+    "date": "2026-11-08",
+    "start": "12:00",
+    "end": "13:30",
+    "h": 12,
+    "text": "Sun 8 Nov 12:00–13:30 at Riverside Sports Centre, court 1"
+   },
+   {
+    "day": "Sat",
+    "date": "2026-11-07",
+    "start": "09:00",
+    "end": "10:30",
+    "h": 9,
+    "text": "Sat 7 Nov 09:00–10:30 at Riverside Sports Centre, court 1"
+   }
+  ],
+  "gold": "Z",
+  "why": {
+   "works": false,
+   "out": "Fri",
+   "earliest": null,
+   "only": "doubles",
+   "day": null,
+   "part": "evening"
+  }
+ }
+]

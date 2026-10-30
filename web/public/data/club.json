@@ -1,0 +1,1055 @@
+{
+ "name": "Riverside Sports Club",
+ "demo": true,
+ "note": "Sample club for the demo: the members, their games and their numbers are made up.",
+ "night": {
+  "day": "Wed",
+  "start": "19:00",
+  "minutes": 90,
+  "courts": 3
+ },
+ "challenge": {
+  "title": "Forty games in two weeks",
+  "text": "Every game a member plays counts, singles or doubles, in any sport.",
+  "target": 40,
+  "weeks": 2
+ },
+ "members": [
+  {
+   "id": "hana",
+   "name": "Hana Chen",
+   "level": "B",
+   "hand": "R",
+   "weak": "rear backhand",
+   "strength": {
+    "shot": "smash",
+    "zone": "rear forehand"
+   },
+   "limit": null,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": true,
+    "limits": true
+   },
+   "free": [
+    "Tue 19-22",
+    "Thu 18-22",
+    "Sat 09-13"
+   ],
+   "prefers": "doubles",
+   "venue": "riverside",
+   "mix": {
+    "Smash": 24,
+    "Net shot": 16,
+    "Lift": 10,
+    "Clear": 12,
+    "Drop": 14,
+    "Drive": 12,
+    "Block": 6,
+    "Push": 6
+   },
+   "area": {
+    "x": 3.3,
+    "y": 6.3,
+    "name": "Riverside"
+   },
+   "rating": 1524,
+   "w": 9,
+   "l": 8,
+   "form": [
+    "L",
+    "W",
+    "W",
+    "L",
+    "W"
+   ],
+   "agent": "Hana prefers doubles but plays singles on Thursdays; likes Riverside.",
+   "sports": [
+    "badminton",
+    "tennis"
+   ],
+   "games": 3
+  },
+  {
+   "id": "ravi",
+   "name": "Ravi Patel",
+   "level": "A",
+   "hand": "R",
+   "weak": "front forehand",
+   "strength": {
+    "shot": "drive",
+    "zone": "mid backhand"
+   },
+   "limit": "no jump landings",
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": true
+   },
+   "free": [
+    "Mon 19-22",
+    "Thu 19-22",
+    "Sun 10-14"
+   ],
+   "prefers": "doubles",
+   "venue": "north",
+   "mix": {
+    "Drive": 26,
+    "Push": 14,
+    "Smash": 16,
+    "Net shot": 14,
+    "Lift": 10,
+    "Clear": 8,
+    "Drop": 6,
+    "Block": 6
+   },
+   "area": {
+    "x": 6.2,
+    "y": 0.9,
+    "name": "North"
+   },
+   "rating": 1642,
+   "w": 14,
+   "l": 5,
+   "form": [
+    "W",
+    "W",
+    "L",
+    "W",
+    "W"
+   ],
+   "agent": "Ravi avoids jump landings and prefers Sunday late mornings.",
+   "sports": [
+    "badminton",
+    "basketball"
+   ],
+   "rulesComplete": true,
+   "games": 2
+  },
+  {
+   "id": "tomas",
+   "name": "Tomás Ruiz",
+   "level": "B",
+   "hand": "R",
+   "weak": "rear forehand",
+   "strength": {
+    "shot": "drop",
+    "zone": "front forehand"
+   },
+   "limit": null,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": true,
+    "limits": true
+   },
+   "free": [
+    "Wed 18-22",
+    "Thu 19-22",
+    "Sat 08-12"
+   ],
+   "prefers": "any",
+   "venue": "riverside",
+   "mix": {
+    "Drop": 22,
+    "Net shot": 22,
+    "Lift": 14,
+    "Clear": 12,
+    "Smash": 10,
+    "Block": 8,
+    "Drive": 6,
+    "Push": 6
+   },
+   "area": {
+    "x": 2.0,
+    "y": 4.6,
+    "name": "Riverside"
+   },
+   "rating": 1497,
+   "w": 8,
+   "l": 8,
+   "form": [
+    "W",
+    "L",
+    "L",
+    "W",
+    "W"
+   ],
+   "agent": "Tomás is flexible; early starts are fine.",
+   "sports": [
+    "badminton",
+    "pickleball",
+    "tennis"
+   ],
+   "rulesComplete": true,
+   "games": 4
+  },
+  {
+   "id": "yuki",
+   "name": "Yuki Sato",
+   "level": "A",
+   "hand": "L",
+   "weak": "mid backhand",
+   "strength": {
+    "shot": "smash",
+    "zone": "rear backhand"
+   },
+   "limit": null,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": true,
+    "limits": true
+   },
+   "free": [
+    "Tue 18-21",
+    "Fri 19-22",
+    "Sat 14-18"
+   ],
+   "prefers": "singles",
+   "venue": "north",
+   "mix": {
+    "Smash": 22,
+    "Clear": 18,
+    "Drop": 14,
+    "Net shot": 14,
+    "Lift": 12,
+    "Block": 8,
+    "Drive": 6,
+    "Push": 6
+   },
+   "area": {
+    "x": 6.0,
+    "y": 2.1,
+    "name": "North"
+   },
+   "rating": 1611,
+   "w": 12,
+   "l": 6,
+   "form": [
+    "W",
+    "L",
+    "W",
+    "W",
+    "W"
+   ],
+   "agent": "Yuki only plays after work on weekdays and wants the game to start at 19:00 or later.",
+   "sports": [
+    "badminton",
+    "tennis"
+   ],
+   "rules": {
+    "notBefore": {
+     "weekday": "19:00"
+    }
+   },
+   "rulesComplete": true,
+   "games": 3
+  },
+  {
+   "id": "aisha",
+   "name": "Aisha Bello",
+   "level": "C",
+   "hand": "R",
+   "weak": "rear forehand",
+   "strength": {
+    "shot": "net shot",
+    "zone": "front backhand"
+   },
+   "limit": null,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": true
+   },
+   "free": [
+    "Mon 18-21",
+    "Thu 18-21",
+    "Sun 09-12"
+   ],
+   "prefers": "doubles",
+   "venue": "lakeside",
+   "mix": {
+    "Net shot": 28,
+    "Lift": 18,
+    "Push": 12,
+    "Drop": 10,
+    "Clear": 10,
+    "Block": 10,
+    "Smash": 6,
+    "Drive": 6
+   },
+   "area": {
+    "x": 8.0,
+    "y": 7.1,
+    "name": "Lakeside"
+   },
+   "rating": 1392,
+   "w": 5,
+   "l": 10,
+   "form": [
+    "L",
+    "L",
+    "W",
+    "L",
+    "W"
+   ],
+   "agent": "Aisha likes early Sunday games.",
+   "sports": [
+    "badminton",
+    "volleyball"
+   ],
+   "rulesComplete": true,
+   "games": 3
+  },
+  {
+   "id": "leo",
+   "name": "Leo Park",
+   "level": "B",
+   "hand": "R",
+   "weak": "front backhand",
+   "strength": {
+    "shot": "smash",
+    "zone": "rear forehand"
+   },
+   "limit": "limit smash volume",
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": true,
+    "limits": true
+   },
+   "free": [
+    "Thu 19-22",
+    "Fri 18-22",
+    "Sat 09-12"
+   ],
+   "prefers": "any",
+   "venue": "riverside",
+   "mix": {
+    "Smash": 28,
+    "Drive": 14,
+    "Clear": 12,
+    "Drop": 12,
+    "Net shot": 12,
+    "Lift": 10,
+    "Block": 6,
+    "Push": 6
+   },
+   "area": {
+    "x": 3.8,
+    "y": 5.4,
+    "name": "Riverside"
+   },
+   "rating": 1483,
+   "w": 7,
+   "l": 8,
+   "form": [
+    "L",
+    "L",
+    "W",
+    "W",
+    "L"
+   ],
+   "agent": "Leo keeps his smash count down for his shoulder and prefers evenings.",
+   "sports": [
+    "badminton",
+    "basketball"
+   ],
+   "rulesComplete": true,
+   "games": 2
+  },
+  {
+   "id": "noor",
+   "name": "Noor Haddad",
+   "level": "A",
+   "hand": "R",
+   "weak": "rear forehand",
+   "strength": {
+    "shot": "clear",
+    "zone": "rear backhand"
+   },
+   "limit": null,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": true,
+    "limits": true
+   },
+   "free": [
+    "Tue 19-22",
+    "Wed 19-22",
+    "Sat 10-14"
+   ],
+   "prefers": "singles",
+   "venue": "riverside",
+   "mix": {
+    "Lift": 20,
+    "Net shot": 18,
+    "Clear": 16,
+    "Block": 14,
+    "Drop": 10,
+    "Smash": 10,
+    "Drive": 6,
+    "Push": 6
+   },
+   "area": {
+    "x": 2.6,
+    "y": 3.6,
+    "name": "Westgate"
+   },
+   "rating": 1586,
+   "w": 11,
+   "l": 6,
+   "form": [
+    "L",
+    "W",
+    "W",
+    "W",
+    "L"
+   ],
+   "agent": "Noor likes Saturday mornings and starting no earlier than 11:00 at weekends; wants a best-of-three rematch.",
+   "sports": [
+    "badminton",
+    "tennis"
+   ],
+   "rules": {
+    "notBefore": {
+     "weekend": "11:00"
+    }
+   },
+   "rulesComplete": true,
+   "games": 4
+  },
+  {
+   "id": "sam",
+   "name": "Sam Okafor",
+   "level": "C",
+   "hand": "R",
+   "weak": "mid forehand",
+   "strength": {
+    "shot": "lift",
+    "zone": "rear backhand"
+   },
+   "limit": null,
+   "shares": {
+    "goals": true,
+    "progress": false,
+    "highlights": false,
+    "limits": true
+   },
+   "free": [
+    "Sat 08-12",
+    "Sun 08-12"
+   ],
+   "prefers": "doubles",
+   "venue": "lakeside",
+   "mix": {
+    "Lift": 26,
+    "Clear": 22,
+    "Net shot": 14,
+    "Block": 12,
+    "Drop": 10,
+    "Smash": 6,
+    "Drive": 6,
+    "Push": 4
+   },
+   "area": {
+    "x": 9.1,
+    "y": 5.0,
+    "name": "Lakeside"
+   },
+   "rating": 1318,
+   "w": 2,
+   "l": 9,
+   "form": [
+    "L",
+    "L",
+    "L",
+    "W",
+    "L"
+   ],
+   "agent": "Sam is new and happy with any weekend morning.",
+   "sports": [
+    "badminton",
+    "pickleball"
+   ],
+   "rulesComplete": true,
+   "games": 1
+  },
+  {
+   "id": "ines",
+   "name": "Ines Duarte",
+   "level": "B",
+   "hand": "L",
+   "weak": "rear backhand",
+   "strength": {
+    "shot": "drop",
+    "zone": "front backhand"
+   },
+   "limit": null,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": true,
+    "limits": true
+   },
+   "free": [
+    "Mon 19-22",
+    "Thu 18-21",
+    "Sun 14-18"
+   ],
+   "prefers": "any",
+   "venue": "north",
+   "mix": {
+    "Net shot": 20,
+    "Lift": 18,
+    "Drop": 18,
+    "Block": 14,
+    "Clear": 12,
+    "Smash": 8,
+    "Drive": 6,
+    "Push": 4
+   },
+   "area": {
+    "x": 6.8,
+    "y": 1.6,
+    "name": "North"
+   },
+   "rating": 1471,
+   "w": 7,
+   "l": 9,
+   "form": [
+    "W",
+    "L",
+    "L",
+    "W",
+    "L"
+   ],
+   "agent": "Ines plays Monday evenings by preference.",
+   "sports": [
+    "badminton",
+    "tennis",
+    "table tennis"
+   ],
+   "rulesComplete": true,
+   "games": 3
+  },
+  {
+   "id": "kenji",
+   "name": "Kenji Wu",
+   "level": "A",
+   "hand": "R",
+   "weak": "front forehand",
+   "strength": {
+    "shot": "push",
+    "zone": "rear forehand"
+   },
+   "limit": null,
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": true,
+    "limits": true
+   },
+   "free": [
+    "Thu 19-22",
+    "Sat 09-12",
+    "Sun 09-12"
+   ],
+   "prefers": "doubles",
+   "venue": "riverside",
+   "mix": {
+    "Lift": 22,
+    "Net shot": 20,
+    "Block": 16,
+    "Push": 12,
+    "Smash": 10,
+    "Clear": 8,
+    "Drop": 6,
+    "Drive": 6
+   },
+   "area": {
+    "x": 6.6,
+    "y": 2.9,
+    "name": "Midtown"
+   },
+   "rating": 1563,
+   "w": 10,
+   "l": 7,
+   "form": [
+    "W",
+    "W",
+    "L",
+    "L",
+    "W"
+   ],
+   "agent": "Kenji likes Midtown and early weekend mornings; happy to play anyone.",
+   "sports": [
+    "badminton",
+    "basketball"
+   ],
+   "rulesComplete": true,
+   "games": 3
+  },
+  {
+   "id": "priya",
+   "name": "Priya Nair",
+   "level": "B",
+   "hand": "R",
+   "weak": "rear forehand",
+   "strength": {
+    "shot": "smash",
+    "zone": "mid backhand"
+   },
+   "limit": "no jump landings",
+   "shares": {
+    "goals": true,
+    "progress": true,
+    "highlights": false,
+    "limits": true
+   },
+   "free": [
+    "Wed 18-21",
+    "Fri 19-22",
+    "Sun 10-13"
+   ],
+   "prefers": "doubles",
+   "venue": "north",
+   "mix": {
+    "Smash": 26,
+    "Drop": 14,
+    "Clear": 14,
+    "Net shot": 14,
+    "Lift": 10,
+    "Drive": 10,
+    "Block": 6,
+    "Push": 6
+   },
+   "area": {
+    "x": 5.0,
+    "y": 0.7,
+    "name": "North"
+   },
+   "rating": 1458,
+   "w": 6,
+   "l": 8,
+   "form": [
+    "L",
+    "W",
+    "L",
+    "L",
+    "W"
+   ],
+   "agent": "Priya avoids jump landings; Wednesday is best for her.",
+   "sports": [
+    "badminton",
+    "pickleball"
+   ],
+   "rulesComplete": true,
+   "games": 2
+  }
+ ],
+ "feed": [
+  {
+   "id": "f0",
+   "who": "leo",
+   "kind": "game",
+   "text": "Doubles on Friday 19:30 at Riverside, court 2. One spot left, anyone?",
+   "ago": "40 min",
+   "cheers": 4,
+   "open": {
+    "day": "Fri",
+    "start": "19:30",
+    "venue": "Riverside Sports Centre",
+    "spots": 1
+   }
+  },
+  {
+   "id": "f1",
+   "who": "tomas",
+   "kind": "challenge",
+   "text": "Three games this week, two of them with people I'd never played. The challenge is working.",
+   "ago": "2 h",
+   "cheers": 22
+  },
+  {
+   "id": "f2",
+   "who": "hana",
+   "kind": "highlight",
+   "text": "Shared a highlight: 17-shot rally, finished with a cross-court smash.",
+   "ago": "5 h",
+   "cheers": 14
+  },
+  {
+   "id": "f2b",
+   "who": "kenji",
+   "kind": "game",
+   "text": "Looking for a singles match this weekend. Open to a challenge.",
+   "ago": "6 h",
+   "cheers": 8,
+   "open": {
+    "day": "Sat",
+    "start": "09:00",
+    "venue": "Midtown Community Gym",
+    "spots": 1,
+    "challenge": true
+   }
+  },
+  {
+   "id": "f3",
+   "who": "noor",
+   "kind": "goal",
+   "text": "New goal: two games a week until the end of the year. Who's in?",
+   "ago": "1 d",
+   "cheers": 6
+  },
+  {
+   "id": "f4",
+   "who": "ravi",
+   "kind": "limit",
+   "text": "Knee is sore, so this week is doubles only; no jump landings.",
+   "ago": "1 d",
+   "cheers": 9
+  },
+  {
+   "id": "f5",
+   "who": "aisha",
+   "kind": "recruit",
+   "text": "Brought my sister to club night. She's already asking about Saturday.",
+   "ago": "2 d",
+   "cheers": 17
+  }
+ ],
+ "you": {
+  "name": "You",
+  "level": "B",
+  "free": [
+   "Mon 19-22",
+   "Tue 19-22",
+   "Thu 18-22",
+   "Sat 08-14",
+   "Sun 09-13"
+  ],
+  "venue": "riverside",
+  "area": {
+   "x": 2.4,
+   "y": 5.8,
+   "name": "Riverside"
+  },
+  "rating": 1505,
+  "w": 6,
+  "l": 5,
+  "form": [
+   "W",
+   "L",
+   "W",
+   "L",
+   "W"
+  ],
+  "history": [
+   {
+    "date": "2026-09-03",
+    "start": "19:00",
+    "sport": "badminton",
+    "format": "singles",
+    "with": [
+     "leo"
+    ],
+    "booked": 90,
+    "played": 120
+   },
+   {
+    "date": "2026-09-05",
+    "start": "09:00",
+    "sport": "badminton",
+    "format": "singles",
+    "with": [
+     "tomas"
+    ],
+    "booked": 90,
+    "played": 100
+   },
+   {
+    "date": "2026-09-10",
+    "start": "19:00",
+    "sport": "badminton",
+    "format": "singles",
+    "with": [
+     "kenji"
+    ],
+    "booked": 90,
+    "played": 90
+   },
+   {
+    "date": "2026-09-15",
+    "start": "19:30",
+    "sport": "tennis",
+    "format": "singles",
+    "with": [
+     "ines"
+    ],
+    "booked": 60,
+    "played": 60
+   },
+   {
+    "date": "2026-09-19",
+    "start": "09:00",
+    "sport": "badminton",
+    "format": "doubles",
+    "with": [
+     "kenji",
+     "tomas",
+     "sam"
+    ],
+    "booked": 90,
+    "played": 90
+   },
+   {
+    "date": "2026-09-24",
+    "start": "19:00",
+    "sport": "badminton",
+    "format": "singles",
+    "with": [
+     "leo"
+    ],
+    "booked": 90,
+    "played": 115
+   },
+   {
+    "date": "2026-10-01",
+    "start": "19:00",
+    "sport": "badminton",
+    "format": "doubles",
+    "with": [
+     "hana",
+     "tomas",
+     "leo"
+    ],
+    "booked": 90,
+    "played": 105
+   },
+   {
+    "date": "2026-10-06",
+    "start": "19:30",
+    "sport": "pickleball",
+    "format": "singles",
+    "with": [
+     "priya"
+    ],
+    "booked": 60,
+    "played": 80
+   },
+   {
+    "date": "2026-10-10",
+    "start": "09:00",
+    "sport": "badminton",
+    "format": "singles",
+    "with": [
+     "tomas"
+    ],
+    "booked": 90,
+    "played": 95
+   },
+   {
+    "date": "2026-10-15",
+    "start": "19:00",
+    "sport": "badminton",
+    "format": "singles",
+    "with": [
+     "kenji"
+    ],
+    "booked": 90,
+    "played": 90
+   },
+   {
+    "date": "2026-10-22",
+    "start": "19:00",
+    "sport": "badminton",
+    "format": "singles",
+    "with": [
+     "leo"
+    ],
+    "booked": 90,
+    "played": 125
+   },
+   {
+    "date": "2026-10-24",
+    "start": "09:00",
+    "sport": "badminton",
+    "format": "singles",
+    "with": [
+     "kenji"
+    ],
+    "booked": 90,
+    "played": 90
+   }
+  ],
+  "goal": {
+   "perWeek": 2,
+   "sport": "badminton",
+   "approval": "ask",
+   "maxTrip": 30
+  },
+  "note": "Your last eight weeks of games (demo): when you played, with whom, and how long against the booking.",
+  "sports": [
+   "badminton",
+   "tennis",
+   "pickleball"
+  ],
+  "body": [
+   {
+    "id": "b-s1",
+    "at": "2026-10-23T08:10:00+08:00",
+    "part": "knee",
+    "side": "right",
+    "kind": "sore",
+    "level": 2,
+    "trigger": "after Thursday's game",
+    "note": "Right knee a bit sore after Thursday's game"
+   },
+   {
+    "id": "b-s2",
+    "at": "2026-10-25T09:30:00+08:00",
+    "part": "knee",
+    "side": "right",
+    "kind": "pain",
+    "level": 3,
+    "trigger": "going down stairs",
+    "note": "Right knee hurts going down stairs, 3 out of 5"
+   },
+   {
+    "id": "b-s3",
+    "at": "2026-10-25T09:30:00+08:00",
+    "part": "calf",
+    "side": "left",
+    "kind": "tight",
+    "level": 2,
+    "trigger": null,
+    "note": "Left calf is tight"
+   },
+   {
+    "id": "b-s4",
+    "at": "2026-10-26T20:00:00+08:00",
+    "part": "calf",
+    "side": "left",
+    "kind": "fine",
+    "level": 0,
+    "trigger": null,
+    "note": "Calf feels fine now"
+   }
+  ]
+ },
+ "incoming": [
+  {
+   "id": "in-noor",
+   "from": "noor",
+   "format": "singles",
+   "when": "Sat 10-14",
+   "note": "Rematch? You took the last one 21–19 in the third. I want it back.",
+   "stake": "Loser buys the shuttles"
+  },
+  {
+   "id": "in-yuki",
+   "from": "yuki",
+   "format": "singles",
+   "when": "Tue 18-21",
+   "note": "Tuesday evening singles? I'll bring the shuttles.",
+   "stake": null
+  }
+ ],
+ "results": [
+  {
+   "id": "r1",
+   "a": [
+    "ravi"
+   ],
+   "b": [
+    "kenji"
+   ],
+   "win": "a",
+   "score": "21–15 21–18",
+   "day": "Mon",
+   "kind": "challenge"
+  },
+  {
+   "id": "r2",
+   "a": [
+    "hana",
+    "tomas"
+   ],
+   "b": [
+    "leo",
+    "ines"
+   ],
+   "win": "b",
+   "score": "19–21 21–17 18–21",
+   "day": "Tue",
+   "kind": "random"
+  },
+  {
+   "id": "r3",
+   "a": [
+    "aisha"
+   ],
+   "b": [
+    "sam"
+   ],
+   "win": "a",
+   "score": "21–12 21–16",
+   "day": "Tue",
+   "kind": "challenge"
+  },
+  {
+   "id": "r4",
+   "a": [
+    "yuki"
+   ],
+   "b": [
+    "noor"
+   ],
+   "win": "a",
+   "score": "21–19 17–21 21–18",
+   "day": "Wed",
+   "kind": "challenge"
+  },
+  {
+   "id": "r5",
+   "a": [
+    "priya",
+    "ines"
+   ],
+   "b": [
+    "aisha",
+    "sam"
+   ],
+   "win": "a",
+   "score": "21–14 21–16",
+   "day": "Thu",
+   "kind": "random"
+  }
+ ],
+ "sports": [
+  "badminton",
+  "tennis",
+  "pickleball",
+  "table tennis",
+  "basketball",
+  "volleyball"
+ ],
+ "recruits": [
+  {
+   "who": "ines",
+   "by": "hana",
+   "ago": "3 weeks"
+  },
+  {
+   "who": "priya",
+   "by": "leo",
+   "ago": "2 weeks"
+  }
+ ]
+}

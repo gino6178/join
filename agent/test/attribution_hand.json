@@ -1,0 +1,17 @@
+{
+ "note": "Hand labels for the held-out pass^5 run's failures (2026-10-28), made by reading each run's steps from test/attribution_check.mjs show, without the code's answer. A partner missing from every game (withOneOf) is labelled at the first game agreed. step: the tool call's number in the run; null for a model turn or the run's step budget.",
+ "runs": {
+  "heldout#15": { "kind": "rule_missed", "step": 4 }, "heldout#16": { "kind": "rule_missed", "step": 4 }, "heldout#18": { "kind": "rule_missed", "step": 4 },
+  "heldout#20": { "kind": "rule_missed", "step": 5 }, "heldout#22": { "kind": "rule_missed", "step": 5 }, "heldout#24": { "kind": "rule_missed", "step": 5 },
+  "heldout#28": { "kind": "rule_caught", "step": 13 },
+  "heldout#30": { "kind": "rule_missed", "step": 5 }, "heldout#31": { "kind": "rule_missed", "step": 5 }, "heldout#33": { "kind": "rule_missed", "step": 4 }, "heldout#34": { "kind": "rule_missed", "step": 5 },
+  "heldout#44": { "kind": "rule_missed", "step": 6 },
+  "heldout#45": { "kind": "rule_caught", "step": 8 },
+  "heldout#49": { "kind": "timeout", "step": null }
+ },
+ "talks": {
+  "neg-ap-mvs2x0dp-d3y6-5": "no_option", "neg-ap-mvs2za5j-wu4j-5": "no_option", "neg-ap-mvs31obh-ue1b-5": "no_option", "neg-ap-mvs33vde-byad-5": "no_option", "neg-ap-mvs3dym2-h2rb-5": "no_option",
+  "neg-ap-mvs3febv-4mfu-5": "no_option", "neg-ap-mvs3hjg2-rt9x-5": "no_option", "neg-ap-mvs3mt0t-kiqz-3": "no_option", "neg-ap-mvs3nj8v-fe6u-3": "no_option", "neg-ap-mvs3nxjs-kxb1-3": "no_option",
+  "neg-ap-mvs3och6-m05b-3": "no_option", "neg-ap-mvs3ordb-y9za-3": "no_option", "neg-ap-mvs3u657-6vrq-3": "no_option", "neg-ap-mvs3umy0-e618-3": "no_option", "neg-ap-mvs3vqw5-24rp-3": "no_option"
+ }
+}
