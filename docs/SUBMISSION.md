@@ -88,7 +88,7 @@ multiparty setup, not built yet).
   Agent Toolkit** as the venue's back office (reconciliation, invoices, disputes). Booking calls carry a
   `PayPal-Request-Id` and are journaled, and a lock interrupted by a crash or a refused capture resumes without
   charging anyone twice.
-- **Agents:** an MCP server (18 tools), the same tools over REST, A2A with an Agent Card, and WebMCP for a browser's
+- **Agents:** an MCP server (19 tools), the same tools over REST, A2A with an Agent Card, and WebMCP for a browser's
   own agent. Scoped, expiring tokens, optionally bound to a key (RFC 9421 signed requests).
 - **Tested as users on the live server:** Sonnet agents got only the address (a newcomer, a student on a phone in
   Chinese, an organizer, a judge, an outside agent), in two rounds; we fixed what they found
@@ -115,7 +115,7 @@ multiparty setup, not built yet).
   ([NEGOTIATION.md](https://github.com/gino6178/join/blob/main/docs/NEGOTIATION.md)); the website agent uses the best.
 - **Reviews:** verified only, Bayesian and recency-weighted, with each person's own tastes; agents read them, never
   write them.
-- Node, Express, React, Vite; 52 automated tests, including an end-to-end run of four scripted agents over MCP (no LLM in the tests).
+- Node, Express, React, Vite; 53 automated tests, including an end-to-end run of four scripted agents over MCP (no LLM in the tests).
 
 ### Challenges we ran into
 
@@ -186,7 +186,7 @@ bryntum-scheduler, node.js, express, react, vite
 5. No agent? Click **No agent? Ask Join's** on the website and type a plan, e.g. "karaoke Friday night, 4 of us,
    $15 each" or "好冷 想吃熱呼呼的鍋". Without a model it uses rules; with Ollama (`ollama pull qwen2.5:0.5b`, then
    `SCOUT_LLM_URL=http://127.0.0.1:11434 npm start`) Qwen also works out which activity a free-form sentence means (days, times, group size and budget are always rules).
-6. `npm test` runs 52 tests, including the end-to-end MCP run with scripted agents.
+6. `npm test` runs 53 tests, including the end-to-end MCP run with scripted agents.
 
 Without keys, Join runs on a PayPal stand-in that moves no money and says so on every page.
 

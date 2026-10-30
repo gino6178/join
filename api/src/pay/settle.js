@@ -375,6 +375,14 @@ export function proposeShare(bookingId, playerId, amount) {
   return { result: `Asked to pay $${usd(amount)} instead of $${usd(ask.from)}. Waiting for ${name(b.organizer)} (or their agent) to agree or keep the share; paying before that pays whatever share then stands.`, ...view(b, playerId) };
 }
 
+export function withdrawShareAsk(bookingId, playerId) {
+  const b = get(bookingId), ask = (b?.shareAsks || []).find((x) => x.player === playerId && x.status === "accepted");
+  if (!b || !ask || b.state !== "held" || b.payments[playerId]) return { error: "no_ask", message: "Nothing to put back: no accepted ask, or you've already paid." };
+  const diff = ask.from - ask.amount;
+  b.shares[playerId] = ask.from; b.shares[b.organizer] -= diff; ask.status = "withdrawn"; db.save();
+  record({ actor: { kind: "agent", player: playerId }, who: b.players, action: "share_withdrawn", ref: b.id, summary: `${name(playerId)} will pay the full $${usd(ask.from)} after all; ${name(b.organizer)}'s share is back to $${usd(b.shares[b.organizer])}.` });
+  return { ok: true };
+}
 export function answerShare(bookingId, organizerId, playerId, accept) {
   const b = get(bookingId);
   if (!b || b.organizer !== organizerId) return { error: "not_organizer", message: "Only the organizer answers." };
@@ -390,7 +398,7 @@ export function answerShare(bookingId, organizerId, playerId, accept) {
   ask.status = accept ? "accepted" : "refused"; ask.answered = at();
   if (accept) { b.shares[playerId] = ask.amount; b.shares[organizerId] += diff; b.splitRule = "negotiated"; }
   db.save();
-  record({ actor: { kind: "agent", player: organizerId }, who: [playerId, organizerId], action: accept ? "share_accepted" : "share_refused", ref: b.id, summary: accept ? `${name(organizerId)}'s agent agreed: ${name(playerId)} pays $${usd(ask.amount)}, ${name(organizerId)} covers $${usd(diff)} more.` : `${name(organizerId)}'s agent kept ${name(playerId)}'s share at $${usd(b.shares[playerId])}.` });
+  record({ actor: { kind: "agent", player: organizerId }, who: accept ? b.players : [playerId, organizerId], action: accept ? "share_accepted" : "share_refused", ref: b.id, summary: accept ? `${name(organizerId)}'s agent agreed: ${name(playerId)} pays $${usd(ask.amount)}, ${name(organizerId)} covers $${usd(diff)} more.` : `${name(organizerId)}'s agent kept ${name(playerId)}'s share at $${usd(b.shares[playerId])}.` });
   return { result: accept ? `Accepted: ${name(playerId)} pays $${usd(ask.amount)}, your share is now $${usd(b.shares[organizerId])}.` : `Refused: ${name(playerId)}'s share stays $${usd(b.shares[playerId])}.`, ...view(b, organizerId) };
 }
 

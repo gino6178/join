@@ -37,7 +37,7 @@ export function sessionOf(req) { const s = sessions.get(cookie(req, COOKIE) || "
 
 // What each scope allows: reading, negotiating (and answering invitations), paying a share
 export const SCOPES = ["read", "negotiate", "pay"];
-const NEEDS = { venue_reviews: "read", whoami: "read", list_activities: "read", list_venues: "read", find_options: "read", find_alternatives: "read", my_plans: "read", booking_status: "read",
+const NEEDS = { venue_reviews: "read", whoami: "read", list_activities: "read", list_venues: "read", find_options: "read", find_alternatives: "read", my_plans: "read", wait_for_news: "read", booking_status: "read",
   start_negotiation: "negotiate", make_offer: "negotiate", accept_price: "negotiate", walk_away: "negotiate", propose_share: "negotiate", answer_share: "negotiate",
   decline_invite: "negotiate", cancel_booking: "negotiate", request_reimbursement: "negotiate", pay_my_share: "pay" };
 export const can = (a, tool) => !a?.scopes || a.scopes.includes(NEEDS[tool] || "negotiate");
@@ -86,7 +86,13 @@ function fromPass(tok, req) {
   return person ? { player: person.id, client: "agent via invite link", token: `pass:${p.n}`, scopes: SCOPES, pass: tok } : null;
 }
 // the person behind a pass, for their own sign-in link (only someone holding the pass has it)
-export const passHolder = (tok, req) => (String(tok).startsWith("join_g_") ? fromPass(tok, req) : null);
+const meSig = (payload) => crypto.createHmac("sha256", passKey()).update(`me:${payload}`).digest("base64url").slice(0, 22);
+export const personLink = (pass) => { const body = pass.slice(7, -22); return `${body}${meSig(body)}`; };
+export function passHolder(link, req) {
+  const body = String(link).slice(0, -22), sig = String(link).slice(-22);
+  if (!body || sig.length !== 22 || !crypto.timingSafeEqual(Buffer.from(sig), Buffer.from(meSig(body)))) return null;
+  return fromPass(`join_g_${body}${passSig(body)}`, req);
+}
 
 // the agent behind a request: { player, client } or null
 export function agentOf(req) {

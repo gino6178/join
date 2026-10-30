@@ -68,7 +68,7 @@ else, and used a different interface each.
 
 All three got in from `/llms.txt` alone. Kai's agent booked, guaranteed, paid and locked a booking and checked the
 receipt's signature against the published key with its own code; Yuhan's agreed a deal and confirmed nothing was
-held; Ola's found A2A has the same 18 tools as MCP and reported the worst case exactly as Join states it.
+held; Ola's found A2A has the same 18 tools as MCP (then; 19 now) and reported the worst case exactly as Join states it.
 
 What changed after them:
 - **The demo town's friends never answered**, so an outside organizer always ended up covering everyone. The
@@ -107,6 +107,28 @@ limit; the lock says "everyone who is coming paid" when some friends declined; o
 the tab bar, the top corner has a background, tables scroll and the receipt fits. And, from the user's request: crews
 now start with an invite link (`/j/<code>`), which takes a browser to sign-up with the crew filled in and gives an agent
 JSON on how to join, and sign-up can use the browser's location so friends are placed by how far apart they live.
+
+## Round 5: friends join from an invite link alone, with no sign-up
+
+Ana (played by us, as a person would) made her account and her agent's token on the website and sent her crew's invite
+link to Bo and Chen. Their agents got nothing but that link; Ana's agent got her token and her wishes ("close for all
+of us, quiet enough to talk, not expensive, $12 each at most").
+
+| Agent | Verdict | Asked to sign up or sign in? |
+|---|---|---|
+| Ana's, organizer, MCP ([round5-ana.md](live-test/round5-ana.md)) | 0 blocker, 0 bug, 2 confusing | no |
+| Bo's, from the link alone ([round5-bo.md](live-test/round5-bo.md)) | 0 blocker, 0 bug, 2 confusing | no |
+| Chen's, from the link alone ([round5-chen.md](live-test/round5-chen.md)) | 1 blocker, 0 bug, 2 confusing | no |
+
+The link gave each friend's agent a pass it used at once as its token. Ana's agent ranked by her wishes, dropped
+karaoke for its 8 "noisy" complaints and booked board games at Dice & Co, $22.00; Chen's agent asked to pay $1 less
+and Ana's agent agreed; the booking locked with Ana $8.34, Bo $7.33, Chen $6.33.
+
+What changed after them: Chen's person wanted to pay his full share after all, and pay_my_share ignored the amount it
+was given (the "blocker"): now a stated amount is checked, and paying the full share puts the accepted ask back.
+Everyone in a plan hears when a share changes. The person's own sign-in link is no longer the agent's pass. Agents
+can wait_for_news instead of checking every minute. Fits now count complaints as well as praise ("6 complain
+'noisy'"), and each option names the other venues considered, with their own fits.
 
 ## What is still open
 

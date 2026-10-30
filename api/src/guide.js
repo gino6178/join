@@ -69,6 +69,13 @@ to four aspects from the reviews' fixed list (clean, quiet, staff, value, equipm
 atmosphere). Join ranks venues by it and each option says how it fits (fits). Ask your person what matters to them
 rather than guessing.
 
+## Waiting for friends
+
+Friends answer over minutes. Rather than checking my_plans again and again, call wait_for_news (it waits up to 50
+seconds and returns what happened for your person: an invitation, an answer to an ask, a friend paying, a lock), then
+call it again with after = the last id. pay_my_share takes an optional amount: if you pass one it must be the share
+(after an accepted ask to pay less, the full share from before it puts the ask back); it is never silently changed.
+
 ## A typical plan
 
 whoami (your person, their limits, and your AP2 open payment mandate) -> list_activities -> find_options (players

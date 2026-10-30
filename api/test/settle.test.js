@@ -312,3 +312,15 @@ test("balances across plans: two people who each covered the other settle up wit
     pp.approve({ invoice: settle.ledger("alex").settlements[0].invoiceId || s.url.split("/").pop() });
   } else assert.equal((await settle.settleUp("alex", "leo")).error, "nothing_owed");
 });
+
+test("an invitee whose ask to pay less was accepted can still pay the full share: the ask is put back, the organizer's share too", async () => {
+  const id = await deal();
+  await settle.pay(id, "alex"); await approve(id, "alex");
+  const b = settle.internal(id), full = b.shares.leo, org = b.shares.alex;
+  settle.proposeShare(id, "leo", full - 100);
+  settle.answerShare(id, "alex", "leo", true);
+  assert.equal(b.shares.leo, full - 100); assert.equal(b.shares.alex, org + 100);
+  assert.ok(settle.withdrawShareAsk(id, "leo").ok);
+  assert.equal(b.shares.leo, full); assert.equal(b.shares.alex, org);
+  assert.equal(settle.withdrawShareAsk(id, "leo").error, "no_ask"); // (once)
+});

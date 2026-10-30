@@ -29,7 +29,7 @@ same operations with the person's session.
  +-------------------------- api/ (Node 20, Express) ------------------------------+
  |  mcp.js (MCP, Streamable HTTP, stateless)   a2a.js (A2A JSON-RPC)   /api/agent   |
  |                         \            |             /                            |
- |                          ops.js: the 18 agent operations                         |
+ |                          ops.js: the 19 agent operations                         |
  |        /            |               |                 \               \          |
  |  negotiate/     alternatives.js   mandate.js         pay/settle.js   activity.js |
  |  policy.js                                           (state machine)             |
@@ -59,7 +59,7 @@ same operations with the person's session.
 | Website | `web/src/**` (about 1,150 lines) |
 | Examples | `examples/scripted-agent.mjs`, `claude-agent.mjs`, `venue-agent.mjs`, `toolkit-cli.mjs`, `verify-receipt.mjs` |
 | Website agent | `api/src/scout/understand.js` (186), `web/src/scout/agent.js`, `web/src/scout/words.js`, `web/src/components/AgentDrawer.jsx` |
-| Tests | `api/test/*.test.js`: 52 tests |
+| Tests | `api/test/*.test.js`: 53 tests |
 
 **Money is integer cents inside, USD strings outward.** Times are the town's local time: the process sets `TZ` from
 `world.json` (`America/Los_Angeles`), and the website renders in that zone (`world.js`, `web/src/api.js`).
@@ -198,7 +198,7 @@ page at `/mock-paypal/approve`, a 3.49% + $0.49 fee, request-id idempotency, and
 ## 8. Agent interfaces
 
 **Tools.** MCP (`/mcp`), REST (`POST /api/agent/<tool>`) and A2A (`/a2a`, `message/send` with one data part
-`{action, ...args}`) offer the same 18 tools:
+`{action, ...args}`) offer the same 19 tools:
 
 | Group | Tools |
 |---|---|
@@ -363,7 +363,7 @@ There are 47, using Node's test runner, and they run against the stand-in with s
 npm run setup          # api, web, examples; builds the website
 npm start              # http://localhost:8790 (the stand-in without keys)
 npm run demo           # four agents over MCP; JOIN_ACTIVITY=karaoke for another plan
-npm test               # 52 tests
+npm test               # 53 tests
 npm --prefix api run bench   # the negotiation benchmark
 ```
 

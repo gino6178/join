@@ -3,6 +3,8 @@
 // activity log in code-made words, so the people involved can see every step on the website.
 // Money crosses as USD strings ("31.50") outward and integer cents inward.
 import * as people from "./people.js";
+import { forPlayer, onActivity } from "./activity.js";
+import { personLink } from "./auth.js";
 import { getWorld, venue, player, freeUnits, forActivity, ACTIVITIES, activity as getActivity, unitName } from "./world.js";
 import * as neg from "./negotiate/engine.js";
 import { price, cents, usd } from "./negotiate/policy.js";
@@ -36,7 +38,7 @@ export function whoami(a) {
   const p = player(a.player), m = getMandate(a.player);
   const w = getWorld();
   return { town: { name: w.town.name, timeZone: w.town.timeZone, currency: w.currency || "USD", now: new Date().toLocaleString("sv-SE", { timeZone: w.town.timeZone }).slice(0, 16), note: "Every date and time on Join is the town's local time; every price is in USD." },
-    ...(a.pass ? { yourPersonsLink: { path: `/me/${a.pass}`, note: "Give this to your person: it signs them in on Join's website (same host) to see plans and set their limits. Keep it private, like a password." } } : {}),
+    ...(a.pass ? { yourPersonsLink: { path: `/me/${personLink(a.pass)}`, note: "Give this to your person: it signs them in on Join's website (same host) to see plans and set their limits. Keep it private: it isn't your pass, but it signs them in." } } : {}),
     ...(p.crew ? { crew: { code: p.crew, invite: `/j/${p.crew}`, members: people.crewmates(p).map((x) => ({ id: x.id, name: x.name, area: x.area?.name })), note: "Your person's friends who joined Join with the same crew code. find_options invites them first; each answers an invitation through their own agent." } } : {}),
     player: { id: p.id, name: p.name, interests: p.interests, ...(p.level ? { sportsLevel: p.level } : {}), usuallyFree: p.free, area: p.area?.name },
     mandate: { perGame: usd(m.perGame), perWeek: usd(m.perWeek), guaranteeOnItsOwn: usd(m.cover), venues: m.venues, autopay: m.autopay && settle.hasVault(a.player), note: "Set by the player on the website. Agents can read it, not change it." },
@@ -66,6 +68,18 @@ export function listVenues({ activity } = {}) {
 function wishes(prefer) {
   const p = prefer && typeof prefer === "object" ? prefer : {};
   return { near: !!p.near, cheap: !!p.cheap, maxTrip: Number.isFinite(+p.maxTrip) && +p.maxTrip > 0 ? +p.maxTrip : null, aspects: (Array.isArray(p.aspects) ? p.aspects : []).filter((k) => k in reviews.ASPECTS).slice(0, 4) };
+}
+// how a venue meets each wish, in words, from the facts: trips, the share, and the reviews' counts both ways
+function fitsOf(wish, v, people) {
+  return [
+    ...(wish.near || wish.maxTrip ? [`${v.myTrip ?? v.longestTrip} min for you, ${v.longestTrip} at most for anyone`] : []),
+    ...(wish.cheap ? [`$${usd(shareOf(v.ask, people))} each`] : []),
+    ...wish.aspects.map((k) => {
+      const n = v.reviews.aspectCounts?.[k] || { liked: 0, disliked: 0 };
+      if (!n.liked && !n.disliked) return `no reviews say either way about ${reviews.ASPECTS[k]}`;
+      return [n.liked ? `${n.liked} review${n.liked === 1 ? "" : "s"} praise ${reviews.ASPECTS[k]}` : "", n.disliked ? `${n.disliked} complain "${reviews.COMPLAINTS[k]}"` : ""].filter(Boolean).join(", ");
+    }),
+  ];
 }
 function wishCost(wish, rv) {
   let c = 0;
@@ -99,24 +113,23 @@ export function findOptions(a, { activity = "badminton", date = null, dates = []
       const group = [me, ...free.slice(0, need).map((x) => x.p)];
       // the venue for this slot: the shortest longest trip, moved by what verified reviews say (a star above the town's
       // average is worth 8 minutes; anyone in the group who rated it 2★ or less costs 30), then the price
-      let best = null;
+      let best = null; const seen = [];
       for (const v of getWorld().venues) {
         if (!forActivity(v, activity) || !freeUnits(v.id, activity, d, hm(s), minutes).length) continue;
         const t = trips(group, v), q = price(v, { activity, date: d, start: hm(s), minutes, players: group.length }, now);
         if (wish.maxTrip && t.longest > wish.maxTrip) continue;
         const rv = reviewsFor(v.id, activity, group.map((g) => g.id), a.player), cost = t.longest * (wish.near ? 2 : 1) + reviews.rankAdjust(rv) + (q.ask / group.length / 100) * (wish.cheap ? 3 : 1) + wishCost(wish, rv);
-        if (!best || cost < best.cost) best = { cost, venue: v.id, venueName: v.name, longestTrip: t.longest, myTrip: t.list.find((x) => x.id === me.id)?.min ?? null, trips: t.list, ask: q.ask, discounts: q.discounts.map((x) => x.kind), reviews: rv };
+        const cand = { cost, venue: v.id, venueName: v.name, longestTrip: t.longest, myTrip: t.list.find((x) => x.id === me.id)?.min ?? null, trips: t.list, ask: q.ask, discounts: q.discounts.map((x) => x.kind), reviews: rv };
+        seen.push(cand);
+        if (!best || cost < best.cost) best = cand;
       }
       if (!best) continue;
       const asked = want.filter((id) => group.some((g) => g.id === id)).length;
       opts.push({ date: d, day: DAYS[date.getDay()], start: hm(s), minutes, players: group.map((g) => g.id), names: group.map((g) => g.name), alsoFree: free.slice(need, need + 3).map((x) => x.p.id),
         venue: best.venue, venueName: best.venueName, longestTrip: best.longestTrip, askPrice: usd(best.ask), share: usd(shareOf(best.ask, group.length)), discounts: best.discounts,
         reviews: { score: best.reviews.score, count: best.reviews.count, praise: best.reviews.praise.map((p) => p.aspect), complaints: best.reviews.complaints.map((p) => p.about), groupLow: best.reviews.groupLow, tasteNotes: best.reviews.tasteNotes, demoData: best.reviews.demoData > 0, reason: reviews.reason(best.reviews) },
-        fits: [
-          ...(wish.near || wish.maxTrip ? [`${best.myTrip ?? best.longestTrip} min for you, ${best.longestTrip} at most for anyone`] : []),
-          ...(wish.cheap ? [`$${usd(shareOf(best.ask, group.length))} each`] : []),
-          ...wish.aspects.map((k) => { const n = best.reviews.aspectCounts?.[k]; return n && n.liked ? `${n.liked} review${n.liked === 1 ? "" : "s"} praise ${reviews.ASPECTS[k]}${n.disliked ? `, ${n.disliked} complain` : ""}` : `no reviews mention ${reviews.ASPECTS[k]}`; }),
-        ],
+        fits: fitsOf(wish, best, group.length),
+        ...(seen.length > 1 ? { alsoConsidered: seen.filter((x) => x !== best).sort((x, y) => x.cost - y.cost).slice(0, 2).map((x) => ({ venue: x.venue, venueName: x.venueName, longestTrip: x.longestTrip, share: usd(shareOf(x.ask, group.length)), score: x.reviews.score, ...(wish.near || wish.cheap || wish.maxTrip || wish.aspects.length ? { fits: fitsOf(wish, x, group.length) } : {}) })) } : {}),
         score: asked * 5 - best.longestTrip * (wish.near ? 0.6 : 0.2) - (best.ask / 1000) * (wish.cheap ? 3 : 1) - days.indexOf(d) * 0.3 - wishCost(wish, best.reviews) * 0.05 });
     }
   }
@@ -224,11 +237,28 @@ export function findAlternatives(a, { activity, date, start, minutes = 90, playe
   return { alternatives: list, budgetPerPerson: usd(share), ...(list.some((x) => x.withinBudget && x.venue !== exclude) ? {} : { note: `No other place offers ${activity} within $${usd(share)} a person then. Try another time or another activity the group shares (find_options).` }) };
 }
 
+// News for a person, as it happens: their activity entries after `after`, waiting up to `seconds` for the first one
+export async function waitForNews(a, { after = 0, seconds = 45 } = {}) {
+  const pick = () => forPlayer(a.player, { after, limit: 20 }).map((e) => ({ id: e.id, at: e.at, action: e.action, ref: e.ref, summary: e.summary }));
+  let news = pick();
+  if (!news.length) await new Promise((ok) => { const t = setTimeout(done, Math.min(50, Math.max(1, seconds)) * 1000); const off = onActivity((e) => e.who.includes(a.player) && e.id > after && done()); function done() { clearTimeout(t); off(); ok(); } });
+  news = news.length ? news : pick();
+  return { news, last: news.length ? news.at(-1).id : after, note: news.length ? "Call again with after: last for what comes next." : "Nothing new yet; call again with the same after." };
+}
 export const myGames = (a, { all = false } = {}) => ({ negotiations: neg.mine(a.player, { all }), bookings: settle.mine(a.player, { all }), ...(all ? {} : { note: "Open negotiations and live bookings only; pass all: true for finished ones too." }) });
 export const gameStatus = (a, { booking }) => settle.status(booking, a.player);
 
-export async function payMyShare(a, { booking, mandate }) {
-  const b0 = settle.status(booking, a.player);
+export async function payMyShare(a, { booking, mandate, amount = null }) {
+  let b0 = settle.status(booking, a.player);
+  // amount, if given, must be what is being paid: the share as it stands, or the full share from before an accepted ask
+  // to pay less (which puts that ask back). Never silently something else.
+  if (amount != null && !b0.error) {
+    const want = toCents(amount), mine = Math.round(+(b0.payments?.[a.player]?.share ?? b0.invite?.share ?? 0) * 100);
+    const asked = (b0.shareAsks || []).find((x) => x.player === a.player && x.status === "accepted");
+    if (want === mine) {} // (as it stands)
+    else if (asked && want === Math.round(+asked.from * 100)) { const w = settle.withdrawShareAsk(booking, a.player); if (w.error) return w; b0 = settle.status(booking, a.player); }
+    else return { error: "bad_amount", message: `Your share is $${usd(mine)}${asked ? ` (or $${asked.from}, your share before your ask to pay less, which puts the difference back on you)` : ""}; pay_my_share pays that, so leave amount out or pass it exactly.` };
+  }
   if (!b0.error && b0.payments?.[a.player]) {
     // (an organizer paying from saved PayPal authorizes the whole price; above `cover`, they approve it in PayPal themselves)
     const p = b0.payments[a.player], total = Math.round(+b0.total * 100), self = p.role === "organizer" && settle.hasVault(a.player) && coverFits(a.player, total);
