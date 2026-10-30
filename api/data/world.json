@@ -1,0 +1,655 @@
+{
+ "demo": true,
+ "note": "A made-up town for the demo. Venues, prices, players and free courts are simulated; a real venue plugs in through the adapter in api/src/world.js.",
+ "town": {
+  "name": "Sample town (placed on San Jose, CA)",
+  "w": 10,
+  "h": 8,
+  "geo": {
+   "lat": 37.3352,
+   "lon": -121.8811,
+   "unitKm": 1.25
+  },
+  "map": {
+   "w": 10,
+   "h": 8,
+   "river": [
+    [
+     0,
+     3
+    ],
+    [
+     1.6,
+     3.6
+    ],
+    [
+     2.8,
+     4.25
+    ],
+    [
+     4,
+     5
+    ],
+    [
+     5.2,
+     6.2
+    ],
+    [
+     6.2,
+     8
+    ]
+   ],
+   "lake": {
+    "x": 8.3,
+    "y": 6.1,
+    "rx": 1.05,
+    "ry": 0.7
+   },
+   "parks": [
+    {
+     "x": 4.4,
+     "y": 2.6,
+     "w": 1.3,
+     "h": 0.9,
+     "name": "Central Park"
+    },
+    {
+     "x": 0.4,
+     "y": 5.6,
+     "w": 1.2,
+     "h": 1.4,
+     "name": ""
+    }
+   ],
+   "roads": [
+    [
+     [
+      0,
+      4.6
+     ],
+     [
+      10,
+      3.6
+     ]
+    ],
+    [
+     [
+      5,
+      0
+     ],
+     [
+      5.3,
+      8
+     ]
+    ],
+    [
+     [
+      0.6,
+      7.6
+     ],
+     [
+      9.6,
+      0.6
+     ]
+    ],
+    [
+     [
+      0,
+      1.6
+     ],
+     [
+      10,
+      2.2
+     ]
+    ]
+   ],
+   "districts": [
+    {
+     "name": "North",
+     "x": 6.4,
+     "y": 0.7
+    },
+    {
+     "name": "Westgate",
+     "x": 1.1,
+     "y": 1.5
+    },
+    {
+     "name": "Midtown",
+     "x": 4.2,
+     "y": 3
+    },
+    {
+     "name": "Riverside",
+     "x": 2,
+     "y": 6.9
+    },
+    {
+     "name": "Lakeside",
+     "x": 8.6,
+     "y": 4.9
+    }
+   ]
+  }
+ },
+ "currency": "USD",
+ "venues": [
+  {
+   "id": "riverside",
+   "name": "Riverside Sports Center",
+   "area": "Riverside",
+   "x": 3,
+   "y": 4.9,
+   "open": [
+    "07:00",
+    "22:00"
+   ],
+   "peakBusy": 0.75,
+   "offBusy": 0.35,
+   "sports": {
+    "badminton": {
+     "courts": 6,
+     "price": 28
+    },
+    "tennis": {
+     "courts": 2,
+     "price": 36
+    },
+    "pickleball": {
+     "courts": 4,
+     "price": 24
+    },
+    "basketball": {
+     "courts": 1,
+     "price": 64
+    }
+   },
+   "policy": {
+    "style": "firm",
+    "floorPct": 0.9,
+    "offPeak": {
+     "pct": 0.15,
+     "before": "17:00"
+    },
+    "group": {
+     "min": 4,
+     "pct": 0.1
+    },
+    "lastMinute": {
+     "withinHours": 6,
+     "pct": 0.2
+    },
+    "rounds": 3
+   },
+   "payee": "riverside-venue@join.example"
+  },
+  {
+   "id": "north",
+   "name": "North Park Gym",
+   "area": "North",
+   "x": 5.6,
+   "y": 1.5,
+   "open": [
+    "06:00",
+    "23:00"
+   ],
+   "peakBusy": 0.6,
+   "offBusy": 0.25,
+   "sports": {
+    "badminton": {
+     "courts": 8,
+     "price": 24
+    },
+    "basketball": {
+     "courts": 2,
+     "price": 56
+    },
+    "volleyball": {
+     "courts": 1,
+     "price": 52
+    }
+   },
+   "policy": {
+    "style": "standard",
+    "floorPct": 0.8,
+    "offPeak": {
+     "pct": 0.15,
+     "before": "17:00"
+    },
+    "group": {
+     "min": 4,
+     "pct": 0.1
+    },
+    "lastMinute": {
+     "withinHours": 6,
+     "pct": 0.2
+    },
+    "rounds": 3
+   },
+   "payee": "north-venue@join.example"
+  },
+  {
+   "id": "lakeside",
+   "name": "Lakeside School Gym",
+   "area": "Lakeside",
+   "x": 7.3,
+   "y": 5.7,
+   "open": [
+    "18:00",
+    "22:00"
+   ],
+   "weekendOpen": [
+    "08:00",
+    "18:00"
+   ],
+   "peakBusy": 0.5,
+   "offBusy": 0.5,
+   "sports": {
+    "badminton": {
+     "courts": 4,
+     "price": 20
+    },
+    "pickleball": {
+     "courts": 2,
+     "price": 18
+    }
+   },
+   "policy": {
+    "style": "eager",
+    "floorPct": 0.7,
+    "offPeak": {
+     "pct": 0.15,
+     "before": "17:00"
+    },
+    "group": {
+     "min": 4,
+     "pct": 0.1
+    },
+    "lastMinute": {
+     "withinHours": 6,
+     "pct": 0.2
+    },
+    "rounds": 3
+   },
+   "payee": "lakeside-venue@join.example"
+  },
+  {
+   "id": "midtown",
+   "name": "Midtown Community Gym",
+   "area": "Midtown",
+   "x": 5.1,
+   "y": 3.9,
+   "open": [
+    "08:00",
+    "22:00"
+   ],
+   "peakBusy": 0.65,
+   "offBusy": 0.3,
+   "sports": {
+    "badminton": {
+     "courts": 5,
+     "price": 26
+    },
+    "tennis": {
+     "courts": 2,
+     "price": 32
+    },
+    "table tennis": {
+     "courts": 6,
+     "price": 12
+    }
+   },
+   "policy": {
+    "style": "standard",
+    "floorPct": 0.82,
+    "offPeak": {
+     "pct": 0.15,
+     "before": "17:00"
+    },
+    "group": {
+     "min": 4,
+     "pct": 0.1
+    },
+    "lastMinute": {
+     "withinHours": 6,
+     "pct": 0.2
+    },
+    "rounds": 3
+   },
+   "payee": "midtown-venue@join.example"
+  },
+  {
+   "id": "westgate",
+   "name": "Westgate Badminton Club",
+   "area": "Westgate",
+   "x": 1.2,
+   "y": 2.4,
+   "open": [
+    "09:00",
+    "22:00"
+   ],
+   "peakBusy": 0.55,
+   "offBusy": 0.3,
+   "sports": {
+    "badminton": {
+     "courts": 6,
+     "price": 22
+    }
+   },
+   "policy": {
+    "style": "standard",
+    "floorPct": 0.78,
+    "offPeak": {
+     "pct": 0.15,
+     "before": "17:00"
+    },
+    "group": {
+     "min": 4,
+     "pct": 0.1
+    },
+    "lastMinute": {
+     "withinHours": 6,
+     "pct": 0.2
+    },
+    "rounds": 3
+   },
+   "payee": "westgate-venue@join.example"
+  }
+ ],
+ "players": [
+  {
+   "id": "you",
+   "name": "Alex Rivera",
+   "level": "B",
+   "free": [
+    "Mon 19-22",
+    "Tue 19-22",
+    "Thu 18-22",
+    "Sat 08-14",
+    "Sun 09-13"
+   ],
+   "area": {
+    "x": 2.4,
+    "y": 5.8,
+    "name": "Riverside"
+   },
+   "sports": [
+    "badminton",
+    "tennis",
+    "pickleball"
+   ],
+   "prefers": "any"
+  },
+  {
+   "id": "hana",
+   "name": "Hana Chen",
+   "level": "B",
+   "free": [
+    "Tue 19-22",
+    "Thu 18-22",
+    "Sat 09-13"
+   ],
+   "prefers": "doubles",
+   "area": {
+    "x": 3.3,
+    "y": 6.3,
+    "name": "Riverside"
+   },
+   "sports": [
+    "badminton",
+    "tennis"
+   ]
+  },
+  {
+   "id": "ravi",
+   "name": "Ravi Patel",
+   "level": "A",
+   "free": [
+    "Mon 19-22",
+    "Thu 19-22",
+    "Sun 10-14"
+   ],
+   "prefers": "doubles",
+   "area": {
+    "x": 6.2,
+    "y": 0.9,
+    "name": "North"
+   },
+   "sports": [
+    "badminton",
+    "basketball"
+   ]
+  },
+  {
+   "id": "tomas",
+   "name": "Tomás Ruiz",
+   "level": "B",
+   "free": [
+    "Wed 18-22",
+    "Thu 19-22",
+    "Sat 08-12"
+   ],
+   "prefers": "any",
+   "area": {
+    "x": 2,
+    "y": 4.6,
+    "name": "Riverside"
+   },
+   "sports": [
+    "badminton",
+    "pickleball",
+    "tennis"
+   ]
+  },
+  {
+   "id": "yuki",
+   "name": "Yuki Sato",
+   "level": "A",
+   "free": [
+    "Tue 18-21",
+    "Fri 19-22",
+    "Sat 14-18"
+   ],
+   "prefers": "singles",
+   "area": {
+    "x": 6,
+    "y": 2.1,
+    "name": "North"
+   },
+   "sports": [
+    "badminton",
+    "tennis"
+   ]
+  },
+  {
+   "id": "aisha",
+   "name": "Aisha Bello",
+   "level": "C",
+   "free": [
+    "Mon 18-21",
+    "Thu 18-21",
+    "Sun 09-12"
+   ],
+   "prefers": "doubles",
+   "area": {
+    "x": 8,
+    "y": 7.1,
+    "name": "Lakeside"
+   },
+   "sports": [
+    "badminton",
+    "volleyball"
+   ]
+  },
+  {
+   "id": "leo",
+   "name": "Leo Park",
+   "level": "B",
+   "free": [
+    "Thu 19-22",
+    "Fri 18-22",
+    "Sat 09-12"
+   ],
+   "prefers": "any",
+   "area": {
+    "x": 3.8,
+    "y": 5.4,
+    "name": "Riverside"
+   },
+   "sports": [
+    "badminton",
+    "basketball"
+   ]
+  },
+  {
+   "id": "noor",
+   "name": "Noor Haddad",
+   "level": "A",
+   "free": [
+    "Tue 19-22",
+    "Wed 19-22",
+    "Sat 10-14"
+   ],
+   "prefers": "singles",
+   "area": {
+    "x": 2.6,
+    "y": 3.6,
+    "name": "Westgate"
+   },
+   "sports": [
+    "badminton",
+    "tennis"
+   ]
+  },
+  {
+   "id": "sam",
+   "name": "Sam Okafor",
+   "level": "C",
+   "free": [
+    "Sat 08-12",
+    "Sun 08-12"
+   ],
+   "prefers": "doubles",
+   "area": {
+    "x": 9.1,
+    "y": 5,
+    "name": "Lakeside"
+   },
+   "sports": [
+    "badminton",
+    "pickleball"
+   ]
+  },
+  {
+   "id": "ines",
+   "name": "Ines Duarte",
+   "level": "B",
+   "free": [
+    "Mon 19-22",
+    "Thu 18-21",
+    "Sun 14-18"
+   ],
+   "prefers": "any",
+   "area": {
+    "x": 6.8,
+    "y": 1.6,
+    "name": "North"
+   },
+   "sports": [
+    "badminton",
+    "tennis",
+    "table tennis"
+   ]
+  },
+  {
+   "id": "kenji",
+   "name": "Kenji Wu",
+   "level": "A",
+   "free": [
+    "Thu 19-22",
+    "Sat 09-12",
+    "Sun 09-12"
+   ],
+   "prefers": "doubles",
+   "area": {
+    "x": 6.6,
+    "y": 2.9,
+    "name": "Midtown"
+   },
+   "sports": [
+    "badminton",
+    "basketball"
+   ]
+  },
+  {
+   "id": "priya",
+   "name": "Priya Nair",
+   "level": "B",
+   "free": [
+    "Wed 18-21",
+    "Fri 19-22",
+    "Sun 10-13"
+   ],
+   "prefers": "doubles",
+   "area": {
+    "x": 5,
+    "y": 0.7,
+    "name": "North"
+   },
+   "sports": [
+    "badminton",
+    "pickleball"
+   ]
+  }
+ ],
+ "publicCourts": [
+  {
+   "id": "pub-guadalupe",
+   "name": "Guadalupe River Park courts",
+   "x": 3.6,
+   "y": 4.2,
+   "sports": [
+    "basketball",
+    "pickleball"
+   ],
+   "lit": true,
+   "indoor": false
+  },
+  {
+   "id": "pub-rosegarden",
+   "name": "Rose Garden tennis courts",
+   "x": 1.8,
+   "y": 3.1,
+   "sports": [
+    "tennis",
+    "pickleball"
+   ],
+   "lit": false,
+   "indoor": false
+  },
+  {
+   "id": "pub-lakeside-park",
+   "name": "Lakeside Park courts",
+   "x": 8.1,
+   "y": 6.4,
+   "sports": [
+    "basketball",
+    "volleyball",
+    "badminton"
+   ],
+   "lit": true,
+   "indoor": false
+  },
+  {
+   "id": "pub-north-school",
+   "name": "North Elementary blacktop",
+   "x": 5.9,
+   "y": 1.1,
+   "sports": [
+    "basketball"
+   ],
+   "lit": false,
+   "indoor": false
+  }
+ ]
+}

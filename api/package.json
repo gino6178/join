@@ -1,0 +1,12 @@
+{
+  "name": "join-api",
+  "description": "Join: the agent-ready marketplace where AI agents organize pickup games, negotiate the court with the venue, split the fee and settle it with PayPal. The platform runs no model of its own.",
+  "type": "module",
+  "private": true,
+  "engines": { "node": ">=20" },
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "node --test \"test/**/*.test.js\""
+  },
+  "dependencies": {}
+}
