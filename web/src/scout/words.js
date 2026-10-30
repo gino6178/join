@@ -66,7 +66,7 @@ export const WORDS = {
     nothing: (b, act) => `${b.dates.map(zhDay).join("、")}${b.from ? ` ${b.from}–${b.to}` : ""} 沒有合適的：需要 ${b.players} 位${act}而且那時有空的朋友，加上有空位的場地。換一天、放寬時間，或少幾個人試試。`,
     likes: (a) => `喜歡${ZH_NAME[a] || a}`,
     notFree: (names) => `${names.join("、")} 那時沒空`,
-    why: { free: (n) => `${n} 人有空`, trip: (m) => `最遠車程 ${m} 分鐘`, discount: (d) => `${d} 折扣` },
+    why: { free: (n) => `${n} 人有空`, trip: (m) => `最遠車程 ${m} 分鐘`, discount: (d) => `${{ "off-peak": "離峰", group: "團體", "last-minute": "臨時" }[d] || d}折扣` },
     card: { asked: "開價", each: "每人", haggle: "超過預算，我去談", tooFar: "超出上限太多，談不下來", negotiate: "去談這個", week: (x) => `你的每週上限那週只剩 $${(+x).toFixed(2)}` },
     style: { eager: "這家很好談", standard: "這家可以談", firm: "固定價格，不議價" },
     stars: (r) => (r?.count ? `★${r.score.toFixed(1)} · ${r.count} 則已驗證評價${r.demoData ? "（示範資料）" : ""}` : "還沒有評價"),

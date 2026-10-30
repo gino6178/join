@@ -125,9 +125,9 @@ app.delete("/api/tokens/:id", signedIn, (req, res) => res.json({ ok: revoke(req.
 app.get("/api/activity", signedIn, (req, res) => res.json({ entries: forPlayer(req.player, { after: +req.query.after || 0 }) }));
 app.get("/api/games", signedIn, (req, res) => res.json(ops.myGames({ player: req.player }, { all: true })));
 // the person can do from the website what their agent can (approving payments is in PayPal itself)
-app.post("/api/bookings/:id/:act", signedIn, async (req, res) => {
+app.post("/api/bookings/:id/:act", signedIn, async (req, res, next) => {
   const a = { player: req.player, client: null }, act = { pay: ops.payMyShare, decline: ops.declineGame, cancel: ops.cancelBooking, "propose-share": ops.proposeShare, "answer-share": ops.answerShare, "reimburse": ops.requestReimbursement }[req.params.act];
-  if (!act) return res.status(404).end();
+  if (!act) return next(); // (review, approved and ap2 have their own routes below)
   const r = await act(a, { ...(req.body || {}), booking: req.params.id }); res.status(r.error ? 400 : 200).json(r);
 });
 // Join's website agent, for people who don't bring one. It understands what they ask on Join's own server (Qwen2.5 0.5B

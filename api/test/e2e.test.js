@@ -36,5 +36,11 @@ test("agents organize, negotiate and settle a group booking over MCP", { skip: !
     const tok = await (await fetch(`${url}/api/tokens`, { method: "POST", headers: { "Content-Type": "application/json", cookie }, body: JSON.stringify({ label: "x" }) })).json();
     const put = await fetch(`${url}/api/mandate`, { method: "PUT", headers: { "Content-Type": "application/json", Authorization: `Bearer ${tok.token}` }, body: JSON.stringify({ perGame: 999999 }) });
     assert.equal(put.status, 401);
+    // reviews: a person's session reaches the review route (and is told why it can't review yet); an agent's token can't
+    const games = await (await fetch(`${url}/api/games`, { headers: { cookie } })).json(), bk = games.bookings[0]?.id || "bk_none";
+    const rev = await fetch(`${url}/api/bookings/${bk}/review`, { method: "POST", headers: { "Content-Type": "application/json", cookie }, body: JSON.stringify({ stars: 4 }) });
+    assert.notEqual(rev.status, 404);
+    const byAgent = await fetch(`${url}/api/bookings/${bk}/review`, { method: "POST", headers: { "Content-Type": "application/json", Authorization: `Bearer ${tok.token}` }, body: JSON.stringify({ stars: 5 }) });
+    assert.equal(byAgent.status, 401);
   } finally { server.kill(); }
 });
