@@ -262,6 +262,15 @@ async function refundAll(b, why) {
 
 // One pass over the bookings that are waiting on time or on PayPal. The server runs it every few seconds.
 // Demo only (server.js allows it in demo mode): the time for shares runs out now
+// Demo only: the game is over now (rather than at its end time), so the venue is paid with PayPal Payouts at once
+export async function endNow(bookingId) {
+  const b = get(bookingId);
+  if (!b || b.state !== "locked") return { error: "not_locked", message: "Only a paid and locked booking can be played." };
+  b.state = "played"; b.endedEarly = true; db.save();
+  note(b, { kind: "platform" }, "played", "The game is over (ended early in the demo).");
+  await tick();
+  return view(b, b.organizer);
+}
 export async function expireNow(bookingId) {
   const b = get(bookingId);
   if (!b || b.state !== "held") return { error: "not_held", message: "Only a booking waiting for shares can run out of time." };

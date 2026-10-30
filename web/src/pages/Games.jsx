@@ -66,6 +66,7 @@ function Booking({ b, me, w, focus, demo, done }) {
       {(b.reimbursements || []).map((r) => <p key={r.player} className="small"><Icon name="send" size={14} />{r.player === me ? tr("You") : firstName(w, r.player)}: PayPal invoice for {money(r.amount)}, {r.status === "sent" ? "waiting to be paid" : r.status === "repaid" ? `paid; ${firstName(w, b.organizer)} was paid back with PayPal Payouts` : r.status.replace(/_/g, " ")}</p>)}
       {b.payout && <p className="small"><Icon name="send" size={14} />Venue paid {money(b.payout.amount)} with PayPal Payouts ({String(b.payout.status).toLowerCase()}), after PayPal's fees.</p>}
       {demo && me === b.organizer && b.state === "held" && <Seats b={b} w={w} done={done} />}
+      {demo && me === b.organizer && b.state === "locked" && <p className="small muted">{tr("Demo: don't want to wait for the game?")} <button className="link-btn small" disabled={!!busy} onClick={async () => { setBusy("end"); try { await api(`/api/demo/bookings/${b.id}/end`, { method: "POST", body: {} }); } catch (e) { setErr(e); } setBusy(null); for (const t of [0, 3000, 8000, 15000]) setTimeout(done, t); }}>{tr("End the game now (the venue is paid)")}</button></p>}
       {err && <p className="err">{err}</p>}
       <div className="actions">
         {me === b.organizer && b.state === "awaiting_organizer" && !b.you?.status && <button className="btn primary" disabled={!!busy} onClick={() => act("pay")}>Guarantee it in PayPal ({money(b.total)})</button>}

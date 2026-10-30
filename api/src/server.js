@@ -1,7 +1,6 @@
 // Join's server: the MCP endpoint and the REST API for players' agents, the website's API for people, PayPal's return
 // URLs and webhooks, the venue's A2A endpoint, and the built website. Configure with environment variables
 // (api/.env.example). Without PayPal keys it runs against the PayPal stand-in (pay/mock.js) and says so everywhere.
-import "./tz.js"; // (first: the process runs on the town's clock)
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -243,6 +242,7 @@ app.post("/api/demo/bookings/:id/:act", signedIn, async (req, res) => {
   const said = (summary) => recordActivity({ actor: { kind: "platform" }, who: b.players, action: "demo_step", ref: b.id, summary: `Demo: ${summary}` });
   const nm = (id) => player(id)?.name.split(" ")[0] || id;
   await demoScope.run(true, async () => { try {
+    if (req.params.act === "end") { said(`${nm(req.player)} ended the game early, so the venue is paid now.`); return res.json(await settle.endNow(b.id)); }
     if (req.params.act === "time-out") { said(`${nm(req.player)} ran the clock out for everyone who hadn't paid.`); return res.json(await settle.expireNow(b.id)); }
     if (!other(who)) return res.status(400).json({ error: "not_invited", message: "Pick someone invited to this booking." });
     if (player(who)?.joined) return res.status(403).json({ error: "real_person", message: `${nm(who)} joined Join themselves: only they (or their agent) can answer.` }); // (the demo panel plays only the made-up residents)
