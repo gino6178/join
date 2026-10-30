@@ -18,7 +18,7 @@ client).
 
 | What | License |
 |---|---|
-| PayPal Agent Toolkit (`@paypal/agent-toolkit`) | Apache 2.0 |
+| PayPal Agent Toolkit (`@paypal/agent-toolkit`) | ISC |
 | Express | MIT |
 | Model Context Protocol TypeScript SDK (`@modelcontextprotocol/sdk`) | MIT |
 | Zod | MIT |
