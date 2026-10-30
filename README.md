@@ -18,8 +18,10 @@ PayPal AI Hackathon 2026 · MIT license
 ![What the agents did](docs/screenshots/1-activity.png)
 
 **For judges:** `npm run setup`, `npm start`, open http://localhost:8790/demo?as=you, then `npm run demo` in another
-terminal. No keys needed. The submission text, testing instructions and screenshots are in
-[docs/SUBMISSION.md](docs/SUBMISSION.md) and [docs/screenshots](docs/screenshots).
+terminal. No keys needed. How Join maps to each judging criterion (Technological Implementation, Design, Potential
+Impact, Innovation, Presentation), with the code behind every claim: [docs/JUDGING.md](docs/JUDGING.md). The submission
+text, testing instructions and screenshots are in [docs/SUBMISSION.md](docs/SUBMISSION.md) and
+[docs/screenshots](docs/screenshots).
 
 ---
 
@@ -207,7 +209,7 @@ sends the receipt to PayPal as evidence the moment a payment is disputed.
 | `api/data/world.json` | The made-up demo town (USD, placed on San Jose, CA) |
 | `web/` | The website (React, Vite) |
 | `examples/` | Agents from outside: scripted (no key), a Claude player agent, a Claude venue agent on the PayPal Agent Toolkit; the receipt verifier |
-| `docs/` | The Devpost submission ([SUBMISSION.md](docs/SUBMISSION.md)), the technical overview ([TECHNICAL.md](docs/TECHNICAL.md)), screenshots, the demo video script |
+| `docs/` | How Join maps to the judging criteria ([JUDGING.md](docs/JUDGING.md)), the Devpost submission ([SUBMISSION.md](docs/SUBMISSION.md)), the technical overview ([TECHNICAL.md](docs/TECHNICAL.md)), screenshots, the demo video script |
 
 ## What's new since 1 October 2026
 

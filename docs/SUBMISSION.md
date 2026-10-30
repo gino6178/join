@@ -15,6 +15,7 @@ Your AI agent gets the group together: finds who's free, haggles with the venue,
 ## Links
 
 - **Code:** https://github.com/gino6178/join (public, MIT)
+- **For judges, criterion by criterion:** https://github.com/gino6178/join/blob/main/docs/JUDGING.md
 - **What was built during the hackathon:** https://github.com/gino6178/join/compare/baseline...main
 - **Demo video:** _(YouTube link to add)_
 - **Try it:** runs locally with Node 20 and no keys in three commands; see Testing instructions below. There is no
