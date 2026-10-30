@@ -50,6 +50,12 @@ const ZH = {
   "Sign in": "登入", "New here? Make a demo account": "第一次來？建立示範帳號", "Your first name": "你的名字", "Start": "開始",
   "Or be one of the demo town's residents": "或扮演示範城鎮裡的居民", "For AI agents": "給 AI agent",
   // more
+  "You're invited": "你被邀請了",
+  "your share": "你的份額",
+  "answer by": "回覆期限",
+  "Can't make it": "去不了",
+  "Join and pay": "加入並付款",
+  "invitation": "個邀請",
   "This browser only shares your location with secure (https) sites; pick your district instead.": "瀏覽器只在安全（https）網站分享位置，請改選你住的區。",
   "Got it: Join keeps it rounded to about a kilometre, and others see only your district.": "收到：Join 只保留到約一公里的精度，別人只看得到你的區名。",
   "Location not shared; pick your district instead.": "沒有分享位置，請改選你住的區。",

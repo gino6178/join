@@ -436,6 +436,7 @@ export function view(b, viewer) {
     reimbursements: Object.values(b.reimbursements || {}).filter((r) => viewer === b.organizer || r.player === viewer).map((r) => ({ player: r.player, amount: usd(r.amount), status: r.status, url: r.player === viewer && r.status === "sent" ? r.url : undefined })),
     extras: (b.bills || []).map((x) => ({ total: usd(x.total), items: x.items.map((i) => i.name), status: x.status, url: viewer === b.organizer && x.status === "sent" ? x.url : undefined })),
     owes: b.reimbursements?.[viewer]?.status === "sent" ? { amount: usd(b.reimbursements[viewer].amount), url: b.reimbursements[viewer].url } : null,
+    shareChanges: (b.shareAsks || []).filter((x) => x.status === "accepted").map((x) => ({ player: x.player, from: usd(x.from), to: usd(x.amount), coveredBy: b.organizer, note: `${name(x.player)} pays $${usd(x.amount)} instead of $${usd(x.from)}; ${name(b.organizer)} covers the $${usd(x.from - x.amount)}.` })),
     split: b.splitRule || "even", shareAsks: (b.shareAsks || []).filter((x) => viewer === b.organizer || x.player === viewer).map((x) => ({ ...x, from: usd(x.from), amount: usd(x.amount) })),
     paypal: paypalMode(), receipts: receipts.forBooking(b.id),
   };

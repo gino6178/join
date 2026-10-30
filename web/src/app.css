@@ -323,3 +323,6 @@ legend { font-size: var(--fs-14); color: var(--ink-2); padding: 0 6px; }
 .where { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; flex-basis: 100%; } .where small { flex-basis: 100%; }
 .where { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; flex-basis: 100%; } .where small { flex-basis: 100%; }
 .crew-card header { display: flex; justify-content: space-between; align-items: center; } .crew-link code { word-break: break-all; }
+.invite-share { font-size: 1.15em; font-weight: 600; }
+.badge { display: inline-block; min-width: 18px; padding: 0 5px; margin-left: 6px; border-radius: 9px; background: var(--bad, #e5484d); color: #fff; font-size: 11px; font-style: normal; line-height: 18px; text-align: center; }
+@media (max-width: 640px) { .need { flex-direction: column; align-items: stretch; } .need .need-btns { justify-content: flex-end; } .side .nav .badge { position: absolute; margin: -6px 0 0 4px; } }

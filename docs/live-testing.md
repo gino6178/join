@@ -80,6 +80,34 @@ What changed after them:
   now "alex"; scope errors say what to do; weekend hours are never null; `/llms.txt` says how receipts are hashed and
   signed, that friends who joined Join are invited by id, and that errors come back inside results.
 
+## Round 4: four friends plan together, each through their own agent
+
+Four testers were friends in one district, Midtown, with the crew code `crew4`, so Join knew they were friends and
+invited them to each other's plans. Each acted for their person: Ana's agent organized over MCP; Bo's agent (REST)
+joined if the share was $12 or less; Chen's agent (A2A) asked to pay $1 less first; 小美 was a person on her phone, on
+the website, in Chinese. A fifth tester, not in the crew, checked the round-2 fixes.
+
+| Tester | Verdict |
+|---|---|
+| Ana's agent, organizer, MCP ([round4-ana.md](live-test/round4-ana.md)) | 0 blocker, 0 bug, 3 confusing |
+| Bo's agent, REST ([round4-bo.md](live-test/round4-bo.md)) | 0 blocker, 0 bug, 1 confusing |
+| Chen's agent, A2A ([round4-chen.md](live-test/round4-chen.md)) | 0 blocker, 0 bug, 0 confusing |
+| 小美, website on a phone ([round4-xiaomei.md](live-test/round4-xiaomei.md)) | 0 blocker, 3 bug, 2 confusing |
+| Verifying the fixes ([round4-verify.md](live-test/round4-verify.md)) | 0 blocker, 4 bug, 3 confusing |
+
+It happened among exactly the four of them: karaoke at Echo Karaoke, $29.40, booking `bk_7dfd44299e92`. Chen's agent
+asked to pay $1 less and Ana's agent agreed; Bo's agent and 小美 paid as invited; the booking locked, with Ana $8.35,
+Bo $7.35, Chen $6.35 and 小美 $7.35, which adds up to the total. Ana's agent checked the receipt's signature with its
+own code against the published key.
+
+What changed after them: everyone in a plan now sees agreed share changes ("Chen pays $6.35 instead of $7.35; Ana
+covers the $1"), in Plans and in booking_status; Plans shows a badge while an invitation waits, and the invitation card
+is in Chinese and fits a phone; a new activity never inherits an earlier budget; an over-budget card says budget, not
+limit; the lock says "everyone who is coming paid" when some friends declined; on phones the agent button sits above
+the tab bar, the top corner has a background, tables scroll and the receipt fits. And, from the user's request: crews
+now start with an invite link (`/j/<code>`), which takes a browser to sign-up with the crew filled in and gives an agent
+JSON on how to join, and sign-up can use the browser's location so friends are placed by how far apart they live.
+
 ## What is still open
 
 - The activity log is written in English only.

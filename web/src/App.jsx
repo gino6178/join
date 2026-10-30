@@ -53,6 +53,14 @@ function Scout({ me, info }) {
 }
 
 function Shell({ me, info, page, onOut, children }) {
+  // invitations waiting for an answer: a badge on Plans, and in the tab's title
+  const [invites, setInvites] = useState(0);
+  useEffect(() => {
+    const f = () => api("/api/games").then((g) => setInvites((g.bookings || []).filter((b) => b.invite).length)).catch(() => {});
+    f(); const t = setInterval(f, 30e3); addEventListener("hashchange", f);
+    return () => { clearInterval(t); removeEventListener("hashchange", f); };
+  }, []);
+  useEffect(() => { document.title = `${invites ? `(${invites}) ` : ""}${document.title.replace(/^\(\d+\) /, "")}`; }, [invites]);
   const out = async () => { await api("/api/session", { method: "DELETE" }).catch(() => {}); onOut(); location.hash = "/"; };
   return (
     <div className="shell">
@@ -60,7 +68,7 @@ function Shell({ me, info, page, onOut, children }) {
         <a className="brand" href="#/"><span className="mark">J</span><span>Join</span></a>
         <nav>{NAV.map((n) => (
           <a key={n.k} href={`#/${n.k}`} className={`nav ${page === n.k ? "on" : ""}`} aria-current={page === n.k ? "page" : undefined}>
-            <Icon name={n.icon} /><span><b>{n.label}</b><small>{n.note}</small></span>
+            <Icon name={n.icon} /><span><b>{n.label}{n.k === "games" && invites > 0 && <i className="badge" aria-label={`${invites} ${tr("invitation")}`}>{invites}</i>}</b><small>{n.note}</small></span>
           </a>))}
         </nav>
         <div className="side-foot">

@@ -91,8 +91,8 @@ export function Invite({ b, done }) {
   };
   return (
     <div className="need">
-      <span><b>You're invited: {b.activity}, {b.date} {b.start}</b><small>{b.venueName} · {b.unitName} · your share {money(b.invite.share)} · answer by {clock(b.invite.payBy)}</small>{err && <small className="err">{err}</small>}</span>
-      <span className="need-btns"><button className="btn ghost" disabled={busy} onClick={() => act("decline")}>Can't make it</button><button className="btn primary" disabled={busy} onClick={() => act("pay")}>Join and pay</button></span>
+      <span><b>{tr("You're invited")}: {b.activity}, {b.date} {b.start}</b><span className="invite-share">{tr("your share")} {money(b.invite.share)}</span><small>{b.venueName} · {b.unitName} · {tr("answer by")} {clock(b.invite.payBy)}</small>{err && <small className="err">{err}</small>}</span>
+      <span className="need-btns"><button className="btn ghost" disabled={busy} onClick={() => act("decline")}>{tr("Can't make it")}</button><button className="btn primary" disabled={busy} onClick={() => act("pay")}>{tr("Join and pay")}</button></span>
     </div>
   );
 }
