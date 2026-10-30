@@ -19,6 +19,7 @@ import { getWorld, player, venue, setPolicy } from "./world.js";
 import { usd } from "./negotiate/policy.js";
 import * as receipts from "./proof/receipts.js";
 import { evmAnchor } from "./proof/anchor.js";
+import * as scout from "./scout/understand.js";
 
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 // a small .env reader, so the server needs no package for it
@@ -87,7 +88,7 @@ app.post("/a2a", (req, res) => a2a.handle(req, res));
 
 // ---- people: the website's API ----------------------------------------------------------------------------------------
 const signedIn = (req, res, next) => { const s = sessionOf(req); if (!s) return res.status(401).json({ error: "signed_out" }); req.player = s.player; req.sid = s.sid; next(); };
-app.get("/api/info", (req, res) => res.json({ timeZone: getWorld().town.timeZone, demoSignin: DEMO, paypal: pp.mode, publicUrl: PUBLIC_URL, mcpUrl: `${PUBLIC_URL}/mcp` }));
+app.get("/api/info", (req, res) => res.json({ timeZone: getWorld().town.timeZone, demoSignin: DEMO, paypal: pp.mode, publicUrl: PUBLIC_URL, mcpUrl: `${PUBLIC_URL}/mcp`, scout: scout.qwenOn() ? scout.MODEL : "rules" }));
 app.get("/api/world", (req, res) => {
   const w = getWorld();
   res.json({ town: w.town, currency: w.currency, note: w.note,
@@ -122,15 +123,21 @@ app.post("/api/bookings/:id/:act", signedIn, async (req, res) => {
   if (!act) return res.status(404).end();
   const r = await act(a, { ...(req.body || {}), booking: req.params.id }); res.status(r.error ? 400 : 200).json(r);
 });
-// Join's website agent, for people who don't bring one: it runs in their browser (Qwen on WebGPU, or plain rules) and
-// calls the same tools their own agent would, as them, under the same limits. It can search, negotiate and accept;
-// paying stays with the person, in PayPal.
+// Join's website agent, for people who don't bring one. It understands what they ask on Join's own server (Qwen2.5 0.5B
+// through a local Ollama, or rules; scout/understand.js), then calls the same tools their own agent would, as them,
+// under the same limits. It can search, negotiate and accept; paying stays with the person, in PayPal.
 const SCOUT = ["whoami", "list_activities", "find_options", "start_negotiation", "make_offer", "accept_price", "walk_away", "find_alternatives", "booking_status", "my_plans"];
+app.post("/api/scout/understand", limit("agent", +(process.env.AGENT_RPM || 120)), signedIn, async (req, res) => {
+  const history = (Array.isArray(req.body?.history) ? req.body.history : []).slice(-8).map((m) => ({ role: m.role === "assistant" ? "assistant" : "user", content: String(m.content || "").slice(0, 500) }));
+  if (!history.length) return res.status(400).json({ error: "empty" });
+  const w = getWorld();
+  res.json(await scout.understand(history, req.body?.brief && typeof req.body.brief === "object" ? req.body.brief : {}, { activities: w.activities, people: w.players.filter((p) => p.id !== req.player), today: new Date() }));
+});
 app.post("/api/scout/:tool", limit("agent", +(process.env.AGENT_RPM || 120)), signedIn, async (req, res) => {
   if (!SCOUT.includes(req.params.tool)) return res.status(404).json({ error: "unknown_tool", tools: SCOUT });
-  const model = String(req.body?._model || "rules") === "qwen" ? "Qwen in the browser" : "rules in the browser";
+  const model = String(req.body?._model || "rules") === "rules" ? "rules" : scout.MODEL;
   const { _model, ...args } = req.body || {};
-  try { const r = await TOOLS[req.params.tool]({ player: req.player, client: `Join website agent, ${model}` }, args); res.status(r?.error ? 400 : 200).json(r); } catch (e) { console.error(e); res.status(500).json({ error: "internal" }); }
+  try { const r = await TOOLS[req.params.tool]({ player: req.player, client: `Join website agent (${model})` }, args); res.status(r?.error ? 400 : 200).json(r); } catch (e) { console.error(e); res.status(500).json({ error: "internal" }); }
 });
 // the JS SDK v6 on the website: a browser-safe token, and the payer's own approval coming back from the PayPal popup
 app.get("/api/paypal/sdk", signedIn, async (req, res) => {

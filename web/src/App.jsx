@@ -37,13 +37,13 @@ export default function App() {
   if (r.page === "venue") return <Shell me={me} info={info} page="venue" onOut={() => setMe(null)}><Venue query={r.query} /></Shell>;
   if (!me) return <SignIn info={info} onIn={loadMe} />;
   const pages = { activity: <Activity entries={entries} me={me} />, games: <Games entries={entries} me={me} query={r.query} />, map: <MapPage entries={entries} me={me} />, limits: <Limits me={me} reload={loadMe} query={r.query} />, connect: <Connect me={me} info={info} reload={loadMe} /> };
-  return <Shell me={me} info={info} page={r.page} onOut={() => setMe(null)}>{pages[r.page] || pages.activity}<Scout me={me} /></Shell>;
+  return <Shell me={me} info={info} page={r.page} onOut={() => setMe(null)}>{pages[r.page] || pages.activity}<Scout me={me} info={info} /></Shell>;
 }
 
 // No agent of your own? Join's website agent asks what you want and does the rest (components/AgentDrawer.jsx)
-function Scout({ me }) {
+function Scout({ me, info }) {
   const [open, setOpen] = useState(() => new URLSearchParams(location.hash.split("?")[1] || "").has("agent"));
-  return <>{!open && <button className="btn primary agent-fab" onClick={() => setOpen(true)}><Icon name="spark" size={16} />No agent? Ask Join's</button>}<AgentDrawer me={me} open={open} onClose={() => setOpen(false)} /></>;
+  return <>{!open && <button className="btn primary agent-fab" onClick={() => setOpen(true)}><Icon name="spark" size={16} />No agent? Ask Join's</button>}<AgentDrawer me={me} info={info} open={open} onClose={() => setOpen(false)} /></>;
 }
 
 function Shell({ me, info, page, onOut, children }) {

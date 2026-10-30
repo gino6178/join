@@ -3,55 +3,41 @@ import { api, money, dayLabel } from "../api.js";
 import { useWorld } from "./Actor.jsx";
 import Icon from "./Icon.jsx";
 import PayPalButtons from "./PayPalButtons.jsx";
-import { byRules, byQwen, loadQwen, qwenReady, webgpu, missing, ASK, MODEL } from "../scout/understand.js";
 import { search, negotiate, acceptDeal, walkAway, alternatives } from "../scout/agent.js";
 
 // Join's website agent, for people who don't have an agent of their own. It asks what they want (activity, day, how
 // many, budget), then does what any agent does on Join, as them and under their limits: finds options, haggles,
-// accepts. The person approves the payment in PayPal themselves. The understanding runs in this browser: Qwen on WebGPU
-// if they choose to download it, otherwise plain rules. Everything it does shows up on the Activity page like any agent's.
+// accepts. The person approves the payment in PayPal themselves. Join's server understands what they write (Qwen2.5 0.5B
+// on Join's own machine, or rules); nothing is downloaded. Everything it does shows up on the Activity page like any agent's.
 const EXAMPLES = ["Karaoke Friday night, 4 of us, $15 each", "Badminton this weekend with 3 friends", "週六晚上 5 個人吃火鍋 每人 20 塊", "An escape room tomorrow for 4"];
 
-export default function AgentDrawer({ me, open, onClose }) {
+export default function AgentDrawer({ me, info, open, onClose }) {
   const w = useWorld();
   const [msgs, setMsgs] = useState([{ from: "agent", text: `Hi ${me.player.name.split(" ")[0]}. Tell me what you'd like to do with friends, and I'll find a time and a place, haggle with the venue, and get it ready for PayPal.` }]);
   const [brief, setBrief] = useState({});
   const [text, setText] = useState(""), [busy, setBusy] = useState(false);
-  const [qwen, setQwen] = useState(qwenReady() ? "ready" : "off"), [progress, setProgress] = useState(null);
   const [cards, setCards] = useState(null), [deal, setDeal] = useState(null), [pending, setPending] = useState(null), [booking, setBooking] = useState(null);
   const end = useRef(null);
   useEffect(() => { end.current?.scrollIntoView({ block: "end" }); }, [msgs, cards, deal, booking]);
-  const model = qwen === "ready" ? "qwen" : "rules";
+  const [model, setModel] = useState(info?.scout || "rules");
   const say = (t) => setMsgs((m) => [...m, { from: "agent", text: t }]);
-  const ctx = () => ({ activities: w.activities, people: w.players.filter((p) => p.id !== me.player.id), today: new Date(), me: me.player.name });
-
-  const startQwen = async () => {
-    setQwen("loading");
-    try { await loadQwen((p) => setProgress(p)); setQwen("ready"); say("Qwen is running in your browser now. Nothing you type here leaves it for this part."); }
-    catch (e) { setQwen("failed"); say(`Qwen couldn't start here (${e.message}). I'll keep using simple rules.`); }
-    setProgress(null);
-  };
 
   const send = async (t = text) => {
     if (!t.trim() || busy || !w) return;
     const history = [...msgs, { from: "me", text: t }];
     setMsgs(history); setText(""); setBusy(true); setCards(null);
     try {
-      let next = brief, reply = "";
-      if (qwen === "ready") {
-        try { ({ brief: next, reply } = await byQwen(history.filter((m) => m.text).map((m) => ({ role: m.from === "me" ? "user" : "assistant", content: m.text })), brief, ctx())); }
-        catch { next = byRules(t, brief, ctx()); }
-      } else next = byRules(t, brief, ctx());
-      setBrief(next);
-      const gap = missing(next);
-      if (gap.length) { say(reply && qwen === "ready" ? reply : ASK[gap[0]]); return; }
-      say(reply && qwen === "ready" ? reply : `Looking for ${next.activity} for ${next.players + 1}${next.budget ? `, about ${money(next.budget)} each` : ""}…`);
+      const u = await api("/api/scout/understand", { method: "POST", body: { brief, history: history.slice(1).map((m) => ({ role: m.from === "me" ? "user" : "assistant", content: m.text })) } });
+      const next = u.brief;
+      setBrief(next); setModel(u.model);
+      say(u.reply);
+      if (u.missing.length) return;
       const r = await search(next, model);
       if (r.error) { say(r.error); return; }
       if (!r.options.length) { say(r.note || "Nothing fits. Try another day or a smaller group."); return; }
       say(`Here ${r.options.length === 1 ? "is one option" : `are ${r.options.length} options`}. Your limit is ${money(r.limit)} a person. Pick one and I'll negotiate.`);
       setCards(r.options);
-    } finally { setBusy(false); }
+    } catch (e) { say(`Something went wrong: ${e.message}`); } finally { setBusy(false); }
   };
 
   const choose = async (o) => {
@@ -84,15 +70,9 @@ export default function AgentDrawer({ me, open, onClose }) {
   return (
     <aside className="drawer" role="dialog" aria-label="Join's website agent">
       <header className="drawer-head">
-        <span><b><Icon name="spark" size={16} /> Join's agent</b><small>{qwen === "ready" ? `${MODEL}, running in your browser` : "Simple rules in your browser · no AI model yet"}</small></span>
+        <span><b><Icon name="spark" size={16} /> Join's agent</b><small>{model === "rules" ? "Simple rules on Join's server" : `Qwen (${model}) on Join's own server · no AI service, no key`}</small></span>
         <button className="icon-btn" onClick={onClose} aria-label="Close"><Icon name="close" size={18} /></button>
       </header>
-      {qwen !== "ready" && <div className="drawer-model">
-        {qwen === "loading" ? <><p className="small">Downloading Qwen to your browser{progress ? `: ${Math.round((progress.progress || 0) * 100)}%` : "…"}</p><progress max="1" value={progress?.progress || 0} /></>
-          : qwen === "failed" ? <p className="small">Qwen couldn't run on this device's GPU, so the agent uses simple rules. Say the activity, the day, how many people and a budget.</p>
-          : webgpu() ? <p className="small">Want it to understand anything you write, in any language? <button className="link" onClick={startQwen}>Use Qwen in your browser</button> (about 1 GB, once; no key, nothing sent to an AI service).</p>
-          : <p className="small">This browser has no WebGPU, so the agent uses simple rules. Say the activity, the day, how many people and a budget.</p>}
-      </div>}
       <div className="drawer-body">
         {msgs.map((m, i) => <p key={i} className={`bubble ${m.from}`}>{m.text}</p>)}
         {msgs.length === 1 && <div className="chips">{EXAMPLES.map((e) => <button key={e} className="chip" onClick={() => send(e)}>{e}</button>)}</div>}
