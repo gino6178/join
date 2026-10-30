@@ -108,6 +108,18 @@ export function byRules(text, brief, { activities, people, today }) {
   // turned into dollars at TWD_PER_USD (32 by default), and the reply says so.
   const twd = n.match(/(?:nt\$|ntd|twd)\s*(\d+(?:\.\d+)?)/) || n.match(/(\d+(?:\.\d+)?)\s*(?:台幣|新台幣|ntd|twd|nt)/) || ((m) => (m && +m[1] >= 100 ? m : null))(n.match(/(\d+(?:\.\d+)?)\s*(?:塊|元)(?!美)/));
   const money = twd || n.match(/\$\s*(\d+(?:\.\d+)?)/) || n.match(/(\d+(?:\.\d+)?)\s*(?:dollars|bucks|usd|塊|元|美金)/) || n.match(/budget\s*(?:is|of)?\s*(\d+(?:\.\d+)?)/);
+  // what they want beyond time and price, for find_options' prefer: near, cheap, a trip limit, aspects from the
+  // reviews' fixed list. Said in English or Chinese; anything else is left out rather than guessed.
+  const wish = {};
+  if (/\b(near|nearby|close by|close to (me|home)|walking distance|walkable)\b|附近|近一點|近一些|近的|離我近|走路/.test(n)) wish.near = true;
+  if (/\b(cheap|cheaper|cheapest|affordable|inexpensive|low cost)\b|便宜|省錢|划算|不要太貴/.test(n)) wish.cheap = true;
+  const trip = n.match(/within (\d+) ?(?:min|minutes)/) || n.match(/(\d+) ?分鐘(?:以內|內)/);
+  if (trip) { wish.maxTrip = +trip[1]; wish.near = true; }
+  const ASP = { quiet: /\bquiet\b|安靜/, clean: /\bclean\b|乾淨/, staff: /friendly staff|\bfriendly\b|服務好|親切/, food: /good food|\bfood\b|好吃|餐點/, atmosphere: /\bvibe\b|atmosphere|氣氛/,
+    equipment: /\bequipment\b|器材|設備/, space: /\bspacious\b|\broomy\b|寬敞|空間大/, value: /good value|\bvalue\b|cp值/, ontime: /on time|no waiting|準時|不用等/, access: /\bparking\b|easy to get to|好停車|交通方便/ };
+  const aspects = Object.keys(ASP).filter((k) => ASP[k].test(n));
+  if (aspects.length) wish.aspects = aspects.slice(0, 4);
+  if (Object.keys(wish).length) out.prefer = wish;
   if (money && +money[1] > 0) {
     const rate = twd ? +(process.env.TWD_PER_USD || 32) : 1, amount = +money[1] / rate;
     const total = /total|in all|altogether|總共|一共|全部/.test(n) && !/each|apiece|per person|每人|每個人/.test(n);
@@ -123,6 +135,15 @@ export function byRules(text, brief, { activities, people, today }) {
   return out;
 }
 
+// the wishes, said back so the person sees what the agent will rank by
+const ASPECT_EN = { quiet: "quiet", clean: "clean", staff: "friendly staff", food: "good food", atmosphere: "atmosphere", equipment: "good equipment", space: "roomy", value: "good value", ontime: "no waiting", access: "easy to get to" };
+const ASPECT_ZH = { quiet: "安靜", clean: "乾淨", staff: "服務好", food: "好吃", atmosphere: "氣氛好", equipment: "器材好", space: "寬敞", value: "划算", ontime: "不用等", access: "交通方便" };
+function wishWords(w, zh) {
+  if (!w) return "";
+  const bits = [...(w.maxTrip ? [zh ? `${w.maxTrip} 分鐘內到得了` : `within ${w.maxTrip} min`] : w.near ? [zh ? "離大家近" : "close by"] : []), ...(w.cheap ? [zh ? "便宜" : "cheap"] : []), ...(w.aspects || []).map((k) => (zh ? ASPECT_ZH : ASPECT_EN)[k])];
+  return bits.length ? (zh ? `，優先：${bits.join("、")}` : `, putting first: ${bits.join(", ")}`) : "";
+}
+
 // A brief from the browser is checked before use: known activity, real dates and times, sane numbers, known people
 export function clean(b, { activities, people }) {
   const o = {}, x = b && typeof b === "object" && !Array.isArray(b) ? b : {};
@@ -132,6 +153,7 @@ export function clean(b, { activities, people }) {
   if (Number.isInteger(x.players) && x.players >= 1 && x.players <= 50) o.players = x.players;
   if (Array.isArray(x.with)) { const w = x.with.filter((id) => typeof id === "string" && people.some((p) => p.id === id)); if (w.length) o.with = [...new Set(w)]; }
   if (typeof x.budget === "number" && x.budget > 0 && x.budget < 1000) o.budget = x.budget;
+  if (x.prefer && typeof x.prefer === "object") { const p = {}; if (x.prefer.near === true) p.near = true; if (x.prefer.cheap === true) p.cheap = true; if (Number.isInteger(x.prefer.maxTrip) && x.prefer.maxTrip > 0 && x.prefer.maxTrip < 240) p.maxTrip = x.prefer.maxTrip; if (Array.isArray(x.prefer.aspects)) { const a = x.prefer.aspects.filter((k) => ["clean", "staff", "value", "equipment", "space", "access", "quiet", "ontime", "food", "atmosphere"].includes(k)).slice(0, 4); if (a.length) p.aspects = a; } if (Object.keys(p).length) o.prefer = p; }
   return o;
 }
 
@@ -172,8 +194,8 @@ export async function understand(history, brief, ctx) {
   const gap = missing(next), zh = /[\u4e00-\u9fff]/.test(last) || (!/[a-z]/i.test(last) && ctx.lang === "zh");
   const names = (next.with || []).map((id) => ctx.people.find((p) => p.id === id)?.name.split(" ")[0]).filter(Boolean);
   const reply = gap.length ? (zh ? ASK_ZH : ASK)[gap[0]]
-    : zh ? `好，幫你找${next.players + 1}個人的${ZH_NAME[next.activity] || next.activity}${names.length ? `（你、${names.join("、")}${next.players > names.length ? " 和其他朋友" : ""}）` : ""}${next.budget ? `，每人約 $${next.budget}${next.budgetNote ? `（${next.budgetNote.replace(/ each at (\d+) NT\$ to the dollar/, "，以 1 美元 = $1 台幣換算")}；Join 的價格都是美元）` : ""}` : ""}…`
-      : `Looking for ${next.activity} for ${next.players + 1}${names.length ? ` (you, ${names.join(", ")}${next.players > names.length ? " and others" : ""})` : ""}${next.budget ? `, about $${next.budget} each${next.budgetNote ? ` (${next.budgetNote}; prices on Join are in US dollars)` : ""}` : ""}…`;
+    : zh ? `好，幫你找${next.players + 1}個人的${ZH_NAME[next.activity] || next.activity}${names.length ? `（你、${names.join("、")}${next.players > names.length ? " 和其他朋友" : ""}）` : ""}${next.budget ? `，每人約 $${next.budget}${next.budgetNote ? `（${next.budgetNote.replace(/ each at (\d+) NT\$ to the dollar/, "，以 1 美元 = $1 台幣換算")}；Join 的價格都是美元）` : ""}` : ""}${wishWords(next.prefer, true)}…`
+      : `Looking for ${next.activity} for ${next.players + 1}${names.length ? ` (you, ${names.join(", ")}${next.players > names.length ? " and others" : ""})` : ""}${next.budget ? `, about $${next.budget} each${next.budgetNote ? ` (${next.budgetNote}; prices on Join are in US dollars)` : ""}` : ""}${wishWords(next.prefer, false)}…`;
   return { brief: next, missing: gap, reply, model, lang: zh ? "zh" : "en" };
 }
 

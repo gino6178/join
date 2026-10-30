@@ -115,7 +115,7 @@ multiparty setup, not built yet).
   ([NEGOTIATION.md](https://github.com/gino6178/join/blob/main/docs/NEGOTIATION.md)); the website agent uses the best.
 - **Reviews:** verified only, Bayesian and recency-weighted, with each person's own tastes; agents read them, never
   write them.
-- Node, Express, React, Vite; 51 automated tests, including an end-to-end run of four scripted agents over MCP (no LLM in the tests).
+- Node, Express, React, Vite; 52 automated tests, including an end-to-end run of four scripted agents over MCP (no LLM in the tests).
 
 ### Challenges we ran into
 
@@ -139,6 +139,10 @@ promise becomes binding, and how a person checks afterwards what happened.
 
 ### What's next
 
+- **Recommendations people can steer, and demand venues can see.** Agents already tell Join what a person wants
+  (close by, cheap, quiet, clean...) and Join ranks by it; venues already see those wishes counted by district, with no
+  names. Next: venues answering demand (an off-peak price for a district that keeps asking), and a paid tier for venues
+  with these insights, the business beside the per-booking fee.
 Real venues' booking systems behind the venue adapter; venues bringing their own agents over A2A; multiparty settlement
 with Partner Referrals; payer approval through AP2 once PayPal supports it.
 
@@ -182,7 +186,7 @@ bryntum-scheduler, node.js, express, react, vite
 5. No agent? Click **No agent? Ask Join's** on the website and type a plan, e.g. "karaoke Friday night, 4 of us,
    $15 each" or "好冷 想吃熱呼呼的鍋". Without a model it uses rules; with Ollama (`ollama pull qwen2.5:0.5b`, then
    `SCOUT_LLM_URL=http://127.0.0.1:11434 npm start`) Qwen also works out which activity a free-form sentence means (days, times, group size and budget are always rules).
-6. `npm test` runs 51 tests, including the end-to-end MCP run with scripted agents.
+6. `npm test` runs 52 tests, including the end-to-end MCP run with scripted agents.
 
 Without keys, Join runs on a PayPal stand-in that moves no money and says so on every page.
 

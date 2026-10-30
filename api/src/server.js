@@ -15,9 +15,10 @@ import * as settle from "./pay/settle.js";
 import { paypal } from "./pay/paypal.js";
 import { mockPaypal } from "./pay/mock.js";
 import { configureToolkit, toolkitMode } from "./pay/toolkit.js";
+import { invitePass, onInvitePass, passHolder } from "./auth.js";
 import { agentOf, sessionOf, createSession, endSession, makeToken, tokensOf, revoke, can, scopeError, COOKIE, VENUE_COOKIE, createVenueSession, venueOf, endVenueSession } from "./auth.js";
 import { getMandate, setMandate } from "./mandate.js";
-import { forPlayer, onActivity, record as recordActivity, demoScope } from "./activity.js";
+import { forPlayer, onActivity, record as recordActivity, demoScope, demand as demandFor } from "./activity.js";
 import { getWorld, player, venue, setPolicy } from "./world.js";
 import { usd } from "./negotiate/policy.js";
 import * as receipts from "./proof/receipts.js";
@@ -80,6 +81,10 @@ app.use(["/mcp", "/api/agent", "/a2a"], limit("agent", +(process.env.AGENT_RPM |
 app.use(["/api/session", "/api/venue-session", "/api/tokens"], limit("people", 30));
 
 // ---- agents -------------------------------------------------------------------------------------------------------
+// an invite pass in the address, for MCP clients that can't set a header: /mcp/g/<pass>
+// the person behind an invite pass, on the website: their agent gives them /me/<pass> to see their plans and set limits
+app.get("/me/:pass", (req, res) => { const a = passHolder(req.params.pass, req); if (!a) return res.status(404).send("This link isn't valid."); res.set("Set-Cookie", `${COOKIE}=${createSession(a.player)}; HttpOnly; SameSite=Lax; Path=/`).redirect("/#/activity"); });
+app.all("/mcp/g/:pass", (req, res, next) => { req.headers.authorization = `Bearer ${req.params.pass}`; req.url = "/mcp"; next(); });
 app.all("/mcp", (req, res) => mcp.handle(req, res).catch((e) => { console.error("mcp", e); if (!res.headersSent) res.status(500).json({ jsonrpc: "2.0", error: { code: -32603, message: "internal error" }, id: null }); }));
 
 // the same tools as plain REST, for agents and scripts that don't speak MCP: POST /api/agent/<tool> with JSON arguments
@@ -129,6 +134,7 @@ app.post("/api/auth/demo", limit("signin", 30), (req, res) => {
 // making a crew if they have none; a friend opens it. A browser gets the sign-up page with the crew filled in; an agent
 // gets JSON saying how to join for its person. Someone already on Join joins with POST /api/crew/join.
 const personOf = (req) => sessionOf(req)?.player || agentOf(req)?.player || null;
+onInvitePass((crew, nonce, name) => people.personFor("invite", nonce, name || "Friend", { crew }));
 const crewLink = (req, code) => `${req.protocol}://${req.headers.host}/j/${code}`;
 app.post("/api/crew", (req, res) => {
   const me = personOf(req);
@@ -149,8 +155,9 @@ app.get("/j/:code", (req, res) => {
   const code = String(req.params.code).toLowerCase().replace(/[^a-z0-9_-]/g, ""), n = people.crewSize(code);
   if (!n) return res.status(404).type(req.accepts(["html", "json"]) === "json" ? "json" : "html").send(req.accepts(["html", "json"]) === "json" ? { error: "no_crew" } : "This invite link isn't valid any more.");
   if (req.accepts(["html", "json"]) === "html") return res.redirect(`/#/?crew=${code}`);
-  const u = `${req.protocol}://${req.headers.host}`;
-  res.json({ crew: code, members: people.crewNames(code), about: `An invitation to a crew on Join (${u}): friends who plan together. Members are invited to each other's plans first, and each answers through their own agent.`,
+  const u = `${req.protocol}://${req.headers.host}`, pass = invitePass(code);
+  res.json({ crew: code, agent: { noSignUp: "Act for your person right away: no account, password or sign-up. Use this pass as your token; the first call adds your person to the crew (send X-Join-Name: <their first name>, or ?name= on the MCP address). It may read, negotiate and pay within your person's default limits, which only they can change.",
+      mcp: `${u}/mcp/g/${pass}`, bearer: pass, rest: `POST ${u}/api/agent/<tool> with Authorization: Bearer <bearer>`, a2a: `${u}/a2a with the same bearer`, firstStep: "whoami, then my_plans for invitations" }, members: people.crewNames(code), about: `An invitation to a crew on Join (${u}): friends who plan together. Members are invited to each other's plans first, and each answers through their own agent.`,
     join: { newPerson: { method: "POST", url: `${u}/api/auth/demo`, body: { name: "<your person's first name>", crew: code, lat: "<optional>", lon: "<optional>" }, then: `POST ${u}/api/tokens for an agent token; see ${u}/llms.txt` },
       existingPerson: { method: "POST", url: `${u}/api/crew/join`, body: { code }, auth: "your person's session, or Authorization: Bearer <their agent token>" } }, guide: `${u}/llms.txt` });
 });
@@ -256,6 +263,7 @@ app.get("/api/venues/:id/policy", venueStaff, (req, res) => res.json({ venue: re
 app.put("/api/venues/:id/policy", venueStaff, (req, res) => { const r = setPolicy(req.params.id, req.body || {}); res.status(r.error ? 400 : 200).json(r); });
 // the venue's money, through the PayPal Agent Toolkit: reconciliation, extras, disputes
 app.get("/api/venues/:id/metrics", venueStaff, (req, res) => res.json(settle.venueMetrics(req.params.id)));
+app.get("/api/venues/:id/demand", venueStaff, (req, res) => { const v = getWorld().venues.find((x) => x.id === req.params.id); if (!v) return res.status(404).json({ error: "no_venue" }); res.json({ venue: v.id, activities: Object.keys(v.offers || {}), days: 30, ...demandFor(Object.keys(v.offers || {})) }); });
 app.get("/api/venues/:id/reconcile", venueStaff, async (req, res) => res.json(await settle.reconcileVenue(req.params.id)));
 app.post("/api/venues/:id/bookings/:booking/extras", venueStaff, async (req, res) => { try { const r = await settle.billExtras(req.params.id, req.params.booking, req.body?.items); res.status(r.error ? 400 : 200).json(r); } catch (e) { res.status(502).json({ error: "paypal", message: e.message }); } });
 app.get("/api/venues/:id/disputes", venueStaff, async (req, res) => { try { res.json({ toolkit: toolkitMode(), disputes: await settle.venueDisputes(req.params.id) }); } catch (e) { res.status(502).json({ error: "paypal", message: e.message }); } });

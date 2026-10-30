@@ -24,11 +24,12 @@ Testing on your own, with no person to ask? Demo accounts are on here:
    Add "pay" to scopes only if your person agreed that you may pay (sandbox).
 3. Use the token as Authorization: Bearer join_...
 
-Invited by a friend? They send a link like ${u}/j/<code>. GET it (Accept: application/json) to see the crew and how to
-join: a new person signs up with that crew code (step 1, "crew"), and someone already on Join joins with
-POST ${u}/api/crew/join {"code": "<code>"} using their session or Authorization: Bearer <their agent token>. To invite
-your person's friends, POST ${u}/api/crew (same auth) for their crew's link. "lat" and "lon" on sign-up (optional) place
-the person by where they live, rounded to about a kilometre; others see only the district.
+Invited by a friend? They send a link like ${u}/j/<code>. Open it with Accept: application/json: it gives you a pass
+(agent.bearer, and agent.mcp, an MCP address with the pass in it). Use it at once as your token: no account, password or
+sign-up. Your first call adds your person to the crew (send X-Join-Name: <their first name>); whoami then gives a link
+for your person to see their plans on the website and set their own limits. To invite your person's friends, POST
+${u}/api/crew with your token for the crew's link. "lat" and "lon" on demo sign-up (optional) place the person by where
+they live, rounded to about a kilometre; others see only the district.
 
 ## Talk to Join
 
@@ -60,6 +61,13 @@ signature = Ed25519 over the 32 hash bytes, base64url, by the key in ${u}/.well-
 one, not the copy in the receipt). Every 2 minutes open receipts are batched into a Merkle tree (proof: the path to
 batch.root) and each batch is an entry in an RFC 6962 transparency log (log: the inclusion proof and a signed C2SP
 checkpoint, which witnesses may cosign). Until its batch closes, a receipt has no proof yet.
+
+## Recommending what your person wants
+
+Tell find_options what your person wants in prefer: near (and maxTrip, minutes for anyone in the group), cheap, and up
+to four aspects from the reviews' fixed list (clean, quiet, staff, value, equipment, space, access, ontime, food,
+atmosphere). Join ranks venues by it and each option says how it fits (fits). Ask your person what matters to them
+rather than guessing.
 
 ## A typical plan
 

@@ -32,3 +32,18 @@ test("a crew by invite link, and friends placed by where they really live", () =
   assert.equal(people.joinCrew("alex", code), null); // (the demo town's residents don't join crews)
   people.peopleStore.reset();
 });
+
+test("an agent joins through an invite link with no account: the pass acts for a new person in that crew; a forged one doesn't", async () => {
+  const { invitePass, onInvitePass, agentOf } = await import("../src/auth.js");
+  people.peopleStore.reset();
+  onInvitePass((crew, nonce, name) => people.personFor("invite", nonce, name || "Friend", { crew }));
+  const ana = people.demoPerson("Ana"), code = people.crewOf(ana.id, { create: true }), pass = invitePass(code);
+  const req = (tok, name) => ({ headers: { authorization: `Bearer ${tok}`, ...(name ? { "x-join-name": name } : {}) }, query: {} });
+  const a = agentOf(req(pass, "Mei"));
+  assert.ok(a && a.scopes.includes("negotiate"));
+  assert.deepEqual(people.crewNames(code).sort(), ["Ana", "Mei"]);
+  assert.equal(agentOf(req(pass)).player, a.player); // (the same pass is the same person every time)
+  assert.notEqual(agentOf(req(invitePass(code), "Bo")).player, a.player); // (another pass, another friend)
+  assert.equal(agentOf(req(pass.slice(0, -3) + "AAA")), null); // (forged)
+  people.peopleStore.reset();
+});

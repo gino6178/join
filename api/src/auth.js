@@ -63,10 +63,36 @@ export function revoke(playerId, id) {
   t.revoked = true; db.save(); return true;
 }
 
+// An invite pass: what an agent gets from a crew's invite link, so it can act for its person at once, with no account
+// to make and nothing to sign in to (agents rightly refuse to sign up for things). It is self-contained and signed by
+// Join: join_g_<payload><signature>, where the payload names the crew and a random id. Making one stores nothing; the
+// person is made the first time an agent uses it (people.personFor("invite", ...)), in that crew, named from the
+// X-Join-Name header or ?name= if given. It may read, negotiate and pay, within the person's default limits, which only
+// the person can change (on the website, through the same invite link).
+let joinedByPass = null;
+export const onInvitePass = (fn) => { joinedByPass = fn; };
+const passKey = () => { if (!db.data.passKey) { db.data.passKey = crypto.randomBytes(32).toString("base64url"); db.save(); } return db.data.passKey; };
+const passSig = (payload) => crypto.createHmac("sha256", passKey()).update(payload).digest("base64url").slice(0, 22);
+export function invitePass(crew) {
+  const payload = Buffer.from(JSON.stringify({ c: crew, n: crypto.randomBytes(9).toString("base64url") })).toString("base64url");
+  return `join_g_${payload}${passSig(payload)}`;
+}
+function fromPass(tok, req) {
+  const body = tok.slice(7), payload = body.slice(0, -22), sig = body.slice(-22);
+  if (!payload || !crypto.timingSafeEqual(Buffer.from(sig.padEnd(22)), Buffer.from(passSig(payload)))) return null;
+  let p; try { p = JSON.parse(Buffer.from(payload, "base64url").toString("utf8")); } catch { return null; }
+  const name = String(req.headers["x-join-name"] || req.query?.name || "").slice(0, 40);
+  const person = joinedByPass?.(p.c, p.n, name);
+  return person ? { player: person.id, client: "agent via invite link", token: `pass:${p.n}`, scopes: SCOPES, pass: tok } : null;
+}
+// the person behind a pass, for their own sign-in link (only someone holding the pass has it)
+export const passHolder = (tok, req) => (String(tok).startsWith("join_g_") ? fromPass(tok, req) : null);
+
 // the agent behind a request: { player, client } or null
 export function agentOf(req) {
   const m = String(req.headers.authorization || "").match(/^Bearer\s+(join_[\w-]+)$/);
   if (!m) return null;
+  if (m[1].startsWith("join_g_")) return fromPass(m[1], req);
   const t = db.data.tokens.find((x) => x.hash === sha(m[1]) && !x.revoked);
   if (!t) return null;
   const now = Date.now();

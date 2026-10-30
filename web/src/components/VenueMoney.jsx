@@ -8,10 +8,11 @@ import { useWorld, firstName } from "./Actor.jsx";
 // with a PayPal invoice, and chargebacks answered with Join's signed receipt as evidence.
 export default function VenueMoney({ id, bookings, reload }) {
   const w = useWorld();
-  const [met, setMet] = useState(null), [rec, setRec] = useState(null), [disp, setDisp] = useState(null), [msg, setMsg] = useState(null), [err, setErr] = useState(null), [busy, setBusy] = useState(false);
+  const [dem, setDem] = useState(null), [met, setMet] = useState(null), [rec, setRec] = useState(null), [disp, setDisp] = useState(null), [msg, setMsg] = useState(null), [err, setErr] = useState(null), [busy, setBusy] = useState(false);
   const load = () => {
     api(`/api/venues/${id}/metrics`).then(setMet).catch(() => {});
     api(`/api/venues/${id}/reconcile`).then(setRec).catch((e) => setErr(e.message));
+    api(`/api/venues/${id}/demand`).then(setDem).catch(() => {});
     api(`/api/venues/${id}/disputes`).then(setDisp).catch((e) => setErr(e.message));
   };
   useEffect(() => { setMsg(null); setErr(null); load(); }, [id]);
@@ -28,6 +29,11 @@ export default function VenueMoney({ id, bookings, reload }) {
           <Tile big={money(met.paidOut.amount)} label="paid out to you" note={`PayPal Payouts after each game, net of PayPal's fees${met.bookings.open ? `; ${met.bookings.open} booking${met.bookings.open === 1 ? "" : "s"} still being paid` : ""}`} />
         </div>
         <p className="small muted">Haggling took {money(met.haggledOff)} off list prices, never below your floor. {met.bookings.released} hold{met.bookings.released === 1 ? "" : "s"} went back to you unpaid; {met.disputes.opened ? `${met.disputes.answered} of ${met.disputes.opened} chargeback${met.disputes.opened === 1 ? "" : "s"} answered with Join's receipt.` : "no chargebacks."}</p>
+      </section>}
+      {dem && <section className="card">
+        <h3><Icon name="pin" size={18} />What people asked for <small className="muted">searches for {dem.activities.join(", ")} in the last {dem.days} days, counted, never named</small></h3>
+        <p className="small">{dem.searches} search{dem.searches === 1 ? "" : "es"}{Object.keys(dem.byArea).length ? `, from ${Object.entries(dem.byArea).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k} (${n})`).join(", ")}` : ""}.</p>
+        {dem.searches > 0 && <p className="small muted">Wanted it close by: {dem.near} · cheap: {dem.cheap}{Object.keys(dem.aspects).length ? ` · ${Object.entries(dem.aspects).sort((a, b) => b[1] - a[1]).map(([k, n]) => `${k}: ${n}`).join(" · ")}` : ""}</p>}
       </section>}
       <section className="card">
         <h3><Icon name="list" size={18} />Reconciliation <small className="muted" title="PayPal Agent Toolkit, list_transactions">checked against PayPal's own records{rec?.mode === "stand-in" ? " (stand-in)" : ""}</small></h3>

@@ -12,7 +12,7 @@ const SERIOUS = 0.72;
 
 // Up to three options, each with why it was picked, which named friends can't come, and whether haggling can reach it
 export async function search(brief, model, w) {
-  const r = await tool("find_options", { activity: brief.activity, dates: brief.dates || [], from: brief.from, to: brief.to, players: brief.players ?? 3, with: brief.with || [] }, model);
+  const r = await tool("find_options", { activity: brief.activity, dates: brief.dates || [], from: brief.from, to: brief.to, players: brief.players ?? 3, with: brief.with || [], ...(brief.prefer ? { prefer: brief.prefer } : {}) }, model);
   if (r.error) return { error: r.message || r.error };
   const limit = +r.mandate.perGame, cap = each(brief, limit);
   return {

@@ -36,6 +36,7 @@ export function whoami(a) {
   const p = player(a.player), m = getMandate(a.player);
   const w = getWorld();
   return { town: { name: w.town.name, timeZone: w.town.timeZone, currency: w.currency || "USD", now: new Date().toLocaleString("sv-SE", { timeZone: w.town.timeZone }).slice(0, 16), note: "Every date and time on Join is the town's local time; every price is in USD." },
+    ...(a.pass ? { yourPersonsLink: { path: `/me/${a.pass}`, note: "Give this to your person: it signs them in on Join's website (same host) to see plans and set their limits. Keep it private, like a password." } } : {}),
     ...(p.crew ? { crew: { code: p.crew, invite: `/j/${p.crew}`, members: people.crewmates(p).map((x) => ({ id: x.id, name: x.name, area: x.area?.name })), note: "Your person's friends who joined Join with the same crew code. find_options invites them first; each answers an invitation through their own agent." } } : {}),
     player: { id: p.id, name: p.name, interests: p.interests, ...(p.level ? { sportsLevel: p.level } : {}), usuallyFree: p.free, area: p.area?.name },
     mandate: { perGame: usd(m.perGame), perWeek: usd(m.perWeek), guaranteeOnItsOwn: usd(m.cover), venues: m.venues, autopay: m.autopay && settle.hasVault(a.player), note: "Set by the player on the website. Agents can read it, not change it." },
@@ -58,7 +59,21 @@ export function listVenues({ activity } = {}) {
 
 // Who is free and when, and the fair venue for each: the organizer's usual free times (or the window they give), the
 // people interested in the activity who are free then, and the venue with a free unit whose longest trip is shortest.
-export function findOptions(a, { activity = "badminton", date = null, dates = [], from = null, to = null, minutes = null, players = 3, people = null, with: want = [] } = {}) {
+// What the person wants, beyond time and price, to rank venues by: near (trips count double, and none longer than
+// maxTrip minutes for anyone), cheap (price counts triple), aspects they care about from the reviews' fixed list
+// (clean, quiet, staff, value, equipment, space, access, ontime, food, atmosphere: a venue praised for one moves up,
+// one complained about moves down). Each option then says how it meets them (fits).
+function wishes(prefer) {
+  const p = prefer && typeof prefer === "object" ? prefer : {};
+  return { near: !!p.near, cheap: !!p.cheap, maxTrip: Number.isFinite(+p.maxTrip) && +p.maxTrip > 0 ? +p.maxTrip : null, aspects: (Array.isArray(p.aspects) ? p.aspects : []).filter((k) => k in reviews.ASPECTS).slice(0, 4) };
+}
+function wishCost(wish, rv) {
+  let c = 0;
+  for (const k of wish.aspects) { const n = rv.aspectCounts?.[k], all = rv.count || 1; if (!n) continue; c -= Math.min(12, (n.liked / all) * 24); c += Math.min(12, (n.disliked / all) * 30); }
+  return c;
+}
+export function findOptions(a, { activity = "badminton", date = null, dates = [], from = null, to = null, minutes = null, players = 3, people = null, with: want = [], prefer = null } = {}) {
+  const wish = wishes(prefer);
   if (Number.isInteger(people) && people >= 1) players = people - 1; // ("people" is the whole group, your user included)
   if (date && !dates.length) dates = [date];
   const now = clock(), me = player(a.player), act = getActivity(activity);
@@ -88,24 +103,30 @@ export function findOptions(a, { activity = "badminton", date = null, dates = []
       for (const v of getWorld().venues) {
         if (!forActivity(v, activity) || !freeUnits(v.id, activity, d, hm(s), minutes).length) continue;
         const t = trips(group, v), q = price(v, { activity, date: d, start: hm(s), minutes, players: group.length }, now);
-        const rv = reviewsFor(v.id, activity, group.map((g) => g.id), a.player), cost = t.longest + reviews.rankAdjust(rv) + q.ask / group.length / 100;
-        if (!best || cost < best.cost) best = { cost, venue: v.id, venueName: v.name, longestTrip: t.longest, trips: t.list, ask: q.ask, discounts: q.discounts.map((x) => x.kind), reviews: rv };
+        if (wish.maxTrip && t.longest > wish.maxTrip) continue;
+        const rv = reviewsFor(v.id, activity, group.map((g) => g.id), a.player), cost = t.longest * (wish.near ? 2 : 1) + reviews.rankAdjust(rv) + (q.ask / group.length / 100) * (wish.cheap ? 3 : 1) + wishCost(wish, rv);
+        if (!best || cost < best.cost) best = { cost, venue: v.id, venueName: v.name, longestTrip: t.longest, myTrip: t.list.find((x) => x.id === me.id)?.min ?? null, trips: t.list, ask: q.ask, discounts: q.discounts.map((x) => x.kind), reviews: rv };
       }
       if (!best) continue;
       const asked = want.filter((id) => group.some((g) => g.id === id)).length;
       opts.push({ date: d, day: DAYS[date.getDay()], start: hm(s), minutes, players: group.map((g) => g.id), names: group.map((g) => g.name), alsoFree: free.slice(need, need + 3).map((x) => x.p.id),
         venue: best.venue, venueName: best.venueName, longestTrip: best.longestTrip, askPrice: usd(best.ask), share: usd(shareOf(best.ask, group.length)), discounts: best.discounts,
         reviews: { score: best.reviews.score, count: best.reviews.count, praise: best.reviews.praise.map((p) => p.aspect), complaints: best.reviews.complaints.map((p) => p.about), groupLow: best.reviews.groupLow, tasteNotes: best.reviews.tasteNotes, demoData: best.reviews.demoData > 0, reason: reviews.reason(best.reviews) },
-        score: asked * 5 - best.longestTrip * 0.2 - best.ask / 1000 - days.indexOf(d) * 0.3 });
+        fits: [
+          ...(wish.near || wish.maxTrip ? [`${best.myTrip ?? best.longestTrip} min for you, ${best.longestTrip} at most for anyone`] : []),
+          ...(wish.cheap ? [`$${usd(shareOf(best.ask, group.length))} each`] : []),
+          ...wish.aspects.map((k) => { const n = best.reviews.aspectCounts?.[k]; return n && n.liked ? `${n.liked} review${n.liked === 1 ? "" : "s"} praise ${reviews.ASPECTS[k]}${n.disliked ? `, ${n.disliked} complain` : ""}` : `no reviews mention ${reviews.ASPECTS[k]}`; }),
+        ],
+        score: asked * 5 - best.longestTrip * (wish.near ? 0.6 : 0.2) - (best.ask / 1000) * (wish.cheap ? 3 : 1) - days.indexOf(d) * 0.3 - wishCost(wish, best.reviews) * 0.05 });
     }
   }
   opts.sort((x, y) => y.score - x.score);
   const out = [];
   for (const o of opts) { if (out.length >= 5) break; if (out.some((x) => x.date === o.date && Math.abs(toMin(x.start) - toMin(o.start)) < 120)) continue; out.push(o); }
-  record({ actor: by(a), who: [a.player], action: "searched", summary: `${said(a)} looked for ${activity} for ${need + 1} people${days.length === 1 ? ` on ${days[0]}` : ` over ${days.length} days`}: ${out.length ? `${out.length} option${out.length === 1 ? "" : "s"}` : "nothing free"}.` });
+  record({ actor: by(a), who: [a.player], action: "searched", data: { activity, area: me.area?.name || null, wish }, summary: `${said(a)} looked for ${activity} for ${need + 1} people${days.length === 1 ? ` on ${days[0]}` : ` over ${days.length} days`}: ${out.length ? `${out.length} option${out.length === 1 ? "" : "s"}` : "nothing free"}.` });
   // what the organizer may still commit to for each option: their per-booking limit, or what's left of that week's
   const m = getMandate(a.player), canSpend = (o) => Math.max(0, Math.min(m.perGame, m.perWeek - settle.spentInWeek(a.player, o.date, o.start)));
-  return { options: out.map(({ score, ...o }) => ({ ...o, youCanSpend: usd(canSpend(o)) })), mandate: { perGame: usd(m.perGame), perWeek: usd(m.perWeek) }, note: out.length ? "Prices are the venue's opening ask; negotiate with start_negotiation." : "Nothing fits. Try other days, a wider window or fewer players." };
+  return { ...(wish.near || wish.cheap || wish.maxTrip || wish.aspects.length ? { rankedBy: wish } : {}), options: out.map(({ score, ...o }) => ({ ...o, ...(o.fits.length ? {} : { fits: undefined }), youCanSpend: usd(canSpend(o)) })), mandate: { perGame: usd(m.perGame), perWeek: usd(m.perWeek) }, note: out.length ? "Prices are the venue's opening ask; negotiate with start_negotiation." : "Nothing fits. Try other days, a wider window or fewer players." };
 }
 
 // What accepting means for the organizer, on every reply they get about an open or agreed negotiation: they guarantee

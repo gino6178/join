@@ -26,4 +26,19 @@ export function record({ actor, who = [], action, summary, ref = null, data = nu
 }
 
 export const forPlayer = (id, { after = 0, limit = 200 } = {}) => db.data.entries.filter((e) => e.id > after && e.who.includes(id)).slice(-limit);
+// What people asked for, for a venue: searches for its activities in the last `days`, counted, never named. How many
+// searches, how many from each district, and how many wanted it close by, cheap, or each aspect from the reviews' list.
+export function demand(activities, { days = 30 } = {}) {
+  const since = Date.now() - days * 864e5, out = { searches: 0, byArea: {}, near: 0, cheap: 0, aspects: {} };
+  for (const e of db.data.entries) {
+    if (e.action !== "searched" || !e.data || !activities.includes(e.data.activity) || Date.parse(e.at) < since) continue;
+    out.searches++;
+    if (e.data.area) out.byArea[e.data.area] = (out.byArea[e.data.area] || 0) + 1;
+    const w = e.data.wish || {};
+    if (w.near || w.maxTrip) out.near++;
+    if (w.cheap) out.cheap++;
+    for (const k of w.aspects || []) out.aspects[k] = (out.aspects[k] || 0) + 1;
+  }
+  return out;
+}
 export const forRef = (ref) => db.data.entries.filter((e) => e.ref === ref);
