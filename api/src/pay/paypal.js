@@ -64,6 +64,11 @@ export function paypal({ clientId, secret, brand = "Join", testCard = false }) {
       const net = j.seller_receivable_breakdown?.net_amount?.value;
       return { id: j.id, status: j.status, net: net ? Math.round(+net * 100) : null };
     },
+    async getCapture(id) {
+      const j = await call("GET", `/v2/payments/captures/${id}`);
+      const b = j.seller_receivable_breakdown || {}, c = (x) => (x?.value ? Math.round(+x.value * 100) : null);
+      return { id, status: j.status, amount: c(j.amount), fee: c(b.paypal_fee), net: c(b.net_amount) };
+    },
     async voidAuthorization(authorizationId, requestId) { await call("POST", `/v2/payments/authorizations/${authorizationId}/void`, undefined, requestId); return { status: "VOIDED" }; },
     async refund(captureId, { amount, currency = "USD", requestId }) {
       const j = await call("POST", `/v2/payments/captures/${captureId}/refund`, { amount: money(amount, currency) }, requestId);

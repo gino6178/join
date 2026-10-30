@@ -185,12 +185,14 @@ test("the venue's side on the PayPal Agent Toolkit: extras invoice, reconciliati
   assert.equal(b.state, "locked");
   const bill = await settle.billExtras("north", id, [{ name: "Overtime, 30 min", amount: 1200 }, { name: "Racket rental", amount: 500 }]);
   assert.equal(bill.total, "17.00");
+  const again = await settle.billExtras("north", id, [{ name: "Overtime, 30 min", amount: 1200 }, { name: "Racket rental", amount: 500 }]);
+  assert.equal(again.already, true); assert.equal(again.invoice, bill.invoice);
   assert.equal((await settle.billExtras("west", id, [{ name: "x", amount: 1 }])).error, "no_booking");
   pp.approve({ invoice: bill.invoice }); await settle.tick();
   assert.equal(b.bills[0].status, "paid_out"); // paid by the organizer, then paid out to the venue
   assert.ok(b.bills[0].payout);
   const rec = await settle.reconcileVenue("north");
-  assert.ok(rec.rows.filter((r) => r.kind === "capture").every((r) => r.paypal === "matched" && r.fee > 0));
+  assert.ok(rec.rows.filter((r) => r.kind === "capture").every((r) => r.paypal.startsWith("matched") && r.fee > 0));
   const d = pp.openDispute(b.payments.leo.captureId);
   await settle.webhook({ event_type: "CUSTOMER.DISPUTE.CREATED", resource: d });
   const list = await settle.venueDisputes("north");

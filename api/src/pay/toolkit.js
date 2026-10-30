@@ -29,7 +29,7 @@ async function run(method, arg) {
 }
 
 // Each capture and payout of a venue's bookings, matched to PayPal's transaction records
-export async function reconcile(bookings) {
+export async function reconcile(bookings, getCapture = null) {
   const rows = [];
   for (const b of bookings) {
     for (const [pid, p] of Object.entries(b.payments || {})) if (p.captureId) rows.push({ booking: b.id, kind: "capture", who: pid, id: p.captureId, amount: p.captured ?? p.amount, status: p.status });
@@ -43,7 +43,18 @@ export async function reconcile(bookings) {
       found.set(i.transaction_id, { amount: Math.round(Math.abs(+i.transaction_amount?.value || 0) * 100), fee: Math.round(Math.abs(+i.fee_amount?.value || 0) * 100), event: i.transaction_event_code, at: i.transaction_initiation_date });
     }
   } catch (e) { return { mode, error: e.message, rows: rows.map((r) => ({ ...r, paypal: "unavailable" })) }; }
-  return { mode, rows: rows.map((r) => { const t = found.get(r.id); return { ...r, paypal: t ? (t.amount === r.amount ? "matched" : "amount differs") : r.kind === "payout" ? "batch (items are listed separately)" : "not in PayPal reporting yet", fee: t?.fee ?? null, event: t?.event ?? null }; }) };
+  // Transaction Search lags (hours, in the sandbox): a capture it doesn't list yet is looked up directly in the Captures
+  // API, so the venue still sees PayPal's own amount and fee
+  const out = [];
+  for (const r of rows) {
+    const t = found.get(r.id);
+    if (t) { out.push({ ...r, paypal: t.amount === r.amount ? "matched in PayPal's transaction records" : "amount differs", fee: t.fee, event: t.event, source: "list_transactions" }); continue; }
+    if (r.kind === "capture" && getCapture) {
+      try { const c = await getCapture(r.id); out.push({ ...r, paypal: c.amount === r.amount ? `confirmed by PayPal (${String(c.status).toLowerCase()}); not in transaction reporting yet` : "amount differs", fee: c.fee, net: c.net, source: "captures API" }); continue; } catch {}
+    }
+    out.push({ ...r, paypal: r.kind === "payout" ? "payout batch (items are listed separately)" : "not in PayPal reporting yet", fee: null, source: null });
+  }
+  return { mode, rows: out };
 }
 
 // A venue bills a group's organizer for extras, on a PayPal invoice

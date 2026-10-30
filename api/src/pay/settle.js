@@ -342,7 +342,7 @@ export function view(b, viewer) {
 
 export const status = (bookingId, viewer) => { const b = get(bookingId); return b && b.players.includes(viewer) ? view(b, viewer) : { error: "no_booking", message: "No such booking." }; };
 export const mine = (viewer) => db.data.bookings.filter((b) => b.players.includes(viewer)).map((b) => view(b, viewer)).reverse();
-export const forVenue = (venueId) => db.data.bookings.filter((b) => b.venue === venueId).map((b) => ({ id: b.id, state: b.state, activity: b.activity, date: b.date, start: b.start, minutes: b.minutes, unit: b.unit, unitName: place(b), total: usd(b.total), players: b.players.length, paid: Object.values(b.payments).filter((p) => p.status === "captured").length, payout: b.payout ? usd(b.payout.amount) : null, captures: Object.values(b.payments).map((p) => p.captureId).filter(Boolean), extras: (b.bills || []).map((x) => ({ total: usd(x.total), status: x.status })), disputes: Object.keys(b.disputes || {}).length }));
+export const forVenue = (venueId) => db.data.bookings.filter((b) => b.venue === venueId).map((b) => ({ id: b.id, state: b.state, activity: b.activity, date: b.date, start: b.start, minutes: b.minutes, unit: b.unit, unitName: place(b), total: usd(b.total), players: b.players.length, paid: Object.values(b.payments).filter((p) => p.status === "captured").length, payout: b.payout ? usd(b.payout.amount) : null, captures: Object.values(b.payments).map((p) => p.captureId).filter(Boolean), extras: (b.bills || []).map((x) => ({ invoice: x.invoiceId, url: x.url, to: player(b.organizer).paypal, items: x.items.map((i) => ({ name: i.name, amount: usd(i.amount) })), total: usd(x.total), status: x.status })), disputes: Object.keys(b.disputes || {}).length }));
 export const internal = get;
 
 // ---- paying the organizer back ---------------------------------------------------------------------------------------------
@@ -399,6 +399,9 @@ export async function billExtras(venueId, bookingId, items) {
   const clean = (items || []).filter((x) => typeof x?.name === "string" && x.name.trim() && Number.isInteger(x.amount) && x.amount > 0 && x.amount <= 50000).slice(0, 10).map((x) => ({ name: x.name.trim().slice(0, 120), amount: x.amount }));
   if (!clean.length) return { error: "bad_items", message: "Each extra needs a name and an amount in cents." };
   const total = clean.reduce((a, x) => a + x.amount, 0);
+  // (the same extras for the same booking are one bill: asking again returns the invoice already sent)
+  const key = JSON.stringify(clean), dup = (b.bills || []).find((x) => JSON.stringify(x.items) === key && x.status !== "cancelled");
+  if (dup) return { invoice: dup.invoiceId, url: dup.url, total: usd(dup.total), status: dup.status, already: true };
   const inv = await toolkit.bill({ recipient: player(b.organizer).paypal, venueName: venue(b.venue).name, reference: b.id, note: `Extras after your ${b.activity} booking on ${b.date} (${place(b)}).`, items: clean });
   (b.bills ||= []).push({ invoiceId: inv.id, url: inv.url, items: clean, total, status: "sent", at: at() }); db.save();
   record({ actor: { kind: "venue", venue: b.venue }, who: b.players, action: "extras_billed", ref: b.id, summary: `${venue(b.venue).name} billed ${name(b.organizer)} $${usd(total)} for extras (${clean.map((x) => x.name).join(", ")}) with a PayPal invoice.`, data: { invoice: inv.id, url: inv.url } });
@@ -420,7 +423,7 @@ async function checkBills(b) {
     } catch {}
   }
 }
-export const reconcileVenue = (venueId) => toolkit.reconcile(db.data.bookings.filter((b) => b.venue === venueId));
+export const reconcileVenue = (venueId) => toolkit.reconcile(db.data.bookings.filter((b) => b.venue === venueId), (id) => pp.getCapture(id));
 export async function venueDisputes(venueId) {
   const mine = db.data.bookings.filter((b) => b.venue === venueId), byCapture = new Map();
   for (const b of mine) for (const p of Object.values(b.payments)) if (p.captureId) byCapture.set(p.captureId, b.id);

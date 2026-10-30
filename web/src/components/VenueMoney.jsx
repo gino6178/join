@@ -20,7 +20,7 @@ export default function VenueMoney({ id, bookings, reload }) {
         <h3><Icon name="list" size={18} />Reconciliation <small className="muted">PayPal Agent Toolkit · list_transactions{rec?.mode === "stand-in" ? " · stand-in" : ""}</small></h3>
         {msg && <p className="note good">{msg}</p>}{err && <p className="err">{err}</p>}
         {!rec ? <p className="muted small">Loading…</p> : !rec.rows.length ? <p className="muted small">No payments yet.</p> : <table className="pays"><thead><tr><th>Booking</th><th>What</th><th>Amount</th><th>PayPal fee</th><th>In PayPal's records</th></tr></thead><tbody>
-          {rec.rows.map((r) => <tr key={r.id}><td><small>{r.booking.slice(-6)}</small></td><td>{r.kind === "payout" ? "payout to you" : `share (${r.who})`}</td><td>{money(r.amount / 100)}</td><td>{r.fee != null ? money(r.fee / 100) : ""}</td><td><span className={`st ${r.paypal === "matched" ? "captured" : "awaiting_approval"}`}>{r.paypal}</span></td></tr>)}
+          {rec.rows.map((r) => <tr key={r.id}><td><small>{r.booking.slice(-6)}</small></td><td>{r.kind === "payout" ? "payout to you" : `share (${r.who})`}</td><td>{money(r.amount / 100)}</td><td>{r.fee != null ? money(r.fee / 100) : ""}</td><td><span className={`st ${r.paypal.startsWith("matched") || r.paypal.startsWith("confirmed") ? "captured" : "awaiting_approval"}`}>{r.paypal}</span></td></tr>)}
         </tbody></table>}
         {rec?.error && <p className="small err">{rec.error}</p>}
       </section>

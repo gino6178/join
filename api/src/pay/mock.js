@@ -60,6 +60,7 @@ export function mockPaypal({ publicUrl = "http://localhost:8790", file = stateFi
         return { id: c.id, status: c.status, net: c.net };
       });
     },
+    async getCapture(cid) { const c = captures.get(cid); if (!c) throw Object.assign(new Error("PayPal: no such capture"), { status: 404 }); return { id: cid, status: c.refunded ? "REFUNDED" : "COMPLETED", amount: c.amount, fee: c.amount - c.net, net: c.net }; },
     async voidAuthorization(aid, requestId) {
       return once(requestId, () => {
         const a = auths.get(aid);
