@@ -161,6 +161,9 @@ Answer "none" unless the message clearly points to one of them.`;
 export async function understand(history, brief, ctx) {
   const last = String(history.at(-1)?.content || "").slice(0, 500);
   const next = byRules(last, clean(brief, ctx), ctx);
+  // a new activity with no budget said is a new plan: an earlier budget doesn't carry over to it
+  const said = byRules(last, {}, ctx), was = clean(brief, ctx);
+  if (said.activity && was.activity && said.activity !== was.activity && said.budget == null) { delete next.budget; delete next.budgetNote; }
   let model = "rules";
   if (!next.activity && qwenOn()) {
     try { const a = await activityByQwen(last, ctx.activities); model = MODEL; if (a) next.activity = a; } catch {}

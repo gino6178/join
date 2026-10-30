@@ -12,7 +12,7 @@ const PAY = { invited: tr("invited, no answer yet"), not_started: "not started",
 
 export default function Games({ entries, me, query, demo }) {
   const [tick, setTick] = useState(0);
-  const g = useApi("/api/games", entries.length + tick);
+  const latest = entries.at(-1)?.id || 0, g = useApi("/api/games", `${latest}:${tick}`); // (refetched on every new activity entry)
   const w = useWorld();
   const focus = query.get("booking");
   if (!g.data) return <div className="page"><p className="muted">Loading…</p></div>;
@@ -20,7 +20,7 @@ export default function Games({ entries, me, query, demo }) {
     <div className="page">
       <header className="page-head"><h1>{tr("Plans")}</h1><p className="muted">{tr("Each deal your agent made, and how it is being paid.")}</p></header>
       {query.get("cancelled") && <p className="note warn">You left PayPal without approving. Your agent can send you the link again.</p>}
-      <Balances tick={entries.length + tick} done={() => setTick((t) => t + 1)} />
+      <Balances tick={`${latest}:${tick}`} done={() => setTick((t) => t + 1)} />
       {!g.data.bookings.length && <p className="empty card">No bookings yet.</p>}
       {g.data.bookings.map((b) => <Booking key={b.id} b={b} me={me.player.id} w={w} focus={b.id === focus} demo={demo} done={() => setTick((t) => t + 1)} />)}
       {g.data.negotiations.length > 0 && <>
@@ -36,7 +36,7 @@ function Booking({ b, me, w, focus, demo, done }) {
   const act = async (a, body) => { setBusy(a); setErr(null); try { const r = await api(`/api/bookings/${b.id}/${a}`, { method: "POST", body }); if (a === "pay" && r.you?.approveUrl) { location.href = r.you.approveUrl; return; } done(); } catch (e) { setErr(e.message); } setBusy(null); };
   const at = STEPS.findIndex(([s]) => s === (b.state === "locking" ? "held" : b.state));
   return (
-    <section className={`card booking ${focus ? "focus" : ""}`}>
+    <section ref={(el) => { if (el && focus && !el.dataset.seen) { el.dataset.seen = "1"; setTimeout(() => el.scrollIntoView({ behavior: "smooth", block: "start" }), 100); } }} className={`card booking ${focus ? "focus" : ""}`}>
       <header>
         <div><h3><a className="plain-link" href={`#/venue?id=${b.venue}`} title="The venue's rooms and courts">{b.venueName}</a> · {b.unitName}</h3><p className="muted">{b.activity} · {dayLabel(b.date)} {b.start} · {b.minutes} min · {money(b.total)} total</p></div>
         {ENDED[b.state] ? <span className="pill warn">{ENDED[b.state]}</span> : <span className="pill good">{STEPS[at]?.[1]}</span>}

@@ -14,7 +14,12 @@ export default function Connect({ me, info, reload }) {
   const flip = (s) => setScopes((xs) => (xs.includes(s) ? xs.filter((x) => x !== s) : [...xs, s]));
   const revoke = async (id) => { await api(`/api/tokens/${id}`, { method: "DELETE" }); reload(); };
   const url = info?.mcpUrl || `${location.origin}/mcp`, tok = made?.token || "join_YOUR_TOKEN";
-  const copy = (k, text) => { navigator.clipboard?.writeText(text); setCopied(k); setTimeout(() => setCopied(null), 1500); };
+  // (navigator.clipboard needs a secure page; on plain http, the older copy command still works)
+  const copy = async (k, text) => {
+    let ok = false;
+    try { await navigator.clipboard.writeText(text); ok = true; } catch { const t = Object.assign(document.createElement("textarea"), { value: text }); document.body.append(t); t.select(); try { ok = document.execCommand("copy"); } catch {} t.remove(); }
+    setCopied(ok ? k : `${k}:failed`); setTimeout(() => setCopied(null), 2000);
+  };
   const snippets = [
     ["Claude Code", `claude mcp add --transport http join ${url} --header "Authorization: Bearer ${tok}"`],
     ["Claude Desktop (claude_desktop_config.json)", JSON.stringify({ mcpServers: { join: { command: "npx", args: ["-y", "mcp-remote", url, "--header", `Authorization: Bearer ${tok}`] } } }, null, 2)],
@@ -49,7 +54,7 @@ export default function Connect({ me, info, reload }) {
         <h3>Your browser's own agent (WebMCP)</h3>
         <p className="small">{webMcpAvailable() ? "This browser supports WebMCP: while you're signed in, this page offers its agent four tools: find options, negotiate, accept (you confirm on the page) and your plans. Payments stay in PayPal." : "Browsers with WebMCP let their built-in agent use this page's tools: find options, negotiate, accept (you confirm on the page) and your plans. This browser doesn't offer it yet, so there's nothing to set up."}</p>
       </section>
-      {snippets.map(([k, text]) => <section key={k} className="card snippet"><header><h3>{k}</h3><button className="btn ghost small" onClick={() => copy(k, text)}>{copied === k ? "Copied" : "Copy"}</button></header><pre>{text}</pre></section>)}
+      {snippets.map(([k, text]) => <section key={k} className="card snippet"><header><h3>{k}</h3><button className="btn ghost small" onClick={() => copy(k, text)}>{copied === k ? "Copied" : copied === `${k}:failed` ? "Select and copy it" : "Copy"}</button></header><pre>{text}</pre></section>)}
       <section className="card">
         <h3>Your agents</h3>
         {!me.tokens.length ? <p className="muted small">None yet.</p> : <ul className="tokens">{me.tokens.map((t) => <li key={t.id}><span><b>{t.label}</b><small>{t.hint} · {(t.scopes || []).join(", ")}{t.signed ? " · signed requests only" : ""}{t.expires ? ` · until ${new Date(t.expires).toLocaleDateString()}` : ""} · made {new Date(t.created).toLocaleString()} · {t.lastUsed ? `last used ${new Date(t.lastUsed).toLocaleString()}` : "not used yet"}</small></span><button className="btn ghost small" onClick={() => revoke(t.id)}>Revoke</button></li>)}</ul>}

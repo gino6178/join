@@ -14,7 +14,7 @@ const TONE = { deal: "good", locked: "good", venue_paid: "good", authorized: "go
 
 export default function Activity({ entries, me }) {
   const w = useWorld(), firstOf = (id) => firstName(w, id);
-  const games = useApi("/api/games", entries.length);
+  const games = useApi("/api/games", entries.at(-1)?.id || 0); // (the latest entry, not the count: the list is capped)
   const waiting = (games.data?.bookings || []).filter((b) => b.you?.approveUrl || b.invite);
   const owing = (games.data?.bookings || []).filter((b) => b.owes);
   const groups = useMemo(() => {

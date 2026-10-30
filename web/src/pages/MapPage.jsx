@@ -8,7 +8,7 @@ import Icon from "../components/Icon.jsx";
 // The map, following the latest thing that happened: a price over budget marks that venue red and numbers the
 // alternatives Join offered instead; a booking shows the place and everyone's trip to it.
 export default function MapPage({ entries, me }) {
-  const w = useWorld(), games = useApi("/api/games", entries.length);
+  const w = useWorld(), games = useApi("/api/games", entries.at(-1)?.id || 0);
   const last = useMemo(() => [...entries].reverse().find((e) => e.data?.alternatives?.length), [entries]);
   const booking = (games.data?.bookings || []).find((b) => !["released", "cancelled", tr("refunded")].includes(b.state));
   const overVenue = last?.ref && (games.data?.negotiations || []).find((n) => n.id === last.ref)?.venue;

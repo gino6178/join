@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { tr, lang, setLang } from "../i18n.js";
 import { api, money } from "../api.js";
 import Icon from "../components/Icon.jsx";
+import { useWorld } from "../components/Actor.jsx";
 import { sha256 as nobleSha256, sha512 } from "@noble/hashes/sha2.js";
 import * as ed from "@noble/ed25519";
 
@@ -57,6 +58,7 @@ async function check(r) {
 }
 
 export default function Receipt({ id }) {
+  const w = useWorld();
   const [r, setR] = useState(null), [c, setC] = useState(null), [err, setErr] = useState(null);
   useEffect(() => { api(`/api/receipts/${id}`).then(async (x) => { setR(x); setC(await check(x)); }).catch(setErr); }, [id]);
   if (err) return <div className="page"><p className="err">{err.message}</p></div>;
@@ -67,6 +69,7 @@ export default function Receipt({ id }) {
     <div className="page">
       <header className="page-head"><h1>{tr("Receipt")}</h1><p className="muted">Proof that this deal and its payments have not changed since they were recorded. Checked here, in your browser.</p></header>
       <section className="card">
+        {b.event === "locked" && <p className="note good"><b>{lang === "zh" ? "訂好了。" : "You're booked."}</b> {w?.venues.find((v) => v.id === b.venue)?.name || ""}, {b.unitName}, {b.date} {b.start}, {b.minutes} min · {money(b.total / 100)}</p>}
         <h3><Icon name="verify" size={18} />{b.event === "locked" ? tr("Paid and locked") : b.event === "refunded" ? "Cancelled and refunded" : tr("Venue paid")}</h3>
         <p>{b.activity} · {b.date} {b.start} · {b.minutes} min · {b.unitName} · <b>{money(b.total / 100)}</b></p>
         {verified && <p className="verified-badge"><Icon name="verify" size={18} />Cryptographically verified in your browser · {c.ms} ms{subtle ? "" : " (noble)"}</p>}
