@@ -8,3 +8,4 @@ api/data/state/
 web/dist/
 examples/witness.json
 examples/signed-agent-key.json
+examples/trial*.mjs
