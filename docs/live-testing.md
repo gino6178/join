@@ -240,6 +240,24 @@ The bug: `wait_for_news` still counted the agent's own `find_alternatives` call 
 - An offer's `expiresMeans` says friends are invited only after the guarantee.
 - `/llms.txt` says the bookable venues on this sandbox are test venues.
 
+## Round 12: Haiku again
+
+Three Haiku agents with fresh accounts. Each booked karaoke for $29: Anna paid $9.68, Bo and Chen-Wei $9.66 each.
+The booking locked within minutes.
+
+| Agent | Verdict |
+|---|---|
+| Anna's ([round12-ana.md](live-test/round12-ana.md)) | 0 blocker, 0 bug, 5 confusing |
+| Bo's ([round12-bo.md](live-test/round12-bo.md)) | 0 blocker, 1 bug, 3 confusing |
+| Chen-Wei's ([round12-chen.md](live-test/round12-chen.md)) | 0 blocker, 0 bug, 3 confusing |
+
+Round 11's news bug did not come back. Bo's agent called `paid: "0.00"` next to an authorized share a bug, since the
+lock news said "everyone paid". Changes after this round:
+- A held payment now shows `held` apart from `paid`, with `paidMeans`.
+- Each option in find_options says why each person is in it.
+- The invitation says that joining means paying, held first and taken at the lock.
+- `/llms.txt` says a sandbox venue holds no room at a real business.
+
 ## What is still open
 
 - The activity log is written in English only.

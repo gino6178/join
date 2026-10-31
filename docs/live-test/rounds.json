@@ -491,6 +491,48 @@
         "An offer says friends are invited only after the guarantee",
         "Sandbox venues named as test venues in /llms.txt"
       ]
+    },
+    {
+      "n": 12,
+      "date": "2026-10-31",
+      "title": "Haiku again, after the fixes",
+      "setup": "Same three people and task, Claude Haiku again, fresh accounts.",
+      "testers": [
+        {
+          "name": "Anna's agent",
+          "role": "organizer",
+          "via": "MCP",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 5,
+          "report": "round12-ana.md"
+        },
+        {
+          "name": "Bo's agent",
+          "role": "crew, from the link",
+          "via": "REST",
+          "blocker": 0,
+          "bug": 1,
+          "confusing": 3,
+          "report": "round12-bo.md"
+        },
+        {
+          "name": "Chen-Wei's agent",
+          "role": "nearby stranger",
+          "via": "REST",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 3,
+          "report": "round12-chen.md"
+        }
+      ],
+      "outcome": "Haggled $29 → $25 asked, $29 agreed: Anna $9.68, Bo and Chen-Wei $9.66, locked within minutes. Round 11's own-search news bug did not come back. Bo's agent called paid: 0.00 next to an authorized share a bug.",
+      "fixes": [
+        "held vs paid shown separately, with paidMeans",
+        "Each option lists why each person is in it",
+        "The invitation says joining is paying (held, then taken at the lock)",
+        "/llms.txt: sandbox venues hold no room at a real business"
+      ]
     }
   ]
 }
