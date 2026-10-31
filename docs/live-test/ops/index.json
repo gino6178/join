@@ -1,7 +1,7 @@
 {
  "about": "Every test agent's operations, one file each (from extract-ops.mjs). Round 0 is the agent tests before the live server.",
- "agents": 52,
- "calls": 1018,
+ "agents": 55,
+ "calls": 1095,
  "screenshots": 143,
  "list": [
   {
@@ -470,6 +470,33 @@
    "model": "Sonnet 5.5",
    "startedAt": "2026-10-31T04:02:08.373Z",
    "calls": 18,
+   "screenshots": 0
+  },
+  {
+   "file": "round11-chen-wei-s-agent-haiku-ac7b18.json",
+   "round": 11,
+   "title": "Round 11: Chen-Wei's agent (Haiku)",
+   "model": "Haiku 5.5",
+   "startedAt": "2026-10-31T04:28:28.285Z",
+   "calls": 24,
+   "screenshots": 0
+  },
+  {
+   "file": "round11-bo-s-agent-haiku-a1c8de.json",
+   "round": 11,
+   "title": "Round 11: Bo's agent (Haiku)",
+   "model": "Haiku 5.5",
+   "startedAt": "2026-10-31T04:28:32.185Z",
+   "calls": 27,
+   "screenshots": 0
+  },
+  {
+   "file": "round11-anna-s-agent-haiku-a3870f.json",
+   "round": 11,
+   "title": "Round 11: Anna's agent (Haiku)",
+   "model": "Haiku 5.5",
+   "startedAt": "2026-10-31T04:28:37.632Z",
+   "calls": 26,
    "screenshots": 0
   }
  ]

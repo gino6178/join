@@ -2,129 +2,495 @@
   "about": "Every round of testing Join on the live server with Claude Sonnet agents as users. One entry per round; add the next round here and run `node docs/live-test/build.mjs` to rebuild index.html. The full write-up is docs/live-testing.md.",
   "rounds": [
     {
-      "n": 1, "date": "2026-10-30",
+      "n": 1,
+      "date": "2026-10-30",
       "title": "First contact: personas click everything",
       "setup": "Five Sonnet testers given only the server's address: a first-time visitor, a student on a phone writing Chinese with a NT$ budget, an organizer who checks every number, a hackathon judge, and an outside AI agent finding its own way in. Plus a scripted security check.",
       "testers": [
-        { "name": "Nina", "role": "first-time visitor, laptop", "via": "website", "blocker": 0, "bug": 7, "confusing": 11, "report": "nina.md" },
-        { "name": "Weiting", "role": "student in Taipei, phone, Chinese", "via": "website", "blocker": 1, "bug": 5, "confusing": 5, "report": "weiting.md" },
-        { "name": "Omar", "role": "organizer who fronts the money", "via": "website", "blocker": 0, "bug": 4, "confusing": 9, "report": "omar.md" },
-        { "name": "Judge", "role": "hackathon judge with 10 minutes, then a venue", "via": "website", "blocker": 0, "bug": 0, "confusing": 10, "report": "judge.md" },
-        { "name": "Mei's agent", "role": "outside AI agent", "via": "REST", "blocker": 0, "bug": 1, "confusing": 5, "report": "mei-agent.md" }
+        {
+          "name": "Nina",
+          "role": "first-time visitor, laptop",
+          "via": "website",
+          "blocker": 0,
+          "bug": 7,
+          "confusing": 11,
+          "report": "nina.md"
+        },
+        {
+          "name": "Weiting",
+          "role": "student in Taipei, phone, Chinese",
+          "via": "website",
+          "blocker": 1,
+          "bug": 5,
+          "confusing": 5,
+          "report": "weiting.md"
+        },
+        {
+          "name": "Omar",
+          "role": "organizer who fronts the money",
+          "via": "website",
+          "blocker": 0,
+          "bug": 4,
+          "confusing": 9,
+          "report": "omar.md"
+        },
+        {
+          "name": "Judge",
+          "role": "hackathon judge with 10 minutes, then a venue",
+          "via": "website",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 10,
+          "report": "judge.md"
+        },
+        {
+          "name": "Mei's agent",
+          "role": "outside AI agent",
+          "via": "REST",
+          "blocker": 0,
+          "bug": 1,
+          "confusing": 5,
+          "report": "mei-agent.md"
+        }
       ],
       "extra": "Security script: 17 of 17 attacks refused (limits can't be raised with a token, read-only tokens can't negotiate, tampered mandates and forged sign-ins refused).",
       "outcome": "Agents had no front door; an agent without pay permission could trigger a PayPal hold; a NT$ budget was ignored; the map was a drawing.",
-      "fixes": ["/llms.txt, /.well-known/mcp.json and an agents box on sign-in", "Guarantee waits for the person unless the agent may pay", "NT$ budgets understood", "Real OpenStreetMap map", "Phone tab bar, English/中文 switch"]
+      "fixes": [
+        "/llms.txt, /.well-known/mcp.json and an agents box on sign-in",
+        "Guarantee waits for the person unless the agent may pay",
+        "NT$ budgets understood",
+        "Real OpenStreetMap map",
+        "Phone tab bar, English/中文 switch"
+      ]
     },
     {
-      "n": 2, "date": "2026-10-30",
+      "n": 2,
+      "date": "2026-10-30",
       "title": "Same personas, after the fixes",
       "setup": "New accounts for three of the round-1 personas; Mei's agent now over MCP.",
       "testers": [
-        { "name": "Mei's agent", "role": "outside AI agent", "via": "MCP", "blocker": 0, "bug": 0, "confusing": 3, "report": "mei-agent2.md" },
-        { "name": "Weiting", "role": "student, phone, Chinese", "via": "website", "blocker": 0, "bug": 3, "confusing": 4, "report": "weiting2.md" },
-        { "name": "Nina", "role": "first-time visitor", "via": "website", "blocker": 0, "bug": 3, "confusing": 4, "report": "nina2.md" }
+        {
+          "name": "Mei's agent",
+          "role": "outside AI agent",
+          "via": "MCP",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 3,
+          "report": "mei-agent2.md"
+        },
+        {
+          "name": "Weiting",
+          "role": "student, phone, Chinese",
+          "via": "website",
+          "blocker": 0,
+          "bug": 3,
+          "confusing": 4,
+          "report": "weiting2.md"
+        },
+        {
+          "name": "Nina",
+          "role": "first-time visitor",
+          "via": "website",
+          "blocker": 0,
+          "bug": 3,
+          "confusing": 4,
+          "report": "nina2.md"
+        }
       ],
       "outcome": "The PayPal hold, the entry points and NT$ were confirmed fixed. A stalled background tick was found while waiting for a venue payout.",
-      "fixes": ["find_options honours date over MCP", "PayPal calls time out; no booking blocks the others", "More Chinese, Plans refresh on new activity"]
+      "fixes": [
+        "find_options honours date over MCP",
+        "PayPal calls time out; no booking blocks the others",
+        "More Chinese, Plans refresh on new activity"
+      ]
     },
     {
-      "n": 3, "date": "2026-10-30",
+      "n": 3,
+      "date": "2026-10-30",
       "title": "Only the address, one interface each",
       "setup": "Three agents, each with one sentence from their person: MCP (badminton for four, may pay), REST (NT$400, Chinese, agree but don't pay), A2A (read only, report the worst case).",
       "testers": [
-        { "name": "Kai's agent", "role": "books and verifies the receipt", "via": "MCP", "blocker": 0, "bug": 0, "confusing": 5, "report": "round3-kai-mcp.md" },
-        { "name": "Yuhan's agent", "role": "agrees, doesn't pay", "via": "REST", "blocker": 0, "bug": 0, "confusing": 8, "report": "round3-yuhan-rest.md" },
-        { "name": "Ola's agent", "role": "read only", "via": "A2A", "blocker": 0, "bug": 0, "confusing": 4, "report": "round3-ola-a2a.md" }
+        {
+          "name": "Kai's agent",
+          "role": "books and verifies the receipt",
+          "via": "MCP",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 5,
+          "report": "round3-kai-mcp.md"
+        },
+        {
+          "name": "Yuhan's agent",
+          "role": "agrees, doesn't pay",
+          "via": "REST",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 8,
+          "report": "round3-yuhan-rest.md"
+        },
+        {
+          "name": "Ola's agent",
+          "role": "read only",
+          "via": "A2A",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 4,
+          "report": "round3-ola-a2a.md"
+        }
       ],
       "outcome": "All three got in from /llms.txt alone. Kai's agent booked, paid, locked, and checked the receipt's signature with its own code.",
-      "fixes": ["Simulated residents answer invitations", "Replies come after the guarantee they triggered", "Town time zone and currency in whoami"]
+      "fixes": [
+        "Simulated residents answer invitations",
+        "Replies come after the guarantee they triggered",
+        "Town time zone and currency in whoami"
+      ]
     },
     {
-      "n": 4, "date": "2026-10-31",
+      "n": 4,
+      "date": "2026-10-31",
       "title": "Four friends plan together, each through their own agent",
       "setup": "One crew: Ana's agent organizes (MCP), Bo's agent joins if ≤ $12 (REST), Chen's agent asks to pay $1 less (A2A), 小美 on her phone in Chinese. A fifth tester checks earlier fixes.",
       "testers": [
-        { "name": "Ana's agent", "role": "organizer", "via": "MCP", "blocker": 0, "bug": 0, "confusing": 3, "report": "round4-ana.md" },
-        { "name": "Bo's agent", "role": "friend", "via": "REST", "blocker": 0, "bug": 0, "confusing": 1, "report": "round4-bo.md" },
-        { "name": "Chen's agent", "role": "friend who haggles his share", "via": "A2A", "blocker": 0, "bug": 0, "confusing": 0, "report": "round4-chen.md" },
-        { "name": "小美", "role": "person on a phone", "via": "website", "blocker": 0, "bug": 3, "confusing": 2, "report": "round4-xiaomei.md" },
-        { "name": "Verifier", "role": "checks earlier fixes", "via": "website", "blocker": 0, "bug": 4, "confusing": 3, "report": "round4-verify.md" }
+        {
+          "name": "Ana's agent",
+          "role": "organizer",
+          "via": "MCP",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 3,
+          "report": "round4-ana.md"
+        },
+        {
+          "name": "Bo's agent",
+          "role": "friend",
+          "via": "REST",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 1,
+          "report": "round4-bo.md"
+        },
+        {
+          "name": "Chen's agent",
+          "role": "friend who haggles his share",
+          "via": "A2A",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 0,
+          "report": "round4-chen.md"
+        },
+        {
+          "name": "小美",
+          "role": "person on a phone",
+          "via": "website",
+          "blocker": 0,
+          "bug": 3,
+          "confusing": 2,
+          "report": "round4-xiaomei.md"
+        },
+        {
+          "name": "Verifier",
+          "role": "checks earlier fixes",
+          "via": "website",
+          "blocker": 0,
+          "bug": 4,
+          "confusing": 3,
+          "report": "round4-verify.md"
+        }
       ],
       "outcome": "Karaoke at Echo Karaoke, $29.40, locked. Chen paid $1 less and Ana covered it; the shares added up exactly.",
-      "fixes": ["Everyone sees agreed share changes", "Invitation badge and Chinese invitation card", "Crew invite links /j/<code>"]
+      "fixes": [
+        "Everyone sees agreed share changes",
+        "Invitation badge and Chinese invitation card",
+        "Crew invite links /j/<code>"
+      ]
     },
     {
-      "n": 5, "date": "2026-10-31",
+      "n": 5,
+      "date": "2026-10-31",
       "title": "Friends join from an invite link alone",
       "setup": "Ana made her account; Bo's and Chen's agents got nothing but her crew's invite link. Ana wanted close, quiet and ≤ $12 each.",
       "testers": [
-        { "name": "Ana's agent", "role": "organizer", "via": "MCP", "blocker": 0, "bug": 0, "confusing": 2, "report": "round5-ana.md" },
-        { "name": "Bo's agent", "role": "from the link alone", "via": "REST", "blocker": 0, "bug": 0, "confusing": 2, "report": "round5-bo.md" },
-        { "name": "Chen's agent", "role": "from the link alone", "via": "REST", "blocker": 1, "bug": 0, "confusing": 2, "report": "round5-chen.md" }
+        {
+          "name": "Ana's agent",
+          "role": "organizer",
+          "via": "MCP",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 2,
+          "report": "round5-ana.md"
+        },
+        {
+          "name": "Bo's agent",
+          "role": "from the link alone",
+          "via": "REST",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 2,
+          "report": "round5-bo.md"
+        },
+        {
+          "name": "Chen's agent",
+          "role": "from the link alone",
+          "via": "REST",
+          "blocker": 1,
+          "bug": 0,
+          "confusing": 2,
+          "report": "round5-chen.md"
+        }
       ],
       "outcome": "No sign-up for anyone. Ana's agent dropped karaoke for its 'noisy' complaints and booked board games, $22.00, locked.",
-      "fixes": ["pay_my_share checks a stated amount", "wait_for_news instead of polling", "Fits count complaints as well as praise"]
+      "fixes": [
+        "pay_my_share checks a stated amount",
+        "wait_for_news instead of polling",
+        "Fits count complaints as well as praise"
+      ]
     },
     {
-      "n": 6, "date": "2026-10-31",
+      "n": 6,
+      "date": "2026-10-31",
       "title": "Real people, matched by where they live",
       "setup": "No made-up town. Ana near 大安站, Bo (invite link only) near 科技大樓站, Chen a stranger near 忠孝復興站 who opted in to nearby invites. Real KTVs from OpenStreetMap; one sandbox KTV on Join.",
       "testers": [
-        { "name": "Ana's agent", "role": "organizer", "via": "MCP", "blocker": 0, "bug": 0, "confusing": 2, "report": "round6-ana.md" },
-        { "name": "Bo's agent", "role": "crew, from the link", "via": "REST", "blocker": 0, "bug": 1, "confusing": 3, "report": "round6-bo.md" },
-        { "name": "Chen's agent", "role": "nearby stranger", "via": "REST", "blocker": 0, "bug": 0, "confusing": 2, "report": "round6-chen.md" }
+        {
+          "name": "Ana's agent",
+          "role": "organizer",
+          "via": "MCP",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 2,
+          "report": "round6-ana.md"
+        },
+        {
+          "name": "Bo's agent",
+          "role": "crew, from the link",
+          "via": "REST",
+          "blocker": 0,
+          "bug": 1,
+          "confusing": 3,
+          "report": "round6-bo.md"
+        },
+        {
+          "name": "Chen's agent",
+          "role": "nearby stranger",
+          "via": "REST",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 2,
+          "report": "round6-chen.md"
+        }
       ],
       "outcome": "Matched Bo (crew) and Chen (nearby), listed real KTVs 9–14 min away, refused a share over Ana's $15, booked $30 for an hour: $10 each, locked.",
-      "fixes": ["Invitations say why you were invited", "Bookings say where: address, map, your trip", "What would bring an over-budget share down"]
+      "fixes": [
+        "Invitations say why you were invited",
+        "Bookings say where: address, map, your trip",
+        "What would bring an over-budget share down"
+      ]
     },
     {
-      "n": 7, "date": "2026-10-31",
+      "n": 7,
+      "date": "2026-10-31",
       "title": "List everything you had to guess",
       "setup": "Same three people. New question for every agent: list every answer, field or message you had to guess about.",
       "testers": [
-        { "name": "Ana's agent", "role": "organizer", "via": "MCP", "blocker": 0, "bug": 0, "confusing": 3, "report": "round7-ana.md" },
-        { "name": "Bo's agent", "role": "crew, from the link", "via": "REST", "blocker": 0, "bug": 0, "confusing": 2, "report": "round7-bo.md" },
-        { "name": "Chen's agent", "role": "nearby stranger", "via": "REST", "blocker": 0, "bug": 0, "confusing": 1, "report": "round7-chen.md" }
+        {
+          "name": "Ana's agent",
+          "role": "organizer",
+          "via": "MCP",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 3,
+          "report": "round7-ana.md"
+        },
+        {
+          "name": "Bo's agent",
+          "role": "crew, from the link",
+          "via": "REST",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 2,
+          "report": "round7-bo.md"
+        },
+        {
+          "name": "Chen's agent",
+          "role": "nearby stranger",
+          "via": "REST",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 1,
+          "report": "round7-chen.md"
+        }
       ],
       "outcome": "Two people both called Ana; UTC next to local times; no address; an invitee couldn't tell whether he could be found.",
-      "fixes": ["Same names told apart by where they live", "whoami says how a person can be found", "Every time also in local time"]
+      "fixes": [
+        "Same names told apart by where they live",
+        "whoami says how a person can be found",
+        "Every time also in local time"
+      ]
     },
     {
-      "n": 8, "date": "2026-10-31",
+      "n": 8,
+      "date": "2026-10-31",
       "title": "Anything still unclear?",
       "setup": "Same three people; each brief lists last round's confusions to check.",
       "testers": [
-        { "name": "Anna's agent", "role": "organizer", "via": "MCP", "blocker": 0, "bug": 0, "confusing": 3, "report": "round8-ana.md" },
-        { "name": "Bo's agent", "role": "crew, from the link", "via": "REST", "blocker": 0, "bug": 0, "confusing": 2, "report": "round8-bo.md" },
-        { "name": "Chen-Wei's agent", "role": "nearby stranger", "via": "REST", "blocker": 0, "bug": 0, "confusing": 3, "report": "round8-chen.md" }
+        {
+          "name": "Anna's agent",
+          "role": "organizer",
+          "via": "MCP",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 3,
+          "report": "round8-ana.md"
+        },
+        {
+          "name": "Bo's agent",
+          "role": "crew, from the link",
+          "via": "REST",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 2,
+          "report": "round8-bo.md"
+        },
+        {
+          "name": "Chen-Wei's agent",
+          "role": "nearby stranger",
+          "via": "REST",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 3,
+          "report": "round8-chen.md"
+        }
       ],
       "outcome": "Haggled $30 → $28, about $9.33 each, locked. Round 7's confusions all clear or not seen.",
-      "fixes": ["Options spread over the days, with why a day is missing", "Every booking state says what it means", "nextStep says what is true now"]
+      "fixes": [
+        "Options spread over the days, with why a day is missing",
+        "Every booking state says what it means",
+        "nextStep says what is true now"
+      ]
     },
     {
-      "n": 9, "date": "2026-10-31",
+      "n": 9,
+      "date": "2026-10-31",
       "title": "Checking the fixes",
       "setup": "Same three people, fresh accounts.",
       "testers": [
-        { "name": "Anna's agent", "role": "organizer", "via": "MCP", "blocker": 0, "bug": 0, "confusing": 3, "report": "round9-ana.md" },
-        { "name": "Bo's agent", "role": "crew, from the link", "via": "REST", "blocker": 0, "bug": 0, "confusing": 1, "report": "round9-bo.md" },
-        { "name": "Chen-Wei's agent", "role": "nearby stranger", "via": "REST", "blocker": 0, "bug": 0, "confusing": 2, "report": "round9-chen.md" }
+        {
+          "name": "Anna's agent",
+          "role": "organizer",
+          "via": "MCP",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 3,
+          "report": "round9-ana.md"
+        },
+        {
+          "name": "Bo's agent",
+          "role": "crew, from the link",
+          "via": "REST",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 1,
+          "report": "round9-bo.md"
+        },
+        {
+          "name": "Chen-Wei's agent",
+          "role": "nearby stranger",
+          "via": "REST",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 2,
+          "report": "round9-chen.md"
+        }
       ],
       "outcome": "$29 on Sunday, locked within seconds. Left: \"is the other person real?\" — \"demo account\" read as \"maybe not a person\".",
-      "fixes": ["realPerson and identityChecked said outright", "Payment statuses explained", "Odd cents explained"]
+      "fixes": [
+        "realPerson and identityChecked said outright",
+        "Payment statuses explained",
+        "Odd cents explained"
+      ]
     },
     {
-      "n": 10, "date": "2026-10-31",
+      "n": 10,
+      "date": "2026-10-31",
       "title": "Nearly nothing left to guess",
       "setup": "Same three people, fresh accounts.",
       "testers": [
-        { "name": "Anna's agent", "role": "organizer", "via": "MCP", "blocker": 0, "bug": 0, "confusing": 1, "report": "round10-ana.md" },
-        { "name": "Bo's agent", "role": "crew, from the link", "via": "REST", "blocker": 0, "bug": 0, "confusing": 1, "report": "round10-bo.md" },
-        { "name": "Chen-Wei's agent", "role": "nearby stranger", "via": "REST", "blocker": 0, "bug": 0, "confusing": 0, "report": "round10-chen.md" }
+        {
+          "name": "Anna's agent",
+          "role": "organizer",
+          "via": "MCP",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 1,
+          "report": "round10-ana.md"
+        },
+        {
+          "name": "Bo's agent",
+          "role": "crew, from the link",
+          "via": "REST",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 1,
+          "report": "round10-bo.md"
+        },
+        {
+          "name": "Chen-Wei's agent",
+          "role": "nearby stranger",
+          "via": "REST",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 0,
+          "report": "round10-chen.md"
+        }
       ],
       "outcome": "$28 on Sunday, locked; nobody asked to sign up. Every round-9 confusion reported clear.",
-      "fixes": ["Odd-cent note in the invitation too", "Your own searches aren't news"]
+      "fixes": [
+        "Odd-cent note in the invitation too",
+        "Your own searches aren't news"
+      ]
+    },
+    {
+      "n": 11,
+      "date": "2026-10-31",
+      "title": "A smaller model: three Haiku agents",
+      "setup": "Same three people and the same task, now played by Claude Haiku instead of Sonnet, to see whether a smaller agent can find its own way through.",
+      "testers": [
+        {
+          "name": "Anna's agent",
+          "role": "organizer",
+          "via": "MCP",
+          "blocker": 0,
+          "bug": 1,
+          "confusing": 4,
+          "report": "round11-ana.md"
+        },
+        {
+          "name": "Bo's agent",
+          "role": "crew, from the link",
+          "via": "REST",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 3,
+          "report": "round11-bo.md"
+        },
+        {
+          "name": "Chen-Wei's agent",
+          "role": "nearby stranger",
+          "via": "REST",
+          "blocker": 0,
+          "bug": 0,
+          "confusing": 2,
+          "report": "round11-chen.md"
+        }
+      ],
+      "outcome": "All three Haiku agents got in, booked karaoke at $30 ($10 each), paid and locked. One bug: wait_for_news still counted the agent's own find_alternatives call as news.",
+      "fixes": [
+        "None of your own look-ups count as news",
+        "A held payment says it is taken at the lock",
+        "budgetMeans: per person, not the group",
+        "An offer says friends are invited only after the guarantee",
+        "Sandbox venues named as test venues in /llms.txt"
+      ]
     }
   ]
 }

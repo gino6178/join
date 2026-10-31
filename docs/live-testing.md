@@ -222,6 +222,24 @@ both fixed after the round:
 - `wait_for_news` counted an agent's own searches as news, so it returned at once. Your own searches are no longer
   news to you.
 
+## Round 11: a smaller model
+
+The same three people and tasks, played by Claude Haiku instead of Sonnet. All three got in from the address or the
+link alone, booked karaoke at $30 ($10 each), paid and locked.
+
+| Agent | Verdict |
+|---|---|
+| Anna's ([round11-ana.md](live-test/round11-ana.md)) | 0 blocker, 1 bug, 4 confusing |
+| Bo's ([round11-bo.md](live-test/round11-bo.md)) | 0 blocker, 0 bug, 3 confusing |
+| Chen-Wei's ([round11-chen.md](live-test/round11-chen.md)) | 0 blocker, 0 bug, 2 confusing |
+
+The bug: `wait_for_news` still counted the agent's own `find_alternatives` call as news (round 10's fix covered only
+`find_options`). Fixed after the round, along with:
+- A friend's held payment now says it is taken at the lock.
+- `budgetMeans` says a budget is per person.
+- An offer's `expiresMeans` says friends are invited only after the guarantee.
+- `/llms.txt` says the bookable venues on this sandbox are test venues.
+
 ## What is still open
 
 - The activity log is written in English only.
