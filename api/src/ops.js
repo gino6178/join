@@ -179,7 +179,7 @@ export function findOptions(a, { activity = "badminton", date = null, dates = []
   record({ actor: by(a), who: [a.player], action: "searched", data: { activity, area: me.area?.name || null, wish }, summary: `${said(a)} looked for ${activity} for ${need + 1} people${days.length === 1 ? ` on ${days[0]}` : ` over ${days.length} days`}: ${out.length ? `${out.length} option${out.length === 1 ? "" : "s"}` : "nothing free"}.` });
   // what the organizer may still commit to for each option: their per-booking limit, or what's left of that week's
   const m = getMandate(a.player), canSpend = (o) => Math.max(0, Math.min(m.perGame, m.perWeek - settle.spentInWeek(a.player, o.date, o.start)));
-  return { ...(wish.near || wish.cheap || wish.maxTrip || wish.aspects.length ? { rankedBy: wish } : {}), days: byDay, options: out.map(({ score, ...o }) => ({ ...o, ...(o.fits.length ? {} : { fits: undefined }), youCanSpend: usd(canSpend(o)) })), mandate: { perGame: usd(m.perGame), perWeek: usd(m.perWeek) }, note: out.length ? "Prices are the venue's opening ask; negotiate with start_negotiation." : "Nothing fits. Try other days, a wider window or fewer players.",
+  return { ...(wish.near || wish.cheap || wish.maxTrip || wish.aspects.length ? { rankedBy: wish } : {}), days: byDay, options: out.map(({ score, ...o }) => ({ ...o, people: o.players.map((id) => ({ id, name: player(id)?.name, how: howFound(me, player(id)) })), ...(o.fits.length ? {} : { fits: undefined }), youCanSpend: usd(canSpend(o)) })), mandate: { perGame: usd(m.perGame), perWeek: usd(m.perWeek) }, note: out.length ? "Prices are the venue's opening ask; negotiate with start_negotiation." : "Nothing fits. Try other days, a wider window or fewer players.",
     ...(!out.length && closest ? { closest: { date: closest.date, start: closest.start, free: [me, ...closest.free].map((p) => p.name), short: need + 1 - (closest.free.length + 1), note: `At best ${closest.free.length + 1} of the ${need + 1} you asked for ${closest.free.length ? "are" : "is"} free (${closest.date} ${closest.start}: ${[me, ...closest.free].map((p) => p.name.split(" ")[0]).join(", ")}). ${closest.free.length ? `Ask for ${closest.free.length + 1} people (players: ${closest.free.length}), or name more people in with.` : "Nobody else is free then: try other days or times, or invite friends (your crew's link)."}` } } : {}),
     ...(out.some((o) => +o.share * 100 > canSpend(o)) ? { overBudget: cheaperWays(out, canSpend, act) } : {}) };
 }
@@ -289,6 +289,14 @@ export function walkAway(a, { negotiation }) {
   return r;
 }
 
+// why someone is in a plan you're making: you, your crew, someone near you who chose to be invited, or a person you named
+function howFound(me, p) {
+  if (!p) return null;
+  if (p.id === me.id) return "you (the organizer)";
+  if (me.crew && p.crew === me.crew) return "in your crew";
+  if (p.nearby && me.area && p.area) return `lives about ${kmBetween(me.area, p.area).toFixed(1)} km from you and chose to be invited by people nearby (they answer for themselves when invited)`;
+  return p.joined ? "a person you named" : "a resident of the demo town";
+}
 export function findAlternatives(a, { activity, date, start, minutes = 90, players = [], budget = null, exclude = null }) {
   if (!isDate(date) || !isTime(start)) return { error: "bad_time", message: "date is YYYY-MM-DD and start HH:MM." };
   const ids = [...new Set([a.player, ...players])].filter((id) => player(id));
