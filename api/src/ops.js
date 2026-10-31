@@ -3,6 +3,7 @@
 // activity log in code-made words, so the people involved can see every step on the website.
 // Money crosses as USD strings ("31.50") outward and integer cents inward.
 import * as people from "./people.js";
+import { activeWithin } from "./people.js"; // (findOptions has a "people" argument, the group size)
 import { forPlayer, onActivity } from "./activity.js";
 import { personLink } from "./auth.js";
 import { places as osmPlaces, geocode } from "./osm.js";
@@ -120,7 +121,7 @@ export function findOptions(a, { activity = "badminton", date = null, dates = []
   if ((from && !isTime(from)) || (to && !isTime(to)) || dates.some((d) => !isDate(d))) return { error: "bad_time", message: "dates are YYYY-MM-DD, from and to HH:MM." };
   const need = Math.max(1, Math.min(11, players | 0));
   const days = dates.length ? dates.slice(0, 7) : Array.from({ length: 7 }, (_, i) => addDays(ymd(now), i));
-  const mine = windows(me.free), crew = me.crew ? me.crew : null, others = getWorld().players.filter((p) => p.id !== me.id && (want.includes(p.id) || (crew && p.crew === crew) || (!p.joined && (p.interests || []).includes(activity)) || (p.nearby && me.area && p.area && kmBetween(me.area, p.area) <= NEAR_KM && (p.interests || []).includes(activity) && people.activeWithin(p.id, 24 * 3600e3)))); // (people who joined Join themselves: your crewmates, anyone you name, and people near you who said they'd like to be invited)
+  const mine = windows(me.free), crew = me.crew ? me.crew : null, others = getWorld().players.filter((p) => p.id !== me.id && (want.includes(p.id) || (crew && p.crew === crew) || (!p.joined && (p.interests || []).includes(activity)) || (p.nearby && me.area && p.area && kmBetween(me.area, p.area) <= NEAR_KM && (p.interests || []).includes(activity) && activeWithin(p.id, 24 * 3600e3)))); // (people who joined Join themselves: your crewmates, anyone you name, and people near you who said they'd like to be invited)
   const opts = []; let closest = null; // (the slot with the most people free, when none has enough)
   for (const d of days) {
     const date = dateOf(d);

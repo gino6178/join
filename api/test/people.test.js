@@ -47,3 +47,13 @@ test("an agent joins through an invite link with no account: the pass acts for a
   assert.equal(agentOf(req(pass.slice(0, -3) + "AAA")), null); // (forged)
   people.peopleStore.reset();
 });
+
+test("someone who opted in to invitations from people nearby is found by a neighbour's search while they're around", () => {
+  people.peopleStore.reset();
+  const a = people.demoPerson("Nia", { area: "Midtown" }), b = people.demoPerson("Oli", { area: "Midtown", nearby: true });
+  people.saw(b.id);
+  const r = ops.findOptions({ player: a.id, client: "test" }, { activity: "karaoke", people: 4 });
+  assert.ok(!r.error);
+  assert.ok(r.options.some((o) => o.players.includes(b.id)));
+  people.peopleStore.reset();
+});
