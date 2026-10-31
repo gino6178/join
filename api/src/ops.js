@@ -36,6 +36,13 @@ export function openMandates(a) {
   return ap2.issueOpen(a.player, kid, m, w.venues, w.activities, a.token ? tokenKey(a.token) : null);
 }
 
+// How a person can be found for plans: where they live (only the place's name), whether people nearby may invite them,
+// and how many people near them could (a count, never who), so an agent can tell "nobody asked" from "can't be found"
+function matchingOf(p) {
+  const near = getWorld().players.filter((x) => x.id !== p.id && x.nearby && x.area && p.area && kmBetween(x.area, p.area) <= NEAR_KM);
+  return { home: p.geo ? p.area?.name || "set" : null, invitedByPeopleNearby: !!p.nearby, peopleNearbyWhoOptedIn: near.length, withinKm: NEAR_KM, crewSize: p.crew ? people.crewmates(p).length + 1 : 0,
+    note: !p.geo ? "No home set: only your crew can invite you (set_home)." : !p.nearby ? "Only your crew, or someone who names you, can invite you; set_home nearby: true (if your person agrees) lets people near them invite them too." : `People within ${NEAR_KM} km who plan your person's activities at a time they're free can invite them; ${near.length} people near them have opted in too.` };
+}
 export function whoami(a) {
   const p = player(a.player), m = getMandate(a.player);
   const w = getWorld();
@@ -43,8 +50,9 @@ export function whoami(a) {
     ...(a.pass ? { yourPersonsLink: { path: `/me/${personLink(a.pass)}`, note: "Give this to your person: it signs them in on Join's website (same host) to see plans and set their limits. Keep it private: it isn't your pass, but it signs them in." } } : {}),
     ...(p.crew ? { crew: { code: p.crew, invite: `/j/${p.crew}`, members: people.crewmates(p).map((x) => ({ id: x.id, name: x.name, area: x.area?.name })), note: "Your person's friends who joined Join with the same crew code. find_options invites them first; each answers an invitation through their own agent." } } : {}),
     player: { id: p.id, name: p.name, interests: p.interests, ...(p.level ? { sportsLevel: p.level } : {}), usuallyFree: p.free, area: p.area?.name },
+    ...(REAL ? { matching: matchingOf(p) } : {}),
     mandate: { perGame: usd(m.perGame), perWeek: usd(m.perWeek), guaranteeOnItsOwn: usd(m.cover), venues: m.venues, autopay: m.autopay && settle.hasVault(a.player), note: "Set by the player on the website. Agents can read it, not change it." },
-    paypal: { savedForAgent: settle.hasVault(a.player), mode: settle.paypalMode() }, client: a.client,
+    paypal: { savedForAgent: settle.hasVault(a.player), mode: settle.paypalMode(), canYouPay: (a.scopes || ["pay"]).includes("pay") ? `yes: your token may pay. ${settle.hasVault(a.player) && m.autopay ? "Payments go from your person's saved PayPal, within their limits." : settle.paypalMode() === "sandbox" ? "On this sandbox server a payment is authorized with PayPal's test card; with a real person, they approve it in PayPal (autopay is off: they haven't saved PayPal for you)." : "Each payment waits for your person's approval in PayPal (autopay is off)."}` : "no: your token may not pay; your person pays on the website." }, client: a.client,
     ap2: { about: "AP2 open mandates (Trusted Agent Provider model): what your user let you book and pay, signed by Join, bound to your token id (cnf.kid). Present them to any verifier that asks.", ...(({ checkout, payment }) => ({ openCheckoutMandate: checkout, openPaymentMandate: payment }))(openMandates(a)) } };
 }
 
@@ -290,7 +298,7 @@ export async function waitForNews(a, { after = 0, seconds = 45 } = {}) {
   let news = pick();
   if (!news.length) await new Promise((ok) => { const t = setTimeout(done, Math.min(50, Math.max(1, seconds)) * 1000); const off = onActivity((e) => e.who.includes(a.player) && e.id > after && done()); function done() { clearTimeout(t); off(); ok(); } });
   news = news.length ? news : pick();
-  return { news, last: news.length ? news.at(-1).id : after, note: news.length ? "Call again with after: last for what comes next." : "Nothing new yet; call again with the same after." };
+  return { news, last: news.length ? news.at(-1).id : after, serverTime: new Date().toISOString(), note: news.length ? "Call again with after: last for what comes next." : "Nothing new yet; call again with the same after. (Quiet can mean nobody has planned anything with your person yet: whoami's matching says how they can be found.)" };
 }
 export const myGames = (a, { all = false } = {}) => ({ negotiations: neg.mine(a.player, { all }), bookings: settle.mine(a.player, { all }), ...(all ? {} : { note: "Open negotiations and live bookings only; pass all: true for finished ones too." }) });
 export const gameStatus = (a, { booking }) => settle.status(booking, a.player);
