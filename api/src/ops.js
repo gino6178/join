@@ -71,6 +71,8 @@ function wishes(prefer) {
   const p = prefer && typeof prefer === "object" ? prefer : {};
   return { near: !!p.near, cheap: !!p.cheap, maxTrip: Number.isFinite(+p.maxTrip) && +p.maxTrip > 0 ? +p.maxTrip : null, aspects: (Array.isArray(p.aspects) ? p.aspects : []).filter((k) => k in reviews.ASPECTS).slice(0, 4) };
 }
+// a person's own trip to a place: minutes (by city transport, about 20 km/h plus 5 to set off) and kilometres
+const tripOf = (t, me) => { const m = t.list?.find((x) => x.id === me.id)?.min; return m == null ? null : { minutes: m, km: +Math.max(0, (m - 5) / 3).toFixed(1) }; };
 // how a venue meets each wish, in words, from the facts: trips, the share, and the reviews' counts both ways
 function fitsOf(wish, v, people) {
   return [
@@ -140,17 +142,17 @@ export function findOptions(a, { activity = "badminton", date = null, dates = []
       if (!best && real.length) {
         const { p, t } = real[0];
         opts.push({ date: d, day: DAYS[date.getDay()], start: hm(s), minutes, players: group.map((g) => g.id), names: group.map((g) => g.name), alsoFree: free.slice(need, need + 3).map((x) => x.p.id),
-          venue: p.id, venueName: p.name, onJoin: false, url: p.url, address: p.address || null, longestTrip: t.longest, askPrice: null, share: null, discounts: [],
+          venue: p.id, venueName: p.name, onJoin: false, url: p.url, address: p.address || null, longestTrip: t.longest, yourTrip: tripOf(t, me), askPrice: null, share: null, price: "unknown: ask the place (not on Join)", discounts: [],
           note: "A real place near you, not on Join: Join can't check its availability, haggle or take payment there. Book with them directly, or pick a venue on Join.",
           fits: fitsOf(wish, { myTrip: t.list.find((x) => x.id === me.id)?.min ?? null, longestTrip: t.longest, ask: 0, reviews: {} }, group.length).filter((f) => !f.startsWith("$")),
           ...(real.length > 1 ? { nearbyReal: nearbyReal.slice(1) } : {}),
-          score: want.filter((id) => group.some((g) => g.id === id)).length * 5 - t.longest * (wish.near ? 0.6 : 0.2) - days.indexOf(d) * 0.3 - 3 });
+          score: want.filter((id) => group.some((g) => g.id === id)).length * 5 - t.longest * (wish.near ? 0.6 : 0.2) - days.indexOf(d) * 0.3 - 20 }); // (a venue on Join, where there is one, first)
         continue;
       }
       if (!best) continue;
       const asked = want.filter((id) => group.some((g) => g.id === id)).length;
       opts.push({ date: d, day: DAYS[date.getDay()], start: hm(s), minutes, players: group.map((g) => g.id), names: group.map((g) => g.name), alsoFree: free.slice(need, need + 3).map((x) => x.p.id),
-        venue: best.venue, venueName: best.venueName, longestTrip: best.longestTrip, askPrice: usd(best.ask), share: usd(shareOf(best.ask, group.length)), discounts: best.discounts,
+        venue: best.venue, venueName: best.venueName, longestTrip: best.longestTrip, yourTrip: tripOf({ list: best.trips }, me), priceFor: `${minutes} minutes, the whole group of ${group.length}`, askPrice: usd(best.ask), share: usd(shareOf(best.ask, group.length)), discounts: best.discounts,
         reviews: { score: best.reviews.score, count: best.reviews.count, praise: best.reviews.praise.map((p) => p.aspect), complaints: best.reviews.complaints.map((p) => p.about), groupLow: best.reviews.groupLow, tasteNotes: best.reviews.tasteNotes, demoData: best.reviews.demoData > 0, reason: reviews.reason(best.reviews) },
         fits: fitsOf(wish, best, group.length), onJoin: true, ...(nearbyReal.length ? { nearbyReal } : {}),
         ...(seen.length > 1 ? { alsoConsidered: seen.filter((x) => x !== best).sort((x, y) => x.cost - y.cost).slice(0, 2).map((x) => ({ venue: x.venue, venueName: x.venueName, longestTrip: x.longestTrip, share: usd(shareOf(x.ask, group.length)), score: x.reviews.score, ...(wish.near || wish.cheap || wish.maxTrip || wish.aspects.length ? { fits: fitsOf(wish, x, group.length) } : {}) })) } : {}),
@@ -284,7 +286,7 @@ export function findAlternatives(a, { activity, date, start, minutes = 90, playe
 
 // News for a person, as it happens: their activity entries after `after`, waiting up to `seconds` for the first one
 export async function waitForNews(a, { after = 0, seconds = 45 } = {}) {
-  const pick = () => forPlayer(a.player, { after, limit: 20 }).map((e) => ({ id: e.id, at: e.at, action: e.action, ref: e.ref, summary: e.summary }));
+  const pick = () => forPlayer(a.player, { after, limit: 20 }).filter((e) => after || Date.now() - Date.parse(e.at) < 15 * 60e3).map((e) => ({ id: e.id, at: e.at, action: e.action, ref: e.ref, summary: e.summary })); // (with no after: the last 15 minutes)
   let news = pick();
   if (!news.length) await new Promise((ok) => { const t = setTimeout(done, Math.min(50, Math.max(1, seconds)) * 1000); const off = onActivity((e) => e.who.includes(a.player) && e.id > after && done()); function done() { clearTimeout(t); off(); ok(); } });
   news = news.length ? news : pick();

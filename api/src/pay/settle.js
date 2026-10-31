@@ -89,7 +89,7 @@ setOnAgreed((n) => {
     payments: {}, declined: [], payout: null, journal: [], paypalMode: paypalMode(),
   };
   db.data.bookings.push(b); db.save();
-  note(b, { kind: "venue", venue: b.venue }, "place_held", `${venue(b.venue).name} holds ${unitName(b.activity, unit)} for ${ORGANIZER_MS / 60e3} minutes while ${name(b.organizer)} authorizes $${usd(b.total)} with PayPal.`);
+  note(b, { kind: "venue", venue: b.venue }, "place_held", `${venue(b.venue).name} holds ${unitName(b.activity, unit)}. Step 1: ${name(b.organizer)} guarantees the whole $${usd(b.total)} in PayPal within ${ORGANIZER_MS / 60e3} minutes. Step 2: then friends are invited and have until the payment deadline (shown then) to pay their shares.`);
   // The guarantee starts at once only if the organizer's side may pay: the person on the website, or an agent whose
   // token has the pay scope. Otherwise it waits for them (pay_my_share, or the button on Plans), so a deal an agent
   // accepted never puts a hold on anyone's PayPal by itself.
@@ -455,6 +455,7 @@ export function view(b, viewer) {
     review: viewer ? (reviewsMod.byPlayer(viewer, b.id) ? { done: reviewsMod.byPlayer(viewer, b.id).stars } : canReview(b, viewer).ok ? { can: true } : null) : null,
     invite: viewer !== b.organizer && b.state === "held" && !mine && !b.declined.includes(viewer) ? { share: usd(b.shares[viewer]), payBy: new Date(b.holdUntil).toISOString(), why: whyInvited(b, viewer) } : null,
     where: whereIs(b, viewer),
+    people: b.players.map((pid) => ({ id: pid, name: name(pid), ...(pid === b.organizer ? { organizer: true } : {}), ...(player(pid)?.joined ? { member: true } : {}), ...(pid !== viewer && player(viewer)?.crew && player(pid)?.crew === player(viewer).crew ? { inYourCrew: true } : {}) })),
     you: mine ? { share: usd(b.shares[viewer]), ...(mine.role === "organizer" ? { guarantee: usd(b.total) } : {}), authorized: usd(mine.amount), paid: mine.status === "captured" ? usd(mine.captured ?? mine.amount) : "0.00", status: mine.status, via: mine.via,
       approveUrl: mine.status === "awaiting_approval" ? mine.approveUrl : null, orderId: mine.status === "awaiting_approval" ? mine.orderId : null, ...(mine.status === "awaiting_approval" && mine.why ? { note: mine.why } : {}),
       paypal: { order: mine.orderId, authorization: mine.authorizationId, capture: mine.captureId } } : null,

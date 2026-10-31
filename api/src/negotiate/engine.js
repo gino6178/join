@@ -13,6 +13,7 @@
 // and a quota of negotiations per player, venue and day, so nobody can map a venue's schedule by asking over and over.
 // When a deal is out of the budget, refused, or the place is gone, the answer carries alternatives nearby.
 import crypto from "node:crypto";
+import { activity as getActivity } from "../world.js";
 import { store, stateFile } from "../store.js";
 import { venue, player, freeUnits, forActivity, ACTIVITIES } from "../world.js";
 import { price, askAt, cheaperTerms, usd } from "./policy.js";
@@ -90,9 +91,15 @@ export function open({ by, players = [], venue: venueId, activity, date, start, 
     history: [{ at: now.toISOString(), by: "venue", type: "ask", amount: q.ask }],
   };
   db.data.negotiations.push(n); db.save();
-  const cheaper = cheaperTerms(v, terms, (t) => freeUnits(v.id, activity, date, t.start, minutes).length > 0, now).map((c) => ({ ...c, ask: usd(c.ask), saves: usd(c.saves) }));
+  const cheaper = cheaperTerms(v, { ...terms, allowedMinutes: getActivity(activity)?.minutes || [] }, (t) => freeUnits(v.id, activity, date, t.start, t.minutes || minutes).length > 0, now).map((c) => ({ ...c, ask: usd(c.ask), saves: usd(c.saves) }));
   const share = shareOf(q.ask, ids.length);
-  return view(n, { cheaper, ...(share > budget ? { overBudget: true, alternatives: alts(n, budget) } : {}) });
+  // whether the organizer's per-booking limit can be met by haggling, from the published rule alone (an offer under 70%
+  // of the ask doesn't count); the venue's floor itself is never told
+  const lowest = Math.ceil((q.ask * 0.7) / ids.length);
+  const budgetCheck = share <= budget ? { reachable: "yes", note: `$${usd(share)} each is within the $${usd(budget)} limit already.` }
+    : lowest > budget ? { reachable: "no", note: `Even the lowest offer this venue takes seriously (70% of the ask, about $${usd(lowest)} each) is over the $${usd(budget)} limit: haggling can't get there. Look at cheaper (a shorter time, another start, more people) or alternatives.` }
+    : { reachable: "maybe", note: `$${usd(share)} each now; counters come down step by step from the ask and the venue's floor is never shown, so it may or may not reach $${usd(budget)} each. cheaper lists sure ways down.` };
+  return view(n, { cheaper, budgetCheck, ...(share > budget ? { overBudget: true, alternatives: alts(n, budget) } : {}) });
 }
 
 function agree(n, amount, who) {

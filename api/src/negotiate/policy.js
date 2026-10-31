@@ -57,5 +57,11 @@ export function cheaperTerms(v, terms, freeAt, now) {
     const q = price(v, { ...terms, players: g.min }, now), each = (x, n) => Math.ceil(x / n);
     if (q && each(q.ask, g.min) < each(base.ask, terms.players)) out.push({ change: { players: g.min }, ask: q.ask, saves: base.ask - q.ask, why: `group rate from ${g.min} people: $${usd(each(q.ask, g.min))} each` });
   }
-  return out.sort((a, b) => b.saves - a.saves).slice(0, 3);
+  // a shorter booking, where the activity has one: the same venue, proportionally less
+  for (const m of (terms.allowedMinutes || []).filter((x) => x < terms.minutes)) {
+    const q = price(v, { ...terms, minutes: m }, now);
+    if (q && q.ask < base.ask) out.push({ change: { minutes: m }, ask: q.ask, saves: base.ask - q.ask, why: `${m} minutes instead of ${terms.minutes}: $${usd(Math.ceil(q.ask / terms.players))} each` });
+  }
+  for (const c of out) if (!c.why) c.why = c.change.start ? `starting at ${c.change.start}` : "";
+  return out.sort((a, b) => b.saves - a.saves).slice(0, 4);
 }

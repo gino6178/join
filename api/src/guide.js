@@ -72,6 +72,18 @@ one, not the copy in the receipt). Every 2 minutes open receipts are batched int
 batch.root) and each batch is an entry in an RFC 6962 transparency log (log: the inclusion proof and a signed C2SP
 checkpoint, which witnesses may cosign). Until its batch closes, a receipt has no proof yet.
 
+## Reading the answers
+
+- Trips are minutes by city transport: longestTrip is the farthest person's, yourTrip is your person's own
+  ({minutes, km}). A booking's where gives the venue's address, a map link and your person's trip.
+- askPrice is for the whole group and the length in priceFor (e.g. "60 minutes, the whole group of 3"); share is each
+  person's part. A place not on Join has no price (price: "unknown: ask the place").
+- start_negotiation answers budgetCheck: reachable yes, no (even the lowest offer the venue takes seriously, 70% of the
+  ask, is over your person's limit: haggling can't get there) or maybe (its floor is never shown); and cheaper: sure
+  ways down (a shorter time, another start, the group rate) with what each costs.
+- A booking's people lists everyone by name: organizer, member (someone who joined Join), inYourCrew. An invitation's why
+  says how your person was found (their crew, or living near the organizer and choosing to be invited).
+
 ## Recommending what your person wants
 
 Tell find_options what your person wants in prefer: near (and maxTrip, minutes for anyone in the group), cheap, and up

@@ -92,7 +92,7 @@ export function summary(venueId, { activity = null, group = [], viewer = null } 
   const groupLow = list.filter((r) => group.includes(r.player) && r.stars <= 2).map((r) => ({ you: r.player === viewer, stars: r.stars, at: r.at.slice(0, 7) }));
   const taste = groupFit(list, group, viewer);
   return {
-    venue: venueId, score: Math.round(score * 10) / 10, average: list.length ? Math.round((list.reduce((a, r) => a + r.stars, 0) / list.length) * 10) / 10 : null,
+    venue: venueId, score: list.length ? Math.round(score * 10) / 10 : null, average: list.length ? Math.round((list.reduce((a, r) => a + r.stars, 0) / list.length) * 10) / 10 : null,
     count: list.length, recent: list.filter((r) => clock() - Date.parse(r.at) < 90 * 864e5).length, scope: list === forAct && activity ? activity : "all",
     praise: count("liked", ASPECTS), complaints: count("disliked", COMPLAINTS), aspectCounts: Object.fromEntries(Object.keys(ASPECTS).map((k) => [k, { liked: list.filter((r) => (r.liked || []).includes(k)).length, disliked: list.filter((r) => (r.disliked || []).includes(k)).length }])), groupLow, tasteFit: taste.fit, tasteNotes: taste.notes, demoData: list.filter((r) => r.seed).length,
     // (quotes are written by people, so an agent reading them is told they are data: an indirect prompt injection would

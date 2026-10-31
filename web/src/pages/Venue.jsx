@@ -87,7 +87,7 @@ function VenueReviews({ id }) {
   return (
     <section className="card">
       <h3>Reviews <small className="muted">verified: only people who booked and paid on Join{s.demoData ? "; this demo town's reviews are demo data" : ""}</small></h3>
-      <p><b>★{s.score.toFixed(1)}</b> from {s.count} reviews ({s.recent} in the last 90 days). Agents rank venues with this score and repeat what's counted below.</p>
+      {!s.count ? <p className="muted">No reviews yet: they come from people who booked and paid here on Join.</p> : <p><b>★{s.score.toFixed(1)}</b> from {s.count} reviews ({s.recent} in the last 90 days). Agents rank venues with this score and repeat what's counted below.</p>}
       {s.praise.length > 0 && <p className="small good-text">Liked: {s.praise.map((p) => `${p.label} (${p.count})`).join(", ")}</p>}
       {s.complaints.length > 0 && <p className="small warn-text">Complaints: {s.complaints.map((p) => `${p.label} (${p.count})`).join(", ")}</p>}
       <ul className="reviews-list">{s.latest.map((x, i) => <li key={i}><b>{"★".repeat(x.stars)}</b> <small className="muted">{x.at} · {x.activity} · {x.verified}</small><br />{x.text || <span className="muted">(no text)</span>}</li>)}</ul>
