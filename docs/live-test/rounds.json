@@ -526,7 +526,7 @@
           "report": "round12-chen.md"
         }
       ],
-      "outcome": "Haggled $29 → $25 asked, $29 agreed: Anna $9.68, Bo and Chen-Wei $9.66, locked within minutes. Round 11's own-search news bug did not come back. Bo's agent called paid: 0.00 next to an authorized share a bug.",
+      "outcome": "Anna offered $25, the venue held at $29: Anna $9.68, Bo and Chen-Wei $9.66, locked within minutes. Round 11's own-search news bug did not come back. Bo's agent called paid: 0.00 next to an authorized share a bug.",
       "fixes": [
         "held vs paid shown separately, with paidMeans",
         "Each option lists why each person is in it",
