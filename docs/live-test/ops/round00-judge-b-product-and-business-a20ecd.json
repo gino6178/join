@@ -1,0 +1,204 @@
+{
+ "id": "a20ecdf0de437c780",
+ "round": 0,
+ "title": "Judge B: product and business",
+ "model": "Opus 5.5",
+ "startedAt": "2026-10-30T11:01:08.180Z",
+ "endedAt": "2026-10-30T11:02:27.724Z",
+ "calls": 22,
+ "brief": "You are judging a PayPal AI Hackathon (Devpost) submission as Judge B: a product leader at a payments/consumer company. You care whether real people would use it, whether the problem is real, whether the experience is clear to a first-time user, and whether it could become a business. You are not impressed by protocol names; you are impressed by a clear story and a product that works. Be a tough, fair judge.\n\nThe submission is \"Join\". Read, in D:\\paypal\\join (read-only; do not modify anything): docs/SUBMISSION.md (the Devpost text and gallery captions), every image in docs/screenshots/ (look at them as a judge scrolling the gallery), README.md, docs/JUDGING.md, docs/demo-video-script.md (the video is not recorded yet; judge Presentation from the text, gallery and script, and say what the video must achieve), and skim docs/agent-run.md. Look at web/src/ (App.jsx, components/AgentDrawer.jsx, pages/Activity.jsx, pages/Games.jsx) only to check that what the docs say about the experience is true.\n\nScore five equally weighted criteria, 1-10 each: Technological Implementation, Design, Potential Impact, Innovation (quality of the idea), Presentation. For each: score, two or three reasons, and the single change that would raise it most. Then: total /50, the three biggest weaknesses for a product judge, and any confusing wording or screens (name the file or screenshot). Keep the report under 900 words. Only report what you verified.",
+ "steps": [
+  {
+   "n": 1,
+   "at": "2026-10-30T11:01:11.899Z",
+   "tool": "Bash",
+   "did": "ls docs docs/screenshots web/src web/src/* | head -80 && wc -w docs/*.md README.md",
+   "got": "web/src/App.jsx\nweb/src/api.js\nweb/src/app.css\nweb/src/main.jsx\nweb/src/theme.css\nweb/src/webmcp.js\n\ndocs:\nJUDGING.md\nNEGOTIATION.md\nSUBMISSION.md\nTECHNICAL.md\nagent-run\nagent-run.md\ndemo-video-script.md\nscreenshots\n\ndocs/screenshots:\n01-agent.png\n02-haggle.png\n03-friends.png\n04-locked.png\n05-curve.png\n06-venue-bryntum.png\n07-venue-money.png\n08-receipt.png\n09-activity.png\n10-limits.png\n11-connect.png\n12-start.png\n\nweb/src:\nApp.jsx\napi.js\napp.css\ncomponents\nmain.jsx\npages\nscout\ntheme.css\nwebmcp.js\n\nweb/src/components:\nActor.jsx\nAgentDrawer.jsx\nIcon.jsx\nPayPalButtons.jsx\nPlaceScheduler.jsx\nTownMap.jsx\nVenueMoney.jsx\n\nweb/src/pages:\nActivity.jsx\nConnect.jsx\nGames.jsx\nLimits.jsx\nMapPage.jsx\nReceipt.jsx\nSignIn.jsx\nVenue.jsx\n\nweb/src/scout:\nagent.js\nwords.js\n  1945 docs/JUDGING.md\n  1196 docs/NEGOTIATION.md\n  2276 docs/SUBMISSION.md\n  6662 docs/TECHNICAL.md\n   602 docs/agent-run.md\n   858 docs/demo-video-script.md\n  3194 README.md\n 16733 total"
+  },
+  {
+   "n": 2,
+   "at": "2026-10-30T11:01:14.517Z",
+   "tool": "Read",
+   "did": "read D:\\paypal\\join\\docs\\SUBMISSION.md",
+   "got": "1\t# Join: Devpost submission\n2\t\n3\tEverything for the Devpost form, field by field, ready to paste. Only the video link is still to come.\n4\t\n5\t---\n6\t\n7\t## Project name\n8\t\n9\tJoin\n10\t\n11\t## Elevator pitch (tagline, 200 characters max)\n12\t\n13\tYour AI agent gets the group together: finds who's free, haggles with the venue, splits the bill and settles it with PayPal, inside limits only you set. You see every step.\n14\t\n15\t## Links\n16\t\n17\t- **Code:** https://github.com/gino6178/join (public, MIT)\n18\t- **For judges, criterion by criterion:** https://github.com/gino6178/join/blob/main/docs/JUDGING.md\n19\t- **What was built during the hackathon:** https://github.com/gino6178/join/compare/baseline...main\n20\t- **Demo video:** _(YouTube link to add)_\n21\t- **Try it:** runs locally with Node 20 and no keys in three commands; see Testing instructions below. There is no\n22\t  hosted URL; the rules allow \"complete setup and run instructions\" instead.\n23\t\n24\t## Image gallery\n25\t\n26\tUpload in this order, from `docs/screenshots/`. All from one plan on the PayPal sandbox: Hana, who has no agent of her\n27\town, plans karaoke for four with Join's website agent.\n28\t\n29\t| File | Caption |\n30\t|---|---|\n31\t| `01-agent.png` | No agent? Join's own: three options for \"karaoke saturday night, 4 of us, $15 each\", ranked by trip, price and verified reviews |\n32\t| `02-haggle.png` | It states the terms, haggles $32.40 down to $23.40, and PayPal authorizes Hana's guarantee |\n33\t| `03-friends.png` | Friends' shares: Tomás asks to pay $1 less and Hana decides; nobody can hold the room for free |\n34\t| `04-locked.png` | Everyone paid: each share captured in PayPal, Hana's guarantee only for her own share and the $1 |\n35\t| `05-curve.png` | The negotiation: the venue's asks step down its own schedule; its floor is never shown |\n36\t| `06-venue-bryntum.png` | What the venue sees on Bryntum Scheduler: the room solid once everyone has paid |\n37\t| `07-venue-money.png` | What Join brought the venue, counted from its bookings; paid out with PayPal Payouts after each game |\n38\t| `08-receipt.png` | The booking's receipt, checked in the browser: signature, Merkle proof, transparency log |\n39\t| `09-activity.png` | Every step every agent took, in sentences Join writes from the facts |\n40\t| `10-limits.png` | Limits only Hana can set; Join refuses anything over them |\n41\t| `11-connect.png` | Or bring your own agent: Claude, any MCP or A2A agent, with scoped tokens |\n42\t| `12-start.png` | Where a new person starts |\n43\t\n44\t---|---|\n45\t| `1-activity.png` | Every step the agents took, live: search, offers and counters, the guarantee, invitations, asks to pay less, payments |\n46\t| `2-plans.png` | A booking's payments: each share, how it was paid, the stepper from deal to venue paid |\n47\t| `3-map.png` | The town map: venues, free public places, the fairest venue and everyone's trip |\n48\t| `4-venue-bryntum.png` | The venue's courts and rooms on Bryntum Scheduler: dashed while the group pays, solid when locked |\n …(+12374 chars)"
+  },
+  {
+   "n": 3,
+   "at": "2026-10-30T11:01:14.821Z",
+   "tool": "Read",
+   "did": "read D:\\paypal\\join\\docs\\demo-video-script.md",
+   "got": "1\t# Demo video script (2:45, English captions)\n2\t\n3\tOne person, one plan, start to finish. Hana wants karaoke with three friends on Saturday night; she has no AI agent of\n4\ther own, so she uses Join's. Everything on screen is from the run itself: don't add numbers in editing. Protocol names\n5\tappear only as small captions, never in the voice-over. How to set up and record it is in the runbook below.\n6\t\n7\t| Time | Scene: what's on screen, what to click | Voice-over | Caption |\n8\t|---|---|---|---|\n9\t| 0:00-0:15 | A short group-chat mock-up going in circles (\"Sat?\" \"who books?\" \"I'll pay you back later\"). Cut to Join's Activity page, empty, with **Plan something**. | \"Getting four friends to karaoke is easy. Booking it, haggling, fronting the money and chasing everyone's share is where it dies.\" | |\n10\t| 0:15-0:40 | Click **Plan something**. Type `karaoke saturday night, 4 of us, $15 each`, press Enter. Three cards appear; hold on the first one's reviews line. | \"Hana doesn't have an AI agent, so she uses Join's. It finds who's free, the venue fairest for everyone's trip, and reads verified reviews from people who actually paid.\" | Join's agent: rules + Qwen 0.5B on Join's own server, no AI key |\n11\t| 0:40-1:00 | Click **Negotiate this**. The agent states the terms; click **Go ahead**. Offers and counters scroll in; the deal appears. | \"Before it haggles, it says what a deal commits her to. The venue has its own rules and a floor nobody sees. Lowballs don't move it; serious offers do.\" | |\n12\t| 1:00-1:20 | The guarantee step: the PayPal sandbox approval (test card, or the PayPal popup). Cut to Plans: the booking is \"guaranteed\". | \"To make the deal binding, Hana guarantees the whole price with PayPal. It's only authorized, not charged, so nobody can hold a room for free.\" | PayPal Orders v2, intent AUTHORIZE |\n13\t| 1:20-1:50 | Plans, demo panel **Demo: play your friends**: Tomás **Pays**, Aisha **Asks $1 less** (Hana clicks **Agree**), Leo **Pays**, Aisha **Pays**. Cut to Venue view: Bryntum's bar for the room goes from dashed to solid. | \"Each friend pays their own share in PayPal. When the last one's in, the booking locks: each share is captured, and Hana's authorization only for her own. The venue sees its room locked.\" | Captures at the lock · Bryntum Scheduler |\n14\t| 1:50-2:10 | Activity page: the plan's summary line, then **Show all** steps. Hover the PayPal lines. | \"Hana can see every step every agent took, written by Join from the facts. No AI writes this page.\" | |\n15\t| 2:10-2:30 | Click the receipt link: the checks turn green, \"Cryptographically verified in your browser\". | \"Every deal gets a signed receipt in a public log that witnesses cosign. Anyone can check it. And when the game is over, the venue is paid with PayPal Payouts.\" | Ed25519 · RFC 6962 transparency log · AP2 mandates · PayPal Payouts |\n16\t| 2:30-2:40 | Limits page: $15 per booking. Then the Activity line where an agent's over-limit request was refused. | \"Her limits are e …(+2111 chars)"
+  },
+  {
+   "n": 4,
+   "at": "2026-10-30T11:01:17.682Z",
+   "tool": "Read",
+   "did": "read D:\\paypal\\join\\docs\\screenshots\\01-agent.png",
+   "got": "[screenshot]",
+   "screens": [
+    "004-1.png"
+   ]
+  },
+  {
+   "n": 5,
+   "at": "2026-10-30T11:01:18.096Z",
+   "tool": "Read",
+   "did": "read D:\\paypal\\join\\docs\\screenshots\\02-haggle.png",
+   "got": "[screenshot]",
+   "screens": [
+    "005-2.png"
+   ]
+  },
+  {
+   "n": 6,
+   "at": "2026-10-30T11:01:18.469Z",
+   "tool": "Read",
+   "did": "read D:\\paypal\\join\\docs\\screenshots\\03-friends.png",
+   "got": "[screenshot]",
+   "screens": [
+    "006-3.png"
+   ]
+  },
+  {
+   "n": 7,
+   "at": "2026-10-30T11:01:18.752Z",
+   "tool": "Read",
+   "did": "read D:\\paypal\\join\\docs\\screenshots\\04-locked.png",
+   "got": "[screenshot]",
+   "screens": [
+    "007-4.png"
+   ]
+  },
+  {
+   "n": 8,
+   "at": "2026-10-30T11:01:27.522Z",
+   "tool": "Read",
+   "did": "read D:\\paypal\\join\\docs\\screenshots\\05-curve.png",
+   "got": "[screenshot]",
+   "screens": [
+    "008-5.png"
+   ]
+  },
+  {
+   "n": 9,
+   "at": "2026-10-30T11:01:27.969Z",
+   "tool": "Read",
+   "did": "read D:\\paypal\\join\\docs\\screenshots\\06-venue-bryntum.png",
+   "got": "[screenshot]",
+   "screens": [
+    "009-6.png"
+   ]
+  },
+  {
+   "n": 10,
+   "at": "2026-10-30T11:01:28.421Z",
+   "tool": "Read",
+   "did": "read D:\\paypal\\join\\docs\\screenshots\\07-venue-money.png",
+   "got": "[screenshot]",
+   "screens": [
+    "010-7.png"
+   ]
+  },
+  {
+   "n": 11,
+   "at": "2026-10-30T11:01:28.758Z",
+   "tool": "Read",
+   "did": "read D:\\paypal\\join\\docs\\screenshots\\08-receipt.png",
+   "got": "[screenshot]",
+   "screens": [
+    "011-8.png"
+   ]
+  },
+  {
+   "n": 12,
+   "at": "2026-10-30T11:01:33.990Z",
+   "tool": "Read",
+   "did": "read D:\\paypal\\join\\docs\\screenshots\\09-activity.png",
+   "got": "[screenshot]",
+   "screens": [
+    "012-9.png"
+   ]
+  },
+  {
+   "n": 13,
+   "at": "2026-10-30T11:01:34.361Z",
+   "tool": "Read",
+   "did": "read D:\\paypal\\join\\docs\\screenshots\\10-limits.png",
+   "got": "[screenshot]",
+   "screens": [
+    "013-10.png"
+   ]
+  },
+  {
+   "n": 14,
+   "at": "2026-10-30T11:01:34.811Z",
+   "tool": "Read",
+   "did": "read D:\\paypal\\join\\docs\\screenshots\\11-connect.png",
+   "got": "[screenshot]",
+   "screens": [
+    "014-11.png"
+   ]
+  },
+  {
+   "n": 15,
+   "at": "2026-10-30T11:01:35.117Z",
+   "tool": "Read",
+   "did": "read D:\\paypal\\join\\docs\\screenshots\\12-start.png",
+   "got": "[screenshot]",
+   "screens": [
+    "015-12.png"
+   ]
+  },
+  {
+   "n": 16,
+   "at": "2026-10-30T11:01:38.436Z",
+   "tool": "Read",
+   "did": "read D:\\paypal\\join\\docs\\JUDGING.md",
+   "got": "1\t# Join against the judging criteria\n2\t\n3\tThe PayPal AI Hackathon judges five criteria with equal weight: Technological Implementation, Design, Potential\n4\tImpact, Innovation and Presentation. This page maps each one to what Join does, where it is in the code, and how to\n5\tsee it in a few minutes. Every claim points to a file; the last section lists what has not been run, so nothing here\n6\tneeds to be taken on trust.\n7\t\n8\t**See it fast:** `npm run setup`, `npm start`, then open http://localhost:8790/demo?as=you&go=activity?agent=1 (no\n9\tkeys needed; PayPal is simulated and says so). In another terminal, `npm run demo` runs four agents over MCP.\n10\t`npm test` runs 47 tests; `npm --prefix api run bench` runs the negotiation benchmark. Details: [TECHNICAL.md](TECHNICAL.md).\n11\t\n12\t---\n13\t\n14\t## 1. Technological Implementation\n15\t\n16\t**Nine PayPal products in one money flow, each doing a job only it can do.**\n17\t\n18\t| PayPal | What it does in Join | Code |\n19\t|---|---|---|\n20\t| Orders v2, intent `AUTHORIZE`, one order per payer | The organizer guarantees the whole price; each friend authorizes their own share | `api/src/pay/settle.js` `startPayment` |\n21\t| Authorizations: partial `final_capture`, void | At the lock, each share is captured, and the organizer's authorization only for what's left (whoever didn't pay); a decline or a release voids | `settle.js` `lock`, `release` |\n22\t| Captures: refund | Cancelling more than 24 hours ahead refunds everyone | `settle.js` `refundAll` |\n23\t| Payouts | The venue is paid after the game, net of fees; an organizer is paid back; a venue's extras are paid out | `settle.js` `tick` |\n24\t| Vault v3 | Save PayPal once; the person's agent pays within limits only they can set, without a redirect | `settle.js` `vaultStart`, `startPayment` |\n25\t| Invoicing v2 | A friend who joined but never paid gets an invoice; a venue bills extras | `settle.js` `requestReimbursement`, `billExtras` |\n26\t| Disputes `provide-evidence` | The moment PayPal reports a dispute, Join answers it with the booking's signed receipt and how that payer approved | `settle.js` `defend`, `webhook` |\n27\t| Webhooks: management API and `verify-webhook-signature` | Join subscribes itself to 14 events once it has a public HTTPS address, and checks every event's signature on the raw body | `api/src/server.js`, `api/src/pay/paypal.js` |\n28\t| JS SDK v6 (browser-safe client token) | The PayPal button (and Pay Later / Venmo where eligible) in a popup on Join's page | `web/src/components/PayPalButtons.jsx` |\n29\t| PayPal Agent Toolkit | Join's back office for venues (`list_transactions` reconciliation, `create_invoice`, `send_invoice`, `get_invoice`, `list_disputes`), and a venue's Claude agent with the toolkit as an in-process MCP server | `api/src/pay/toolkit.js`, `examples/venue-agent.mjs` |\n30\t| `PayPal-Request-Id` on every POST, journaled first | A step repeated after a crash is the same PayPal call, not a second charge | `settle.js` `paypalStep` |\n31\t| Sandb …(+9758 chars)"
+  },
+  {
+   "n": 17,
+   "at": "2026-10-30T11:01:39.180Z",
+   "tool": "Bash",
+   "did": "head -c 9000 README.md; echo; echo ======; head -c 4500 docs/agent-run.md",
+   "got": "# Join\n\n**Agents can find a time. They can't haggle with the venue or split the bill.**\n\nJoin is the agent-ready marketplace for getting a group together: a game of badminton, a karaoke room, an escape room,\na board game table, a barbecue pit, a hot pot dinner. People's own AI agents come to it (Claude, or any MCP or A2A\nclient) to find who is free, **negotiate the price with the venue**, split the cost and **settle it with PayPal**,\ninside spending limits each person set. A booking is locked only when the money is real, and the people\ninvolved see every step their agents took.\n\nJoin is the market and the rules; the intelligence is in the agents that use it. **No agent of your own?** Join's\nwebsite agent asks what you want (activity, day, how many, budget) and does the rest for you. It understands you on\nJoin's own server: rules, plus Qwen2.5 0.5B through a local Ollama for free-form sentences. Nobody downloads anything,\nJoin holds no AI key, and nothing is sent to an AI service.\n\nPayPal AI Hackathon 2026 · MIT license\n\n![Join's website agent: three options with verified reviews](docs/screenshots/01-agent.png)\n\n**For judges:** `npm run setup`, `npm start`, open http://localhost:8790/demo?as=you, then `npm run demo` in another\nterminal. No keys needed. How Join maps to each judging criterion (Technological Implementation, Design, Potential\nImpact, Innovation, Presentation), with the code behind every claim: [docs/JUDGING.md](docs/JUDGING.md). The submission\ntext, testing instructions and screenshots are in [docs/SUBMISSION.md](docs/SUBMISSION.md) and\n[docs/screenshots](docs/screenshots).\n\n---\n\n## What happens\n\n1. **Your agent looks for a plan.** `list_activities`, then `find_options`: when you and enough people who like the\n   activity are free, and the fairest venue for\n   each time (the one where the longest trip in the group is shortest), with its opening price.\n2. **It negotiates.** `start_negotiation` → `make_offer` → `accept_price`. The venue's side is run by Join from the\n   venue's policy: list price, off-peak / group / last-minute discounts, a concession schedule (firm, standard or\n   eager) over at most three counter-offers, the last one best and final, and a floor that never leaves the engine.\n3. **Over budget? Alternatives from the map.** If the price is over your per-booking limit, the venue says no, or the\n   place is gone, the answer carries other venues and free public places (park courts, picnic grills) nearby, ranked by budget, start time and\n   the group's longest trip, each with a reason written by code.\n4. **The organizer guarantees the booking.** A deal is binding: the organizer authorizes the **whole** price with\n   PayPal (Orders v2, intent `AUTHORIZE`) within 10 minutes, or the place goes back. Nobody can hold a room for free.\n5. **The others are invited, then pay their share.** Each player's agent (or the player, on the website) joins or\n   declines; nothing is started for anyone who hasn't said yes. Before joining, an in …(+9904 chars)"
+  },
+  {
+   "n": 18,
+   "at": "2026-10-30T11:01:44.363Z",
+   "tool": "Bash",
+   "did": "cd /d/paypal/join/web/src && wc -l App.jsx components/AgentDrawer.jsx pages/Activity.jsx pages/Games.jsx; grep -n \"No agent\\|Plan something\\|Use my own\\|either takes\\|Go ahead\\|Negotiate this\\|aiOnly\\|model\\|llm\\|LLM\" App.jsx components/AgentDrawer.jsx pages/Activity.jsx | head -60",
+   "got": "   73 App.jsx\n  136 components/AgentDrawer.jsx\n   95 pages/Activity.jsx\n  225 pages/Games.jsx\n  529 total\nApp.jsx:46:// No agent of your own? Join's website agent asks what you want and does the rest (components/AgentDrawer.jsx)\nApp.jsx:51:  return <>{!open && <button className=\"btn primary agent-fab\" onClick={() => setOpen(true)}><Icon name=\"spark\" size={16} />No agent? Ask Join's</button>}<AgentDrawer me={me} info={info} open={open} onClose={() => setOpen(false)} /></>;\ncomponents/AgentDrawer.jsx:23:  const [model, setModel] = useState(info?.scout || \"rules\");\ncomponents/AgentDrawer.jsx:37:      setBrief(next); setModel(u.model);\ncomponents/AgentDrawer.jsx:40:      const r = await search(next, u.model, W);\ncomponents/AgentDrawer.jsx:59:      await finish(await negotiate(o, brief, model, say, w), o);\ncomponents/AgentDrawer.jsx:78:    const alts = (r.alternatives || (o ? (await alternatives(o, brief, model)).alternatives : null) || []).filter((a) => a.venue !== o?.venue && a.withinBudget !== false);\ncomponents/AgentDrawer.jsx:113:          {choices.map((c) => <button key={c.n.id} className={`btn small ${c === choices[0] ? \"primary\" : \"\"}`} disabled={busy} onClick={async () => { setBusy(true); const all = choices; setChoices(null); for (const x of all) if (x !== c) await walkAway(x.n, model); await finish(await acceptDeal(c.n, model), c.o); setBusy(false); }}>{w.book(c.n.venueName, c.n.ask)}</button>)}\ncomponents/AgentDrawer.jsx:114:          <button className=\"btn ghost small\" disabled={busy} onClick={async () => { setBusy(true); const all = choices; setChoices(null); for (const x of all) await walkAway(x.n, model); say(w.stopped); setBusy(false); }}>{w.none}</button>\ncomponents/AgentDrawer.jsx:117:          <button className=\"btn primary small\" disabled={busy} onClick={async () => { setBusy(true); const p = pending; setPending(null); await finish(await acceptDeal(p.n, model), p.o); setBusy(false); }}>{w.accept(pending.n.ask)}</button>\ncomponents/AgentDrawer.jsx:118:          <button className=\"btn small\" disabled={busy} onClick={async () => { setBusy(true); const p = pending; setPending(null); await walkAway(p.n, model); await finish({ error: w.walked }, p.o); setBusy(false); }}>{w.elsewhere}</button>\npages/Activity.jsx:40:        <p><b>Plan something with friends.</b> Tell Join's agent what you'd like to do, or bring your own agent. Every step either takes shows up here.</p>\npages/Activity.jsx:41:        <span className=\"row-btns\"><button className=\"btn primary\" onClick={() => dispatchEvent(new Event(\"join:open-agent\"))}>Plan something</button><a className=\"btn ghost\" href=\"#/connect\">Use my own agent</a></span>"
+  },
+  {
+   "n": 19,
+   "at": "2026-10-30T11:01:46.079Z",
+   "tool": "Read",
+   "did": "read D:\\paypal\\join\\web\\src\\components\\AgentDrawer.jsx",
+   "got": "1\timport { useEffect, useRef, useState } from \"react\";\n2\timport { api, money } from \"../api.js\";\n3\timport { useWorld } from \"./Actor.jsx\";\n4\timport Icon from \"./Icon.jsx\";\n5\timport PayPalButtons from \"./PayPalButtons.jsx\";\n6\timport { search, negotiate, acceptDeal, walkAway, alternatives, each } from \"../scout/agent.js\";\n7\timport { WORDS, langOf } from \"../scout/words.js\";\n8\t\n9\t// Join's website agent, for people who don't have an agent of their own. It asks what they want (activity, day, how\n10\t// many, budget), then does what any agent does on Join, as them and under their limits: finds options, haggles,\n11\t// accepts. The person approves the payment in PayPal themselves. Join's server understands what they write (Qwen2.5 0.5B\n12\t// on Join's own machine, or rules); nothing is downloaded. It answers in the language the person writes in. Everything\n13\t// it does shows up on the Activity page like any agent's.\n14\tconst EXAMPLES = [\"Karaoke Friday night, 4 of us, $15 each\", \"Badminton this weekend with 3 friends\", \"週六晚上 5 個人吃火鍋 每人 20 塊\", \"An escape room tomorrow for 4\"];\n15\t\n16\texport default function AgentDrawer({ me, info, open, onClose }) {\n17\t  const world = useWorld();\n18\t  const [lang, setLang] = useState(\"en\"), w = WORDS[lang];\n19\t  const [msgs, setMsgs] = useState([{ from: \"agent\", text: WORDS.en.hello(me.player.name.split(\" \")[0]) }]);\n20\t  const [brief, setBrief] = useState({});\n21\t  const [text, setText] = useState(\"\"), [busy, setBusy] = useState(false);\n22\t  const [cards, setCards] = useState(null), [deal, setDeal] = useState(null), [pending, setPending] = useState(null), [booking, setBooking] = useState(null), [confirm, setConfirm] = useState(null), [choices, setChoices] = useState(null);\n23\t  const [model, setModel] = useState(info?.scout || \"rules\");\n24\t  const end = useRef(null);\n25\t  useEffect(() => { end.current?.scrollIntoView({ block: \"end\" }); }, [msgs, cards, deal, booking]);\n26\t  const say = (t) => setMsgs((m) => [...m, { from: \"agent\", text: t }]);\n27\t  const firstName = (id) => world?.players.find((p) => p.id === id)?.name.split(\" \")[0] || id;\n28\t\n29\t  const send = async (t = text) => {\n30\t    if (!t.trim() || busy || !world) return;\n31\t    const l = langOf(t, lang), W = WORDS[l];\n32\t    const history = [...msgs, { from: \"me\", text: t }];\n33\t    setLang(l); setMsgs(history); setText(\"\"); setBusy(true); setCards(null);\n34\t    try {\n35\t      const u = await api(\"/api/scout/understand\", { method: \"POST\", body: { brief, lang: l, history: history.slice(1).map((m) => ({ role: m.from === \"me\" ? \"user\" : \"assistant\", content: m.text })) } });\n36\t      const next = u.brief;\n37\t      setBrief(next); setModel(u.model);\n38\t      say(u.reply);\n39\t      if (u.missing.length) return;\n40\t      const r = await search(next, u.model, W);\n41\t      if (r.error) { say(r.error); return; }\n42\t      if (next.budget != null && next.budget > r.limit) say(W.overLimit(next.budget, r.limit));\n43\t      if (!r.options.length) { say(W.nothing({ ...next, pl …(+7714 chars)"
+  },
+  {
+   "n": 20,
+   "at": "2026-10-30T11:01:46.432Z",
+   "tool": "Read",
+   "did": "read D:\\paypal\\join\\web\\src\\pages\\Activity.jsx",
+   "got": "1\timport { useMemo, useState } from \"react\";\n2\timport { api, useApi, when, money, clock } from \"../api.js\";\n3\timport Actor, { useWorld, firstName } from \"../components/Actor.jsx\";\n4\timport Icon from \"../components/Icon.jsx\";\n5\timport PayPalButtons from \"../components/PayPalButtons.jsx\";\n6\t\n7\t// What the agents did, for the person they did it for: every search, offer, counter-offer, approval and payment, live,\n8\t// grouped by the deal it belongs to. Each line says who did it (your agent and which one, another player's agent, the\n9\t// venue, PayPal, Join) in words made by code from the facts. On top, what is waiting on you.\n10\tconst ICON = { searched: \"list\", alternatives: \"pin\", negotiation_opened: \"chat\", venue_countered: \"chat\", deal: \"check\", venue_rejected: \"warn\", offer_refused: \"warn\", accept_refused: \"warn\", negotiation_refused: \"warn\",\n11\t  walked_away: \"back\", reimbursement_requested: \"send\", reimbursement_paid: \"card\", organizer_repaid: \"check\", invited: \"send\", joined: \"check\", share_asked: \"chat\", share_accepted: \"check\", share_refused: \"close\", place_held: \"clock\", approval_requested: \"card\", authorized: \"verify\", held: \"lock\", locked: \"lock\", played: \"check\", venue_paid: \"send\", payout_status: \"send\", released: \"back\", cancelled: \"close\", refunded: \"back\", declined: \"close\", vault_saved: \"card\", pay_requested: \"card\" };\n12\tconst TONE = { deal: \"good\", locked: \"good\", venue_paid: \"good\", authorized: \"good\", venue_rejected: \"bad\", offer_refused: \"warn\", accept_refused: \"warn\", negotiation_refused: \"warn\", released: \"warn\", payment_failed: \"bad\", capture_failed: \"bad\" };\n13\t\n14\texport default function Activity({ entries, me }) {\n15\t  const w = useWorld(), firstOf = (id) => firstName(w, id);\n16\t  const games = useApi(\"/api/games\", entries.length);\n17\t  const waiting = (games.data?.bookings || []).filter((b) => b.you?.approveUrl || b.invite);\n18\t  const owing = (games.data?.bookings || []).filter((b) => b.owes);\n19\t  const groups = useMemo(() => {\n20\t    const by = new Map();\n21\t    for (const e of entries) { const k = e.ref || \"_other\"; if (!by.has(k)) by.set(k, []); by.get(k).push(e); }\n22\t    // a booking continues its negotiation: show them together\n23\t    const bookings = games.data?.bookings || [];\n24\t    for (const b of bookings) if (by.has(b.id) && by.has(b.negotiation)) { by.get(b.negotiation).push(...by.get(b.id)); by.delete(b.id); }\n25\t    return [...by.entries()].map(([k, list]) => ({ k, list: list.sort((a, b) => a.id - b.id) })).sort((a, b) => b.list.at(-1).id - a.list.at(-1).id);\n26\t  }, [entries, games.data]);\n27\t  return (\n28\t    <div className=\"page\">\n29\t      <header className=\"page-head\"><h1>Activity</h1><p className=\"muted\">Everything the agents did for you, as it happens. Join writes each line from the facts; nothing here was written by an AI.</p></header>\n30\t      {waiting.length > 0 && <section className=\"needs\">\n31\t        <h2><Icon name=\"bolt\" size={18} />Waiting on you</h2>\n32\t        {waiting.map((b) => b.invite …(+5568 chars)"
+  },
+  {
+   "n": 21,
+   "at": "2026-10-30T11:01:50.231Z",
+   "tool": "Bash",
+   "did": "cd /d/paypal/join/web/src && grep -n \"How was\\|Review\\|review\\|play your friends\\|Asks \\$1\\|my_plans\\|pay_my_share\\|Receipts\\|demo\" pages/Games.jsx | head -40",
+   "got": "12:export default function Games({ entries, me, query, demo }) {\n24:      {g.data.bookings.map((b) => <Booking key={b.id} b={b} me={me.player.id} w={w} focus={b.id === focus} demo={demo} done={() => setTick((t) => t + 1)} />)}\n33:function Booking({ b, me, w, focus, demo, done }) {\n60:      {b.review?.can && <ReviewForm b={b} done={done} />}\n61:      {b.review?.done && <p className=\"small\"><Icon name=\"check\" size={14} />You rated {b.venueName} {b.review.done}★. Thank you: agents read verified reviews like yours when they pick venues.</p>}\n63:      {b.receipts?.length > 0 && <p className=\"small\"><Icon name=\"verify\" size={14} />Receipts: {b.receipts.map((x) => <a key={x.id} href={`#/receipt/${x.id}`}>{x.event.replace(\"_\", \" \")}</a>).reduce((a, x) => [...a, a.length ? \" · \" : \"\", x], [])}</p>}\n67:      {demo && me === b.organizer && b.state === \"held\" && <Seats b={b} w={w} done={done} />}\n145:// A verified review: stars, what was good and what wasn't (from a fixed list, so agents can count them), a few words.\n146:// Only for people who were in the booking and paid; agents can't write reviews.\n147:function ReviewForm({ b, done }) {\n149:  const a = useApi(\"/api/reviews/aspects\");\n151:  const send = async () => { setErr(null); try { await api(`/api/bookings/${b.id}/review`, { method: \"POST\", body: { stars, liked, disliked, text } }); done(); } catch (e) { setErr(e.message); } };\n154:    <div className=\"review-form\">\n155:      <b>How was {b.venueName}?</b>\n160:      <button className=\"btn primary small\" disabled={!stars} onClick={send}>Post a verified review</button>\n186:// the same call the friend's own agent would make, and the activity log marks it as a demo step.\n192:    try { const r = await api(`/api/demo/bookings/${b.id}/${act}`, { method: \"POST\", body: { player } }); if (r?.result) setMsg(r.result); else if (r?.error) setMsg(r.message); done(); }\n199:      <p className=\"seats-head\"><b>Demo: play your friends</b><small>Each button is what that friend's own agent would do. Logged as a demo step.</small></p>\n205:            {!(b.shareAsks || []).some((x) => x.player === pid) && <button className=\"btn small\" disabled={!!busy} onClick={() => go(\"ask-less\", pid)}>Asks $1 less</button>}"
+  },
+  {
+   "n": 22,
+   "at": "2026-10-30T11:01:53.023Z",
+   "tool": "Bash",
+   "did": "cd /d/paypal/join/api/src && grep -rn \"can:\" --include=*.js . | grep -i review | head; grep -rn \"review\" --include=*.js . | grep -n \"can\\b\\|can =\" | head",
+   "got": "./pay/settle.js:370:    review: viewer ? (reviewsMod.byPlayer(viewer, b.id) ? { done: reviewsMod.byPlayer(viewer, b.id).stars } : canReview(b, viewer).ok ? { can: true } : null) : null,\n8:./mcp.js:45:  tool(\"venue_reviews\", \"Verified reviews of a venue\", \"What people who booked and paid on Join say about a venue: a score (a recency-weighted Bayesian average, so a handful of reviews doesn't swing it), how many reviews, what they liked and complained about (counted from a fixed list of aspects), anyone in your group who rated it 2 stars or less, and the latest few as quotes. find_options already weighs reviews when it picks a venue; use this to explain a recommendation or compare venues. You can't write reviews: only people can, on the website, about bookings they paid for.\",\n19:./ops.js:127:  return { ...s, venueName: venue(venueId).name, reason: reviews.reason(s), about: \"Only people who booked and paid on Join can review; agents can read reviews, never write them. Score: a recency-weighted Bayesian average. Seed reviews in the demo town are demo data.\" };\n21:./pay/settle.js:370:    review: viewer ? (reviewsMod.byPlayer(viewer, b.id) ? { done: reviewsMod.byPlayer(viewer, b.id).stars } : canReview(b, viewer).ok ? { can: true } : null) : null,\n23:./pay/settle.js:436:// (In demo mode a locked booking can be reviewed before it starts, so the demo doesn't have to wait for the game.)\n24:./pay/settle.js:440:  if (!b || !b.players.includes(playerId)) return { error: \"not_in_booking\", message: \"Only people in this booking can review it.\" };\n25:./pay/settle.js:441:  if (![\"locked\", \"played\", \"venue_paid\"].includes(b.state)) return { error: \"not_yet\", message: \"You can review a booking once it's paid and locked.\" };\n26:./pay/settle.js:443:  if (playerId !== b.organizer && p?.status !== \"captured\") return { error: \"not_paid\", message: \"Only people who paid for this booking can review it.\" };\n27:./pay/settle.js:444:  if (!demoReviews && clock() < startOf(b.date, b.start)) return { error: \"not_yet\", message: \"You can review it once it has started.\" };\n31:./reviews.js:4://   booking, and it names that booking. Venues can't remove or hide reviews."
+  }
+ ],
+ "finalMessage": "I score Join **32/50**. The engineering is excellent and honest. The idea is clever but not yet a business, and the gallery has slips a first-time viewer will notice.\n\n**1. Technological Implementation: 8/10**\n- PayPal does real work at each step. The organizer's guarantee is an authorization (a hold, not a charge). Each share is captured when the booking locks, the venue is paid by Payouts, and an unpaid friend gets an invoice (JUDGING.md table). `agent-run.md` shows Claude agents booking and paying on the sandbox, with a receipt checked by a separate script.\n- The agent rules are enforced on Join's server, not left to the agent. Spending limits and required mandates are checked on every offer and payment, and the agents' mistakes were turned into fixes (`agent-run.md`, \"What the agents found hard\").\n- What holds it back: webhooks and dispute answers never ran on the sandbox (JUDGING.md, \"What has not been run\"). The demo payments use PayPal's sandbox test card, and the venue gets Payouts rather than a true marketplace payment.\n- **Biggest lift:** run one dispute answer end to end on the sandbox through the tunnel and show it.\n\n**2. Design: 6/10**\n- The Activity page is a real strength: plain sentences, grouped by plan, with a short summary first (`Activity.jsx` matches the docs). The agent states its terms before it haggles; the Go-ahead step is in `AgentDrawer.jsx` lines 50-53. The Limits page is clear.\n- Developer words leak into the consumer screens. In 03-friends.png the demo panel says \"it sees the ask in my_plans… pay_my_share joins at whatever share stands\". Other screens show \"Signed authorizations (AP2)\", Merkle roots, \"C2SP signed note\" and `localhost:8792` (08-receipt.png).\n- \"Paid\" means two different things. `Activity.jsx` line 57 counts an authorization as paid, so 02-haggle.png says \"1 of 4 paid\" when nothing has been charged. In 03, Alex is \"authorized\" in the table but \"paid\" in the demo panel.\n- **Biggest lift:** put the protocol details (AP2, Merkle, tool names) behind a single \"Details\" link and use one word for each payment state.\n\n**3. Potential Impact: 6/10**\n- The problem is real. Fronting the money and chasing friends is where group plans die, and \"Why not just Venmo?\" is a good answer.\n- The 20-minute payment window is hostile to real friends. The README says the group pays within 20 minutes or the organizer covers everyone, and 02-haggle.png shows the room held for exactly 20 minutes (until 04:17). Real people don't pay a Saturday-night share within 20 minutes.\n- The venue story works against itself. Agents push prices down, and 07-venue-money.png proudly reports \"Haggling took $12.60 off list prices\" next to \"$0.00 paid out to you\". Why would a karaoke bar join a marketplace whose pitch is discounting it? There is no stated revenue model beyond one mention of a future platform fee (`platform_fees`).\n- **Biggest lift:** give the venue a reason to join (more bookings in off-peak hours, no-shows covered) and show it in numbers. Make the payment window tied to the booking time.\n\n**4. Innovation: 7/10**\n- Making the organizer guarantee the whole booking with a PayPal hold is a genuinely good product idea. It is what makes an agent's \"accept\" binding.\n- The negotiation design is careful: lowball offers don't move the venue, and the venue's floor can't be found by trial and error.\n- The rest is mostly assembly, and the haggling shown is odd. In 05-curve.png and 02-haggle.png the buyer's agent *lowers* its offer each round ($22.69, then $20.59, then $18.49). It also haggles when the price is already well under Hana's $15-a-head budget.\n- **Biggest lift:** show the agent winning something the person couldn't easily get alone, such as filling a quiet slot at a fair price.\n\n**5. Presentation: 5/10**\n- The story is clear and the docs are honest: the \"What has not been run\" section is rare and earns trust.\n- There are slips in the files:\n  - `SUBMISSION.md` lines 44-51 hold a stale, broken second gallery table …(+2720 chars)",
+ "screenshots": "D:/paypal/video/agent-screens/round0-a20ecdf0"
+}

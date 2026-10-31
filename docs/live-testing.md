@@ -8,6 +8,10 @@ source code, no docs from the repository, no accounts made for them. Each wrote 
 All rounds at a glance, with a chart of what each round found: [`live-test/index.html`](live-test/index.html)
 (built from [`live-test/rounds.json`](live-test/rounds.json) by `node docs/live-test/build.mjs`; add each new round there).
 
+What every agent actually did, call by call (what it sent, what came back), is in [`live-test/ops/`](live-test/ops/):
+one file per agent, tokens and local paths removed, listed in [`ops/index.json`](live-test/ops/index.json). Round 0 is
+the agent tests before the live server. `node docs/live-test/extract-ops.mjs <subagents folder>` rebuilds it after a round.
+
 ## Round 1
 
 | Tester | Played | Verdict |

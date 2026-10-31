@@ -1,0 +1,476 @@
+{
+ "about": "Every test agent's operations, one file each (from extract-ops.mjs). Round 0 is the agent tests before the live server.",
+ "agents": 52,
+ "calls": 1018,
+ "screenshots": 143,
+ "list": [
+  {
+   "file": "round00-simulated-hackathon-judging-of-join-a1e360.json",
+   "round": 0,
+   "title": "Simulated hackathon judging of Join",
+   "model": "Opus 5.5",
+   "startedAt": "2026-10-30T05:53:22.255Z",
+   "calls": 17,
+   "screenshots": 0
+  },
+  {
+   "file": "round00-sonnet-agent-tests-join-as-players-af3d16.json",
+   "round": 0,
+   "title": "Sonnet agent tests Join as players",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T06:13:42.811Z",
+   "calls": 15,
+   "screenshots": 0
+  },
+  {
+   "file": "round00-sonnet-agent-tests-venue-ops-on-agent-to-a1d1e3.json",
+   "round": 0,
+   "title": "Sonnet agent tests venue ops on Agent Toolkit",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T06:13:54.651Z",
+   "calls": 4,
+   "screenshots": 0
+  },
+  {
+   "file": "round00-test-join-s-website-agent-in-browser-a82b84.json",
+   "round": 0,
+   "title": "Test Join's website agent in browser",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T07:50:24.697Z",
+   "calls": 50,
+   "screenshots": 26
+  },
+  {
+   "file": "round00-test-website-agent-api-over-http-abab94.json",
+   "round": 0,
+   "title": "Test website agent API over HTTP",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T07:50:38.724Z",
+   "calls": 22,
+   "screenshots": 0
+  },
+  {
+   "file": "round00-judge-a-paypal-developer-judge-a54bf1.json",
+   "round": 0,
+   "title": "Judge A: PayPal developer judge",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T09:39:30.323Z",
+   "calls": 9,
+   "screenshots": 2
+  },
+  {
+   "file": "round00-judge-b-product-and-design-judge-acdf7c.json",
+   "round": 0,
+   "title": "Judge B: product and design judge",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T09:39:38.672Z",
+   "calls": 42,
+   "screenshots": 13
+  },
+  {
+   "file": "round00-judge-c-ai-and-agents-researcher-judge-aa1c4a.json",
+   "round": 0,
+   "title": "Judge C: AI and agents researcher judge",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T09:39:47.722Z",
+   "calls": 15,
+   "screenshots": 0
+  },
+  {
+   "file": "round00-llm-organizer-agent-runs-join-over-mcp-a7834b.json",
+   "round": 0,
+   "title": "LLM organizer agent runs Join over MCP",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T09:57:47.849Z",
+   "calls": 13,
+   "screenshots": 0
+  },
+  {
+   "file": "round00-llm-friend-agent-answers-the-invitation-a29c2c.json",
+   "round": 0,
+   "title": "LLM friend agent answers the invitation",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T09:59:54.533Z",
+   "calls": 6,
+   "screenshots": 0
+  },
+  {
+   "file": "round00-llm-buyer-thrifty-a0fd7a.json",
+   "round": 0,
+   "title": "LLM buyer: thrifty",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T10:02:31.766Z",
+   "calls": 12,
+   "screenshots": 0
+  },
+  {
+   "file": "round00-llm-buyer-in-a-hurry-a5958f.json",
+   "round": 0,
+   "title": "LLM buyer: in a hurry",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T10:02:37.414Z",
+   "calls": 11,
+   "screenshots": 0
+  },
+  {
+   "file": "round00-llm-buyer-floor-hunter-a6073a.json",
+   "round": 0,
+   "title": "LLM buyer: floor hunter",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T10:02:44.713Z",
+   "calls": 11,
+   "screenshots": 0
+  },
+  {
+   "file": "round00-llm-buyer-prompt-injected-agent-a4811d.json",
+   "round": 0,
+   "title": "LLM buyer: prompt-injected agent",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T10:02:52.592Z",
+   "calls": 12,
+   "screenshots": 0
+  },
+  {
+   "file": "round00-judge-a-paypal-engineer-acde29.json",
+   "round": 0,
+   "title": "Judge A: PayPal engineer",
+   "model": "Opus 5.5",
+   "startedAt": "2026-10-30T11:01:03.136Z",
+   "calls": 33,
+   "screenshots": 12
+  },
+  {
+   "file": "round00-judge-b-product-and-business-a20ecd.json",
+   "round": 0,
+   "title": "Judge B: product and business",
+   "model": "Opus 5.5",
+   "startedAt": "2026-10-30T11:01:08.180Z",
+   "calls": 22,
+   "screenshots": 12
+  },
+  {
+   "file": "round00-judge-c-ai-agents-researcher-a89a5c.json",
+   "round": 0,
+   "title": "Judge C: AI agents researcher",
+   "model": "Opus 5.5",
+   "startedAt": "2026-10-30T11:01:13.288Z",
+   "calls": 22,
+   "screenshots": 0
+  },
+  {
+   "file": "round01-tester-newcomer-on-a-laptop-a08ecd.json",
+   "round": 1,
+   "title": "Tester: newcomer on a laptop",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T11:52:03.755Z",
+   "calls": 44,
+   "screenshots": 15
+  },
+  {
+   "file": "round01-tester-chinese-user-on-a-phone-aff4b7.json",
+   "round": 1,
+   "title": "Tester: Chinese user on a phone",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T11:52:10.303Z",
+   "calls": 33,
+   "screenshots": 13
+  },
+  {
+   "file": "round01-tester-organizer-with-friends-a0a8dc.json",
+   "round": 1,
+   "title": "Tester: organizer with friends",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T11:52:15.854Z",
+   "calls": 41,
+   "screenshots": 8
+  },
+  {
+   "file": "round01-tester-outside-mcp-agent-from-url-a76676.json",
+   "round": 1,
+   "title": "Tester: outside MCP agent from URL",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T11:52:23.047Z",
+   "calls": 14,
+   "screenshots": 0
+  },
+  {
+   "file": "round01-tester-hostile-outside-agent-ad3439.json",
+   "round": 1,
+   "title": "Tester: hostile outside agent",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T11:52:31.523Z",
+   "calls": 0,
+   "screenshots": 0
+  },
+  {
+   "file": "round01-tester-venue-staff-and-judge-aaf3b4.json",
+   "round": 1,
+   "title": "Tester: venue staff and judge",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T11:52:37.142Z",
+   "calls": 38,
+   "screenshots": 10
+  },
+  {
+   "file": "round02-chinese-phone-user-ad6952.json",
+   "round": 2,
+   "title": "Round 2: Chinese phone user",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T12:17:04.964Z",
+   "calls": 30,
+   "screenshots": 9
+  },
+  {
+   "file": "round02-newcomer-on-a-laptop-a3a52d.json",
+   "round": 2,
+   "title": "Round 2: newcomer on a laptop",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T12:17:10.542Z",
+   "calls": 37,
+   "screenshots": 7
+  },
+  {
+   "file": "round02-outside-agent-from-url-a45483.json",
+   "round": 2,
+   "title": "Round 2: outside agent from URL",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T12:17:17.379Z",
+   "calls": 12,
+   "screenshots": 0
+  },
+  {
+   "file": "round03-url-agent-mcp-organizer-who-pays-ab097b.json",
+   "round": 3,
+   "title": "URL agent: MCP organizer who pays",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T13:49:17.202Z",
+   "calls": 23,
+   "screenshots": 0
+  },
+  {
+   "file": "round03-url-agent-rest-chinese-person-a6832c.json",
+   "round": 3,
+   "title": "URL agent: REST, Chinese person",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T13:49:23.331Z",
+   "calls": 12,
+   "screenshots": 0
+  },
+  {
+   "file": "round03-url-agent-a2a-careful-friend-a4c51b.json",
+   "round": 3,
+   "title": "URL agent: A2A, careful friend",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T13:49:28.628Z",
+   "calls": 10,
+   "screenshots": 0
+  },
+  {
+   "file": "round04-crew-friend-bo-s-agent-over-rest-aa04cc.json",
+   "round": 4,
+   "title": "Crew friend: Bo's agent over REST",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T17:30:31.876Z",
+   "calls": 7,
+   "screenshots": 0
+  },
+  {
+   "file": "round04-crew-friend-chen-s-agent-over-a2a-affedc.json",
+   "round": 4,
+   "title": "Crew friend: Chen's agent over A2A",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T17:30:36.819Z",
+   "calls": 14,
+   "screenshots": 0
+  },
+  {
+   "file": "round04-crew-friend-mei-on-the-website-phone-aa3bcc.json",
+   "round": 4,
+   "title": "Crew friend: Mei on the website, phone",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T17:30:42.965Z",
+   "calls": 38,
+   "screenshots": 4
+  },
+  {
+   "file": "round04-crew-organizer-ana-s-agent-over-mcp-ac04b4.json",
+   "round": 4,
+   "title": "Crew organizer: Ana's agent over MCP",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T17:30:49.371Z",
+   "calls": 19,
+   "screenshots": 0
+  },
+  {
+   "file": "round04-verify-round-2-fixes-on-the-website-ac30d0.json",
+   "round": 4,
+   "title": "Verify round-2 fixes on the website",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T17:30:56.755Z",
+   "calls": 42,
+   "screenshots": 12
+  },
+  {
+   "file": "round05-friend-agent-from-invite-link-only-a2560f.json",
+   "round": 5,
+   "title": "Friend agent from invite link only",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T18:28:58.807Z",
+   "calls": 13,
+   "screenshots": 0
+  },
+  {
+   "file": "round05-friend-agent-from-link-asks-less-a767a7.json",
+   "round": 5,
+   "title": "Friend agent from link, asks less",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T18:29:03.752Z",
+   "calls": 11,
+   "screenshots": 0
+  },
+  {
+   "file": "round05-organizer-agent-with-wishes-aa37f5.json",
+   "round": 5,
+   "title": "Organizer agent with wishes",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-30T18:29:11.284Z",
+   "calls": 19,
+   "screenshots": 0
+  },
+  {
+   "file": "round06-bo-s-agent-invite-link-sets-home-ad0778.json",
+   "round": 6,
+   "title": "Bo's agent: invite link, sets home",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-31T01:36:57.648Z",
+   "calls": 25,
+   "screenshots": 0
+  },
+  {
+   "file": "round06-chen-s-agent-nearby-stranger-opted-in-ab10c4.json",
+   "round": 6,
+   "title": "Chen's agent: nearby stranger opted in",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-31T01:37:03.146Z",
+   "calls": 15,
+   "screenshots": 0
+  },
+  {
+   "file": "round06-ana-s-agent-organizer-real-places-a47832.json",
+   "round": 6,
+   "title": "Ana's agent: organizer, real places",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-31T01:37:09.759Z",
+   "calls": 20,
+   "screenshots": 0
+  },
+  {
+   "file": "round07-ana-s-agent-is-it-clear-ae7be2.json",
+   "round": 7,
+   "title": "Round 7: Ana's agent, is it clear",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-31T02:27:49.705Z",
+   "calls": 24,
+   "screenshots": 0
+  },
+  {
+   "file": "round07-bo-s-agent-from-the-link-af7c28.json",
+   "round": 7,
+   "title": "Round 7: Bo's agent from the link",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-31T02:27:54.726Z",
+   "calls": 15,
+   "screenshots": 0
+  },
+  {
+   "file": "round07-chen-s-agent-nearby-a58557.json",
+   "round": 7,
+   "title": "Round 7: Chen's agent, nearby",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-31T02:28:01.228Z",
+   "calls": 11,
+   "screenshots": 0
+  },
+  {
+   "file": "round08-chen-wei-s-agent-nearby-abc5b6.json",
+   "round": 8,
+   "title": "Round 8: Chen-Wei's agent, nearby",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-31T02:59:54.139Z",
+   "calls": 18,
+   "screenshots": 0
+  },
+  {
+   "file": "round08-bo-s-agent-from-link-a3970f.json",
+   "round": 8,
+   "title": "Round 8: Bo's agent from link",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-31T02:59:59.127Z",
+   "calls": 14,
+   "screenshots": 0
+  },
+  {
+   "file": "round08-anna-s-agent-organizer-afefc1.json",
+   "round": 8,
+   "title": "Round 8: Anna's agent, organizer",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-31T03:00:06.627Z",
+   "calls": 15,
+   "screenshots": 0
+  },
+  {
+   "file": "round09-chen-wei-s-agent-nearby-a48557.json",
+   "round": 9,
+   "title": "Round 9: Chen-Wei's agent, nearby",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-31T03:27:25.617Z",
+   "calls": 14,
+   "screenshots": 0
+  },
+  {
+   "file": "round09-bo-s-agent-from-link-adf9cb.json",
+   "round": 9,
+   "title": "Round 9: Bo's agent from link",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-31T03:27:29.546Z",
+   "calls": 15,
+   "screenshots": 0
+  },
+  {
+   "file": "round09-anna-s-agent-organizer-aab5a1.json",
+   "round": 9,
+   "title": "Round 9: Anna's agent, organizer",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-31T03:27:35.593Z",
+   "calls": 14,
+   "screenshots": 0
+  },
+  {
+   "file": "round10-chen-wei-s-agent-nearby-aa9194.json",
+   "round": 10,
+   "title": "Round 10: Chen-Wei's agent, nearby",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-31T04:01:58.120Z",
+   "calls": 14,
+   "screenshots": 0
+  },
+  {
+   "file": "round10-bo-s-agent-from-link-a275e8.json",
+   "round": 10,
+   "title": "Round 10: Bo's agent from link",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-31T04:02:02.272Z",
+   "calls": 13,
+   "screenshots": 0
+  },
+  {
+   "file": "round10-anna-s-agent-organizer-a3d3f1.json",
+   "round": 10,
+   "title": "Round 10: Anna's agent, organizer",
+   "model": "Sonnet 5.5",
+   "startedAt": "2026-10-31T04:02:08.373Z",
+   "calls": 18,
+   "screenshots": 0
+  }
+ ]
+}
