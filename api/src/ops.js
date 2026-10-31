@@ -6,7 +6,7 @@ import * as people from "./people.js";
 import { activeWithin } from "./people.js"; // (findOptions has a "people" argument, the group size)
 import { forPlayer, onActivity } from "./activity.js";
 import { personLink } from "./auth.js";
-import { places as osmPlaces, geocode } from "./osm.js";
+import { places as osmPlaces, geocode, garbled } from "./osm.js";
 import { kmBetween } from "./geo.js";
 import { REAL, toKm, getWorld, venue, player, freeUnits, forActivity, ACTIVITIES, activity as getActivity, unitName } from "./world.js";
 import * as neg from "./negotiate/engine.js";
@@ -122,7 +122,7 @@ export function findOptions(a, { activity = "badminton", date = null, dates = []
   const need = Math.max(1, Math.min(11, players | 0));
   const days = dates.length ? dates.slice(0, 7) : Array.from({ length: 7 }, (_, i) => addDays(ymd(now), i));
   const mine = windows(me.free), crew = me.crew ? me.crew : null, others = getWorld().players.filter((p) => p.id !== me.id && (want.includes(p.id) || (crew && p.crew === crew) || (!p.joined && (p.interests || []).includes(activity)) || (p.nearby && me.area && p.area && kmBetween(me.area, p.area) <= NEAR_KM && (p.interests || []).includes(activity) && activeWithin(p.id, 24 * 3600e3)))); // (people who joined Join themselves: your crewmates, anyone you name, and people near you who said they'd like to be invited)
-  const opts = []; let closest = null; // (the slot with the most people free, when none has enough)
+  const opts = [], closestBy = {}; let closest = null; // (the slot with the most people free, when none has enough)
   for (const d of days) {
     const date = dateOf(d);
     for (let s = from ? toMin(from) : 7 * 60; s + minutes <= (to ? toMin(to) : 22 * 60); s += 30) {
@@ -132,7 +132,7 @@ export function findOptions(a, { activity = "badminton", date = null, dates = []
         // (for a sport, players close to your level first; for anything else, everyone interested is as good)
         .map((p) => ({ p, score: (want.includes(p.id) ? 10 : 0) + (crew && p.crew === crew ? 6 : 0) - (act.kind === "sport" ? Math.abs("CBA".indexOf(p.level) - "CBA".indexOf(me.level)) + (p.prefers && p.prefers !== "any" && p.prefers !== (need === 1 ? "singles" : "doubles") ? 1 : 0) : 0) }))
         .sort((x, y) => y.score - x.score);
-      if (free.length < need) { if (!closest || free.length > closest.free.length) closest = { date: d, start: hm(s), free: free.map((x) => x.p) }; continue; }
+      if (free.length < need) { closestBy[d] = Math.max(closestBy[d] || 0, free.length); if (!closest || free.length > closest.free.length) closest = { date: d, start: hm(s), free: free.map((x) => x.p) }; continue; }
       const group = [me, ...free.slice(0, need).map((x) => x.p)];
       // the venue for this slot: the shortest longest trip, moved by what verified reviews say (a star above the town's
       // average is worth 8 minutes; anyone in the group who rated it 2★ or less costs 30), then the price
@@ -170,11 +170,16 @@ export function findOptions(a, { activity = "badminton", date = null, dates = []
   }
   opts.sort((x, y) => y.score - x.score);
   const out = [];
-  for (const o of opts) { if (out.length >= 5) break; if (out.some((x) => x.date === o.date && Math.abs(toMin(x.start) - toMin(o.start)) < 120)) continue; out.push(o); }
+  const clash = (o) => out.some((x) => x.date === o.date && Math.abs(toMin(x.start) - toMin(o.start)) < 120);
+  for (const o of opts) { if (out.length >= 5) break; if (clash(o) || out.filter((x) => x.date === o.date).length >= 2) continue; out.push(o); } // (two a day first, so one good day doesn't hide the others)
+  for (const o of opts) { if (out.length >= 5) break; if (!clash(o)) out.push(o); }
+  out.sort((x, y) => y.score - x.score);
+  const byDay = days.map((d) => { const n = opts.filter((o) => o.date === d).length, shown = out.filter((o) => o.date === d).length;
+    return { date: d, options: shown, ...(n ? (shown < n ? { more: n - shown } : {}) : { why: closestBy[d] ? `at most ${closestBy[d] + 1} of ${need + 1} free that day` : "nobody's free times and a free venue meet that day" }) }; });
   record({ actor: by(a), who: [a.player], action: "searched", data: { activity, area: me.area?.name || null, wish }, summary: `${said(a)} looked for ${activity} for ${need + 1} people${days.length === 1 ? ` on ${days[0]}` : ` over ${days.length} days`}: ${out.length ? `${out.length} option${out.length === 1 ? "" : "s"}` : "nothing free"}.` });
   // what the organizer may still commit to for each option: their per-booking limit, or what's left of that week's
   const m = getMandate(a.player), canSpend = (o) => Math.max(0, Math.min(m.perGame, m.perWeek - settle.spentInWeek(a.player, o.date, o.start)));
-  return { ...(wish.near || wish.cheap || wish.maxTrip || wish.aspects.length ? { rankedBy: wish } : {}), options: out.map(({ score, ...o }) => ({ ...o, ...(o.fits.length ? {} : { fits: undefined }), youCanSpend: usd(canSpend(o)) })), mandate: { perGame: usd(m.perGame), perWeek: usd(m.perWeek) }, note: out.length ? "Prices are the venue's opening ask; negotiate with start_negotiation." : "Nothing fits. Try other days, a wider window or fewer players.",
+  return { ...(wish.near || wish.cheap || wish.maxTrip || wish.aspects.length ? { rankedBy: wish } : {}), days: byDay, options: out.map(({ score, ...o }) => ({ ...o, ...(o.fits.length ? {} : { fits: undefined }), youCanSpend: usd(canSpend(o)) })), mandate: { perGame: usd(m.perGame), perWeek: usd(m.perWeek) }, note: out.length ? "Prices are the venue's opening ask; negotiate with start_negotiation." : "Nothing fits. Try other days, a wider window or fewer players.",
     ...(!out.length && closest ? { closest: { date: closest.date, start: closest.start, free: [me, ...closest.free].map((p) => p.name), short: need + 1 - (closest.free.length + 1), note: `At best ${closest.free.length + 1} of the ${need + 1} you asked for ${closest.free.length ? "are" : "is"} free (${closest.date} ${closest.start}: ${[me, ...closest.free].map((p) => p.name.split(" ")[0]).join(", ")}). ${closest.free.length ? `Ask for ${closest.free.length + 1} people (players: ${closest.free.length}), or name more people in with.` : "Nobody else is free then: try other days or times, or invite friends (your crew's link)."}` } } : {}),
     ...(out.some((o) => +o.share * 100 > canSpend(o)) ? { overBudget: cheaperWays(out, canSpend, act) } : {}) };
 }
@@ -213,7 +218,7 @@ export function venueReviews(a, { venue: venueId, activity = null, players = [] 
 // where a person lives, from a place name (looked up on OpenStreetMap) or lat/lon; and whether people nearby may invite them
 export async function setHome(a, { place = null, lat = null, lon = null, nearby } = {}) {
   let where = lat != null && lon != null ? { lat, lon, label: place } : null;
-  if (!where && place) { const g = await geocode(place); if (!g) return { error: "not_found", message: `No place called "${place}" found on OpenStreetMap: try a neighbourhood, a station or a landmark.` }; where = { ...g, label: place }; }
+  if (!where && place) { const g = await geocode(place); if (!g) return { error: "not_found", message: garbled(String(place)) ? "The place name arrived garbled: send it as UTF-8 text (from a program, not a shell that re-encodes it), or send lat and lon." : `No place called "${place}" found on OpenStreetMap: try a neighbourhood, a station or a landmark.` }; where = { ...g, label: place }; }
   const p = people.setHome(a.player, { ...(where || {}), nearby });
   if (!p) return { error: "not_yours", message: "Only people who joined Join have a home to set (not the demo town's residents)." };
   return { ok: true, home: p.area?.name || (p.geo ? "set" : null), nearby: !!p.nearby, note: "Kept rounded to about a kilometre; others see only the place's name." };
@@ -299,7 +304,7 @@ export async function waitForNews(a, { after = 0, seconds = 45 } = {}) {
   let news = pick();
   if (!news.length) await new Promise((ok) => { const t = setTimeout(done, Math.min(50, Math.max(1, seconds)) * 1000); const off = onActivity((e) => e.who.includes(a.player) && e.id > after && done()); function done() { clearTimeout(t); off(); ok(); } });
   news = news.length ? news : pick();
-  return { news, last: news.length ? news.at(-1).id : after, serverTime: new Date().toISOString(), note: news.length ? "Call again with after: last for what comes next." : "Nothing new yet; call again with the same after. (Quiet can mean nobody has planned anything with your person yet: whoami's matching says how they can be found.)" };
+  return { news, last: news.length ? news.at(-1).id : after, serverTime: new Date().toISOString(), serverTimeLocal: new Date().toLocaleString("sv-SE").slice(0, 16), note: news.length ? "Call again with after: last for what comes next." : "Nothing new yet; call again with the same after. (Quiet can mean nobody has planned anything with your person yet: whoami's matching says how they can be found.)" };
 }
 export const myGames = (a, { all = false } = {}) => ({ negotiations: neg.mine(a.player, { all }), bookings: settle.mine(a.player, { all }), ...(all ? {} : { note: "Open negotiations and live bookings only; pass all: true for finished ones too." }) });
 export const gameStatus = (a, { booking }) => settle.status(booking, a.player);

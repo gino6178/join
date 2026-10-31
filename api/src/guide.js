@@ -81,6 +81,9 @@ checkpoint, which witnesses may cosign). Until its batch closes, a receipt has n
 - start_negotiation answers budgetCheck: reachable yes, no (even the lowest offer the venue takes seriously, 70% of the
   ask, is over your person's limit: haggling can't get there) or maybe (its floor is never shown); and cheaper: sure
   ways down (a shorter time, another start, the group rate) with what each costs.
+- find_options' days says, for each day searched, how many options it found (two a day are shown first) or why none.
+- A booking's stateMeans says what its state means now (e.g. locking: PayPal is capturing each payment). Every time comes
+  in UTC (ISO) and in the town's local time (...Local fields, and the text of news and invitations).
 - A booking's people lists everyone by name: organizer, member (someone who joined Join), inYourCrew. An invitation's why
   says how your person was found (their crew, or living near the organizer and choosing to be invited).
 

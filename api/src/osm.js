@@ -24,6 +24,8 @@ export function address(lat, lon) {
     } catch { return null; }
   }));
 }
+// text that was mangled on its way here (a shell that didn't send UTF-8): replacement characters, or Latin-1 runs
+export const garbled = (t) => /\uFFFD/.test(t) || /[\u0080-\u00ff]{3,}/.test(t);
 export function geocode(q) {
   const text = String(q || "").trim().slice(0, 120);
   if (!text) return Promise.resolve(null);

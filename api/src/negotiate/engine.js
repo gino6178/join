@@ -50,7 +50,7 @@ function view(n, extra = {}) {
     list: usd(n.list), ask: usd(n.ask), share: usd(share), shares: { organizer: usd(n.ask - each * (n.players.length - 1)), eachOther: usd(each) }, discounts: n.discounts,
     round: n.round, roundsLeft: Math.max(0, n.rounds - n.round), final: n.final,
     agreed: n.agreed ? { amount: usd(n.agreed.amount), share: usd(shareOf(n.agreed.amount, n.players.length)), at: n.agreed.at } : null,
-    expiresAt: new Date(n.expiresAt).toISOString(), history: n.history.map((h) => ({ ...h, amount: h.amount != null ? usd(h.amount) : undefined })),
+    expiresAt: new Date(n.expiresAt).toISOString(), expiresAtLocal: new Date(n.expiresAt).toLocaleString("sv-SE").slice(0, 16), history: n.history.map((h) => ({ ...h, amount: h.amount != null ? usd(h.amount) : undefined })),
     ...extra,
   };
 }

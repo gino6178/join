@@ -8,7 +8,7 @@ import express from "express";
 import * as mcp from "./mcp.js";
 import * as oauth from "./oauth.js";
 import * as people from "./people.js";
-import { geocode, places as osmPlaces, address as osmAddress } from "./osm.js";
+import { geocode, places as osmPlaces, address as osmAddress, garbled } from "./osm.js";
 import { REAL } from "./world.js";
 import { agentGuide } from "./guide.js";
 import * as ops from "./ops.js";
@@ -156,7 +156,7 @@ app.post("/api/auth/demo", limit("signin", 30), async (req, res) => {
   const name = String(req.body?.name || "").trim();
   if (!name) return res.status(400).json({ error: "name", message: "Give a first name for the demo account." });
   let { lat, lon } = req.body || {}, label = req.body?.place || null;
-  if ((lat == null || lon == null) && label) { const g = await geocode(String(label)); if (g) ({ lat, lon } = g); else return res.status(400).json({ error: "not_found", message: `No place called "${label}" found: try a neighbourhood, a station or a landmark.` }); }
+  if ((lat == null || lon == null) && label) { const g = await geocode(String(label)); if (g) ({ lat, lon } = g); else return res.status(400).json({ error: "not_found", message: garbled(String(label)) ? "The place name arrived garbled: send it as UTF-8 text (from a program, not a shell that re-encodes it), or send lat and lon." : `No place called "${label}" found: try a neighbourhood, a station or a landmark.` }); }
   const p = people.demoPerson(name, { area: req.body?.area, crew: req.body?.crew, lat, lon, label, nearby: req.body?.nearby === true }), sid = createSession(p.id);
   res.set("Set-Cookie", `${COOKIE}=${sid}; HttpOnly; SameSite=Lax; Path=/`).json({ ok: true, player: { id: p.id, name: p.name, area: p.area.name, ...(p.crew ? { crew: p.crew, crewmates: people.crewmates(p).map((x) => ({ id: x.id, name: x.name })) } : {}) } });
 });

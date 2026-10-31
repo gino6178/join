@@ -155,7 +155,7 @@ export function guaranteeTerms(playerId, { total, players, venue: venueId, date,
   const auto = !!(db.data.vaults[playerId] && m.autopay && f.ok && c.ok);
   return { guarantee: usd(total), yourShare: usd(shares[playerId]), worstCase: usd(total), approval: !mayPay ? "your person guarantees it on Join (this agent may not pay)" : auto ? "saved PayPal, within your limits" : pp?.testCard ? "sandbox test card (stands in for your approval)" : "you approve it in PayPal",
     note: `As the organizer you guarantee the whole $${usd(total)} with a PayPal authorization until the others pay. You pay your own $${usd(shares[playerId])} unless someone doesn't pay; then you cover them, at most $${usd(total)} in all.`,
-    ...(total > m.perGame ? { warning: `If friends don't pay you could pay up to $${usd(total)}, over your $${usd(m.perGame)} per-booking limit (it is within the $${usd(m.cover)} you may guarantee for a group). Invite people who will answer, or ask your person first.` } : {}) };
+    ...(total > m.perGame ? { warning: `Two limits apply: $${usd(m.perGame)} is for your own share of a booking, and $${usd(m.cover)} is what you may guarantee for a whole group as organizer. This guarantee ($${usd(total)}) is within the second, so Join allows it; but if friends don't pay, you'd pay up to $${usd(total)}, more than your usual $${usd(m.perGame)}. Invite people who will answer, or ask your person first.` } : {}) };
 }
 
 // ---- a payer approved: authorize ---------------------------------------------------------------------------------
@@ -204,11 +204,23 @@ function whyInvited(b, viewer) {
   return me.joined ? `${name(b.organizer)}'s agent asked for you by name.` : null;
 }
 // where the booking is, and how far for this person: the venue's address and their trip, in km and minutes
+const STATE_MEANS = {
+  awaiting_organizer: "The venue holds the place while the organizer guarantees the whole price in PayPal (10 minutes).",
+  held: "Guaranteed. Friends are invited and pay their shares until payBy; then it locks.",
+  locking: "Everyone who is coming has paid: PayPal is capturing each payment now (seconds). Then it is locked.",
+  locked: "Paid and booked. The venue is paid after the game.",
+  played: "The game is over; the venue is being paid.",
+  venue_paid: "The venue has been paid through PayPal Payouts.",
+  released: "Nobody guaranteed it in time; the place went back to the venue. Nothing was charged.",
+  cancelled: "Cancelled before it locked; authorizations were voided. Nothing was charged.",
+  refunded: "Cancelled after it locked; everyone was refunded.",
+};
 function whereIs(b, viewer) {
   const v = venue(b.venue), me = player(viewer);
   if (!v) return null;
   const km = me?.area && v.x != null ? +(Math.hypot(me.area.x - v.x, me.area.y - v.y) * 1.25).toFixed(1) : null;
-  return { venue: v.name, address: v.address || (typeof v.area === "string" ? v.area : null) || null, ...(v.lat != null ? { lat: v.lat, lon: v.lon, map: `https://www.openstreetmap.org/?mlat=${v.lat}&mlon=${v.lon}#map=17/${v.lat}/${v.lon}` } : {}), ...(km != null ? { yourTrip: { km, minutes: Math.round(5 + 3 * km) } } : {}) };
+  const address = v.address || (typeof v.area === "string" ? v.area : null) || null;
+  return { venue: v.name, address, ...(address && !/\d/.test(address) ? { addressNote: "OpenStreetMap has no street number here: use the map link." } : {}), ...(v.lat != null ? { lat: v.lat, lon: v.lon, map: `https://www.openstreetmap.org/?mlat=${v.lat}&mlon=${v.lon}#map=17/${v.lat}/${v.lon}` } : {}), ...(km != null ? { yourTrip: { km, minutes: Math.round(5 + 3 * km) } } : {}) };
 }
 
 // ---- moving the state on ------------------------------------------------------------------------------------------
@@ -463,11 +475,11 @@ export function view(b, viewer) {
   return {
     id: b.id, state: b.state, negotiation: b.negotiation, venue: b.venue, venueName: v?.name, activity: b.activity, date: b.date, start: b.start, minutes: b.minutes, unit: b.unit, unitName: place(b),
     currency: "USD", total: usd(b.total), organizer: b.organizer, players: b.players, declined: b.declined,
-    guaranteeBy: b.state === "awaiting_organizer" ? new Date(b.organizerUntil).toISOString() : null, payBy: b.state === "held" ? new Date(b.holdUntil).toISOString() : null,
+    guaranteeBy: b.state === "awaiting_organizer" ? new Date(b.organizerUntil).toISOString() : null, payBy: b.state === "held" ? new Date(b.holdUntil).toISOString() : null, ...(b.state === "held" ? { payByLocal: `${new Date(b.holdUntil).toLocaleString("sv-SE").slice(0, 16)} ${zoneName()}` } : {}), ...(b.state === "awaiting_organizer" ? { guaranteeByLocal: `${new Date(b.organizerUntil).toLocaleString("sv-SE").slice(0, 16)} ${zoneName()}` } : {}),
     payments: Object.fromEntries(b.players.map((pid) => { const p = b.payments[pid]; return [pid, { share: usd(b.shares[pid]), ...(pid === b.organizer ? { guarantee: usd(b.total), paid: p?.captured != null ? usd(p.captured) : null } : {}), role: pid === b.organizer ? "organizer" : "share", status: b.declined.includes(pid) ? "declined" : p?.status || (pid !== b.organizer && b.state === "held" ? "invited" : "not_started"), via: p?.via || null, paypal: p ? { order: p.orderId || null, authorization: p.authorizationId || null, capture: p.captureId || null } : null }]; })),
     review: viewer ? (reviewsMod.byPlayer(viewer, b.id) ? { done: reviewsMod.byPlayer(viewer, b.id).stars } : canReview(b, viewer).ok ? { can: true } : null) : null,
     invite: viewer !== b.organizer && b.state === "held" && !mine && !b.declined.includes(viewer) ? { share: usd(b.shares[viewer]), payBy: new Date(b.holdUntil).toISOString(), payByLocal: `${new Date(b.holdUntil).toLocaleString("sv-SE").slice(0, 16)} ${zoneName()}`, why: whyInvited(b, viewer) } : null,
-    where: whereIs(b, viewer),
+    where: whereIs(b, viewer), stateMeans: STATE_MEANS[b.state] || null,
     people: ((L) => b.players.map((pid) => ({ id: pid, name: L[pid] || name(pid), how: howConnected(b, viewer, pid), ...(pid === b.organizer ? { organizer: true } : {}), ...(player(pid)?.joined ? { member: true } : {}), ...(pid !== viewer && player(viewer)?.crew && player(pid)?.crew === player(viewer).crew ? { inYourCrew: true } : {}) })))(labels(b.players)),
     you: mine ? { share: usd(b.shares[viewer]), ...(mine.role === "organizer" ? { guarantee: usd(b.total) } : {}), authorized: usd(mine.amount), paid: mine.status === "captured" ? usd(mine.captured ?? mine.amount) : "0.00", status: mine.status, via: mine.via,
       approveUrl: mine.status === "awaiting_approval" ? mine.approveUrl : null, orderId: mine.status === "awaiting_approval" ? mine.orderId : null, ...(mine.status === "awaiting_approval" && mine.why ? { note: mine.why } : {}),
