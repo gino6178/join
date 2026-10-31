@@ -175,7 +175,7 @@ export function findOptions(a, { activity = "badminton", date = null, dates = []
   for (const o of opts) { if (out.length >= 5) break; if (!clash(o)) out.push(o); }
   out.sort((x, y) => y.score - x.score);
   const byDay = days.map((d) => { const n = opts.filter((o) => o.date === d).length, shown = out.filter((o) => o.date === d).length;
-    return { date: d, options: shown, ...(n ? (shown < n ? { more: n - shown } : {}) : { why: closestBy[d] ? `at most ${closestBy[d] + 1} of ${need + 1} free that day` : "nobody's free times and a free venue meet that day" }) }; });
+    return { date: d, options: shown, ...(n ? (shown < n ? { more: n - shown, moreMeans: "other start times or venues that also fit that day, not shown (at most 5 options in all); ask for that date to see them" } : {}) : { why: closestBy[d] ? `at most ${closestBy[d] + 1} of ${need + 1} free that day` : "nobody's free times and a free venue meet that day" }) }; });
   record({ actor: by(a), who: [a.player], action: "searched", data: { activity, area: me.area?.name || null, wish }, summary: `${said(a)} looked for ${activity} for ${need + 1} people${days.length === 1 ? ` on ${days[0]}` : ` over ${days.length} days`}: ${out.length ? `${out.length} option${out.length === 1 ? "" : "s"}` : "nothing free"}.` });
   // what the organizer may still commit to for each option: their per-booking limit, or what's left of that week's
   const m = getMandate(a.player), canSpend = (o) => Math.max(0, Math.min(m.perGame, m.perWeek - settle.spentInWeek(a.player, o.date, o.start)));
@@ -327,11 +327,13 @@ export async function payMyShare(a, { booking, mandate, amount = null }) {
     const own = p.role === "organizer" && !(b0.shareChanges || []).length ? Math.min(Math.round(+p.share * 100), evenShare(total, b0.players.length)) : Math.round(+p.share * 100);
     const no = mandateCheck(a, mandate, { venue: b0.venue, share: own, authorized: self ? total : own, date: b0.date, start: b0.start, booking }); if (no) return no;
   }
+  const before = b0.payments?.[a.player]?.status;
   const r = await settle.pay(booking, a.player);
-  if (!r.error) record({ actor: by(a), who: [a.player], action: "pay_requested", ref: booking, summary: r.you?.status === "authorized" ? (r.you.via === "vault" ? `${said(a)} paid ${first(a.player)}'s $${r.you.authorized} from saved PayPal, within the limit.` : `${said(a)} started ${first(a.player)}'s $${r.you.authorized} payment; PayPal authorized it (${r.you.via}).`) : r.you?.approveUrl ? `${said(a)} asked ${first(a.player)} to approve $${r.you.authorized} in PayPal.` : `${said(a)} checked the payment: ${r.you?.status || r.state}.` });
+  if (!r.error) record({ actor: by(a), who: [a.player], action: "pay_requested", ref: booking, summary: r.you?.status === "authorized" ? (r.you.via === "vault" ? `${said(a)} paid ${first(a.player)}'s $${r.you.authorized} from saved PayPal, within the limit.` : (r.you.guarantee ? `${said(a)} guaranteed the whole $${r.you.authorized} for ${first(a.player)}; PayPal authorized it (${r.you.via}). ${first(a.player)}'s own share is $${r.you.share}.` : `${said(a)} started ${first(a.player)}'s $${r.you.authorized} payment; PayPal authorized it (${r.you.via}).`)) : r.you?.approveUrl ? `${said(a)} asked ${first(a.player)} to approve $${r.you.authorized} in PayPal.` : `${said(a)} checked the payment: ${r.you?.status || r.state}.` });
   const when = ["locked", "played", "venue_paid"].includes(r.state) ? "It's locked: everyone's payment is captured (PayPal) and the receipt is issued; nothing more to do."
     : r.state === "locking" ? "Everyone has paid: PayPal is capturing the payments now; it will be locked in seconds."
     : "The booking locks when everyone invited has paid, or at payBy (whoever hasn't paid by then is covered by the organizer); nothing is captured before it locks.";
+  if (!r.error && before === "authorized" && r.you?.guarantee) r.note = `Nothing new was charged: your $${r.you.guarantee} guarantee already covers your $${r.you.share} share. At the lock PayPal takes your share (and anyone's who didn't pay) from it.`;
   return r.you?.approveUrl ? { ...r, nextStep: `PAYER_ACTION_REQUIRED: show approveUrl to your user. They approve in PayPal; check booking_status afterwards. ${when}` } : r.error ? r : { ...r, nextStep: when };
 }
 export const declineGame = (a, { booking }) => settle.decline(booking, a.player);

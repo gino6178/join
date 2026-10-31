@@ -155,7 +155,7 @@ export function guaranteeTerms(playerId, { total, players, venue: venueId, date,
   const auto = !!(db.data.vaults[playerId] && m.autopay && f.ok && c.ok);
   return { guarantee: usd(total), yourShare: usd(shares[playerId]), worstCase: usd(total), approval: !mayPay ? "your person guarantees it on Join (this agent may not pay)" : auto ? "saved PayPal, within your limits" : pp?.testCard ? "sandbox test card (stands in for your approval)" : "you approve it in PayPal",
     note: `As the organizer you guarantee the whole $${usd(total)} with a PayPal authorization until the others pay. You pay your own $${usd(shares[playerId])} unless someone doesn't pay; then you cover them, at most $${usd(total)} in all.`,
-    ...(total > m.perGame ? { warning: `Two limits apply: $${usd(m.perGame)} is for your own share of a booking, and $${usd(m.cover)} is what you may guarantee for a whole group as organizer. This guarantee ($${usd(total)}) is within the second, so Join allows it; but if friends don't pay, you'd pay up to $${usd(total)}, more than your usual $${usd(m.perGame)}. Invite people who will answer, or ask your person first.` } : {}) };
+    ...(total > m.perGame ? { warning: `Two limits apply: $${usd(m.perGame)} is for your own share of a booking, and $${usd(m.cover)} is what you may guarantee for a whole group as organizer. This guarantee ($${usd(total)}) is within the second, so Join allows it; but if friends don't pay, you'd pay up to $${usd(total)}, more than your usual $${usd(m.perGame)}. Invite people who will answer.` } : {}) };
 }
 
 // ---- a payer approved: authorize ---------------------------------------------------------------------------------
@@ -187,7 +187,7 @@ const zoneName = () => (process.env.TZ || "local").split("/").pop().replace(/_/g
 // how a person in a plan is connected to the one viewing it: you, the organizer, your crew, or someone near the
 // organizer who chose to be invited (with the distance)
 function howConnected(b, viewer, pid) {
-  if (pid === viewer) return "you";
+  if (pid === viewer) return viewer === b.organizer ? "you (the organizer)" : `you: ${whyInvited(b, viewer) || "invited"}`;
   const p = player(pid), org = player(b.organizer), v = player(viewer);
   if (pid === b.organizer) return v?.crew && v.crew === p?.crew ? "the organizer, in your crew" : "the organizer";
   if (p?.crew && p.crew === org?.crew) return v?.crew === p.crew ? "in your crew" : "in the organizer's crew";
@@ -206,12 +206,14 @@ function whyInvited(b, viewer) {
 // where the booking is, and how far for this person: the venue's address and their trip, in km and minutes
 // what kind of account a person in a plan has: everyone in real mode signed up themselves; on this sandbox server the
 // sign-up is a demo account (a name and a place, no outside login), unless they used a provider
-const ACCOUNT = { demo: "a person who signed up on Join (demo account: no outside login, sandbox money)", invite: "a person who joined from a friend's invite link (their agent, no outside login)", google: "signed in with Google", facebook: "signed in with Facebook", line: "signed in with LINE", paypal: "signed in with PayPal" };
+const ACCOUNT = { demo: "signed up on Join with a name and where they live (no outside login)", invite: "joined from a friend's invite link (no outside login)", google: "signed in with Google", facebook: "signed in with Facebook", line: "signed in with LINE", paypal: "signed in with PayPal" };
+const REAL = { realPerson: true, identityChecked: false, note: "A person using Join, not a made-up resident. Join doesn't check who people are: on this sandbox server nobody signs in with an outside account, so trust them as you would someone from a friend's group chat." };
+const PAY_MEANS = { creating: "PayPal is setting up this payment (seconds).", awaiting_approval: "Waiting for the person to approve it in PayPal.", authorized: "Authorized in PayPal: held, not taken yet. It is captured when the booking locks.", captured: "Taken: the money has moved.", voided: "The hold was released; nothing was taken.", refunded: "Taken and then refunded.", capture_failed: "PayPal couldn't take it; Join retries." };
 const STATE_MEANS = {
   awaiting_organizer: "The venue holds the place while the organizer guarantees the whole price in PayPal (10 minutes).",
   held: "Guaranteed. Friends are invited and pay their shares until payBy; then it locks.",
   locking: "Everyone who is coming has paid: PayPal is capturing each payment now (seconds). Then it is locked.",
-  locked: "Paid and booked. The venue is paid after the game.",
+  locked: "Paid and booked. After the game ends, Join pays the venue through PayPal Payouts (payout stays null until then).",
   played: "The game is over; the venue is being paid.",
   venue_paid: "The venue has been paid through PayPal Payouts.",
   released: "Nobody guaranteed it in time; the place went back to the venue. Nothing was charged.",
@@ -479,11 +481,11 @@ export function view(b, viewer) {
     id: b.id, state: b.state, negotiation: b.negotiation, venue: b.venue, venueName: v?.name, activity: b.activity, date: b.date, start: b.start, minutes: b.minutes, unit: b.unit, unitName: place(b),
     currency: "USD", total: usd(b.total), organizer: b.organizer, players: b.players, declined: b.declined,
     guaranteeBy: b.state === "awaiting_organizer" ? new Date(b.organizerUntil).toISOString() : null, payBy: b.state === "held" ? new Date(b.holdUntil).toISOString() : null, ...(b.state === "held" ? { payByLocal: `${new Date(b.holdUntil).toLocaleString("sv-SE").slice(0, 16)} ${zoneName()}` } : {}), ...(b.state === "awaiting_organizer" ? { guaranteeByLocal: `${new Date(b.organizerUntil).toLocaleString("sv-SE").slice(0, 16)} ${zoneName()}` } : {}),
-    payments: Object.fromEntries(b.players.map((pid) => { const p = b.payments[pid]; return [pid, { share: usd(b.shares[pid]), ...(pid === b.organizer ? { guarantee: usd(b.total), paid: p?.captured != null ? usd(p.captured) : null } : {}), role: pid === b.organizer ? "organizer" : "share", status: b.declined.includes(pid) ? "declined" : p?.status || (pid !== b.organizer && b.state === "held" ? "invited" : "not_started"), via: p?.via || null, paypal: p ? { order: p.orderId || null, authorization: p.authorizationId || null, capture: p.captureId || null } : null }]; })),
+    payments: Object.fromEntries(b.players.map((pid) => { const p = b.payments[pid]; return [pid, { share: usd(b.shares[pid]), ...(pid === b.organizer ? { guarantee: usd(b.total), paid: p?.captured != null ? usd(p.captured) : null } : {}), role: pid === b.organizer ? "organizer" : "share", status: b.declined.includes(pid) ? "declined" : p?.status || (pid !== b.organizer && b.state === "held" ? "invited" : "not_started"), ...(PAY_MEANS[p?.status] ? { statusMeans: PAY_MEANS[p.status] } : {}), via: p?.via || null, paypal: p ? { order: p.orderId || null, authorization: p.authorizationId || null, capture: p.captureId || null } : null }]; })),
     review: viewer ? (reviewsMod.byPlayer(viewer, b.id) ? { done: reviewsMod.byPlayer(viewer, b.id).stars } : canReview(b, viewer).ok ? { can: true } : null) : null,
     invite: viewer !== b.organizer && b.state === "held" && !mine && !b.declined.includes(viewer) ? { share: usd(b.shares[viewer]), payBy: new Date(b.holdUntil).toISOString(), payByLocal: `${new Date(b.holdUntil).toLocaleString("sv-SE").slice(0, 16)} ${zoneName()}`, why: whyInvited(b, viewer) } : null,
     where: whereIs(b, viewer), stateMeans: STATE_MEANS[b.state] || null, ...(viewer !== b.organizer ? { howYouWereFound: whyInvited(b, viewer) } : {}),
-    people: ((L) => b.players.map((pid) => ({ id: pid, name: L[pid] || name(pid), how: howConnected(b, viewer, pid), ...(pid === b.organizer ? { organizer: true } : {}), ...(player(pid)?.joined ? { member: true, account: ACCOUNT[player(pid).joined.provider] || "signed up on Join" } : { account: "a made-up resident of the demo town" }), ...(pid !== viewer && player(viewer)?.crew && player(pid)?.crew === player(viewer).crew ? { inYourCrew: true } : {}) })))(labels(b.players)),
+    people: ((L) => b.players.map((pid) => ({ id: pid, name: L[pid] || name(pid), how: howConnected(b, viewer, pid), ...(pid === b.organizer ? { organizer: true } : {}), ...(player(pid)?.joined ? { member: true, account: ACCOUNT[player(pid).joined.provider] || "signed up on Join", ...REAL, ...(["google", "facebook", "line", "paypal"].includes(player(pid).joined.provider) ? { identityChecked: true, note: `Signed in with ${player(pid).joined.provider}.` } : {}) } : { account: "a made-up resident of the demo town", realPerson: false }), ...(pid !== viewer && player(viewer)?.crew && player(pid)?.crew === player(viewer).crew ? { inYourCrew: true } : {}) })))(labels(b.players)),
     you: mine ? { share: usd(b.shares[viewer]), ...(mine.role === "organizer" ? { guarantee: usd(b.total) } : {}), authorized: usd(mine.amount), paid: mine.status === "captured" ? usd(mine.captured ?? mine.amount) : "0.00", status: mine.status, via: mine.via,
       approveUrl: mine.status === "awaiting_approval" ? mine.approveUrl : null, orderId: mine.status === "awaiting_approval" ? mine.orderId : null, ...(mine.status === "awaiting_approval" && mine.why ? { note: mine.why } : {}),
       paypal: { order: mine.orderId, authorization: mine.authorizationId, capture: mine.captureId } } : null,
@@ -492,7 +494,7 @@ export function view(b, viewer) {
     extras: (b.bills || []).map((x) => ({ total: usd(x.total), items: x.items.map((i) => i.name), status: x.status, url: viewer === b.organizer && x.status === "sent" ? x.url : undefined })),
     owes: b.reimbursements?.[viewer]?.status === "sent" ? { amount: usd(b.reimbursements[viewer].amount), url: b.reimbursements[viewer].url } : null,
     shareChanges: (b.shareAsks || []).filter((x) => x.status === "accepted").map((x) => ({ player: x.player, from: usd(x.from), to: usd(x.amount), coveredBy: b.organizer, note: `${name(x.player)} pays $${usd(x.amount)} instead of $${usd(x.from)}; ${name(b.organizer)} covers the $${usd(x.from - x.amount)}.` })),
-    split: b.splitRule || "even", shareAsks: (b.shareAsks || []).filter((x) => viewer === b.organizer || x.player === viewer).map((x) => ({ ...x, from: usd(x.from), amount: usd(x.amount) })),
+    split: b.splitRule || "even", ...(new Set(Object.values(b.shares)).size > 1 && (b.splitRule || "even") === "even" ? { splitNote: "An even split of the total in cents: the organizer's share takes the odd cents so the shares add up exactly." } : {}), shareAsks: (b.shareAsks || []).filter((x) => viewer === b.organizer || x.player === viewer).map((x) => ({ ...x, from: usd(x.from), amount: usd(x.amount) })),
     paypal: paypalMode(), receipts: receipts.forBooking(b.id),
   };
 }
