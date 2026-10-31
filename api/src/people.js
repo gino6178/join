@@ -103,7 +103,7 @@ export function labels(ids) {
 // when someone was last around (their agent or the website), so plans only invite strangers who will answer
 const seenAt = new Map();
 export const saw = (id) => { if (id) seenAt.set(id, Date.now()); };
-export const activeWithin = (id, ms) => Date.now() - (seenAt.get(id) || Date.parse(db.data.people.find((x) => x.id === id)?.joined?.at || 0)) < ms;
+export const activeWithin = (id, ms) => Date.now() - (seenAt.get(id) || 0) < ms; // (only real use counts: an account nobody uses is not invited)
 export const crewSize = (code) => db.data.people.filter((x) => x.crew === cleanCrew(code)).length;
 export const crewNames = (code) => db.data.people.filter((x) => x.crew === cleanCrew(code)).map((x) => x.name);
 export const peopleStore = { reset: () => { const w = getWorld(); w.players = w.players.filter((x) => !x.joined); db.data.people = []; db.save(); } };
