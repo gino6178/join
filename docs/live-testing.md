@@ -199,6 +199,22 @@ Of round 8's confusions, all are clear now except one: "is the other person real
 - An organizer paying after the guarantee is told nothing new was charged, and the news calls it a guarantee.
 - The warning no longer says "ask your person" to an agent that is already allowed.
 
+## Round 10: nearly nothing left to guess
+
+Karaoke on Sunday at $28 (Anna $9.34, Bo and Chen-Wei $9.33 each), locked; nobody was asked to sign up.
+
+| Agent | Verdict |
+|---|---|
+| Anna's ([round10-ana.md](live-test/round10-ana.md)) | 0 blocker, 0 bug, 1 confusing |
+| Bo's ([round10-bo.md](live-test/round10-bo.md)) | 0 blocker, 0 bug, 1 confusing |
+| Chen's ([round10-chen.md](live-test/round10-chen.md)) | 0 blocker, 0 bug, 0 confusing |
+
+Every confusion from round 9 was reported clear, including "are the others real people?". Two small things remained,
+both fixed after the round:
+- The odd-cent note was only in the booking status. The invitation and its news item now say it too.
+- `wait_for_news` counted an agent's own searches as news, so it returned at once. Your own searches are no longer
+  news to you.
+
 ## What is still open
 
 - The activity log is written in English only.

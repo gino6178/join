@@ -300,9 +300,9 @@ export function findAlternatives(a, { activity, date, start, minutes = 90, playe
 
 // News for a person, as it happens: their activity entries after `after`, waiting up to `seconds` for the first one
 export async function waitForNews(a, { after = 0, seconds = 45 } = {}) {
-  const pick = () => forPlayer(a.player, { after, limit: 20 }).filter((e) => after || Date.now() - Date.parse(e.at) < 15 * 60e3).map((e) => ({ id: e.id, at: e.at, atLocal: new Date(e.at).toLocaleString("sv-SE").slice(0, 16), action: e.action, ref: e.ref, summary: e.summary })); // (with no after: the last 15 minutes; atLocal is the town's time, as the summaries are)
+  const pick = () => forPlayer(a.player, { after, limit: 20 }).filter((e) => e.action !== "searched").filter((e) => after || Date.now() - Date.parse(e.at) < 15 * 60e3).map((e) => ({ id: e.id, at: e.at, atLocal: new Date(e.at).toLocaleString("sv-SE").slice(0, 16), action: e.action, ref: e.ref, summary: e.summary })); // (with no after: the last 15 minutes; atLocal is the town's time, as the summaries are)
   let news = pick();
-  if (!news.length) await new Promise((ok) => { const t = setTimeout(done, Math.min(50, Math.max(1, seconds)) * 1000); const off = onActivity((e) => e.who.includes(a.player) && e.id > after && done()); function done() { clearTimeout(t); off(); ok(); } });
+  if (!news.length) await new Promise((ok) => { const t = setTimeout(done, Math.min(50, Math.max(1, seconds)) * 1000); const off = onActivity((e) => e.who.includes(a.player) && e.id > after && e.action !== "searched" && done()); function done() { clearTimeout(t); off(); ok(); } });
   news = news.length ? news : pick();
   return { news, last: news.length ? news.at(-1).id : after, serverTime: new Date().toISOString(), serverTimeLocal: new Date().toLocaleString("sv-SE").slice(0, 16), note: news.length ? "Call again with after: last for what comes next." : "Nothing new yet; call again with the same after. (Quiet can mean nobody has planned anything with your person yet: whoami's matching says how they can be found.)" };
 }
