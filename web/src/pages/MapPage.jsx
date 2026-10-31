@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { tr, lang, setLang } from "../i18n.js";
 import { useApi, money } from "../api.js";
 import RealMap from "../components/RealMap.jsx";
@@ -8,6 +8,7 @@ import Icon from "../components/Icon.jsx";
 // The map, following the latest thing that happened: a price over budget marks that venue red and numbers the
 // alternatives Join offered instead; a booking shows the place and everyone's trip to it.
 export default function MapPage({ entries, me }) {
+  const [act, setAct] = useState("badminton"), places = useApi(`/api/places?activity=${encodeURIComponent(act)}`, act);
   const w = useWorld(), games = useApi("/api/games", entries.at(-1)?.id || 0);
   const last = useMemo(() => [...entries].reverse().find((e) => e.data?.alternatives?.length), [entries]);
   const booking = (games.data?.bookings || []).find((b) => !["released", "cancelled", tr("refunded")].includes(b.state));
@@ -16,9 +17,9 @@ export default function MapPage({ entries, me }) {
   const alts = fresh ? last.data.alternatives : [];
   return (
     <div className="page wide">
-      <header className="page-head"><h1>{tr("Map")}</h1><p className="muted">{w ? `${w.town.name}. ` : ""}{tr("Venues are round pins (click one for what it offers, or to plan there); squares are free public places such as park courts and picnic grills (first come, not bookable); blue circles are people's home areas, never addresses.")}</p></header>
+      <header className="page-head"><h1>{tr("Map")}</h1>{w?.real && <p className="small">{tr("Real places nearby")}: <select value={act} onChange={(e) => setAct(e.target.value)}>{(w.activities || []).map((x) => <option key={x.id} value={x.id}>{x.id}</option>)}</select> {places.loading ? "…" : `${places.data?.places?.length ?? 0}`} <small className="muted">({tr("not on Join")}; OpenStreetMap)</small>{places.data?.note && <small className="muted"> {places.data.note}</small>}</p>}<p className="muted">{w ? `${w.town.name}. ` : ""}{tr("Venues are round pins (click one for what it offers, or to plan there); squares are free public places such as park courts and picnic grills (first come, not bookable); blue circles are people's home areas, never addresses.")}</p></header>
       <div className="map-layout">
-        <div className="card map-card"><RealMap world={w} me={me.player.id} over={fresh ? overVenue : null} alternatives={alts} booked={!fresh ? booking?.venue : null} people={!fresh ? booking?.players || [] : [me.player.id]} /></div>
+        <div className="card map-card"><RealMap places={w?.real ? places.data?.places || [] : []} world={w} me={me.player.id} over={fresh ? overVenue : null} alternatives={alts} booked={!fresh ? booking?.venue : null} people={!fresh ? booking?.players || [] : [me.player.id]} /></div>
         <aside className="map-side">
           {fresh ? <section className="card">
             <h3><Icon name="pin" size={18} />{tr("Alternatives")}</h3>

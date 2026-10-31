@@ -15,7 +15,7 @@ const load = () => { try { return JSON.parse(localStorage.getItem(HERE) || "null
 const save = (c) => { try { c ? localStorage.setItem(HERE, JSON.stringify(c)) : localStorage.removeItem(HERE); } catch {} };
 const esc = (s) => String(s).replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]);
 
-export default function RealMap({ world, me, over = null, alternatives = [], people = [], booked = null }) {
+export default function RealMap({ world, me, over = null, alternatives = [], people = [], booked = null, places = [] }) {
   const box = useRef(null), map = useRef(null), layer = useRef(null);
   const [center, setCenter] = useState(load), [note, setNote] = useState(null);
   const geo = world?.town.geo, c = center || geo;
@@ -31,7 +31,7 @@ export default function RealMap({ world, me, over = null, alternatives = [], peo
   useEffect(() => {
     if (!world || !map.current) return;
     const g = layer.current; g.clearLayers();
-    const at = (a) => toGeo(c, a, geo.unitKm);
+    const at = (a) => (a.lat != null && a.lon != null && !center ? [a.lat, a.lon] : toGeo(c, a, geo.unitKm)); // (real places sit where they are)
     const altIndex = Object.fromEntries(alternatives.map((a, i) => [a.venue, i + 1]));
     const target = booked || alternatives[0]?.venue;
     const spot = (id) => world.venues.find((v) => v.id === id) || world.publicPlaces.find((p) => p.id === id);
@@ -52,13 +52,19 @@ export default function RealMap({ world, me, over = null, alternatives = [], peo
       else m.bindTooltip(esc(v.name), { direction: "top" });
       m.bindPopup(`<b>${esc(v.name)}</b><br><small>${esc(v.area)} · open ${esc(v.open?.[0] || "")}-${esc(v.open?.[1] || "")}</small><br>${offers}<div class="rm-acts"><button data-plan="${esc(Object.keys(v.offers || {})[0] || "")}" data-venue="${esc(v.name)}">Plan here with Join's agent</button><a href="#/venue?id=${esc(v.id)}">Its rooms and courts</a></div>`);
     }
+    // real places from OpenStreetMap: grey, not on Join (no haggling or payment there)
+    for (const p of places) {
+      const ll = [p.lat, p.lon]; pts.push(ll);
+      L.circleMarker(ll, { radius: 6, color: "#888", weight: 1, fillColor: "#ddd", fillOpacity: 1 }).addTo(g)
+        .bindPopup(`<b>${esc(p.name)}</b><br><small>${esc(p.address || "")}</small><br><small>Not on Join: book with them directly.</small><br><a href="${esc(p.url)}" target="_blank" rel="noreferrer">OpenStreetMap</a>`);
+    }
     for (const p of world.publicPlaces) {
       const ll = at(p), n = altIndex[p.id]; pts.push(ll);
       const m = L.marker(ll, { icon: L.divIcon({ className: `rm-pub ${n ? "alt" : ""}`, html: n ? String(n) : "", iconSize: [16, 16] }) }).addTo(g);
       m.bindPopup(`<b>${esc(p.name)}</b><br><small>Free public place: first come, not bookable</small>`);
     }
     if (pts.length) map.current.fitBounds(L.latLngBounds(pts).pad(0.15));
-  }, [world, c?.lat, c?.lon, over, booked, alternatives.map((a) => a.venue).join(), people.join()]);
+  }, [world, c?.lat, c?.lon, over, booked, alternatives.map((a) => a.venue).join(), people.join(), places.length]);
 
   // "Plan here" in a popup opens Join's agent with a sentence to start from
   useEffect(() => {
@@ -77,8 +83,8 @@ export default function RealMap({ world, me, over = null, alternatives = [], peo
     <div className="rmap-wrap">
       <div ref={box} className="rmap" role="application" aria-label="Map of the venues" />
       <div className="rmap-bar">
-        <button className="btn small" onClick={aroundMe}>{center ? tr("Back to the sample town") : tr("Show around me")}</button>
-        <small className="muted">{note || (center ? "Placed around you (made-up venues on a real map)." : `${world?.town.name || ""}. Tap or click a venue for what it offers.`)}</small>
+        {!world?.real && <button className="btn small" onClick={aroundMe}>{center ? tr("Back to the sample town") : tr("Show around me")}</button>}
+        <small className="muted">{world?.real ? "Black pins are venues on Join (bookable); grey pins are real places from OpenStreetMap, not on Join." : note || (center ? "Placed around you (made-up venues on a real map)." : `${world?.town.name || ""}. Tap or click a venue for what it offers.`)}</small>
       </div>
     </div>
   );

@@ -8,6 +8,8 @@ import express from "express";
 import * as mcp from "./mcp.js";
 import * as oauth from "./oauth.js";
 import * as people from "./people.js";
+import { geocode, places as osmPlaces } from "./osm.js";
+import { REAL } from "./world.js";
 import { agentGuide } from "./guide.js";
 import * as ops from "./ops.js";
 import * as a2a from "./a2a.js";
@@ -19,13 +21,14 @@ import { invitePass, onInvitePass, passHolder } from "./auth.js";
 import { agentOf, sessionOf, createSession, endSession, makeToken, tokensOf, revoke, can, scopeError, COOKIE, VENUE_COOKIE, createVenueSession, venueOf, endVenueSession } from "./auth.js";
 import { getMandate, setMandate } from "./mandate.js";
 import { forPlayer, onActivity, record as recordActivity, demoScope, demand as demandFor } from "./activity.js";
-import { getWorld, player, venue, setPolicy } from "./world.js";
+import { getWorld, player, venue, setPolicy, registerVenue } from "./world.js";
 import { usd } from "./negotiate/policy.js";
 import * as receipts from "./proof/receipts.js";
 import * as scout from "./scout/understand.js";
 import * as ap2 from "./proof/mandates.js";
 import * as reviews from "./reviews.js";
 import { negotiationsStore } from "./negotiate/engine.js";
+import * as neg from "./negotiate/engine.js";
 import { mandatesStore } from "./mandate.js";
 import { activityStore } from "./activity.js";
 
@@ -88,7 +91,7 @@ app.all("/mcp/g/:pass", (req, res, next) => { req.headers.authorization = `Beare
 app.all("/mcp", (req, res) => mcp.handle(req, res).catch((e) => { console.error("mcp", e); if (!res.headersSent) res.status(500).json({ jsonrpc: "2.0", error: { code: -32603, message: "internal error" }, id: null }); }));
 
 // the same tools as plain REST, for agents and scripts that don't speak MCP: POST /api/agent/<tool> with JSON arguments
-const TOOLS = { whoami: ops.whoami, list_activities: () => ops.listActivities(), list_venues: (a, x) => ops.listVenues(x), find_options: ops.findOptions, start_negotiation: ops.startNegotiation, make_offer: (a, x) => ops.afterDeal(a, ops.makeOffer(a, x)), accept_price: (a, x) => ops.afterDeal(a, ops.acceptPrice(a, x)),
+const TOOLS = { whoami: ops.whoami, list_activities: () => ops.listActivities(), list_venues: (a, x) => ops.listVenues(x), find_options: (a, x) => ops.findOptionsLive(a, x), set_home: (a, x) => ops.setHome(a, x), start_negotiation: ops.startNegotiation, make_offer: (a, x) => ops.afterDeal(a, ops.makeOffer(a, x)), accept_price: (a, x) => ops.afterDeal(a, ops.acceptPrice(a, x)),
   walk_away: ops.walkAway, find_alternatives: ops.findAlternatives, my_plans: (a, x) => ops.myGames(a, x), wait_for_news: (a, x) => ops.waitForNews(a, x), booking_status: ops.gameStatus, pay_my_share: ops.payMyShare, decline_invite: ops.declineGame, cancel_booking: ops.cancelBooking,
   propose_share: ops.proposeShare, answer_share: ops.answerShare, request_reimbursement: ops.requestReimbursement, venue_reviews: (a, x) => ops.venueReviews(a, x) };
 app.post("/api/agent/:tool", async (req, res) => {
@@ -108,11 +111,30 @@ app.post("/a2a", (req, res) => a2a.handle(req, res));
 const signedIn = (req, res, next) => { const s = sessionOf(req); if (!s) return res.status(401).json({ error: "signed_out" }); req.player = s.player; req.sid = s.sid; next(); };
 app.get("/api/info", (req, res) => res.json({ timeZone: getWorld().town.timeZone, demoSignin: DEMO, paypal: pp.mode, publicUrl: PUBLIC_URL, mcpUrl: `${PUBLIC_URL}/mcp`, scout: scout.qwenOn() ? scout.MODEL : "rules" }));
 app.get("/api/world", (req, res) => {
-  const w = getWorld();
-  res.json({ town: w.town, currency: w.currency, note: w.note,
+  const w = getWorld(), me = sessionOf(req)?.player;
+  // (in real mode, the people you may see: you, your crew, and whoever shares a plan with you; never everyone)
+  const shown = REAL ? new Set([me, ...people.crewmates(player(me)).map((x) => x.id), ...settle.mine(me, { all: true }).flatMap((b) => b.players), ...neg.mine(me, { all: true }).flatMap((n) => n.players)].filter(Boolean)) : null;
+  res.json({ town: w.town, currency: w.currency, note: w.note, real: REAL,
     activities: w.activities,
-    venues: w.venues.map((v) => ({ id: v.id, name: v.name, area: v.area, x: v.x, y: v.y, open: v.open, offers: v.offers, style: v.policy.style })),
-    players: w.players.map((p) => ({ id: p.id, name: p.name, level: p.level, area: p.area, interests: p.interests, ...(p.joined ? { joined: true } : {}) })), publicPlaces: w.publicPlaces });
+    venues: w.venues.map((v) => ({ id: v.id, name: v.name, area: v.area, x: v.x, y: v.y, ...(v.lat != null ? { lat: v.lat, lon: v.lon } : {}), open: v.open, offers: v.offers, style: v.policy.style, ...(v.partner ? { partner: true } : {}) })),
+    players: w.players.filter((p) => !shown || shown.has(p.id)).map((p) => ({ id: p.id, name: p.name, level: p.level, area: p.area, interests: p.interests, ...(p.joined ? { joined: true } : {}) })), publicPlaces: w.publicPlaces });
+});
+// Real places near the signed-in person for an activity (OpenStreetMap), for the map: not on Join, suggestions only
+app.get("/api/places", signedIn, async (req, res) => {
+  const me = player(req.player);
+  if (!me?.geo) return res.json({ places: [], note: "Set where you live to see real places near you." });
+  res.json({ places: await osmPlaces(String(req.query.activity || "badminton"), me.geo, 4, { waitMs: 12e3 }), source: "OpenStreetMap (ODbL)", onJoin: false });
+});
+// A venue registers itself: its name, its real address (looked up) or location, hours, what it offers and prices. It
+// becomes bookable on Join (haggling by the default rules, which it then changes in Venue view) and its staff are
+// signed in. (Demo: anyone may register a venue; a real deployment would check the business.)
+app.post("/api/venues/register", limit("signin", 30), async (req, res) => {
+  const b = req.body || {};
+  let { lat, lon } = b;
+  if ((lat == null || lon == null) && b.address) { const g = await geocode(String(b.address)); if (!g) return res.status(400).json({ error: "not_found", message: "That address wasn't found on OpenStreetMap." }); ({ lat, lon } = g); }
+  const v = registerVenue({ ...b, lat, lon });
+  if (v.error) return res.status(400).json(v);
+  res.set("Set-Cookie", `${VENUE_COOKIE}=${createVenueSession(v.id)}; HttpOnly; SameSite=Lax; Path=/`).json({ ok: true, venue: { id: v.id, name: v.name, lat: v.lat, lon: v.lon, offers: v.offers } });
 });
 app.post("/api/session", (req, res) => {
   if (!DEMO) return res.status(403).json({ error: "demo sign-in is off" });
@@ -122,12 +144,18 @@ app.post("/api/session", (req, res) => {
 });
 // Sign-in with an account people have (Google, Facebook, LINE, PayPal: whichever has keys here, oauth.js), or a new
 // demo account with just a name. Either way the person joins the town (people.js) and gets the usual session cookie.
-app.get("/api/auth/providers", (req, res) => res.json({ providers: oauth.providers(), demo: DEMO, areas: people.districts() }));
-app.post("/api/auth/demo", limit("signin", 30), (req, res) => {
+app.get("/api/auth/providers", (req, res) => res.json({ providers: oauth.providers(), demo: DEMO, real: REAL, areas: REAL ? [] : people.districts() }));
+// a place someone typed, looked up on OpenStreetMap (for the sign-up page, where a plain-http browser won't share its location)
+app.get("/api/geocode", limit("signin", 30), async (req, res) => { const g = await geocode(String(req.query.q || "")); g ? res.json(g) : res.status(404).json({ error: "not_found" }); });
+// the signed-in person sets their home, or whether people nearby may invite them
+app.post("/api/home", signedIn, async (req, res) => { const r = await ops.setHome({ player: req.player }, req.body || {}); res.status(r.error ? 400 : 200).json(r); });
+app.post("/api/auth/demo", limit("signin", 30), async (req, res) => {
   if (!DEMO) return res.status(403).json({ error: "demo accounts are off" });
   const name = String(req.body?.name || "").trim();
   if (!name) return res.status(400).json({ error: "name", message: "Give a first name for the demo account." });
-  const p = people.demoPerson(name, { area: req.body?.area, crew: req.body?.crew, lat: req.body?.lat, lon: req.body?.lon }), sid = createSession(p.id);
+  let { lat, lon } = req.body || {}, label = req.body?.place || null;
+  if ((lat == null || lon == null) && label) { const g = await geocode(String(label)); if (g) ({ lat, lon } = g); else return res.status(400).json({ error: "not_found", message: `No place called "${label}" found: try a neighbourhood, a station or a landmark.` }); }
+  const p = people.demoPerson(name, { area: req.body?.area, crew: req.body?.crew, lat, lon, label, nearby: req.body?.nearby === true }), sid = createSession(p.id);
   res.set("Set-Cookie", `${COOKIE}=${sid}; HttpOnly; SameSite=Lax; Path=/`).json({ ok: true, player: { id: p.id, name: p.name, area: p.area.name, ...(p.crew ? { crew: p.crew, crewmates: people.crewmates(p).map((x) => ({ id: x.id, name: x.name })) } : {}) } });
 });
 // Crews, by invite link. Someone signed in (on the website, or their agent with a token) gets their crew's link,

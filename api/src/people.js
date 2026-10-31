@@ -9,7 +9,7 @@
 // crew. No provider token is kept, and no email.
 import crypto from "node:crypto";
 import { store, stateFile } from "./store.js";
-import { getWorld } from "./world.js";
+import { getWorld, REAL } from "./world.js";
 
 const db = store(stateFile("people"), { people: [] });
 const FREE = ["Mon 18-22", "Tue 18-22", "Wed 18-22", "Thu 18-22", "Fri 18-23", "Sat 08-23", "Sun 08-22"];
@@ -30,7 +30,16 @@ const cleanCrew = (c) => String(c || "").toLowerCase().replace(/[^a-z0-9_-]/g, "
 // rounded position (two decimals, about a kilometre) is kept, and others see only the district's name. Without a
 // location, a district they pick, or one in turn.
 const r2 = (v) => Math.round(v * 100) / 100;
-function homeArea({ area, lat, lon, crew }) {
+// In real mode there is no made-up town: a person is where they are (rounded to two decimals, about a kilometre),
+// measured in kilometres from the region's centre, and their area is the place they gave, or "near you" to others.
+function realHome({ lat, lon, label }) {
+  const g = getWorld().town.geo, geo = { lat: r2(+lat), lon: r2(+lon) };
+  const x = ((geo.lon - g.lon) * 111.32 * Math.cos((g.lat * Math.PI) / 180)) / g.unitKm, y = ((g.lat - geo.lat) * 110.57) / g.unitKm;
+  return { area: { x: +x.toFixed(3), y: +y.toFixed(3), name: String(label || "").split(",")[0].trim().slice(0, 40) || null }, geo };
+}
+const hasGeo = (lat, lon) => lat != null && lon != null && lat !== "" && lon !== "" && Number.isFinite(+lat) && Number.isFinite(+lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180;
+function homeArea({ area, lat, lon, crew, label }) {
+  if (REAL) return hasGeo(lat, lon) ? realHome({ lat, lon, label }) : { area: null };
   const w = getWorld(), all = w.town.map.districts, unit = w.town.geo?.unitKm || 1.25, near = (x, y) => all.reduce((a, d) => (Math.hypot(d.x - x, d.y - y) < Math.hypot(a.x - x, a.y - y) ? d : a));
   if (lat != null && lon != null && lat !== "" && lon !== "" && Number.isFinite(+lat) && Number.isFinite(+lon) && Math.abs(lat) <= 90 && Math.abs(lon) <= 180) {
     const geo = { lat: r2(+lat), lon: r2(+lon) }, anchor = crew && db.data.people.find((p) => p.crew === crew && p.geo);
@@ -45,14 +54,14 @@ function homeArea({ area, lat, lon, crew }) {
 }
 
 // the person for a provider's account: made the first time, found again later
-export function personFor(provider, providerId, name, { area = null, crew = null, lat = null, lon = null } = {}) {
+export function personFor(provider, providerId, name, { area = null, crew = null, lat = null, lon = null, label = null, nearby = false } = {}) {
   const id = `u_${crypto.createHash("sha256").update(`${provider}:${providerId}`).digest("hex").slice(0, 10)}`;
   const known = db.data.people.find((p) => p.id === id);
   if (known) { if (crew && !known.crew) joinCrew(known, crew); return known; }
-  const w = getWorld(), c = cleanCrew(crew), home = homeArea({ area, lat, lon, crew: c });
+  const w = getWorld(), c = cleanCrew(crew), home = homeArea({ area, lat, lon, crew: c, label });
   const clean = String(name || "").replace(/[^\p{L}\p{N} .'-]/gu, "").trim().slice(0, 40) || "New member";
   const p = { id, name: clean, level: "B", free: FREE, ...home, prefers: "any",
-    interests: w.activities.map((a) => a.id), paypal: `${id}@join-demo.example`, joined: { provider, at: new Date().toISOString() }, ...(c ? { crew: c } : {}) };
+    interests: w.activities.map((a) => a.id), paypal: `${id}@join-demo.example`, joined: { provider, at: new Date().toISOString() }, ...(c ? { crew: c } : {}), ...(nearby ? { nearby: true } : {}) };
   db.data.people.push(p); db.save();
   return place(p);
 }
@@ -73,6 +82,15 @@ export function joinCrew(pOrId, code) {
   const p = typeof pOrId === "string" ? db.data.people.find((x) => x.id === pOrId) : pOrId, c = cleanCrew(code);
   if (!p || !c) return null;
   p.crew = c; db.save();
+  return p;
+}
+// A person sets (or moves) their home, and whether people near them who share an interest may invite them
+export function setHome(playerId, { lat, lon, label = null, nearby }) {
+  const p = db.data.people.find((x) => x.id === playerId);
+  if (!p) return null;
+  if (hasGeo(lat, lon)) Object.assign(p, REAL ? realHome({ lat, lon, label }) : homeArea({ lat, lon, crew: p.crew, label }));
+  if (typeof nearby === "boolean") p.nearby = nearby;
+  db.save();
   return p;
 }
 export const crewSize = (code) => db.data.people.filter((x) => x.crew === cleanCrew(code)).length;

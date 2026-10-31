@@ -13,7 +13,7 @@ const PlaceScheduler = lazy(() => import("../components/PlaceScheduler.jsx"));
 
 export default function Venue({ query }) {
   const w = useWorld();
-  const [id, setId] = useState(query.get("id") || "westgate");
+  const [id, setId] = useState(query.get("id") || (w?.real ? w.venues[0]?.id : "westgate") || "westgate");
   const [tick, setTick] = useState(0);
   // the schedule follows payments as they happen
   useEffect(() => { const t = setInterval(() => setTick((x) => x + 1), 3000); return () => clearInterval(t); }, []);
@@ -27,6 +27,7 @@ export default function Venue({ query }) {
   return (
     <div className="page wide">
       <header className="page-head"><h1>{tr("Venue view")}</h1><p className="muted">{tr("What a venue sees: its courts, rooms or tables, with the bookings Join's agents made. Dashed: held while the group pays. Solid: paid and locked.")}</p></header>
+      {w?.real && <RegisterVenue activities={w.activities} onDone={(v) => { location.hash = `/venue?id=${v.id}`; location.reload(); }} />}
       <div className="seg">{w?.venues.map((x) => <button key={x.id} className={x.id === id ? "on" : ""} onClick={() => { setId(x.id); setDate(null); }}>{x.name}</button>)}</div>
       {dates.length > 0 && <div className="seg small">{dates.map((d) => <button key={d} className={d === day ? "on" : ""} onClick={() => setDate(d)}>{d}</button>)}</div>}
       <section className="card sched">
@@ -92,5 +93,32 @@ function VenueReviews({ id }) {
       <ul className="reviews-list">{s.latest.map((x, i) => <li key={i}><b>{"★".repeat(x.stars)}</b> <small className="muted">{x.at} · {x.activity} · {x.verified}</small><br />{x.text || <span className="muted">(no text)</span>}</li>)}</ul>
       <p className="small muted">Reviews can't be removed or hidden by the venue.</p>
     </section>
+  );
+}
+
+// A venue joins Join: its name, its real address (looked up on OpenStreetMap), what it offers, how many, the price and
+// its hours. It is then bookable, haggling by default rules it can change below, and its staff are signed in.
+function RegisterVenue({ activities, onDone }) {
+  const [open, setOpen] = useState(false), [f, setF] = useState({ name: "", address: "", activity: "badminton", units: 4, price: 20, per: "hour", from: "10:00", to: "22:00" }), [err, setErr] = useState(null), [busy, setBusy] = useState(false);
+  const set = (k) => (e) => setF({ ...f, [k]: e.target.type === "number" ? +e.target.value : e.target.value });
+  const send = async (e) => {
+    e.preventDefault(); setErr(null); setBusy(true);
+    try { const r = await api("/api/venues/register", { method: "POST", body: { name: f.name, address: f.address, open: [f.from, f.to], offers: { [f.activity]: { units: f.units, per: f.per, price: f.price } } } }); onDone(r.venue); }
+    catch (x) { setErr(x.message); }
+    setBusy(false);
+  };
+  if (!open) return <p className="small"><button className="btn small" onClick={() => setOpen(true)}>{tr("Register your venue")}</button> <span className="muted">Run a court, a karaoke room, a café? Put it on Join with its real address, and groups' agents can book and pay you.</span></p>;
+  return (
+    <form className="card register" onSubmit={send}>
+      <h3>{tr("Register your venue")}</h3>
+      <label><span>Name</span><input value={f.name} onChange={set("name")} required maxLength={60} /></label>
+      <label><span>Address (looked up on OpenStreetMap)</span><input value={f.address} onChange={set("address")} required placeholder="e.g. 台北市大安區復興南路一段 / a station / a landmark" /></label>
+      <label><span>Activity</span><select value={f.activity} onChange={set("activity")}>{activities.map((a) => <option key={a.id}>{a.id}</option>)}</select></label>
+      <label><span>How many (courts, rooms, tables)</span><input type="number" min="1" max="50" value={f.units} onChange={set("units")} /></label>
+      <label><span>Price (USD)</span><span className="money-in">$<input type="number" min="1" step="1" value={f.price} onChange={set("price")} /> <select value={f.per} onChange={set("per")}><option value="hour">per hour</option><option value="person">per person</option></select></span></label>
+      <label><span>Open</span><span><input type="time" value={f.from} onChange={set("from")} /> – <input type="time" value={f.to} onChange={set("to")} /></span></label>
+      {err && <p className="err small">{err}</p>}
+      <button className="btn primary" disabled={busy}>{busy ? "…" : tr("Register your venue")}</button>
+    </form>
   );
 }

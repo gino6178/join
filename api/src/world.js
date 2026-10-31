@@ -2,6 +2,7 @@
 // The demo world is api/data/world.json, made up. A real venue plugs in by implementing hours() and freeCourts()
 // against its own booking system; everything above this file only calls those.
 import fs from "node:fs";
+import crypto from "node:crypto";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { dateOf, toMin, ymd } from "./time.js";
@@ -10,6 +11,18 @@ import { store, stateFile } from "./store.js";
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const FILE = process.env.WORLD_FILE || path.join(HERE, "../data/world.json");
 let world = JSON.parse(fs.readFileSync(FILE, "utf8"));
+// Two modes. "real" (the default): no made-up town. People are where they really are (their location, rounded to
+// about a kilometre), the venues are the ones that registered on Join with their real address, and real places from
+// OpenStreetMap near a group are suggested too (osm.js). "demo" (the tests, and JOIN_TOWN=demo): the made-up town in
+// world.json, its residents and its venues, for working offline.
+export const MODE = process.env.JOIN_TOWN || (process.env.NODE_TEST_CONTEXT ? "demo" : "real");
+export const REAL = MODE === "real";
+if (REAL) {
+  const [lat, lon] = String(process.env.JOIN_REGION_CENTER || "25.0330,121.5654").split(",").map(Number);
+  world = { ...world, demo: false, note: "Real people and real places: venues that registered on Join, and places from OpenStreetMap.",
+    town: { name: process.env.JOIN_REGION_NAME || "Taipei", timeZone: process.env.JOIN_TZ || "Asia/Taipei", w: 0, h: 0, geo: { lat, lon, unitKm: 1.25 }, map: { districts: [], parks: [], roads: [], river: [], lake: null } },
+    venues: [], players: [], publicPlaces: [] };
+}
 // Dates and times on Join are the town's local ones ("2026-11-05 19:00" in San Jose), wherever the server runs: the
 // process takes the town's time zone, so "today", "an hour from now" and a booking's start all agree.
 if (world.town.timeZone && !process.env.JOIN_KEEP_TZ) process.env.TZ = world.town.timeZone;
@@ -38,6 +51,29 @@ export function setPolicy(venueId, p) {
   return { venue: venueId, policy: next };
 }
 
+// Partner venues: registered on Join by their staff, with a real address, opening hours, what they offer and their
+// prices; the same negotiation policies as any venue. In real mode these are the only bookable venues.
+const partners = store(stateFile("partner-venues"), { venues: [] });
+export const partnersStore = partners;
+const placePartner = (v) => { const t = REAL ? { x: +(((v.lon - world.town.geo.lon) * 111.32 * Math.cos((world.town.geo.lat * Math.PI) / 180)) / 1.25).toFixed(3), y: +(((world.town.geo.lat - v.lat) * 110.57) / 1.25).toFixed(3) } : {}; const p = { ...v, ...t }; if (!world.venues.some((x) => x.id === v.id)) world.venues.push(p); return p; };
+if (REAL) for (const v of partners.data.venues) placePartner(v);
+export function registerVenue({ name, lat, lon, address = "", open = ["10:00", "22:00"], weekendOpen = null, offers = {}, payee = null }) {
+  const clean = String(name || "").replace(/[<>]/g, "").trim().slice(0, 60);
+  const time = (s) => /^([01]\d|2[0-3]):[0-5]\d$/.test(String(s));
+  if (!clean || !Number.isFinite(+lat) || !Number.isFinite(+lon) || Math.abs(lat) > 90 || Math.abs(lon) > 180) return { error: "invalid", message: "A venue needs a name and its real location (lat, lon)." };
+  const off = {};
+  for (const [act, o] of Object.entries(offers || {})) if (world.activities.some((a) => a.id === act) && Number.isInteger(o.units) && o.units >= 1 && o.units <= 50 && +o.price > 0 && +o.price < 1000 && ["hour", "person"].includes(o.per)) off[act] = { units: o.units, per: o.per, price: +o.price };
+  if (!Object.keys(off).length) return { error: "invalid", message: "Say what you offer: offers: { badminton: { units: 4, per: \"hour\", price: 20 } }." };
+  if (!(Array.isArray(open) && open.every(time))) return { error: "invalid", message: "open is [\"HH:MM\", \"HH:MM\"]." };
+  const id = `v_${crypto.randomBytes(5).toString("hex")}`;
+  const v = { id, name: clean, area: String(address).slice(0, 80), lat: +(+lat).toFixed(5), lon: +(+lon).toFixed(5), open, ...(weekendOpen && weekendOpen.every?.(time) ? { weekendOpen } : {}), peakBusy: 0, offBusy: 0,
+    policy: { style: "standard", floorPct: 0.8, rounds: 3, group: { min: 4, pct: 0.1 } }, payee: payee || `${id}@join-venue.example`, offers: off, partner: true, registered: new Date().toISOString() };
+  partners.data.venues.push(v); partners.save();
+  return placePartner(v);
+}
+
+// kilometres-based position (the units trips use) of a real place, from the region's centre
+export const toKm = (lat, lon) => ({ x: +(((lon - world.town.geo.lon) * 111.32 * Math.cos((world.town.geo.lat * Math.PI) / 180)) / world.town.geo.unitKm).toFixed(3), y: +(((world.town.geo.lat - lat) * 110.57) / world.town.geo.unitKm).toFixed(3) });
 export const getWorld = () => world;
 export const setWorld = (w) => { world = w; };
 

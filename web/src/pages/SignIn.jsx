@@ -7,11 +7,11 @@ import Icon from "../components/Icon.jsx";
 // account with just a name, or as one of the demo town's residents. And, for AI agents, the way in.
 const BRAND = { google: "#4285F4", facebook: "#1877F2", line: "#06C755", paypal: "#003087" };
 export default function SignIn({ info, onIn }) {
-  const [world, setWorld] = useState(null), [err, setErr] = useState(null), [auth, setAuth] = useState(null), [name, setName] = useState(""), [area, setArea] = useState(""), [where, setWhere] = useState(null), [whereMsg, setWhereMsg] = useState(null), [crew, setCrew] = useState(() => new URLSearchParams(location.hash.split("?")[1] || "").get("crew") || "");
+  const [world, setWorld] = useState(null), [err, setErr] = useState(null), [auth, setAuth] = useState(null), [name, setName] = useState(""), [place, setPlace] = useState(""), [nearby, setNearby] = useState(false), [area, setArea] = useState(""), [where, setWhere] = useState(null), [whereMsg, setWhereMsg] = useState(null), [crew, setCrew] = useState(() => new URLSearchParams(location.hash.split("?")[1] || "").get("crew") || "");
   useEffect(() => { api("/api/world").then(setWorld).catch(setErr); api("/api/auth/providers").then(setAuth).catch(() => {}); }, []);
   useEffect(() => { const m = /signin=([^&]+)/.exec(location.hash); if (m && m[1] !== "off") setErr(new Error(decodeURIComponent(m[1]))); }, []);
   const pick = async (id) => { try { await api("/api/session", { method: "POST", body: { player: id } }); location.hash = "/"; onIn(); } catch (e) { setErr(e); } };
-  const fresh = async (e) => { e.preventDefault(); try { await api("/api/auth/demo", { method: "POST", body: { name, area, crew, ...(where || {}) } }); location.hash = "/"; onIn(); } catch (x) { setErr(x); } };
+  const fresh = async (e) => { e.preventDefault(); try { await api("/api/auth/demo", { method: "POST", body: { name, area, crew, nearby, ...(where || (place ? { place } : {})) } }); location.hash = "/"; onIn(); } catch (x) { setErr(x); } };
   const on = (auth?.providers || []).filter((p) => p.on), off = (auth?.providers || []).filter((p) => !p.on);
   return (
     <div className="signin">
@@ -49,13 +49,17 @@ export default function SignIn({ info, onIn }) {
               if (!navigator.geolocation || !window.isSecureContext) { setWhereMsg(tr("This browser only shares your location with secure (https) sites; pick your district instead.")); return; }
               navigator.geolocation.getCurrentPosition((p) => { setWhere({ lat: p.coords.latitude, lon: p.coords.longitude }); setWhereMsg(tr("Got it: Join keeps it rounded to about a kilometre, and others see only your district.")); }, () => setWhereMsg(tr("Location not shared; pick your district instead.")), { timeout: 8000 });
             }}>{where ? tr("Location shared") : tr("Use my location")}</button>
-            {!where && <select value={area} onChange={(e) => setArea(e.target.value)} aria-label={tr("Where you live")}><option value="">{tr("Or pick your district")}</option>{(auth?.areas || []).map((d) => <option key={d}>{d}</option>)}</select>}
+            {!where && (auth?.real
+              ? <input value={place} onChange={(e) => setPlace(e.target.value)} placeholder={tr("Or type where you live (a neighbourhood, a station)")} aria-label={tr("Where you live")} required={!where} />
+              : <select value={area} onChange={(e) => setArea(e.target.value)} aria-label={tr("Where you live")}><option value="">{tr("Or pick your district")}</option>{(auth?.areas || []).map((d) => <option key={d}>{d}</option>)}</select>)}
             {whereMsg && <small className="muted">{whereMsg}</small>}
           </span>
           <label><span>{tr("Friends' crew code (optional)")}</span><input value={crew} onChange={(e) => setCrew(e.target.value)} placeholder="e.g. badminton-fri" maxLength={32} /></label>
           <small className="muted">{tr("Friends who type the same crew code are invited to each other's plans first.")}</small>
+          {auth?.real && <label className="check"><input type="checkbox" checked={nearby} onChange={(e) => setNearby(e.target.checked)} />{tr("People near me who like the same things may invite me")}</label>}
           <button className="btn primary">{tr("Start")}</button>
         </form>}
+        {!auth?.real && <>
         <h3>{tr("Or be one of the demo town's residents")}</h3>
         <p className="muted">A made-up town placed on San Jose, CA. {info?.paypal === "mock" ? "PayPal is simulated: no money moves." : "PayPal sandbox: test money only."}</p>
         {err && <p className="err">{err.message}</p>}
@@ -63,6 +67,9 @@ export default function SignIn({ info, onIn }) {
         <div className="players">{world?.players.filter((p) => !p.id.startsWith("u_")).map((p) => (
           <button key={p.id} className="player-btn" onClick={() => pick(p.id)}><span className="avatar">{p.name[0]}</span><span><b>{p.name}</b><small>{p.area?.name} · {p.interests.join(", ")}</small></span></button>
         ))}</div>
+        </>}
+        {auth?.real && <p className="small muted">{tr("Real people and real places: friends and people near you who opted in; venues on Join, and places from OpenStreetMap. Payments are PayPal sandbox: test money only.")}</p>}
+        {auth?.real && err && <p className="err">{err.message}</p>}
       </section>
     </div>
   );

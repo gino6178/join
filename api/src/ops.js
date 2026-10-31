@@ -5,7 +5,9 @@
 import * as people from "./people.js";
 import { forPlayer, onActivity } from "./activity.js";
 import { personLink } from "./auth.js";
-import { getWorld, venue, player, freeUnits, forActivity, ACTIVITIES, activity as getActivity, unitName } from "./world.js";
+import { places as osmPlaces, geocode } from "./osm.js";
+import { kmBetween } from "./geo.js";
+import { REAL, toKm, getWorld, venue, player, freeUnits, forActivity, ACTIVITIES, activity as getActivity, unitName } from "./world.js";
 import * as neg from "./negotiate/engine.js";
 import { price, cents, usd } from "./negotiate/policy.js";
 import { alternatives as alts, shareOf } from "./alternatives.js";
@@ -86,7 +88,17 @@ function wishCost(wish, rv) {
   for (const k of wish.aspects) { const n = rv.aspectCounts?.[k], all = rv.count || 1; if (!n) continue; c -= Math.min(12, (n.liked / all) * 24); c += Math.min(12, (n.disliked / all) * 30); }
   return c;
 }
-export function findOptions(a, { activity = "badminton", date = null, dates = [], from = null, to = null, minutes = null, players = 3, people = null, with: want = [], prefer = null } = {}) {
+// In real mode, the real places near your person (OpenStreetMap) are fetched first, so find_options can suggest them
+// beside the venues on Join; a person needs a location for that.
+const NEAR_KM = +(process.env.JOIN_NEAR_KM || 8);
+export async function findOptionsLive(a, args = {}) {
+  if (!REAL) return findOptions(a, args);
+  const me = player(a.player);
+  if (!me?.geo) return { error: "location_needed", message: "Join matches people and places by where they really are: set your person's home first (set_home with a place name, or lat and lon)." };
+  const found = await osmPlaces(args.activity || "badminton", me.geo, 4, { waitMs: 12e3 });
+  return findOptions(a, { ...args, _places: found.map((p) => ({ ...p, ...toKm(p.lat, p.lon) })) });
+}
+export function findOptions(a, { activity = "badminton", date = null, dates = [], from = null, to = null, minutes = null, players = 3, people = null, with: want = [], prefer = null, _places = [] } = {}) {
   const wish = wishes(prefer);
   if (Number.isInteger(people) && people >= 1) players = people - 1; // ("people" is the whole group, your user included)
   if (date && !dates.length) dates = [date];
@@ -98,7 +110,7 @@ export function findOptions(a, { activity = "badminton", date = null, dates = []
   if ((from && !isTime(from)) || (to && !isTime(to)) || dates.some((d) => !isDate(d))) return { error: "bad_time", message: "dates are YYYY-MM-DD, from and to HH:MM." };
   const need = Math.max(1, Math.min(11, players | 0));
   const days = dates.length ? dates.slice(0, 7) : Array.from({ length: 7 }, (_, i) => addDays(ymd(now), i));
-  const mine = windows(me.free), crew = me.crew ? me.crew : null, others = getWorld().players.filter((p) => p.id !== me.id && (want.includes(p.id) || (crew && p.crew === crew) || (!p.joined && (p.interests || []).includes(activity)))); // (people who joined Join themselves: your crewmates, or anyone you name)
+  const mine = windows(me.free), crew = me.crew ? me.crew : null, others = getWorld().players.filter((p) => p.id !== me.id && (want.includes(p.id) || (crew && p.crew === crew) || (!p.joined && (p.interests || []).includes(activity)) || (p.nearby && me.area && p.area && kmBetween(me.area, p.area) <= NEAR_KM && (p.interests || []).includes(activity)))); // (people who joined Join themselves: your crewmates, anyone you name, and people near you who said they'd like to be invited)
   const opts = [];
   for (const d of days) {
     const date = dateOf(d);
@@ -123,12 +135,24 @@ export function findOptions(a, { activity = "badminton", date = null, dates = []
         seen.push(cand);
         if (!best || cost < best.cost) best = cand;
       }
+      const real = _places.map((p) => ({ p, t: trips(group, p) })).filter((x) => !wish.maxTrip || x.t.longest <= wish.maxTrip).sort((x, y) => x.t.longest - y.t.longest).slice(0, 3);
+      const nearbyReal = real.map(({ p, t }) => ({ name: p.name, longestTrip: t.longest, address: p.address || null, url: p.url, onJoin: false }));
+      if (!best && real.length) {
+        const { p, t } = real[0];
+        opts.push({ date: d, day: DAYS[date.getDay()], start: hm(s), minutes, players: group.map((g) => g.id), names: group.map((g) => g.name), alsoFree: free.slice(need, need + 3).map((x) => x.p.id),
+          venue: p.id, venueName: p.name, onJoin: false, url: p.url, address: p.address || null, longestTrip: t.longest, askPrice: null, share: null, discounts: [],
+          note: "A real place near you, not on Join: Join can't check its availability, haggle or take payment there. Book with them directly, or pick a venue on Join.",
+          fits: fitsOf(wish, { myTrip: t.list.find((x) => x.id === me.id)?.min ?? null, longestTrip: t.longest, ask: 0, reviews: {} }, group.length).filter((f) => !f.startsWith("$")),
+          ...(real.length > 1 ? { nearbyReal: nearbyReal.slice(1) } : {}),
+          score: want.filter((id) => group.some((g) => g.id === id)).length * 5 - t.longest * (wish.near ? 0.6 : 0.2) - days.indexOf(d) * 0.3 - 3 });
+        continue;
+      }
       if (!best) continue;
       const asked = want.filter((id) => group.some((g) => g.id === id)).length;
       opts.push({ date: d, day: DAYS[date.getDay()], start: hm(s), minutes, players: group.map((g) => g.id), names: group.map((g) => g.name), alsoFree: free.slice(need, need + 3).map((x) => x.p.id),
         venue: best.venue, venueName: best.venueName, longestTrip: best.longestTrip, askPrice: usd(best.ask), share: usd(shareOf(best.ask, group.length)), discounts: best.discounts,
         reviews: { score: best.reviews.score, count: best.reviews.count, praise: best.reviews.praise.map((p) => p.aspect), complaints: best.reviews.complaints.map((p) => p.about), groupLow: best.reviews.groupLow, tasteNotes: best.reviews.tasteNotes, demoData: best.reviews.demoData > 0, reason: reviews.reason(best.reviews) },
-        fits: fitsOf(wish, best, group.length),
+        fits: fitsOf(wish, best, group.length), onJoin: true, ...(nearbyReal.length ? { nearbyReal } : {}),
         ...(seen.length > 1 ? { alsoConsidered: seen.filter((x) => x !== best).sort((x, y) => x.cost - y.cost).slice(0, 2).map((x) => ({ venue: x.venue, venueName: x.venueName, longestTrip: x.longestTrip, share: usd(shareOf(x.ask, group.length)), score: x.reviews.score, ...(wish.near || wish.cheap || wish.maxTrip || wish.aspects.length ? { fits: fitsOf(wish, x, group.length) } : {}) })) } : {}),
         score: asked * 5 - best.longestTrip * (wish.near ? 0.6 : 0.2) - (best.ask / 1000) * (wish.cheap ? 3 : 1) - days.indexOf(d) * 0.3 - wishCost(wish, best.reviews) * 0.05 });
     }
@@ -166,7 +190,16 @@ export function venueReviews(a, { venue: venueId, activity = null, players = [] 
   return { ...s, venueName: venue(venueId).name, reason: reviews.reason(s), about: "Only people who booked and paid on Join can review; agents can read reviews, never write them. Score: a recency-weighted Bayesian average. Seed reviews in the demo town are demo data." };
 }
 
+// where a person lives, from a place name (looked up on OpenStreetMap) or lat/lon; and whether people nearby may invite them
+export async function setHome(a, { place = null, lat = null, lon = null, nearby } = {}) {
+  let where = lat != null && lon != null ? { lat, lon, label: place } : null;
+  if (!where && place) { const g = await geocode(place); if (!g) return { error: "not_found", message: `No place called "${place}" found on OpenStreetMap: try a neighbourhood, a station or a landmark.` }; where = { ...g, label: place }; }
+  const p = people.setHome(a.player, { ...(where || {}), nearby });
+  if (!p) return { error: "not_yours", message: "Only people who joined Join have a home to set (not the demo town's residents)." };
+  return { ok: true, home: p.area?.name || (p.geo ? "set" : null), nearby: !!p.nearby, note: "Kept rounded to about a kilometre; others see only the place's name." };
+}
 export function startNegotiation(a, { venue: venueId, activity, date, start, minutes = 90, players = [] }) {
+  if (String(venueId).startsWith("osm:")) return { error: "not_on_join", message: "That place isn't on Join: Join can't check its availability, haggle or take payment there. Book with them directly (the option has its link), or pick a venue on Join." };
   openMandates(a);
   const r = neg.open({ by: a.player, players, venue: venueId, activity, date, start, minutes, agentKid: a.token || "website-agent" });
   const v = venue(venueId);
@@ -191,6 +224,9 @@ function mandateCheck(a, presented, { venue: venueId, share, authorized = share,
 // whether this caller may start a payment: the person on the website (or Join's website agent, in their session), or an
 // agent token with the pay scope
 const mayPay = (a) => !a.scopes || a.scopes.includes("pay");
+// the share a limit is checked against: the even split, rounded; the organizer's odd cents from a split (at most one
+// per friend) don't count against their limit
+const evenShare = (total, k) => Math.round(total / k);
 const ownShare = (total, k) => total - Math.floor(total / k) * (k - 1);
 
 // For agents: a deal's reply after the guarantee it triggered has started, with the booking as it now stands
@@ -204,7 +240,7 @@ export function makeOffer(a, { negotiation, amount, mandate }) {
   const c = toCents(amount);
   if (!c) return { error: "bad_amount", message: "amount is the total for the booking in USD as a number, e.g. 30 or 31.5 (not the per-person share)." };
   const cur = neg.status({ id: negotiation, by: a.player });
-  if (!cur.error) { const no = mandateCheck(a, mandate, { venue: cur.venue, share: ownShare(Math.min(c, cents(cur.ask)), cur.players.length), date: cur.date, start: cur.start }); if (no) return no; }
+  if (!cur.error) { const no = mandateCheck(a, mandate, { venue: cur.venue, share: evenShare(Math.min(c, cents(cur.ask)), cur.players.length), date: cur.date, start: cur.start }); if (no) return no; }
   const r = settle.deferGuarantee(!mayPay(a), () => neg.offer({ id: negotiation, by: a.player, amount: c }));
   const n = r.error ? r.negotiation : r;
   if (n) record({ actor: by(a), who: n.players, action: r.error ? "offer_refused" : r.status === "agreed" ? "deal" : r.status === "rejected" ? "venue_rejected" : "venue_countered", ref: n.id,
@@ -215,7 +251,7 @@ export function makeOffer(a, { negotiation, amount, mandate }) {
 
 export function acceptPrice(a, { negotiation, mandate }) {
   const cur = neg.status({ id: negotiation, by: a.player });
-  if (!cur.error) { const no = mandateCheck(a, mandate, { venue: cur.venue, share: ownShare(cents(cur.ask), cur.players.length), date: cur.date, start: cur.start }); if (no) return no; }
+  if (!cur.error) { const no = mandateCheck(a, mandate, { venue: cur.venue, share: evenShare(cents(cur.ask), cur.players.length), date: cur.date, start: cur.start }); if (no) return no; }
   const r = settle.deferGuarantee(!mayPay(a), () => neg.accept({ id: negotiation, by: a.player }));
   const n = r.error ? r.negotiation : r;
   if (n) record({ actor: by(a), who: n.players, action: r.error ? "accept_refused" : "deal", ref: n.id, summary: r.error ? `${said(a)} tried to accept $${n.ask}: ${r.message}` : `${said(a)} accepted ${n.venueName}'s $${n.agreed.amount}. Next: ${first(a.player)} guarantees the whole $${n.agreed.amount} in PayPal until the others pay; ${first(a.player)}'s own share is $${organizerShare(n)}, and at most $${n.agreed.amount} if nobody else pays.`, data: r.alternatives ? { alternatives: r.alternatives } : null });
@@ -262,7 +298,9 @@ export async function payMyShare(a, { booking, mandate, amount = null }) {
   if (!b0.error && b0.payments?.[a.player]) {
     // (an organizer paying from saved PayPal authorizes the whole price; above `cover`, they approve it in PayPal themselves)
     const p = b0.payments[a.player], total = Math.round(+b0.total * 100), self = p.role === "organizer" && settle.hasVault(a.player) && coverFits(a.player, total);
-    const no = mandateCheck(a, mandate, { venue: b0.venue, share: Math.round(+p.share * 100), authorized: self ? total : Math.round(+p.share * 100), date: b0.date, start: b0.start, booking }); if (no) return no;
+    // (the organizer's own share is checked as the even split: the odd cents a split leaves them aren't over their limit)
+    const own = p.role === "organizer" && !(b0.shareChanges || []).length ? Math.min(Math.round(+p.share * 100), evenShare(total, b0.players.length)) : Math.round(+p.share * 100);
+    const no = mandateCheck(a, mandate, { venue: b0.venue, share: own, authorized: self ? total : own, date: b0.date, start: b0.start, booking }); if (no) return no;
   }
   const r = await settle.pay(booking, a.player);
   if (!r.error) record({ actor: by(a), who: [a.player], action: "pay_requested", ref: booking, summary: r.you?.status === "authorized" ? (r.you.via === "vault" ? `${said(a)} paid ${first(a.player)}'s $${r.you.authorized} from saved PayPal, within the limit.` : `${said(a)} started ${first(a.player)}'s $${r.you.authorized} payment; PayPal authorized it (${r.you.via}).`) : r.you?.approveUrl ? `${said(a)} asked ${first(a.player)} to approve $${r.you.authorized} in PayPal.` : `${said(a)} checked the payment: ${r.you?.status || r.state}.` });

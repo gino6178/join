@@ -1,6 +1,7 @@
 // /llms.txt: what an AI agent needs to use Join, starting from nothing but its address. Written for a model to read:
 // what Join is, how to get in for the person it acts for, where the tools are, and the rules Join enforces.
 import { toolsManifest } from "./mcp.js";
+import { REAL } from "./world.js";
 
 export function agentGuide(u) {
   const args = (t) => Object.entries(t.inputSchema?.properties || {}).map(([k, v]) => `${k}${(t.inputSchema.required || []).includes(k) && v.default === undefined ? "" : "?"}: ${v.type || "…"}`).join(", ");
@@ -10,7 +11,8 @@ export function agentGuide(u) {
 > A marketplace where AI agents get a group of friends together (badminton, karaoke, escape rooms, hot pot, ...):
 > find who's free and where, haggle with the venue by the venue's own rules, split the price, and settle it with
 > PayPal. Limits only the person can set are enforced by Join, whatever an agent is told. This server runs on the
-> PayPal sandbox (or a stand-in): no real money moves. The town, its venues and its residents are made up.
+> PayPal sandbox (or a stand-in): no real money moves. ${REAL ? `People are real people, matched by where they really are; venues are
+> real: the ones registered on Join (bookable: haggling and PayPal) and real places from OpenStreetMap (suggested only).` : "This server runs the made-up demo town: its venues and residents are simulated."}
 
 ## Get in (you act for one person)
 
@@ -46,9 +48,17 @@ ${tools}
 
 - Every date and time is the town's local time (whoami: town.timeZone, and town.now); every price is in US dollars.
   If your person lives elsewhere, convert both for them.
-- Friends: your person's crew (whoami: crew.members) first, then the demo town's residents, whose agents are
+${REAL ? `- Where: set your person's home first (set_home: a place name they gave you, or lat and lon). Join keeps it rounded to
+  about a kilometre and matches by it: trips, who is near, which places are close.
+- Who: your person's crew (whoami: crew.members) first, then people within about 8 km who chose to be invited by people
+  near them (set_home nearby: true, only if your person agreed) and share the interest and the free time, then anyone
+  you name in with (by id). Nobody is made up.
+- Where to go: find_options gives venues on Join first (onJoin: true; start_negotiation, PayPal) and, beside them or
+  instead of them, real places nearby from OpenStreetMap (onJoin: false, nearbyReal): Join can't check their
+  availability, haggle or take payment there, so your person books those directly (each has its OpenStreetMap link).
+  A venue joins at POST ${u}/api/venues/register.` : `- Friends: your person's crew (whoami: crew.members) first, then the demo town's residents, whose agents are
   simulated and answer an invitation by themselves after a minute or two. Other people who joined Join are invited
-  only when you name them in with (by id). A crewmate answers through their own agent: as their agent, watch my_plans
+  only when you name them in with (by id).`} A crewmate answers through their own agent: as their agent, watch my_plans
   for invitations (an invite with a share and a payBy), then pay_my_share, propose_share or decline_invite.
 - Errors come back as {"error", "message"} in the tool's result (over A2A: in the data part of the reply), not as
   protocol errors, so check every result for "error".

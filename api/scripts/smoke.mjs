@@ -18,6 +18,55 @@ const call = async (method, p, body) => {
 const scout = (tool, args) => call("POST", `/api/scout/${tool}`, args);
 const wait = (ms) => new Promise((ok) => setTimeout(ok, ms));
 
+// A server in real mode (no made-up town) is checked with real people: a sandbox test venue registered once near a
+// fixed point, two people who live near it in one crew, the organizer's plan through Join's website agent, and the
+// friend paying from their own session. Then the same lock, receipt and log checks as the demo town's.
+const mode = (await call("GET", "/api/auth/providers")).body;
+if (mode?.real) await realSmoke();
+async function realSmoke() {
+  if (process.argv.includes("--reset")) await call("POST", "/api/demo/reset");
+  const at = { lat: 25.033, lon: 121.5435 }, name = "Join smoke-test badminton (sandbox)";
+  const w0 = (await call("GET", "/api/world")).body;
+  if (!w0.venues.some((v) => v.name === name)) { const r = await call("POST", "/api/venues/register", { name, ...at, open: ["07:00", "23:00"], offers: { badminton: { units: 6, per: "hour", price: 20 } } }); step(r.status === 200, "registered the sandbox test venue", r.body?.venue?.id); }
+  const join = async (who, body) => { const r = await fetch(`${BASE}/api/auth/demo`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) }); return { cookie: (r.headers.get("set-cookie") || "").split(";")[0], me: (await r.json()).player }; };
+  const ana = await join("ana", { name: "Smoke Ana", lat: at.lat + 0.004, lon: at.lon });
+  cookie = ana.cookie;
+  const crew = (await call("POST", "/api/crew")).body.code;
+  const bo = await join("bo", { name: "Smoke Bo", lat: at.lat - 0.004, lon: at.lon + 0.004, crew });
+  step(!!ana.cookie && !!bo.cookie, "two real people near each other, in one crew", crew);
+  const f = await scout("find_options", { activity: "badminton", players: 1 });
+  const o = (f.body?.options || []).find((x) => x.onJoin && x.players.includes(bo.me.id));
+  step(!!o, "found an option on Join with the friend", o ? `${o.venueName} ${o.date} ${o.start} $${o.askPrice}; nearby real places: ${(o.nearbyReal || []).length}` : JSON.stringify(f.body).slice(0, 160));
+  let n = await scout("start_negotiation", { venue: o.venue, activity: "badminton", date: o.date, start: o.start, minutes: o.minutes, players: [bo.me.id] });
+  step(n.body?.status === "open", "opened a negotiation", `ask $${n.body?.ask}`);
+  while (n.body.status === "open" && !n.body.final && n.body.roundsLeft > 0) n = await scout("make_offer", { negotiation: n.body.id, amount: Math.ceil(+n.body.ask * 70 + 1) / 100 });
+  const a = n.body.status === "agreed" ? n : await scout("accept_price", { negotiation: n.body.id });
+  step(a.body?.status === "agreed" && !!a.body.booking, "deal", `$${a.body?.agreed?.amount}`);
+  const id = a.body.booking.id;
+  let b;
+  // (on the PayPal stand-in, a payment waits for its approval page: approve it, as the payer would)
+  const approve = async (bk) => { if (bk?.you?.approveUrl?.includes("/mock-paypal/") && bk.you.status === "awaiting_approval") { await fetch(bk.you.approveUrl, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: "a=yes", redirect: "manual" }); await call("POST", `/api/bookings/${bk.id}/approved`); } };
+  for (let i = 0; i < 20; i++) { b = (await call("GET", "/api/games")).body.bookings.find((x) => x.id === id); await approve(b); if (b?.state === "held") break; await wait(700); }
+  step(b?.state === "held", "the organizer guaranteed the booking in PayPal", `(${b?.you?.via})`);
+  cookie = bo.cookie;
+  const paid = await call("POST", `/api/bookings/${id}/pay`);
+  for (let i = 0; i < 10; i++) { const mine = (await call("GET", "/api/games")).body.bookings.find((x) => x.id === id); await approve(mine); if (["authorized", "captured"].includes(mine?.you?.status)) break; await wait(700); }
+  step(paid.status === 200, "the friend paid from their own session");
+  cookie = ana.cookie;
+  for (let i = 0; i < 20 && b.state !== "locked"; i++) { await wait(700); b = (await call("GET", "/api/games")).body.bookings.find((x) => x.id === id); }
+  step(b.state === "locked", "everyone paid: the booking is locked");
+  await call("POST", "/api/receipts/batch");
+  b = (await call("GET", "/api/games")).body.bookings.find((x) => x.id === id);
+  const rid = b.receipts?.[0]?.id;
+  step(!!rid, "a receipt was issued", rid);
+  const verifier = path.join(path.dirname(fileURLToPath(import.meta.url)), "../../examples/verify-receipt.mjs");
+  let verified = false;
+  try { execFileSync(process.execPath, [verifier, rid], { env: { ...process.env, JOIN_URL: BASE }, stdio: "pipe" }); verified = true; } catch {}
+  step(verified, "the receipt verifies independently (hash, signature, Merkle path, log inclusion, checkpoint)");
+  console.log(`\nThe main path works on ${BASE} (real mode).`);
+  process.exit(0);
+}
+
 const s = await call("GET", `/demo?as=${WHO}${process.argv.includes("--reset") ? "&reset=1" : ""}`);
 cookie = (s.headers.get("set-cookie") || "").split(";")[0];
 step(!!cookie, `signed in as ${WHO}`);

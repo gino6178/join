@@ -50,6 +50,12 @@ const ZH = {
   "Sign in": "登入", "New here? Make a demo account": "第一次來？建立示範帳號", "Your first name": "你的名字", "Start": "開始",
   "Or be one of the demo town's residents": "或扮演示範城鎮裡的居民", "For AI agents": "給 AI agent",
   // more
+  "Or type where you live (a neighbourhood, a station)": "或輸入你住哪（區域、捷運站）",
+  "People near me who like the same things may invite me": "讓附近興趣相同的人可以邀請我",
+  "Real people and real places: friends and people near you who opted in; venues on Join, and places from OpenStreetMap. Payments are PayPal sandbox: test money only.": "真實的人和真實的地方：你的朋友，以及附近選擇開放邀請的人；Join 上的場地，以及 OpenStreetMap 上的地點。付款是 PayPal 沙盒：只用測試金。",
+  "Real places nearby": "附近的真實地點",
+  "not on Join": "尚未加入 Join",
+  "Register your venue": "註冊你的場地",
   "You're invited": "你被邀請了",
   "your share": "你的份額",
   "answer by": "回覆期限",
