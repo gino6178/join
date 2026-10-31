@@ -153,6 +153,32 @@ be invited by people near you"); a booking says where it is (address, map link, 
 find_options says who is free and how many are missing when nothing fits, and what would bring an over-budget share
 down (a shorter booking, one more person).
 
+## Rounds 7 and 8: can an agent understand every answer?
+
+The same three people, the same sandbox KTV, now asked one more thing: list everything you had to guess. No blocker
+and no bug in either round; what was left was wording.
+
+| Agent | Round 7 | Round 8 |
+|---|---|---|
+| Ana's | [3 confusing](live-test/round7-ana.md) | [3 confusing](live-test/round8-ana.md) |
+| Bo's | [2 confusing](live-test/round7-bo.md) | [2 confusing](live-test/round8-bo.md) |
+| Chen's | [1 confusing](live-test/round7-chen.md) | [3 confusing](live-test/round8-chen.md) |
+
+Round 8 booked karaoke for Anna, Bo and Chen-Wei: haggled $30 down to $28, each paid about $9.33, locked, receipt
+issued. Round 7's confusions were all reported as clear in round 8 or not seen again.
+
+What changed after them:
+- Two people with the same first name are told apart by where they live.
+- A person who joined last is shown as such, and whoami says how a person can be found (home, opt-in, how many people
+  near them opted in).
+- Every time also comes in the town's local time (`payByLocal`, `atLocal`, `serverTimeLocal`, `expiresAtLocal`).
+- find_options spreads options over the days and says for each day why nothing more was found.
+- The limit warning names both limits (a person's own share, and what they may guarantee for a group).
+- Every booking state says what it means.
+- Each person in a plan says what kind of account they have, and an invitee's booking keeps `howYouWereFound`.
+- The invitation news says the distance and why you were invited.
+- `nextStep` says what is true now (for example, locked: nothing more to do).
+
 ## What is still open
 
 - The activity log is written in English only.
