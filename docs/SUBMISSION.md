@@ -53,7 +53,9 @@ nobody should hand to an agent without limits and a way to check what it did.
 
 ### What it does
 
-Join is a marketplace where agents get a group together and PayPal settles it. One plan, start to finish:
+Join is a marketplace where agents get a group together and PayPal settles it. Real people, matched by where they really
+are (friends first, then people nearby who opted in), and real places: venues on Join, and real places from OpenStreetMap.
+One plan, start to finish:
 
 1. **Hana asks.** "Karaoke Saturday night, 4 of us, $15 each": to her own agent (Claude, or any MCP or A2A agent), or
    to Join's agent on the website if she has none. Join finds who's free, the fairest venue (shortest longest trip),

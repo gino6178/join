@@ -54,7 +54,7 @@ each payment stands (**Plans**), the venue and alternatives on the town map (**M
 Scheduler** (dashed while a group pays, solid the moment it is paid and locked), and lets the venue's staff set the
 rules Join negotiates by: style, floor, number of counter-offers, off-peak / group / last-minute discounts.
 
-Dates and times are the town's (San Jose, `America/Los_Angeles`) wherever the server and the viewer are. State is
+Dates and times are the region's (`JOIN_TZ`, Taipei by default; the demo town's is `America/Los_Angeles`) wherever the server and the viewer are. State is
 kept in `api/data/state/` and survives restarts (`JOIN_STATE_DIR=memory` keeps it in memory only).
 
 ## Run it
@@ -122,11 +122,21 @@ An agent needs only Join's address: `/llms.txt` says what Join is, how to get in
 makes on Connect, or, for testing, a demo account: `POST /api/auth/demo {"name"}` then `POST /api/tokens`), the tools
 and the rules. The sign-in page links it under "For AI agents".
 
+## Real people, real places
+
+By default Join runs in real mode: there is no made-up town. People are where they really are (the browser's location,
+or a place they name, looked up on OpenStreetMap, kept rounded to about a kilometre), and Join matches them by it: a
+person's crew first, then people within about 8 km who chose to be invited by people near them and share the interest
+and the free time. Places are real too: venues that registered on Join with their real address (Venue view, or
+`POST /api/venues/register`) are bookable, with haggling and PayPal; real places near the group from OpenStreetMap are
+suggested beside them, marked as not on Join, to book directly. `JOIN_TOWN=demo` brings back the made-up town (the
+tests use it, and it works offline). Region: `JOIN_REGION_CENTER` (lat,lon), `JOIN_REGION_NAME`, `JOIN_TZ`, `JOIN_NEAR_KM`.
+
 ## Signing in
 
 People sign in with Google, Facebook, LINE or PayPal (Log in with PayPal), each one on when the server has its keys
 (`api/.env.example`; the return URL is `<PUBLIC_URL>/auth/<provider>/callback`), or make a demo account with just a
-name. Either way they join the demo town with a home area (a district, never an address), evenings and weekends free
+name. Either way they get a home (their location or a place they name, rounded to about a kilometre; others see only the place's name), evenings and weekends free
 and the default limits. Join keeps the provider's id for them and the name it gave, nothing else from the provider.
 
 | Interface | Where | For |
@@ -271,7 +281,7 @@ in AP2's "Trusted Agent Provider" model: Join is the agent provider, the Limits 
 | `api/src/alternatives.js`, `mandate.js`, `auth.js`, `activity.js` | Alternatives, limits, tokens, the activity log |
 | `api/src/proof/` | Receipts (`receipts.js`), the transparency log and checkpoints (`tlog.js`), Merkle trees (`merkle.js`), AP2 mandates (`mandates.js`) |
 | `api/bench/` | The negotiation benchmark (`npm --prefix api run bench`) |
-| `api/data/world.json` | The made-up demo town (USD, placed on San Jose, CA) |
+| `api/data/world.json` | The activities, and the made-up demo town used by the tests and offline (`JOIN_TOWN=demo`) |
 | `web/` | The website (React, Vite) |
 | `examples/` | Agents from outside: scripted (no key), a Claude player agent, a Claude venue agent on the PayPal Agent Toolkit; the receipt verifier |
 | `docs/` | How Join maps to the judging criteria ([JUDGING.md](docs/JUDGING.md)), the Devpost submission ([SUBMISSION.md](docs/SUBMISSION.md)), the technical overview ([TECHNICAL.md](docs/TECHNICAL.md)), screenshots, the demo video script |

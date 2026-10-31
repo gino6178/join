@@ -90,7 +90,7 @@ use the demo panel to play the friends, and watch each payment's PayPal status, 
 - **For PayPal:** one group plan becomes several PayPal payments on both sides. Four friends booking a court are four
   orders, four authorizations, four captures and a payout, plus invoices and payouts when someone doesn't pay or the
   venue bills extras. A plan that would otherwise be settled in a group chat runs on PayPal.
-- **Any group activity, any agent:** 11 activities across 10 venues in the demo town, and any MCP or A2A agent can use
+- **Any group activity, any agent, real places:** 11 activities; people matched by where they really are; venues that registered on Join (bookable) and real places from OpenStreetMap (suggested); and any MCP or A2A agent can use
   it. Multiparty (the venue as `payee`, Join's fee as `platform_fees`) is the production path once partner
   onboarding is available (README, "Why Payouts and not multiparty (yet)").
 
