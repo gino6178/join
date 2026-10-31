@@ -295,16 +295,17 @@ export function findAlternatives(a, { activity, date, start, minutes = 90, playe
   const share = budget != null ? toCents(budget) : getMandate(a.player).perGame;
   const list = alts({ people: ids.map(player), activity, date, start, minutes, budgetShare: share, exclude, from: exclude ? venue(exclude) : null, now: clock() });
   record({ actor: by(a), who: [a.player], action: "alternatives", summary: list.length ? `${said(a)} compared ${list.length} other place${list.length === 1 ? "" : "s"} for ${activity} on ${date} around ${start}.` : `${said(a)} checked for other places for ${activity} on ${date} around ${start}; none is free then, so it stayed with this one.`, data: { alternatives: list } });
-  return { alternatives: list, budgetPerPerson: usd(share), ...(list.some((x) => x.withinBudget && x.venue !== exclude) ? {} : { note: `No other place offers ${activity} within $${usd(share)} a person then. Try another time or another activity the group shares (find_options).` }) };
+  return { alternatives: list, budgetPerPerson: usd(share), budgetMeans: budget != null ? `the budget you passed, per person (not for the group)` : "your person's per-booking limit, per person", ...(list.some((x) => x.withinBudget && x.venue !== exclude) ? {} : { note: `No other place offers ${activity} within $${usd(share)} a person then. Try another time or another activity the group shares (find_options).` }) };
 }
 
 // News for a person, as it happens: their activity entries after `after`, waiting up to `seconds` for the first one
+const OWN_LOOKUPS = ["searched", "alternatives"];
 export async function waitForNews(a, { after = 0, seconds = 45 } = {}) {
-  const pick = () => forPlayer(a.player, { after, limit: 20 }).filter((e) => e.action !== "searched").filter((e) => after || Date.now() - Date.parse(e.at) < 15 * 60e3).map((e) => ({ id: e.id, at: e.at, atLocal: new Date(e.at).toLocaleString("sv-SE").slice(0, 16), action: e.action, ref: e.ref, summary: e.summary })); // (with no after: the last 15 minutes; atLocal is the town's time, as the summaries are)
+  const pick = () => forPlayer(a.player, { after, limit: 20 }).filter((e) => !OWN_LOOKUPS.includes(e.action)).filter((e) => after || Date.now() - Date.parse(e.at) < 15 * 60e3).map((e) => ({ id: e.id, at: e.at, atLocal: new Date(e.at).toLocaleString("sv-SE").slice(0, 16), action: e.action, ref: e.ref, summary: e.summary })); // (with no after: the last 15 minutes; atLocal is the town's time, as the summaries are)
   let news = pick();
-  if (!news.length) await new Promise((ok) => { const t = setTimeout(done, Math.min(50, Math.max(1, seconds)) * 1000); const off = onActivity((e) => e.who.includes(a.player) && e.id > after && e.action !== "searched" && done()); function done() { clearTimeout(t); off(); ok(); } });
+  if (!news.length) await new Promise((ok) => { const t = setTimeout(done, Math.min(50, Math.max(1, seconds)) * 1000); const off = onActivity((e) => e.who.includes(a.player) && e.id > after && !OWN_LOOKUPS.includes(e.action) && done()); function done() { clearTimeout(t); off(); ok(); } });
   news = news.length ? news : pick();
-  return { news, last: news.length ? news.at(-1).id : after, serverTime: new Date().toISOString(), serverTimeLocal: new Date().toLocaleString("sv-SE").slice(0, 16), note: news.length ? "Call again with after: last for what comes next." : "Nothing new yet; call again with the same after. (Quiet can mean nobody has planned anything with your person yet: whoami's matching says how they can be found.)" };
+  return { news, last: news.length ? news.at(-1).id : after, serverTime: new Date().toISOString(), serverTimeLocal: new Date().toLocaleString("sv-SE").slice(0, 16), note: news.length ? "Call again with after: last for what comes next (an older after returns everything since it again)." : "Nothing new yet; call again with the same after. (Quiet can mean nobody has planned anything with your person yet: whoami's matching says how they can be found.)" };
 }
 export const myGames = (a, { all = false } = {}) => ({ negotiations: neg.mine(a.player, { all }), bookings: settle.mine(a.player, { all }), ...(all ? {} : { note: "Open negotiations and live bookings only; pass all: true for finished ones too." }) });
 export const gameStatus = (a, { booking }) => settle.status(booking, a.player);
@@ -333,6 +334,7 @@ export async function payMyShare(a, { booking, mandate, amount = null }) {
   const when = ["locked", "played", "venue_paid"].includes(r.state) ? "It's locked: everyone's payment is captured (PayPal) and the receipt is issued; nothing more to do."
     : r.state === "locking" ? "Everyone has paid: PayPal is capturing the payments now; it will be locked in seconds."
     : "The booking locks when everyone invited has paid, or at payBy (whoever hasn't paid by then is covered by the organizer); nothing is captured before it locks.";
+  if (!r.error && !r.you?.guarantee && r.you?.status === "authorized") r.note = `Your $${r.you.authorized} is held in PayPal (authorized), not taken yet: paid shows 0.00 until the booking locks, then it is taken (captured).`;
   if (!r.error && before === "authorized" && r.you?.guarantee) r.note = `Nothing new was charged: your $${r.you.guarantee} guarantee already covers your $${r.you.share} share. At the lock PayPal takes your share (and anyone's who didn't pay) from it.`;
   return r.you?.approveUrl ? { ...r, nextStep: `PAYER_ACTION_REQUIRED: show approveUrl to your user. They approve in PayPal; check booking_status afterwards. ${when}` } : r.error ? r : { ...r, nextStep: when };
 }

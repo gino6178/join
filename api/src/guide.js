@@ -12,7 +12,7 @@ export function agentGuide(u) {
 > find who's free and where, haggle with the venue by the venue's own rules, split the price, and settle it with
 > PayPal. Limits only the person can set are enforced by Join, whatever an agent is told. This server runs on the
 > PayPal sandbox (or a stand-in): no real money moves. ${REAL ? `People are real people, matched by where they really are; venues are
-> real: the ones registered on Join (bookable: haggling and PayPal) and real places from OpenStreetMap (suggested only).` : "This server runs the made-up demo town: its venues and residents are simulated."}
+> real: the ones registered on Join (bookable: haggling and PayPal) and real places from OpenStreetMap (suggested only). On this sandbox server the bookable venues are test venues registered for trying Join (their names say 測試/沙盒, test/sandbox); the OpenStreetMap places are real.` : "This server runs the made-up demo town: its venues and residents are simulated."}
 
 ## Get in (you act for one person)
 
