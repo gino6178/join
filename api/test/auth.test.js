@@ -33,7 +33,8 @@ test("a token tied to a key needs every request signed: a good signature passes;
   assert.equal(agentOf({ headers: { authorization: `Bearer ${t.token}` } }), null); // the token alone is useless
   const good = signed(t.token);
   assert.match(agentOf(good).client, /signed/);
-  assert.equal(agentOf(good), null); // the same signed request again: a replay
+  const again = { ...good, headers: { ...good.headers } }; delete again._agent; // (a new request with the same signature)
+  assert.equal(agentOf(again), null); // a replay
   const tampered = signed(t.token); tampered.rawBody = Buffer.from('{"activity":"bbq"}');
   assert.equal(agentOf(tampered), null);
   assert.equal(agentOf(signed(t.token, { created: Math.floor(Date.now() / 1000) - 3600 })), null);

@@ -94,8 +94,15 @@ export function passHolder(link, req) {
   return fromPass(`join_g_${body}${passSig(body)}`, req);
 }
 
-// the agent behind a request: { player, client } or null
+// the agent behind a request: { player, client } or null. Worked out once per request (a signed request's signature
+// is accepted only once, so a second look would see a replay)
 export function agentOf(req) {
+  if (req && "_agent" in req) return req._agent;
+  const a = agentOfOnce(req);
+  if (req) req._agent = a;
+  return a;
+}
+function agentOfOnce(req) {
   const m = String(req.headers.authorization || "").match(/^Bearer\s+(join_[\w-]+)$/);
   if (!m) return null;
   if (m[1].startsWith("join_g_")) return fromPass(m[1], req);

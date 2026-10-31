@@ -120,7 +120,7 @@ export function findOptions(a, { activity = "badminton", date = null, dates = []
   if ((from && !isTime(from)) || (to && !isTime(to)) || dates.some((d) => !isDate(d))) return { error: "bad_time", message: "dates are YYYY-MM-DD, from and to HH:MM." };
   const need = Math.max(1, Math.min(11, players | 0));
   const days = dates.length ? dates.slice(0, 7) : Array.from({ length: 7 }, (_, i) => addDays(ymd(now), i));
-  const mine = windows(me.free), crew = me.crew ? me.crew : null, others = getWorld().players.filter((p) => p.id !== me.id && (want.includes(p.id) || (crew && p.crew === crew) || (!p.joined && (p.interests || []).includes(activity)) || (p.nearby && me.area && p.area && kmBetween(me.area, p.area) <= NEAR_KM && (p.interests || []).includes(activity)))); // (people who joined Join themselves: your crewmates, anyone you name, and people near you who said they'd like to be invited)
+  const mine = windows(me.free), crew = me.crew ? me.crew : null, others = getWorld().players.filter((p) => p.id !== me.id && (want.includes(p.id) || (crew && p.crew === crew) || (!p.joined && (p.interests || []).includes(activity)) || (p.nearby && me.area && p.area && kmBetween(me.area, p.area) <= NEAR_KM && (p.interests || []).includes(activity) && people.activeWithin(p.id, 24 * 3600e3)))); // (people who joined Join themselves: your crewmates, anyone you name, and people near you who said they'd like to be invited)
   const opts = []; let closest = null; // (the slot with the most people free, when none has enough)
   for (const d of days) {
     const date = dateOf(d);
@@ -294,7 +294,7 @@ export function findAlternatives(a, { activity, date, start, minutes = 90, playe
 
 // News for a person, as it happens: their activity entries after `after`, waiting up to `seconds` for the first one
 export async function waitForNews(a, { after = 0, seconds = 45 } = {}) {
-  const pick = () => forPlayer(a.player, { after, limit: 20 }).filter((e) => after || Date.now() - Date.parse(e.at) < 15 * 60e3).map((e) => ({ id: e.id, at: e.at, action: e.action, ref: e.ref, summary: e.summary })); // (with no after: the last 15 minutes)
+  const pick = () => forPlayer(a.player, { after, limit: 20 }).filter((e) => after || Date.now() - Date.parse(e.at) < 15 * 60e3).map((e) => ({ id: e.id, at: e.at, atLocal: new Date(e.at).toLocaleString("sv-SE").slice(0, 16), action: e.action, ref: e.ref, summary: e.summary })); // (with no after: the last 15 minutes; atLocal is the town's time, as the summaries are)
   let news = pick();
   if (!news.length) await new Promise((ok) => { const t = setTimeout(done, Math.min(50, Math.max(1, seconds)) * 1000); const off = onActivity((e) => e.who.includes(a.player) && e.id > after && done()); function done() { clearTimeout(t); off(); ok(); } });
   news = news.length ? news : pick();

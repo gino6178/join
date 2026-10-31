@@ -154,7 +154,8 @@ export function guaranteeTerms(playerId, { total, players, venue: venueId, date,
   const f = fits(playerId, { venue: venueId, share: shares[playerId], spentThisWeek: spentInWeek(playerId, date, start) }), c = coverFits(playerId, total);
   const auto = !!(db.data.vaults[playerId] && m.autopay && f.ok && c.ok);
   return { guarantee: usd(total), yourShare: usd(shares[playerId]), worstCase: usd(total), approval: !mayPay ? "your person guarantees it on Join (this agent may not pay)" : auto ? "saved PayPal, within your limits" : pp?.testCard ? "sandbox test card (stands in for your approval)" : "you approve it in PayPal",
-    note: `As the organizer you guarantee the whole $${usd(total)} with a PayPal authorization until the others pay. You pay your own $${usd(shares[playerId])} unless someone doesn't pay; then you cover them, at most $${usd(total)} in all.` };
+    note: `As the organizer you guarantee the whole $${usd(total)} with a PayPal authorization until the others pay. You pay your own $${usd(shares[playerId])} unless someone doesn't pay; then you cover them, at most $${usd(total)} in all.`,
+    ...(total > m.perGame ? { warning: `If friends don't pay you could pay up to $${usd(total)}, over your $${usd(m.perGame)} per-booking limit (it is within the $${usd(m.cover)} you may guarantee for a group). Invite people who will answer, or ask your person first.` } : {}) };
 }
 
 // ---- a payer approved: authorize ---------------------------------------------------------------------------------

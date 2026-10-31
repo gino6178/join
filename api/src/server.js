@@ -67,6 +67,8 @@ app.post("/paypal/webhook", express.raw({ type: "*/*", limit: "256kb" }), async 
 });
 // (the exact bytes are kept too, for a signed agent's Content-Digest)
 app.use(express.json({ limit: "64kb", verify: (req, res, buf) => { req.rawBody = buf; } }));
+// (who is around: their agent or their session, for matching strangers who will answer)
+app.use((req, res, next) => { try { people.saw(sessionOf(req)?.player || (req.headers.authorization ? agentOf(req)?.player : null)); } catch {} next(); });
 
 // Rate limits: a fixed window per caller (the agent's token when there is one, else the address). Agents get room for a
 // busy negotiation; signing in and making tokens get less.
