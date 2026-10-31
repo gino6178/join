@@ -14,6 +14,7 @@
 // When a deal is out of the budget, refused, or the place is gone, the answer carries alternatives nearby.
 import crypto from "node:crypto";
 import { activity as getActivity } from "../world.js";
+import { labels } from "../people.js";
 import { store, stateFile } from "../store.js";
 import { venue, player, freeUnits, forActivity, ACTIVITIES } from "../world.js";
 import { price, askAt, cheaperTerms, usd } from "./policy.js";
@@ -45,7 +46,7 @@ function view(n, extra = {}) {
   const share = shareOf(n.ask, n.players.length), each = Math.floor(n.ask / n.players.length);
   return {
     id: n.id, status: n.status, venue: n.venue, venueName: venue(n.venue)?.name, activity: n.activity, date: n.date, start: n.start, minutes: n.minutes,
-    players: n.players, organizer: n.by, currency: "USD",
+    players: n.players, names: labels(n.players), organizer: n.by, currency: "USD",
     list: usd(n.list), ask: usd(n.ask), share: usd(share), shares: { organizer: usd(n.ask - each * (n.players.length - 1)), eachOther: usd(each) }, discounts: n.discounts,
     round: n.round, roundsLeft: Math.max(0, n.rounds - n.round), final: n.final,
     agreed: n.agreed ? { amount: usd(n.agreed.amount), share: usd(shareOf(n.agreed.amount, n.players.length)), at: n.agreed.at } : null,

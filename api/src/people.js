@@ -93,6 +93,13 @@ export function setHome(playerId, { lat, lon, label = null, nearby }) {
   db.save();
   return p;
 }
+// How people in one plan are shown to each other: their name, and where they live when two share a first name
+// ("Ana (大安站)"), so nobody is confused for someone else
+export function labels(ids) {
+  const w = getWorld(), ps = ids.map((id) => w.players.find((p) => p.id === id)).filter(Boolean);
+  const first = (p) => p.name.split(" ")[0], twice = new Set(ps.map(first).filter((f, i, a) => a.indexOf(f) !== i));
+  return Object.fromEntries(ps.map((p) => [p.id, twice.has(first(p)) ? `${p.name} (${p.area?.name || p.id.slice(-4)})` : p.name]));
+}
 export const crewSize = (code) => db.data.people.filter((x) => x.crew === cleanCrew(code)).length;
 export const crewNames = (code) => db.data.people.filter((x) => x.crew === cleanCrew(code)).map((x) => x.name);
 export const peopleStore = { reset: () => { const w = getWorld(); w.players = w.players.filter((x) => !x.joined); db.data.people = []; db.save(); } };

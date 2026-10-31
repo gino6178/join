@@ -23,6 +23,7 @@
 import crypto from "node:crypto";
 import { store, stateFile } from "../store.js";
 import { setTaken, venue, player, freeUnits, unitName, activity as getActivity } from "../world.js";
+import { labels } from "../people.js";
 // "room 3" (or "Room 3" to start a sentence)
 const place = (b, cap = false) => { const t = unitName(b.activity, b.unit); return cap ? t[0].toUpperCase() + t.slice(1) : t; };
 import { setOnAgreed, setSpent, internal as negotiation } from "../negotiate/engine.js";
@@ -181,6 +182,17 @@ export async function approvedByOrder(orderId) {
   return null;
 }
 
+const zoneName = () => (process.env.TZ || "local").split("/").pop().replace(/_/g, " ") + " time";
+// how a person in a plan is connected to the one viewing it: you, the organizer, your crew, or someone near the
+// organizer who chose to be invited (with the distance)
+function howConnected(b, viewer, pid) {
+  if (pid === viewer) return "you";
+  const p = player(pid), org = player(b.organizer), v = player(viewer);
+  if (pid === b.organizer) return v?.crew && v.crew === p?.crew ? "the organizer, in your crew" : "the organizer";
+  if (p?.crew && p.crew === org?.crew) return v?.crew === p.crew ? "in your crew" : "in the organizer's crew";
+  if (p?.nearby && p.area && org?.area) return `lives about ${(Math.hypot(p.area.x - org.area.x, p.area.y - org.area.y) * 1.25).toFixed(1)} km from the organizer and chose to be invited by people nearby`;
+  return p?.joined ? "asked for by name" : "a resident of the demo town";
+}
 // why someone was asked along, from what Join knows: the organizer's crew, or someone near them who chose to be invited
 // by people nearby and shares the activity (with how far apart they live), or named by the organizer's agent
 function whyInvited(b, viewer) {
@@ -203,7 +215,7 @@ async function advance(b) {
   const now = clock().getTime(), org = b.payments[b.organizer];
   if (b.state === "awaiting_organizer" && org?.status === "authorized") {
     b.state = "held"; b.holdUntil = shareWindowEnd(b, now); db.save();
-    const until = hm(new Date(b.holdUntil).getHours() * 60 + new Date(b.holdUntil).getMinutes());
+    const until = `${hm(new Date(b.holdUntil).getHours() * 60 + new Date(b.holdUntil).getMinutes())} (${zoneName()})`;
     note(b, { kind: "platform" }, "held", `${name(b.organizer)} guaranteed the booking: ${place(b)} is held until ${until}. ${name(b.organizer)} covers anyone who doesn't join and pay by then.`);
     for (const pid of b.players) if (pid !== b.organizer && !b.declined.includes(pid))
       record({ actor: { kind: "agent", player: b.organizer }, who: [pid], action: "invited", ref: b.id, summary: `${name(b.organizer)}'s agent invited you: ${b.activity} on ${b.date} ${b.start} at ${venue(b.venue).name}, ${place(b)}. Your share is $${usd(b.shares[pid])}. Join or decline by ${until}.`, data: { share: usd(b.shares[pid]), payBy: until } });
@@ -453,9 +465,9 @@ export function view(b, viewer) {
     guaranteeBy: b.state === "awaiting_organizer" ? new Date(b.organizerUntil).toISOString() : null, payBy: b.state === "held" ? new Date(b.holdUntil).toISOString() : null,
     payments: Object.fromEntries(b.players.map((pid) => { const p = b.payments[pid]; return [pid, { share: usd(b.shares[pid]), ...(pid === b.organizer ? { guarantee: usd(b.total), paid: p?.captured != null ? usd(p.captured) : null } : {}), role: pid === b.organizer ? "organizer" : "share", status: b.declined.includes(pid) ? "declined" : p?.status || (pid !== b.organizer && b.state === "held" ? "invited" : "not_started"), via: p?.via || null, paypal: p ? { order: p.orderId || null, authorization: p.authorizationId || null, capture: p.captureId || null } : null }]; })),
     review: viewer ? (reviewsMod.byPlayer(viewer, b.id) ? { done: reviewsMod.byPlayer(viewer, b.id).stars } : canReview(b, viewer).ok ? { can: true } : null) : null,
-    invite: viewer !== b.organizer && b.state === "held" && !mine && !b.declined.includes(viewer) ? { share: usd(b.shares[viewer]), payBy: new Date(b.holdUntil).toISOString(), why: whyInvited(b, viewer) } : null,
+    invite: viewer !== b.organizer && b.state === "held" && !mine && !b.declined.includes(viewer) ? { share: usd(b.shares[viewer]), payBy: new Date(b.holdUntil).toISOString(), payByLocal: `${new Date(b.holdUntil).toLocaleString("sv-SE").slice(0, 16)} ${zoneName()}`, why: whyInvited(b, viewer) } : null,
     where: whereIs(b, viewer),
-    people: b.players.map((pid) => ({ id: pid, name: name(pid), ...(pid === b.organizer ? { organizer: true } : {}), ...(player(pid)?.joined ? { member: true } : {}), ...(pid !== viewer && player(viewer)?.crew && player(pid)?.crew === player(viewer).crew ? { inYourCrew: true } : {}) })),
+    people: ((L) => b.players.map((pid) => ({ id: pid, name: L[pid] || name(pid), how: howConnected(b, viewer, pid), ...(pid === b.organizer ? { organizer: true } : {}), ...(player(pid)?.joined ? { member: true } : {}), ...(pid !== viewer && player(viewer)?.crew && player(pid)?.crew === player(viewer).crew ? { inYourCrew: true } : {}) })))(labels(b.players)),
     you: mine ? { share: usd(b.shares[viewer]), ...(mine.role === "organizer" ? { guarantee: usd(b.total) } : {}), authorized: usd(mine.amount), paid: mine.status === "captured" ? usd(mine.captured ?? mine.amount) : "0.00", status: mine.status, via: mine.via,
       approveUrl: mine.status === "awaiting_approval" ? mine.approveUrl : null, orderId: mine.status === "awaiting_approval" ? mine.orderId : null, ...(mine.status === "awaiting_approval" && mine.why ? { note: mine.why } : {}),
       paypal: { order: mine.orderId, authorization: mine.authorizationId, capture: mine.captureId } } : null,

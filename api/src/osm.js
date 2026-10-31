@@ -13,6 +13,17 @@ let queue = Promise.resolve(), slowQueue = Promise.resolve();
 const polite = (fn) => (queue = queue.then(fn, fn)); // (one at a time, for Nominatim)
 const slow = (fn) => (slowQueue = slowQueue.then(fn, fn)); // (Overpass, on its own line, so its long waits never hold up the quick searches)
 
+export function address(lat, lon) {
+  return cached(`r:${(+lat).toFixed(4)}:${(+lon).toFixed(4)}`, 30 * 864e5, () => polite(async () => {
+    try {
+      const r = await fetch(`https://nominatim.openstreetmap.org/reverse?format=jsonv2&zoom=18&accept-language=zh-TW,en&lat=${lat}&lon=${lon}`, { headers: { "User-Agent": UA }, signal: AbortSignal.timeout(10e3) });
+      const j = r.ok ? await r.json() : null;
+      await new Promise((ok) => setTimeout(ok, 1100));
+      const a = j?.address || {};
+      return [a.city || a.county, a.suburb || a.city_district, a.road, a.house_number].filter(Boolean).join(" ") || j?.display_name || null;
+    } catch { return null; }
+  }));
+}
 export function geocode(q) {
   const text = String(q || "").trim().slice(0, 120);
   if (!text) return Promise.resolve(null);

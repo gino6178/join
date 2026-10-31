@@ -8,7 +8,7 @@ import express from "express";
 import * as mcp from "./mcp.js";
 import * as oauth from "./oauth.js";
 import * as people from "./people.js";
-import { geocode, places as osmPlaces } from "./osm.js";
+import { geocode, places as osmPlaces, address as osmAddress } from "./osm.js";
 import { REAL } from "./world.js";
 import { agentGuide } from "./guide.js";
 import * as ops from "./ops.js";
@@ -21,7 +21,7 @@ import { invitePass, onInvitePass, passHolder } from "./auth.js";
 import { agentOf, sessionOf, createSession, endSession, makeToken, tokensOf, revoke, can, scopeError, COOKIE, VENUE_COOKIE, createVenueSession, venueOf, endVenueSession } from "./auth.js";
 import { getMandate, setMandate } from "./mandate.js";
 import { forPlayer, onActivity, record as recordActivity, demoScope, demand as demandFor } from "./activity.js";
-import { getWorld, player, venue, setPolicy, registerVenue } from "./world.js";
+import { getWorld, player, venue, setPolicy, registerVenue, partnersStore } from "./world.js";
 import { usd } from "./negotiate/policy.js";
 import * as receipts from "./proof/receipts.js";
 import * as scout from "./scout/understand.js";
@@ -132,7 +132,7 @@ app.post("/api/venues/register", limit("signin", 30), async (req, res) => {
   const b = req.body || {};
   let { lat, lon } = b;
   if ((lat == null || lon == null) && b.address) { const g = await geocode(String(b.address)); if (!g) return res.status(400).json({ error: "not_found", message: "That address wasn't found on OpenStreetMap." }); ({ lat, lon } = g); }
-  const v = registerVenue({ ...b, lat, lon });
+  const v = registerVenue({ ...b, lat, lon, address: b.address || (await osmAddress(lat, lon)) || "" });
   if (v.error) return res.status(400).json(v);
   res.set("Set-Cookie", `${VENUE_COOKIE}=${createVenueSession(v.id)}; HttpOnly; SameSite=Lax; Path=/`).json({ ok: true, venue: { id: v.id, name: v.name, lat: v.lat, lon: v.lon, offers: v.offers } });
 });
@@ -389,6 +389,8 @@ app.all(/^\/(\.well-known|api)\//, (req, res) => res.status(404).json({ error: "
 if (fs.existsSync(WEB)) { app.use(express.static(WEB)); app.get(/^\/(?!api|mcp|paypal|a2a|mock-paypal|\.well-known).*/, (req, res) => res.sendFile(path.join(WEB, "index.html"))); }
 
 setInterval(() => settle.tick().catch((e) => console.error("tick", e.message)), +(process.env.TICK_MS || 5000)).unref();
+// venues registered with coordinates only get an address from OpenStreetMap, once, in the background
+if (REAL) (async () => { for (const v of partnersStore.data.venues.filter((x) => !x.area)) { const ad = await osmAddress(v.lat, v.lon); if (!ad) continue; v.area = ad; partnersStore.save(); const live = getWorld().venues.find((x) => x.id === v.id); if (live) live.area = ad; } })().catch(() => {});
 app.use((err, req, res, next) => {
   if (res.headersSent) return next(err);
   const status = err.status || err.statusCode || 500;
