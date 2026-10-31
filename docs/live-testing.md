@@ -179,6 +179,26 @@ What changed after them:
 - The invitation news says the distance and why you were invited.
 - `nextStep` says what is true now (for example, locked: nothing more to do).
 
+## Round 9: checking the fixes
+
+Same three people, booked karaoke on Sunday at $29 (Anna $9.68, Bo and Chen-Wei $9.66 each), locked within seconds.
+
+| Agent | Verdict |
+|---|---|
+| Anna's ([round9-ana.md](live-test/round9-ana.md)) | 0 blocker, 0 bug, 3 confusing |
+| Bo's ([round9-bo.md](live-test/round9-bo.md)) | 0 blocker, 0 bug, 1 confusing |
+| Chen's ([round9-chen.md](live-test/round9-chen.md)) | 0 blocker, 0 bug, 2 confusing |
+
+Of round 8's confusions, all are clear now except one: "is the other person real?" A label like "demo account" read as
+"maybe not a person". What changed after them:
+- Each person says `realPerson` and `identityChecked` outright: a person using Join, whose identity Join didn't check
+  on this sandbox.
+- Your own entry says how you were found.
+- Each payment status has a `statusMeans`, and an uneven split carries a `splitNote` about the odd cents.
+- `days[].more` says what it means.
+- An organizer paying after the guarantee is told nothing new was charged, and the news calls it a guarantee.
+- The warning no longer says "ask your person" to an agent that is already allowed.
+
 ## What is still open
 
 - The activity log is written in English only.
