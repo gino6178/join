@@ -57,7 +57,7 @@ export function listVenues({ activity } = {}) {
     id: v.id, name: v.name, area: v.area, open: v.open, weekendOpen: v.weekendOpen || v.open, // (the same hours at weekends unless the venue has its own)
     offers: Object.fromEntries(Object.keys(v.offers).map((k) => { const o = forActivity(v, k); return [k, { units: o.units, unit: o.unit, people: `${o.min}-${o.max}`, price: usd(cents(o.price)), per: o.per === "person" ? "person" : `${o.unit} per hour`, minutes: o.minutes }]; })),
     reviews: (({ score, count, praise, complaints, demoData }) => ({ score, count, liked: praise.map((p) => p.label), complaints: complaints.map((p) => p.label), demoData: demoData > 0 }))(reviews.summary(v.id, { activity })),
-    negotiates: { style: v.policy.style, maxCounterOffers: v.policy.style === "firm" ? 0 : v.policy.rounds, discounts: [`off-peak ${v.policy.offPeak.pct * 100}% (weekday bookings ending by ${v.policy.offPeak.before})`, `group ${v.policy.group.pct * 100}% (${v.policy.group.min}+ people)`, `last-minute ${v.policy.lastMinute.pct * 100}% (within ${v.policy.lastMinute.withinHours} h)`] },
+    negotiates: { style: v.policy.style, maxCounterOffers: v.policy.style === "firm" ? 0 : v.policy.rounds, discounts: [...(v.policy.offPeak ? [`off-peak ${v.policy.offPeak.pct * 100}% (weekday bookings ending by ${v.policy.offPeak.before})`] : []), ...(v.policy.group ? [`group ${v.policy.group.pct * 100}% (${v.policy.group.min}+ people)`] : []), ...(v.policy.lastMinute ? [`last-minute ${v.policy.lastMinute.pct * 100}% (within ${v.policy.lastMinute.withinHours} h)`] : [])] },
   })), publicPlaces: (w.publicPlaces || []).filter((p) => !activity || p.activities.includes(activity)).map((p) => ({ id: p.id, name: p.name, activities: p.activities, lit: p.lit, bookable: false })) };
 }
 
@@ -111,7 +111,7 @@ export function findOptions(a, { activity = "badminton", date = null, dates = []
   const need = Math.max(1, Math.min(11, players | 0));
   const days = dates.length ? dates.slice(0, 7) : Array.from({ length: 7 }, (_, i) => addDays(ymd(now), i));
   const mine = windows(me.free), crew = me.crew ? me.crew : null, others = getWorld().players.filter((p) => p.id !== me.id && (want.includes(p.id) || (crew && p.crew === crew) || (!p.joined && (p.interests || []).includes(activity)) || (p.nearby && me.area && p.area && kmBetween(me.area, p.area) <= NEAR_KM && (p.interests || []).includes(activity)))); // (people who joined Join themselves: your crewmates, anyone you name, and people near you who said they'd like to be invited)
-  const opts = [];
+  const opts = []; let closest = null; // (the slot with the most people free, when none has enough)
   for (const d of days) {
     const date = dateOf(d);
     for (let s = from ? toMin(from) : 7 * 60; s + minutes <= (to ? toMin(to) : 22 * 60); s += 30) {
@@ -121,7 +121,7 @@ export function findOptions(a, { activity = "badminton", date = null, dates = []
         // (for a sport, players close to your level first; for anything else, everyone interested is as good)
         .map((p) => ({ p, score: (want.includes(p.id) ? 10 : 0) + (crew && p.crew === crew ? 6 : 0) - (act.kind === "sport" ? Math.abs("CBA".indexOf(p.level) - "CBA".indexOf(me.level)) + (p.prefers && p.prefers !== "any" && p.prefers !== (need === 1 ? "singles" : "doubles") ? 1 : 0) : 0) }))
         .sort((x, y) => y.score - x.score);
-      if (free.length < need) continue;
+      if (free.length < need) { if (!closest || free.length > closest.free.length) closest = { date: d, start: hm(s), free: free.map((x) => x.p) }; continue; }
       const group = [me, ...free.slice(0, need).map((x) => x.p)];
       // the venue for this slot: the shortest longest trip, moved by what verified reviews say (a star above the town's
       // average is worth 8 minutes; anyone in the group who rated it 2★ or less costs 30), then the price
@@ -163,9 +163,18 @@ export function findOptions(a, { activity = "badminton", date = null, dates = []
   record({ actor: by(a), who: [a.player], action: "searched", data: { activity, area: me.area?.name || null, wish }, summary: `${said(a)} looked for ${activity} for ${need + 1} people${days.length === 1 ? ` on ${days[0]}` : ` over ${days.length} days`}: ${out.length ? `${out.length} option${out.length === 1 ? "" : "s"}` : "nothing free"}.` });
   // what the organizer may still commit to for each option: their per-booking limit, or what's left of that week's
   const m = getMandate(a.player), canSpend = (o) => Math.max(0, Math.min(m.perGame, m.perWeek - settle.spentInWeek(a.player, o.date, o.start)));
-  return { ...(wish.near || wish.cheap || wish.maxTrip || wish.aspects.length ? { rankedBy: wish } : {}), options: out.map(({ score, ...o }) => ({ ...o, ...(o.fits.length ? {} : { fits: undefined }), youCanSpend: usd(canSpend(o)) })), mandate: { perGame: usd(m.perGame), perWeek: usd(m.perWeek) }, note: out.length ? "Prices are the venue's opening ask; negotiate with start_negotiation." : "Nothing fits. Try other days, a wider window or fewer players." };
+  return { ...(wish.near || wish.cheap || wish.maxTrip || wish.aspects.length ? { rankedBy: wish } : {}), options: out.map(({ score, ...o }) => ({ ...o, ...(o.fits.length ? {} : { fits: undefined }), youCanSpend: usd(canSpend(o)) })), mandate: { perGame: usd(m.perGame), perWeek: usd(m.perWeek) }, note: out.length ? "Prices are the venue's opening ask; negotiate with start_negotiation." : "Nothing fits. Try other days, a wider window or fewer players.",
+    ...(!out.length && closest ? { closest: { date: closest.date, start: closest.start, free: [me, ...closest.free].map((p) => p.name), short: need + 1 - (closest.free.length + 1), note: `At best ${closest.free.length + 1} of the ${need + 1} you asked for ${closest.free.length ? "are" : "is"} free (${closest.date} ${closest.start}: ${[me, ...closest.free].map((p) => p.name.split(" ")[0]).join(", ")}). ${closest.free.length ? `Ask for ${closest.free.length + 1} people (players: ${closest.free.length}), or name more people in with.` : "Nobody else is free then: try other days or times, or invite friends (your crew's link)."}` } } : {}),
+    ...(out.some((o) => +o.share * 100 > canSpend(o)) ? { overBudget: cheaperWays(out, canSpend, act) } : {}) };
 }
 
+// When an option's share is over what the person may spend: what would bring it down, from the venue's own pricing
+// (a shorter booking, if the activity has one, costs proportionally less; one more person splits it further)
+function cheaperWays(out, canSpend, act) {
+  const o = out.find((x) => +x.share * 100 > canSpend(x)), shorter = act.minutes.filter((m) => m < o.minutes).sort((a, b) => b - a)[0], ask = Math.round(+o.askPrice * 100), k = o.players.length;
+  return { option: `${o.venueName} ${o.date} ${o.start}`, share: o.share, youCanSpend: usd(canSpend(o)),
+    ways: [...(shorter ? [`${shorter} minutes instead of ${o.minutes}: about $${usd(Math.round((ask * shorter) / o.minutes / k))} each (pass minutes: ${shorter})`] : []), ...(k < act.max ? [`one more person: about $${usd(Math.round(ask / (k + 1)))} each`] : []), "haggle: the venue's last counter can be lower than its ask"] };
+}
 // What accepting means for the organizer, on every reply they get about an open or agreed negotiation: they guarantee
 // the whole price until the others pay, pay their own share unless someone doesn't, and at most the whole price.
 function withTerms(a, r) {

@@ -181,6 +181,23 @@ export async function approvedByOrder(orderId) {
   return null;
 }
 
+// why someone was asked along, from what Join knows: the organizer's crew, or someone near them who chose to be invited
+// by people nearby and shares the activity (with how far apart they live), or named by the organizer's agent
+function whyInvited(b, viewer) {
+  const me = player(viewer), org = player(b.organizer);
+  if (!me || !org) return null;
+  if (me.crew && me.crew === org.crew) return `You're in ${name(b.organizer)}'s crew.`;
+  if (me.nearby && me.area && org.area) return `You live about ${(Math.hypot(me.area.x - org.area.x, me.area.y - org.area.y) * 1.25).toFixed(1)} km from ${name(b.organizer)}, like ${b.activity}, and chose to be invited by people near you.`;
+  return me.joined ? `${name(b.organizer)}'s agent asked for you by name.` : null;
+}
+// where the booking is, and how far for this person: the venue's address and their trip, in km and minutes
+function whereIs(b, viewer) {
+  const v = venue(b.venue), me = player(viewer);
+  if (!v) return null;
+  const km = me?.area && v.x != null ? +(Math.hypot(me.area.x - v.x, me.area.y - v.y) * 1.25).toFixed(1) : null;
+  return { venue: v.name, address: v.address || (typeof v.area === "string" ? v.area : null) || null, ...(v.lat != null ? { lat: v.lat, lon: v.lon, map: `https://www.openstreetmap.org/?mlat=${v.lat}&mlon=${v.lon}#map=17/${v.lat}/${v.lon}` } : {}), ...(km != null ? { yourTrip: { km, minutes: Math.round(5 + 3 * km) } } : {}) };
+}
+
 // ---- moving the state on ------------------------------------------------------------------------------------------
 async function advance(b) {
   const now = clock().getTime(), org = b.payments[b.organizer];
@@ -436,7 +453,8 @@ export function view(b, viewer) {
     guaranteeBy: b.state === "awaiting_organizer" ? new Date(b.organizerUntil).toISOString() : null, payBy: b.state === "held" ? new Date(b.holdUntil).toISOString() : null,
     payments: Object.fromEntries(b.players.map((pid) => { const p = b.payments[pid]; return [pid, { share: usd(b.shares[pid]), ...(pid === b.organizer ? { guarantee: usd(b.total), paid: p?.captured != null ? usd(p.captured) : null } : {}), role: pid === b.organizer ? "organizer" : "share", status: b.declined.includes(pid) ? "declined" : p?.status || (pid !== b.organizer && b.state === "held" ? "invited" : "not_started"), via: p?.via || null, paypal: p ? { order: p.orderId || null, authorization: p.authorizationId || null, capture: p.captureId || null } : null }]; })),
     review: viewer ? (reviewsMod.byPlayer(viewer, b.id) ? { done: reviewsMod.byPlayer(viewer, b.id).stars } : canReview(b, viewer).ok ? { can: true } : null) : null,
-    invite: viewer !== b.organizer && b.state === "held" && !mine && !b.declined.includes(viewer) ? { share: usd(b.shares[viewer]), payBy: new Date(b.holdUntil).toISOString() } : null,
+    invite: viewer !== b.organizer && b.state === "held" && !mine && !b.declined.includes(viewer) ? { share: usd(b.shares[viewer]), payBy: new Date(b.holdUntil).toISOString(), why: whyInvited(b, viewer) } : null,
+    where: whereIs(b, viewer),
     you: mine ? { share: usd(b.shares[viewer]), ...(mine.role === "organizer" ? { guarantee: usd(b.total) } : {}), authorized: usd(mine.amount), paid: mine.status === "captured" ? usd(mine.captured ?? mine.amount) : "0.00", status: mine.status, via: mine.via,
       approveUrl: mine.status === "awaiting_approval" ? mine.approveUrl : null, orderId: mine.status === "awaiting_approval" ? mine.orderId : null, ...(mine.status === "awaiting_approval" && mine.why ? { note: mine.why } : {}),
       paypal: { order: mine.orderId, authorization: mine.authorizationId, capture: mine.captureId } } : null,

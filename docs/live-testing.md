@@ -130,6 +130,29 @@ Everyone in a plan hears when a share changes. The person's own sign-in link is 
 can wait_for_news instead of checking every minute. Fits now count complaints as well as praise ("6 complain
 'noisy'"), and each option names the other venues considered, with their own fits.
 
+## Round 6: real people, matched by where they live, at real places
+
+No made-up town any more. Three people in Taipei, each with their own agent: Ana (near 大安站) organizing over MCP; Bo
+(near 科技大樓站), whose agent had only Ana's invite link and set Bo's home itself; and Chen (near 忠孝復興站), a stranger
+to both, who had chosen to be invited by people near him. The only bookable venue was a sandbox test KTV we registered
+on Join under that name; the real KTVs near them came from OpenStreetMap.
+
+| Agent | Verdict |
+|---|---|
+| Ana's ([round6-ana.md](live-test/round6-ana.md)) | 0 blocker, 0 bug, 2 confusing |
+| Bo's ([round6-bo.md](live-test/round6-bo.md)) | 0 blocker, 1 bug, 3 confusing |
+| Chen's ([round6-chen.md](live-test/round6-chen.md)) | 0 blocker, 0 bug, 2 confusing |
+
+Ana's agent matched Bo (crew) and Chen (nearby, opted in), listed the real KTVs near them (錢櫃, 星聚點, 錢櫃Partyworld,
+9 to 14 minutes away, not on Join), and refused a two-hour booking at $18 each, over Ana's $15; at one hour it booked
+$30, and Ana, Bo and Chen each paid $10. The booking locked. Nobody was asked to sign up or sign in.
+
+What changed after them: list_venues failed on a venue registered without off-peak or last-minute discounts (fixed);
+an invitation now says why you were invited (your crew, or "you live about 1.6 km from Ana, like karaoke, and chose to
+be invited by people near you"); a booking says where it is (address, map link, your trip in km and minutes);
+find_options says who is free and how many are missing when nothing fits, and what would bring an over-budget share
+down (a shorter booking, one more person).
+
 ## What is still open
 
 - The activity log is written in English only.
