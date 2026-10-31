@@ -1,0 +1,187 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Join Agent Testing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f6f7f9;--card:#fff;--ink:#14181f;--soft:#5b6472;--line:#e3e6eb;--accent:#0b63ce;--blocker:#d6336c;--bug:#e8890c;--confusing:#8aa4c8;--chipbg:#eef1f5}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1116;--card:#161b22;--ink:#e8ecf2;--soft:#98a2b3;--line:#2a313c;--accent:#5aa2ff;--blocker:#ff6b9a;--bug:#ffb347;--confusing:#5f7aa3;--chipbg:#1f2630}}
+:root[data-theme="dark"]{--bg:#0e1116;--card:#161b22;--ink:#e8ecf2;--soft:#98a2b3;--line:#2a313c;--accent:#5aa2ff;--blocker:#ff6b9a;--bug:#ffb347;--confusing:#5f7aa3;--chipbg:#1f2630}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif}
+main{max-width:1040px;margin:0 auto;padding:48px 16px 80px}
+h1{font-size:clamp(28px,4.4vw,44px);line-height:1.1;margin:0 0 12px;letter-spacing:-.02em}
+.lede{color:var(--soft);font-size:18px;max-width:760px;margin:0 0 28px}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-bottom:28px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
+.stat b{display:block;font-size:30px;letter-spacing:-.02em}.stat span{color:var(--soft);font-size:14px}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:20px 20px 12px;margin-bottom:36px}
+.panel h2{margin:0 0 4px;font-size:18px}.legend{display:flex;gap:16px;flex-wrap:wrap;color:var(--soft);font-size:14px;margin-bottom:8px}
+.legend i{display:inline-block;width:11px;height:11px;border-radius:3px;margin-right:6px;vertical-align:-1px}
+svg{width:100%;height:auto;display:block}.grid{stroke:var(--line)}.tick{fill:var(--soft);font-size:13px}.val{fill:var(--ink);font-size:13px;font-weight:600}
+rect.blocker,.legend .blocker{fill:var(--blocker);background:var(--blocker)}rect.bug,.legend .bug{fill:var(--bug);background:var(--bug)}rect.confusing,.legend .confusing{fill:var(--confusing);background:var(--confusing)}
+.round{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin-bottom:18px}
+.round header{display:flex;gap:16px;align-items:flex-start;flex-wrap:wrap}
+.num{flex:none;width:44px;height:44px;border-radius:12px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;font-size:20px}
+.round h2{margin:0;font-size:21px;letter-spacing:-.01em}.date{margin:0;color:var(--soft);font-size:13px;text-transform:uppercase;letter-spacing:.06em}
+.round header>div:nth-child(2){flex:1;min-width:220px}.sums{display:flex;gap:6px;flex-wrap:wrap}
+.chip{font-size:13px;font-weight:600;padding:3px 10px;border-radius:99px;background:var(--chipbg)}
+.chip.blocker{color:var(--blocker)}.chip.bug{color:var(--bug)}.chip.confusing{color:var(--soft)}.chip.zero{opacity:.45}
+.setup{color:var(--soft);margin:14px 0}
+table{width:100%;border-collapse:collapse;font-size:15px;display:block;overflow-x:auto}
+thead,tbody{display:table;width:100%;min-width:560px;border-collapse:collapse}
+th{text-align:left;color:var(--soft);font-weight:500;font-size:13px;border-bottom:1px solid var(--line);padding:6px 8px}
+td{border-bottom:1px solid var(--line);padding:7px 8px}td.n,th.n{text-align:right;font-variant-numeric:tabular-nums;width:84px}
+td.hot{color:var(--blocker);font-weight:700}td.warm{color:var(--bug);font-weight:700}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+.via{font:500 12px "JetBrains Mono",monospace;background:var(--chipbg);padding:2px 7px;border-radius:6px}
+.extra{font-size:14px;color:var(--soft);border-left:3px solid var(--accent);padding-left:10px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:14px}@media (max-width:700px){.two{grid-template-columns:1fr}}
+h3{font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--soft);margin:0 0 6px}.two p{margin:0}ul{margin:0;padding-left:18px}
+footer{color:var(--soft);font-size:14px;margin-top:32px}
+</style></head><body><main>
+<h1>Join, tested by AI agents</h1>
+<p class="lede">Claude Sonnet agents were given the address of the live server and nothing else: no source code, no docs, no account made for them. Each played a person or that person's agent, booked and paid in the PayPal sandbox, and reported every blocker, bug and thing it had to guess. After each round we fixed what they found and sent the next one.</p>
+<div class="stats">
+  <div class="stat"><b>10</b><span>rounds</span></div>
+  <div class="stat"><b>34</b><span>agent and persona runs</span></div>
+  <div class="stat"><b>18 → 0</b><span>blockers and bugs, round 1 → 10</span></div>
+  <div class="stat"><b>40 → 2</b><span>things an agent had to guess</span></div>
+</div>
+<section class="panel"><h2>Issues found per round</h2>
+<div class="legend"><span><i class="blocker"></i>Blocker</span><span><i class="bug"></i>Bug</span><span><i class="confusing"></i>Confusing</span></div>
+<svg viewBox="0 0 960 300" role="img" aria-label="Issues found per round"><line x1="40" x2="960" y1="264" y2="264" class="grid"/><text x="32" y="268" class="tick" text-anchor="end">0</text><line x1="40" x2="960" y1="140" y2="140" class="grid"/><text x="32" y="144" class="tick" text-anchor="end">30</text><line x1="40" x2="960" y1="16" y2="16" class="grid"/><text x="32" y="20" class="tick" text-anchor="end">60</text><rect x="63" y="259.8666666666667" width="46" height="2.6333333333333258" rx="3" class="blocker"><title>Round 1: 1 blocker</title></rect><rect x="63" y="189.6" width="46" height="68.76666666666668" rx="3" class="bug"><title>Round 1: 17 bug</title></rect><rect x="63" y="24.266666666666666" width="46" height="163.83333333333331" rx="3" class="confusing"><title>Round 1: 40 confusing</title></rect><text x="86" y="17.266666666666666" class="val" text-anchor="middle">58</text><text x="86" y="284" class="tick" text-anchor="middle">R1</text><rect x="155" y="239.20000000000002" width="46" height="23.299999999999983" rx="3" class="bug"><title>Round 2: 6 bug</title></rect><rect x="155" y="193.73333333333335" width="46" height="43.96666666666667" rx="3" class="confusing"><title>Round 2: 11 confusing</title></rect><text x="178" y="186.73333333333335" class="val" text-anchor="middle">17</text><text x="178" y="284" class="tick" text-anchor="middle">R2</text><rect x="247" y="193.73333333333335" width="46" height="68.76666666666665" rx="3" class="confusing"><title>Round 3: 17 confusing</title></rect><text x="270" y="186.73333333333335" class="val" text-anchor="middle">17</text><text x="270" y="284" class="tick" text-anchor="middle">R3</text><rect x="339" y="235.06666666666666" width="46" height="27.433333333333337" rx="3" class="bug"><title>Round 4: 7 bug</title></rect><rect x="339" y="197.86666666666667" width="46" height="35.69999999999999" rx="3" class="confusing"><title>Round 4: 9 confusing</title></rect><text x="362" y="190.86666666666667" class="val" text-anchor="middle">16</text><text x="362" y="284" class="tick" text-anchor="middle">R4</text><rect x="431" y="259.8666666666667" width="46" height="2.6333333333333258" rx="3" class="blocker"><title>Round 5: 1 blocker</title></rect><rect x="431" y="235.06666666666666" width="46" height="23.30000000000001" rx="3" class="confusing"><title>Round 5: 6 confusing</title></rect><text x="454" y="228.06666666666666" class="val" text-anchor="middle">7</text><text x="454" y="284" class="tick" text-anchor="middle">R5</text><rect x="523" y="259.8666666666667" width="46" height="2.6333333333333258" rx="3" class="bug"><title>Round 6: 1 bug</title></rect><rect x="523" y="230.93333333333334" width="46" height="27.433333333333337" rx="3" class="confusing"><title>Round 6: 7 confusing</title></rect><text x="546" y="223.93333333333334" class="val" text-anchor="middle">8</text><text x="546" y="284" class="tick" text-anchor="middle">R6</text><rect x="615" y="239.20000000000002" width="46" height="23.299999999999983" rx="3" class="confusing"><title>Round 7: 6 confusing</title></rect><text x="638" y="232.20000000000002" class="val" text-anchor="middle">6</text><text x="638" y="284" class="tick" text-anchor="middle">R7</text><rect x="707" y="230.93333333333334" width="46" height="31.566666666666663" rx="3" class="confusing"><title>Round 8: 8 confusing</title></rect><text x="730" y="223.93333333333334" class="val" text-anchor="middle">8</text><text x="730" y="284" class="tick" text-anchor="middle">R8</text><rect x="799" y="239.20000000000002" width="46" height="23.299999999999983" rx="3" class="confusing"><title>Round 9: 6 confusing</title></rect><text x="822" y="232.20000000000002" class="val" text-anchor="middle">6</text><text x="822" y="284" class="tick" text-anchor="middle">R9</text><rect x="891" y="255.73333333333335" width="46" height="6.7666666666666515" rx="3" class="confusing"><title>Round 10: 2 confusing</title></rect><text x="914" y="248.73333333333335" class="val" text-anchor="middle">2</text><text x="914" y="284" class="tick" text-anchor="middle">R10</text></svg></section>
+<article class="round" id="r1">
+  <header><div class="num">1</div><div><p class="date">Round 1 · 2026-10-30</p><h2>First contact: personas click everything</h2></div>
+    <div class="sums"><span class="chip blocker">1 blocker</span><span class="chip bug">17 bug</span><span class="chip confusing">40 confusing</span></div></header>
+  <p class="setup">Five Sonnet testers given only the server's address: a first-time visitor, a student on a phone writing Chinese with a NT$ budget, an organizer who checks every number, a hackathon judge, and an outside AI agent finding its own way in. Plus a scripted security check.</p>
+  <table><thead><tr><th>Tester</th><th>Played</th><th>Via</th><th class="n">Blocker</th><th class="n">Bug</th><th class="n">Confusing</th></tr></thead><tbody>
+  <tr><td><a href="nina.md">Nina</a></td><td>first-time visitor, laptop</td><td><span class="via">website</span></td><td class="n">0</td><td class="n warm">7</td><td class="n">11</td></tr>
+  <tr><td><a href="weiting.md">Weiting</a></td><td>student in Taipei, phone, Chinese</td><td><span class="via">website</span></td><td class="n hot">1</td><td class="n warm">5</td><td class="n">5</td></tr>
+  <tr><td><a href="omar.md">Omar</a></td><td>organizer who fronts the money</td><td><span class="via">website</span></td><td class="n">0</td><td class="n warm">4</td><td class="n">9</td></tr>
+  <tr><td><a href="judge.md">Judge</a></td><td>hackathon judge with 10 minutes, then a venue</td><td><span class="via">website</span></td><td class="n">0</td><td class="n">0</td><td class="n">10</td></tr>
+  <tr><td><a href="mei-agent.md">Mei's agent</a></td><td>outside AI agent</td><td><span class="via">REST</span></td><td class="n">0</td><td class="n warm">1</td><td class="n">5</td></tr>
+  </tbody></table>
+  <p class="extra">Security script: 17 of 17 attacks refused (limits can't be raised with a token, read-only tokens can't negotiate, tampered mandates and forged sign-ins refused).</p>
+  <div class="two"><div><h3>What happened</h3><p>Agents had no front door; an agent without pay permission could trigger a PayPal hold; a NT$ budget was ignored; the map was a drawing.</p></div>
+    <div><h3>What we fixed after</h3><ul><li>/llms.txt, /.well-known/mcp.json and an agents box on sign-in</li><li>Guarantee waits for the person unless the agent may pay</li><li>NT$ budgets understood</li><li>Real OpenStreetMap map</li><li>Phone tab bar, English/中文 switch</li></ul></div></div>
+</article>
+<article class="round" id="r2">
+  <header><div class="num">2</div><div><p class="date">Round 2 · 2026-10-30</p><h2>Same personas, after the fixes</h2></div>
+    <div class="sums"><span class="chip blocker zero">0 blocker</span><span class="chip bug">6 bug</span><span class="chip confusing">11 confusing</span></div></header>
+  <p class="setup">New accounts for three of the round-1 personas; Mei's agent now over MCP.</p>
+  <table><thead><tr><th>Tester</th><th>Played</th><th>Via</th><th class="n">Blocker</th><th class="n">Bug</th><th class="n">Confusing</th></tr></thead><tbody>
+  <tr><td><a href="mei-agent2.md">Mei's agent</a></td><td>outside AI agent</td><td><span class="via">MCP</span></td><td class="n">0</td><td class="n">0</td><td class="n">3</td></tr>
+  <tr><td><a href="weiting2.md">Weiting</a></td><td>student, phone, Chinese</td><td><span class="via">website</span></td><td class="n">0</td><td class="n warm">3</td><td class="n">4</td></tr>
+  <tr><td><a href="nina2.md">Nina</a></td><td>first-time visitor</td><td><span class="via">website</span></td><td class="n">0</td><td class="n warm">3</td><td class="n">4</td></tr>
+  </tbody></table>
+  
+  <div class="two"><div><h3>What happened</h3><p>The PayPal hold, the entry points and NT$ were confirmed fixed. A stalled background tick was found while waiting for a venue payout.</p></div>
+    <div><h3>What we fixed after</h3><ul><li>find_options honours date over MCP</li><li>PayPal calls time out; no booking blocks the others</li><li>More Chinese, Plans refresh on new activity</li></ul></div></div>
+</article>
+<article class="round" id="r3">
+  <header><div class="num">3</div><div><p class="date">Round 3 · 2026-10-30</p><h2>Only the address, one interface each</h2></div>
+    <div class="sums"><span class="chip blocker zero">0 blocker</span><span class="chip bug zero">0 bug</span><span class="chip confusing">17 confusing</span></div></header>
+  <p class="setup">Three agents, each with one sentence from their person: MCP (badminton for four, may pay), REST (NT$400, Chinese, agree but don't pay), A2A (read only, report the worst case).</p>
+  <table><thead><tr><th>Tester</th><th>Played</th><th>Via</th><th class="n">Blocker</th><th class="n">Bug</th><th class="n">Confusing</th></tr></thead><tbody>
+  <tr><td><a href="round3-kai-mcp.md">Kai's agent</a></td><td>books and verifies the receipt</td><td><span class="via">MCP</span></td><td class="n">0</td><td class="n">0</td><td class="n">5</td></tr>
+  <tr><td><a href="round3-yuhan-rest.md">Yuhan's agent</a></td><td>agrees, doesn't pay</td><td><span class="via">REST</span></td><td class="n">0</td><td class="n">0</td><td class="n">8</td></tr>
+  <tr><td><a href="round3-ola-a2a.md">Ola's agent</a></td><td>read only</td><td><span class="via">A2A</span></td><td class="n">0</td><td class="n">0</td><td class="n">4</td></tr>
+  </tbody></table>
+  
+  <div class="two"><div><h3>What happened</h3><p>All three got in from /llms.txt alone. Kai's agent booked, paid, locked, and checked the receipt's signature with its own code.</p></div>
+    <div><h3>What we fixed after</h3><ul><li>Simulated residents answer invitations</li><li>Replies come after the guarantee they triggered</li><li>Town time zone and currency in whoami</li></ul></div></div>
+</article>
+<article class="round" id="r4">
+  <header><div class="num">4</div><div><p class="date">Round 4 · 2026-10-31</p><h2>Four friends plan together, each through their own agent</h2></div>
+    <div class="sums"><span class="chip blocker zero">0 blocker</span><span class="chip bug">7 bug</span><span class="chip confusing">9 confusing</span></div></header>
+  <p class="setup">One crew: Ana's agent organizes (MCP), Bo's agent joins if ≤ $12 (REST), Chen's agent asks to pay $1 less (A2A), 小美 on her phone in Chinese. A fifth tester checks earlier fixes.</p>
+  <table><thead><tr><th>Tester</th><th>Played</th><th>Via</th><th class="n">Blocker</th><th class="n">Bug</th><th class="n">Confusing</th></tr></thead><tbody>
+  <tr><td><a href="round4-ana.md">Ana's agent</a></td><td>organizer</td><td><span class="via">MCP</span></td><td class="n">0</td><td class="n">0</td><td class="n">3</td></tr>
+  <tr><td><a href="round4-bo.md">Bo's agent</a></td><td>friend</td><td><span class="via">REST</span></td><td class="n">0</td><td class="n">0</td><td class="n">1</td></tr>
+  <tr><td><a href="round4-chen.md">Chen's agent</a></td><td>friend who haggles his share</td><td><span class="via">A2A</span></td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+  <tr><td><a href="round4-xiaomei.md">小美</a></td><td>person on a phone</td><td><span class="via">website</span></td><td class="n">0</td><td class="n warm">3</td><td class="n">2</td></tr>
+  <tr><td><a href="round4-verify.md">Verifier</a></td><td>checks earlier fixes</td><td><span class="via">website</span></td><td class="n">0</td><td class="n warm">4</td><td class="n">3</td></tr>
+  </tbody></table>
+  
+  <div class="two"><div><h3>What happened</h3><p>Karaoke at Echo Karaoke, $29.40, locked. Chen paid $1 less and Ana covered it; the shares added up exactly.</p></div>
+    <div><h3>What we fixed after</h3><ul><li>Everyone sees agreed share changes</li><li>Invitation badge and Chinese invitation card</li><li>Crew invite links /j/&lt;code&gt;</li></ul></div></div>
+</article>
+<article class="round" id="r5">
+  <header><div class="num">5</div><div><p class="date">Round 5 · 2026-10-31</p><h2>Friends join from an invite link alone</h2></div>
+    <div class="sums"><span class="chip blocker">1 blocker</span><span class="chip bug zero">0 bug</span><span class="chip confusing">6 confusing</span></div></header>
+  <p class="setup">Ana made her account; Bo's and Chen's agents got nothing but her crew's invite link. Ana wanted close, quiet and ≤ $12 each.</p>
+  <table><thead><tr><th>Tester</th><th>Played</th><th>Via</th><th class="n">Blocker</th><th class="n">Bug</th><th class="n">Confusing</th></tr></thead><tbody>
+  <tr><td><a href="round5-ana.md">Ana's agent</a></td><td>organizer</td><td><span class="via">MCP</span></td><td class="n">0</td><td class="n">0</td><td class="n">2</td></tr>
+  <tr><td><a href="round5-bo.md">Bo's agent</a></td><td>from the link alone</td><td><span class="via">REST</span></td><td class="n">0</td><td class="n">0</td><td class="n">2</td></tr>
+  <tr><td><a href="round5-chen.md">Chen's agent</a></td><td>from the link alone</td><td><span class="via">REST</span></td><td class="n hot">1</td><td class="n">0</td><td class="n">2</td></tr>
+  </tbody></table>
+  
+  <div class="two"><div><h3>What happened</h3><p>No sign-up for anyone. Ana's agent dropped karaoke for its 'noisy' complaints and booked board games, $22.00, locked.</p></div>
+    <div><h3>What we fixed after</h3><ul><li>pay_my_share checks a stated amount</li><li>wait_for_news instead of polling</li><li>Fits count complaints as well as praise</li></ul></div></div>
+</article>
+<article class="round" id="r6">
+  <header><div class="num">6</div><div><p class="date">Round 6 · 2026-10-31</p><h2>Real people, matched by where they live</h2></div>
+    <div class="sums"><span class="chip blocker zero">0 blocker</span><span class="chip bug">1 bug</span><span class="chip confusing">7 confusing</span></div></header>
+  <p class="setup">No made-up town. Ana near 大安站, Bo (invite link only) near 科技大樓站, Chen a stranger near 忠孝復興站 who opted in to nearby invites. Real KTVs from OpenStreetMap; one sandbox KTV on Join.</p>
+  <table><thead><tr><th>Tester</th><th>Played</th><th>Via</th><th class="n">Blocker</th><th class="n">Bug</th><th class="n">Confusing</th></tr></thead><tbody>
+  <tr><td><a href="round6-ana.md">Ana's agent</a></td><td>organizer</td><td><span class="via">MCP</span></td><td class="n">0</td><td class="n">0</td><td class="n">2</td></tr>
+  <tr><td><a href="round6-bo.md">Bo's agent</a></td><td>crew, from the link</td><td><span class="via">REST</span></td><td class="n">0</td><td class="n warm">1</td><td class="n">3</td></tr>
+  <tr><td><a href="round6-chen.md">Chen's agent</a></td><td>nearby stranger</td><td><span class="via">REST</span></td><td class="n">0</td><td class="n">0</td><td class="n">2</td></tr>
+  </tbody></table>
+  
+  <div class="two"><div><h3>What happened</h3><p>Matched Bo (crew) and Chen (nearby), listed real KTVs 9–14 min away, refused a share over Ana's $15, booked $30 for an hour: $10 each, locked.</p></div>
+    <div><h3>What we fixed after</h3><ul><li>Invitations say why you were invited</li><li>Bookings say where: address, map, your trip</li><li>What would bring an over-budget share down</li></ul></div></div>
+</article>
+<article class="round" id="r7">
+  <header><div class="num">7</div><div><p class="date">Round 7 · 2026-10-31</p><h2>List everything you had to guess</h2></div>
+    <div class="sums"><span class="chip blocker zero">0 blocker</span><span class="chip bug zero">0 bug</span><span class="chip confusing">6 confusing</span></div></header>
+  <p class="setup">Same three people. New question for every agent: list every answer, field or message you had to guess about.</p>
+  <table><thead><tr><th>Tester</th><th>Played</th><th>Via</th><th class="n">Blocker</th><th class="n">Bug</th><th class="n">Confusing</th></tr></thead><tbody>
+  <tr><td><a href="round7-ana.md">Ana's agent</a></td><td>organizer</td><td><span class="via">MCP</span></td><td class="n">0</td><td class="n">0</td><td class="n">3</td></tr>
+  <tr><td><a href="round7-bo.md">Bo's agent</a></td><td>crew, from the link</td><td><span class="via">REST</span></td><td class="n">0</td><td class="n">0</td><td class="n">2</td></tr>
+  <tr><td><a href="round7-chen.md">Chen's agent</a></td><td>nearby stranger</td><td><span class="via">REST</span></td><td class="n">0</td><td class="n">0</td><td class="n">1</td></tr>
+  </tbody></table>
+  
+  <div class="two"><div><h3>What happened</h3><p>Two people both called Ana; UTC next to local times; no address; an invitee couldn't tell whether he could be found.</p></div>
+    <div><h3>What we fixed after</h3><ul><li>Same names told apart by where they live</li><li>whoami says how a person can be found</li><li>Every time also in local time</li></ul></div></div>
+</article>
+<article class="round" id="r8">
+  <header><div class="num">8</div><div><p class="date">Round 8 · 2026-10-31</p><h2>Anything still unclear?</h2></div>
+    <div class="sums"><span class="chip blocker zero">0 blocker</span><span class="chip bug zero">0 bug</span><span class="chip confusing">8 confusing</span></div></header>
+  <p class="setup">Same three people; each brief lists last round's confusions to check.</p>
+  <table><thead><tr><th>Tester</th><th>Played</th><th>Via</th><th class="n">Blocker</th><th class="n">Bug</th><th class="n">Confusing</th></tr></thead><tbody>
+  <tr><td><a href="round8-ana.md">Anna's agent</a></td><td>organizer</td><td><span class="via">MCP</span></td><td class="n">0</td><td class="n">0</td><td class="n">3</td></tr>
+  <tr><td><a href="round8-bo.md">Bo's agent</a></td><td>crew, from the link</td><td><span class="via">REST</span></td><td class="n">0</td><td class="n">0</td><td class="n">2</td></tr>
+  <tr><td><a href="round8-chen.md">Chen-Wei's agent</a></td><td>nearby stranger</td><td><span class="via">REST</span></td><td class="n">0</td><td class="n">0</td><td class="n">3</td></tr>
+  </tbody></table>
+  
+  <div class="two"><div><h3>What happened</h3><p>Haggled $30 → $28, about $9.33 each, locked. Round 7's confusions all clear or not seen.</p></div>
+    <div><h3>What we fixed after</h3><ul><li>Options spread over the days, with why a day is missing</li><li>Every booking state says what it means</li><li>nextStep says what is true now</li></ul></div></div>
+</article>
+<article class="round" id="r9">
+  <header><div class="num">9</div><div><p class="date">Round 9 · 2026-10-31</p><h2>Checking the fixes</h2></div>
+    <div class="sums"><span class="chip blocker zero">0 blocker</span><span class="chip bug zero">0 bug</span><span class="chip confusing">6 confusing</span></div></header>
+  <p class="setup">Same three people, fresh accounts.</p>
+  <table><thead><tr><th>Tester</th><th>Played</th><th>Via</th><th class="n">Blocker</th><th class="n">Bug</th><th class="n">Confusing</th></tr></thead><tbody>
+  <tr><td><a href="round9-ana.md">Anna's agent</a></td><td>organizer</td><td><span class="via">MCP</span></td><td class="n">0</td><td class="n">0</td><td class="n">3</td></tr>
+  <tr><td><a href="round9-bo.md">Bo's agent</a></td><td>crew, from the link</td><td><span class="via">REST</span></td><td class="n">0</td><td class="n">0</td><td class="n">1</td></tr>
+  <tr><td><a href="round9-chen.md">Chen-Wei's agent</a></td><td>nearby stranger</td><td><span class="via">REST</span></td><td class="n">0</td><td class="n">0</td><td class="n">2</td></tr>
+  </tbody></table>
+  
+  <div class="two"><div><h3>What happened</h3><p>$29 on Sunday, locked within seconds. Left: &quot;is the other person real?&quot; — &quot;demo account&quot; read as &quot;maybe not a person&quot;.</p></div>
+    <div><h3>What we fixed after</h3><ul><li>realPerson and identityChecked said outright</li><li>Payment statuses explained</li><li>Odd cents explained</li></ul></div></div>
+</article>
+<article class="round" id="r10">
+  <header><div class="num">10</div><div><p class="date">Round 10 · 2026-10-31</p><h2>Nearly nothing left to guess</h2></div>
+    <div class="sums"><span class="chip blocker zero">0 blocker</span><span class="chip bug zero">0 bug</span><span class="chip confusing">2 confusing</span></div></header>
+  <p class="setup">Same three people, fresh accounts.</p>
+  <table><thead><tr><th>Tester</th><th>Played</th><th>Via</th><th class="n">Blocker</th><th class="n">Bug</th><th class="n">Confusing</th></tr></thead><tbody>
+  <tr><td><a href="round10-ana.md">Anna's agent</a></td><td>organizer</td><td><span class="via">MCP</span></td><td class="n">0</td><td class="n">0</td><td class="n">1</td></tr>
+  <tr><td><a href="round10-bo.md">Bo's agent</a></td><td>crew, from the link</td><td><span class="via">REST</span></td><td class="n">0</td><td class="n">0</td><td class="n">1</td></tr>
+  <tr><td><a href="round10-chen.md">Chen-Wei's agent</a></td><td>nearby stranger</td><td><span class="via">REST</span></td><td class="n">0</td><td class="n">0</td><td class="n">0</td></tr>
+  </tbody></table>
+  
+  <div class="two"><div><h3>What happened</h3><p>$28 on Sunday, locked; nobody asked to sign up. Every round-9 confusion reported clear.</p></div>
+    <div><h3>What we fixed after</h3><ul><li>Odd-cent note in the invitation too</li><li>Your own searches aren't news</li></ul></div></div>
+</article>
+<footer>Each tester's full report is linked by name. The write-up with every fix is <a href="../live-testing.md">live-testing.md</a>. Built from rounds.json by build.mjs.</footer>
+</main></body></html>

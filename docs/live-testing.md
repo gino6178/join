@@ -5,6 +5,9 @@ Claude Sonnet agents at its address, each playing a different kind of user. They
 source code, no docs from the repository, no accounts made for them. Each wrote a report, kept here in
 [`live-test/`](live-test/), ending with a verdict line. We fixed what they found and sent a second round.
 
+All rounds at a glance, with a chart of what each round found: [`live-test/index.html`](live-test/index.html)
+(built from [`live-test/rounds.json`](live-test/rounds.json) by `node docs/live-test/build.mjs`; add each new round there).
+
 ## Round 1
 
 | Tester | Played | Verdict |
